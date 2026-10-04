@@ -67,6 +67,28 @@ Danach startet die App von selbst neu. Auf dem iPhone: Teilen → „Zum Home-Bi
 
 **Lieber ohne Assistent?** `RAHMEN_IMMICH_URL` und `RAHMEN_IMMICH_KEY` in die `.env` eintragen. Werte aus der `.env` haben immer Vorrang vor dem Assistenten.
 
+## Was kann als Bilderrahmen dienen?
+Jedes Gerät mit einem **Webbrowser**, das eine Adresse öffnen kann. Ein **Kiosk-Modus** (Vollbild, Bildschirm bleibt an, nichts anderes erreichbar) ist nicht nötig, aber empfehlenswert.
+
+| Gerät | So geht es |
+|---|---|
+| **Raspberry Pi + beliebiger Monitor/Fernseher** (günstigste Dauerlösung) | `./examples/raspberry-pi/setup-kiosk.sh http://<server>:8090/tv/` – installiert Chromium im Kiosk-Modus und startet es beim Einschalten (siehe unten) |
+| **Android-Tablet oder altes Handy** | [Fully Kiosk](https://www.fully-kiosk.com) (einmalig ca. 8 €; nötig für die Fernsteuerung von Nachtruhe und Akku) oder kostenlos: Chrome → Adresse öffnen → „Zum Startbildschirm hinzufügen“ → von dort öffnen (Vollbild) und die Bildschirm-Auszeit auf „nie“ stellen |
+| **iPad / altes iPhone** | Safari → Adresse öffnen → Teilen → „Zum Home-Bildschirm“; als Kiosk-Modus den **Geführten Zugriff** nutzen (Einstellungen → Bedienungshilfen) und die Auto-Sperre auf „Nie“ stellen |
+| **Fernseher, Fire TV, Android TV, Chromecast mit Google TV, Shield** | Browser öffnen, Adresse eingeben, als Lesezeichen speichern |
+| **Alter Laptop / Mini-PC** | Chrome mit `--kiosk <Adresse>` im Autostart |
+
+Die Adresse `http://<server>:8090/tv/` **ohne** `?ziel=…` öffnen, um das Gerät per Code zu koppeln: Es zeigt einen Code (und einen QR-Code), den du in der App unter **📡 Geräte** eingibst und dabei wählst, welcher Fernseher/Rahmen es ist.
+
+**Nicht möglich:** fertige Rahmen mit geschlossener Software (z. B. Aura, Skylight, Nixplay, Pix-Star, Frameo). Sie nehmen Fotos nur über ihre eigene App oder per E-Mail an und lassen keine freie Adresse zu.
+
+### Raspberry Pi in 5 Minuten
+1. **Raspberry Pi OS mit Desktop** aufspielen (Raspberry Pi Imager), dort WLAN/SSH einrichten, starten und automatisch am Desktop anmelden lassen.
+2. Auf dem Pi im Terminal: `curl -O https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/examples/raspberry-pi/setup-kiosk.sh && chmod +x setup-kiosk.sh && ./setup-kiosk.sh http://<server>:8090/tv/`
+3. `sudo reboot`. Der Pi startet im Vollbild und zeigt den Kopplungs-Code. Entfernen: `./setup-kiosk.sh --entfernen`.
+
+*Das Raspberry-Pi-Skript ist für Raspberry Pi OS (Bookworm) geschrieben, aber nicht auf jedem Pi-Modell getestet – Rückmeldungen sind willkommen.*
+
 ## Fernseher einrichten
 1. In der `.env`: `RAHMEN_WEB_TV_ZIELE=wohnzimmer=Wohnzimmer` (`kennung=Anzeigename`, bei mehreren Fernsehern kommagetrennt).
 2. `docker compose up -d`

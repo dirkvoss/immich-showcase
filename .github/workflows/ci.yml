@@ -31,6 +31,7 @@ jobs:
           rm .env
           (cd examples/immich-stack && DB_PASSWORD=x docker compose config -q)
           bash -n install.sh
+          bash -n examples/raspberry-pi/setup-kiosk.sh
 
   integration:
     # Echtes Immich (ohne Machine Learning) mit erfundenen Fotos/Personen/Konten: Immich Showcase verbindet sich, postdeploy.py + Zusatzpruefungen.

@@ -67,6 +67,28 @@ The app restarts by itself. On an iPhone: Share → "Add to Home Screen".
 
 **Prefer no wizard?** Put `RAHMEN_IMMICH_URL` and `RAHMEN_IMMICH_KEY` into `.env`. Values in `.env` always win over the wizard.
 
+## What can be used as a picture frame?
+Any device with a **web browser** that can open an address. A **kiosk mode** (full screen, screen stays on, nothing else reachable) is not required but recommended.
+
+| Device | How |
+|---|---|
+| **Raspberry Pi + any monitor/TV** (cheapest permanent solution) | `./examples/raspberry-pi/setup-kiosk.sh http://<server>:8090/tv/` – installs Chromium in kiosk mode and starts it on power-up (see below) |
+| **Android tablet or old phone** | [Fully Kiosk](https://www.fully-kiosk.com) (about 8 € once; needed for the remote control of night mode and battery), or free: Chrome → open the address → "Add to Home screen" → open it from there (full screen) and set the screen timeout to "never" |
+| **iPad / old iPhone** | Safari → open the address → Share → "Add to Home Screen"; use **Guided Access** (Settings → Accessibility → Guided Access) as kiosk mode and set Auto-Lock to "Never" |
+| **TV, Fire TV, Android TV, Chromecast with Google TV, Shield** | open the browser, enter the address, bookmark it |
+| **Old laptop / mini PC** | Chrome with `--kiosk <address>` in autostart |
+
+Use `http://<server>:8090/tv/` **without** `?ziel=…` to pair the device by code: it shows a code (and a QR code), you enter it in the app under **📡 Devices** and choose which TV/frame it is.
+
+**Not supported:** ready-made frames with closed software (for example Aura, Skylight, Nixplay, Pix-Star, Frameo). They accept photos only through their own app or e-mail and do not let you open an address.
+
+### Raspberry Pi in 5 minutes
+1. Flash **Raspberry Pi OS with desktop** (Raspberry Pi Imager), enable Wi-Fi/SSH there, boot, let it log in to the desktop automatically.
+2. On the Pi, in a terminal: `curl -O https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/examples/raspberry-pi/setup-kiosk.sh && chmod +x setup-kiosk.sh && ./setup-kiosk.sh http://<server>:8090/tv/`
+3. `sudo reboot`. The Pi starts full screen and shows the pairing code. Remove again with `./setup-kiosk.sh --entfernen`.
+
+*The Raspberry Pi script was written for Raspberry Pi OS (Bookworm) but has not been tested on every Pi model – feedback is welcome.*
+
 ## Set up a TV
 1. In `.env`: `RAHMEN_WEB_TV_ZIELE=livingroom=Living room` (`id=Display name`, comma-separated for several TVs).
 2. `docker compose up -d`
