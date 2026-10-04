@@ -38,6 +38,7 @@ The picture frame (continuous programme with blurred background, date, place and
 - For the picture frame: a **tablet** (or any device with a browser). For the TV: a TV with a web browser.
 
 ## Installation (about 5 minutes)
+Shortcut: `./install.sh` (or `./install.sh --with-immich` if you have no Immich yet) does the steps below for you.
 
 ```bash
 git clone https://github.com/dirkvoss/immich-showcase.git
@@ -76,6 +77,23 @@ The app restarts by itself. On an iPhone: Share → "Add to Home Screen".
 3. `docker compose up -d`
 4. On the tablet, open `http://<server>:8090/tv/?ziel=frame` in full screen – or set it as the start page of Fully Kiosk.
    *Tip (Fully Kiosk):* if you use it as the **screensaver**, enter the address as the screensaver playlist item and restart the app once – Fully Kiosk only reads changes to the playlist after a restart.
+
+## Pair devices by code (no typing of addresses)
+1. On the TV or tablet, open **`http://<server>:8090/tv/`** (no `?ziel=`). It shows a 6-character **code** and a **QR code**.
+2. In the app tap **📡 Devices**, enter the code (or scan the QR code with your phone camera – the code is filled in), choose which TV/frame this is, tap **Pair**.
+3. The device remembers its role. From then on `/tv/` alone is enough. (The TVs and frames themselves are still defined in `.env`, see below.)
+
+## The Devices view
+**📡 Devices** in the app lists every TV and frame: online or offline, what is playing, how long the current picture has been shown, and when it was last seen.
+
+## Several frames, schedules, "on this day"
+- **Own programme per frame:** `RAHMEN_WEB_RAHMEN_QUELLEN_FLUR=<album-id>:70, neu14:30` (the id in capitals) – see `.env.example`.
+- **Schedule:** `RAHMEN_WEB_RAHMEN_ZEITPLAN=Mo-Fr 18:00-22:00 = <album-id>:1; Sa,So 08:00-20:00 = heute:50, *:50` – different sources at different times (also per frame, ranges across midnight allowed).
+- **On this day:** the source `heute` (or `heute5` = ±5 days) shows photos taken on this day in earlier years.
+- **Weather and appointments** at the top right of the frame: `RAHMEN_WEB_WETTER_ORT=52.52,13.40` (open-meteo.com, free, no account – your **server** asks, only the coordinates are sent) and `RAHMEN_WEB_KALENDER_URL=<iCalendar link>` (Google/Nextcloud/Apple "secret iCal address"; simple daily/weekly/yearly repeats are understood). Only what you configure appears.
+
+## Quick install helper
+`./install.sh` starts Immich Showcase and prints the address and setup code. **No Immich yet?** `./install.sh --with-immich` starts **Immich and Immich Showcase together** (see `examples/immich-stack/`).
 
 ## Daily use
 1. Open the app on your phone and sign in (PIN, or your Immich account if you set `RAHMEN_WEB_AUTH=immich`).
@@ -128,14 +146,13 @@ The interface and the sentence search work in **German, English, Spanish, French
 
 ## Limitations
 - Without database access, the motif search ("on the beach") takes the best 60 ranked hits instead of checking similarity exactly. Filters are slightly slower but equivalent. Database access is optional (`RAHMEN_DB_DSN`).
-- No pairing by QR code yet: the address has to be entered on each device once.
 - No music is bundled.
 
 ## Development
 `pip install -r requirements-dev.txt && python -m pytest`. Releases are built by GitHub Actions from version tags; see [RELEASING.md](RELEASING.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Third-party parts
-Font *Cormorant Garamond* (SIL OFL 1.1). The logo is original. No music in the repository.
+Font *Cormorant Garamond* (SIL OFL 1.1). QR code generator *qrcode-generator* by Kazuhiko Arase (MIT, `static/qrcode.js`). The logo is original. No music in the repository.
 
 ## License
 [GNU Affero General Public License v3.0 or later](LICENSE) (AGPL-3.0-or-later), like Immich itself. If you run a modified version as a service for others, you must make your changes available. Font: see `static/fonts/OFL.txt`.

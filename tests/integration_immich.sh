@@ -22,6 +22,12 @@ fail() {
 }
 
 echo "== Immich $IMV starten"
+# Images laden mit Wiederholung: die Registry begrenzt anonyme Downloads von gemeinsam genutzten CI-Rechnern ("toomanyrequests")
+for versuch in 1 2 3 4; do
+  docker compose -p "$P" -f dev/docker-compose.immich.yml pull -q >/dev/null 2>&1 && break
+  [[ $versuch == 4 ]] && echo "Images konnten nicht geladen werden" >&2
+  sleep $((versuch * 20))
+done
 docker compose -p "$P" -f dev/docker-compose.immich.yml up -d >/dev/null
 for _ in $(seq 1 90); do curl -fs "http://127.0.0.1:$PORT/api/server/version" >/dev/null 2>&1 && break; sleep 2; done
 curl -fs "http://127.0.0.1:$PORT/api/server/version" | grep -q major && ok "Immich antwortet: $(curl -s http://127.0.0.1:$PORT/api/server/version)" || fail "Immich startet nicht"

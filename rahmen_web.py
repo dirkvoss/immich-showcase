@@ -542,7 +542,8 @@ def konfig():
     return {"name": APP_NAME, "version": VERSION, "modus": MODUS, "auth": AUTH, "musik_upload": MUSIK_UPLOAD, "konfiguriert": konfiguriert(), "tv_url": TV_URL, "beispiele": BEISPIELE, "beispiele_en": BEISPIELE_EN,
             "ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT and k not in RAHMEN_ZIELE},
             "rahmen": list(RAHMEN_ZIELE), "rahmen_sek": RAHMEN_SEK, "rahmen_fuellung": RAHMEN_FUELLUNG, "tv_fuellung": TV_FUELLUNG,
-            "rahmen_anzeige": RAHMEN_ANZEIGE, "rahmen_nacht": RAHMEN_NACHT}
+            "rahmen_anzeige": RAHMEN_ANZEIGE, "rahmen_nacht": RAHMEN_NACHT, "rahmen_zusatz": ZUSATZ, "koppeln": True,
+            "alle_ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT}}
 
 
 # --------------------------------------------------------------------------- Einrichtungsassistent (nur solange nicht eingerichtet)
@@ -1528,10 +1529,83 @@ def tv_ziel(z):
     return TV[z]
 
 
-def rahmen_quellen():
-    """[{'typ': 'album'|'neu'|'alle'|'alben', 'gewicht': float, ...}] aus der Konfiguration."""
+TAGE = {"mo": 0, "di": 1, "mi": 2, "do": 3, "fr": 4, "sa": 5, "so": 6, "mon": 0, "tue": 1, "wed": 2, "thu": 3, "fri": 4, "sat": 5, "sun": 6}
+
+
+def _tage_lesen(text):
+    """'Mo-Fr' | 'Sa,So' | 'taeglich' -> Menge von Wochentagen (0 = Montag); None bei Unsinn."""
+    text = text.strip().lower().replace("ä", "ae")
+    if text in ("taeglich", "daily", "alle", "*"):
+        return set(range(7))
+    tage = set()
+    for teil in text.split(","):
+        teil = teil.strip()
+        if "-" in teil:
+            a, _, b = teil.partition("-")
+            if a.strip() not in TAGE or b.strip() not in TAGE:
+                return None
+            i, j = TAGE[a.strip()], TAGE[b.strip()]
+            while True:
+                tage.add(i)
+                if i == j:
+                    break
+                i = (i + 1) % 7
+        elif teil in TAGE:
+            tage.add(TAGE[teil])
+        else:
+            return None
+    return tage or None
+
+
+def zeitplan_lesen(text):
+    """'Mo-Fr 18:00-22:00 = <quellen>; Sa,So 08:00-20:00 = *' -> [(tage, von_minuten, bis_minuten, [quellen])]. Unlesbare Eintraege werden uebersprungen."""
+    regeln = []
+    for eintrag in (text or "").split(";"):
+        links, _, rechts = eintrag.partition("=")
+        m = re.fullmatch(r"\s*(?P<t>[^\d]+?)\s+(?P<v>\d{1,2}):(?P<vm>\d{2})\s*-\s*(?P<b>\d{1,2}):(?P<bm>\d{2})\s*", links)
+        quellen = [x.strip() for x in rechts.split(",") if x.strip()]
+        tage = _tage_lesen(m.group("t")) if m else None
+        if not m or not tage or not quellen:
+            if eintrag.strip():
+                H.log.warning("Zeitplan: Eintrag nicht lesbar: %r", eintrag.strip())
+            continue
+        regeln.append((tage, int(m.group("v")) * 60 + int(m.group("vm")), int(m.group("b")) * 60 + int(m.group("bm")), quellen))
+    return regeln
+
+
+def zeitplan_quellen(regeln, jetzt):
+    """Quellen der ersten passenden Regel (Bereiche ueber Mitternacht zaehlen zum Starttag) oder None."""
+    tag, minute = jetzt.weekday(), jetzt.hour * 60 + jetzt.minute
+    for tage, von, bis, quellen in regeln:
+        if von <= bis:
+            ok = tag in tage and von <= minute < bis
+        else:
+            ok = (tag in tage and minute >= von) or (((tag - 1) % 7) in tage and minute < bis)
+        if ok:
+            return quellen
+    return None
+
+
+def _je_rahmen(basis, ziel):
+    """Einstellung fuer einen bestimmten Rahmen (RAHMEN_WEB_..._<ZIEL>), sonst die allgemeine."""
+    if ziel and re.fullmatch(r"[a-z0-9]+", ziel):
+        wert = os.environ.get(f"{basis}_{ziel.upper()}")
+        if wert is not None and wert.strip():
+            return wert
+    return os.environ.get(basis, "")
+
+
+def rahmen_quellen(ziel=None, jetzt=None):
+    """[{'typ': 'album'|'neu'|'heute'|'alle'|'alben', 'gewicht': float, ...}] aus der Konfiguration (je Rahmen und nach Zeitplan)."""
+    roh = None
+    plan = zeitplan_lesen(_je_rahmen("RAHMEN_WEB_RAHMEN_ZEITPLAN", ziel))
+    if plan:
+        roh = zeitplan_quellen(plan, jetzt or datetime.datetime.now())
+    if roh is None:
+        eigene = os.environ.get(f"RAHMEN_WEB_RAHMEN_QUELLEN_{ziel.upper()}", "") if ziel and re.fullmatch(r"[a-z0-9]+", ziel) else ""
+        roh = [x.strip() for x in eigene.split(",") if x.strip()] if eigene.strip() else RAHMEN_QUELLEN_ROH
     quellen = []
-    for e in RAHMEN_QUELLEN_ROH:
+    for e in roh:
         name, _, gw = e.partition(":")
         try:
             gewicht = max(0.0, float(gw)) if gw else 1.0
@@ -1541,12 +1615,42 @@ def rahmen_quellen():
             quellen.append({"typ": "alle", "gewicht": gewicht})
         elif re.fullmatch(r"neu\d{1,3}", name):
             quellen.append({"typ": "neu", "tage": int(name[3:]), "gewicht": gewicht})
+        elif re.fullmatch(r"heute\d{0,2}", name):
+            quellen.append({"typ": "heute", "tage": int(name[5:] or 2), "gewicht": gewicht})
         elif re.fullmatch(r"[0-9a-f-]{36}", name):
             quellen.append({"typ": "album", "id": name, "gewicht": gewicht})
     quellen = [q for q in quellen if q["gewicht"] > 0]
     if not quellen:
         quellen = [{"typ": "alben", "gewicht": 1.0}] if (RAHMEN_ALBEN or RAHMEN_MARKER) else [{"typ": "alle", "gewicht": 1.0}]
     return quellen
+
+
+HEUTE_CACHE = {"key": None, "ids": []}
+
+
+def heute_ids(tage, heute=None):
+    """Fotos von 'heute vor 1..20 Jahren' (+/- tage), einmal je Tag ermittelt."""
+    heute = heute or datetime.date.today()
+    if HEUTE_CACHE["key"] == (heute, tage):
+        return HEUTE_CACHE["ids"]
+    ids = []
+    for jahr in range(heute.year - 1, heute.year - 21, -1):
+        try:
+            mitte = heute.replace(year=jahr)
+        except ValueError:                                              # 29. Februar
+            mitte = datetime.date(jahr, 2, 28)
+        von = datetime.datetime.combine(mitte - datetime.timedelta(days=tage), datetime.time.min)
+        bis = datetime.datetime.combine(mitte + datetime.timedelta(days=tage + 1), datetime.time.min)
+        body = {"size": 30, "type": "IMAGE", "withExif": True, "visibility": "timeline",
+                "takenAfter": von.strftime("%Y-%m-%dT%H:%M:%S.000Z"), "takenBefore": bis.strftime("%Y-%m-%dT%H:%M:%S.000Z")}
+        try:
+            items = H.api("POST", "/search/random", body) or []
+        except Exception as e:  # noqa: BLE001 - ein Jahr ohne Antwort stoert die anderen nicht
+            H.log.warning("Heute-Quelle %s: %s", jahr, e)
+            continue
+        ids += [a["id"] for a in items if not H.ist_screenshot(a)]
+    HEUTE_CACHE.update(key=(heute, tage), ids=ids)
+    return ids
 
 
 MARKER_CACHE = {"t": 0.0, "v": ([], [])}
@@ -1614,9 +1718,10 @@ def verteilen(gewichte, n):
 
 
 AMBIENT_GESEHEN = collections.deque(maxlen=600)          # zuletzt gezeigte Fotos des Dauerprogramms: kommen nicht gleich wieder
+AMBIENT_PRO_ZIEL = {}
 
 
-def rahmen_auswahl(n):
+def rahmen_auswahl(n, ziel=None):
     alben_ids, exklusiv = rahmen_alben()
     if exklusiv:
         try:
@@ -1626,11 +1731,22 @@ def rahmen_auswahl(n):
             ergebnis = []
         if ergebnis:
             return ergebnis
-    quellen = rahmen_quellen()
-    gesehen = set(AMBIENT_GESEHEN)
+    quellen = rahmen_quellen(ziel)
+    gedaechtnis = AMBIENT_GESEHEN if ziel is None else AMBIENT_PRO_ZIEL.setdefault(ziel, collections.deque(maxlen=600))
+    gesehen = set(gedaechtnis)
     ergebnis, bereits, reste = [], set(), []
     for q, k in zip(quellen, verteilen([q["gewicht"] for q in quellen], n)):
         if k <= 0:
+            continue
+        if q["typ"] == "heute":
+            kandidaten = list(heute_ids(q["tage"]))
+            random.shuffle(kandidaten)
+            frisch = [i for i in kandidaten if i not in bereits]
+            neu = [i for i in frisch if i not in gesehen] or frisch
+            for i in neu[:k]:
+                ergebnis.append(i)
+                bereits.add(i)
+            reste.append((q["gewicht"], neu[k:]))
             continue
         body = {"size": max(10, k * 3), "type": "IMAGE", "withExif": True, "visibility": "timeline"}
         if q["typ"] == "album":
@@ -1659,14 +1775,14 @@ def rahmen_auswahl(n):
                     ergebnis.append(i)
                     bereits.add(i)
     random.shuffle(ergebnis)
-    AMBIENT_GESEHEN.extend(ergebnis)
+    gedaechtnis.extend(ergebnis)
     return ergebnis
 
 
 @app.get("/api/rahmen/zufall")
-def rahmen_zufall(n: int = 40, _=Depends(geraet)):
-    """Dauerprogramm des Rahmens: zufaellige Fotos nach Quellen und Gewicht (ohne Screenshots, ohne kuerzlich gezeigte)."""
-    return {"ids": rahmen_auswahl(max(5, min(n, 100)))}
+def rahmen_zufall(n: int = 40, ziel: str = "", _=Depends(geraet)):
+    """Dauerprogramm des Rahmens: zufaellige Fotos nach Quellen und Gewicht (ohne Screenshots, ohne kuerzlich gezeigte); je Rahmen und nach Zeitplan."""
+    return {"ids": rahmen_auswahl(max(5, min(n, 100)), ziel if ziel in RAHMEN_ZIELE else None)}
 
 
 BILDINFO = {}
@@ -1707,6 +1823,211 @@ def rahmen_status(_=Depends(geraet)):
     return {"version": VERSION, "rahmen": [{"id": z, "name": n, "online": jetzt - TV[z]["hb"] < 10, "zuletzt_vor_s": int(jetzt - TV[z]["hb"]) if TV[z]["hb"] else None,
             "spielt": TV[z]["tv_name"] if TV[z]["tv_laeuft"] else None, "dauerprogramm": TV[z].get("ambient", False), "bild_alter_s": TV[z].get("bild_alter")}
             for z, n in RAHMEN_ZIELE.items()]}
+
+
+# --------------------------------------------------------------------------- Zusatzanzeige am Rahmen: Wetter und Termine (beides optional)
+# Wetter: Open-Meteo (kostenlos, ohne Schluessel). Der SERVER fragt ab (Koordinaten verlassen nur ihn, nicht die Geraete).
+WETTER_ORT = None
+_m = re.fullmatch(r"\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*", os.environ.get("RAHMEN_WEB_WETTER_ORT", ""))
+if _m:
+    WETTER_ORT = (float(_m.group(1)), float(_m.group(2)))
+KALENDER_URL = os.environ.get("RAHMEN_WEB_KALENDER_URL", "").strip()
+if not re.match(r"^https?://", KALENDER_URL):
+    KALENDER_URL = ""
+ZUSATZ = [k for k in _liste("RAHMEN_WEB_RAHMEN_ZUSATZ", "wetter,kalender") if (k == "wetter" and WETTER_ORT) or (k == "kalender" and KALENDER_URL)]
+ZUSATZ_CACHE = {}
+
+
+def http_text(url, timeout=10):
+    req = urllib.request.Request(url, headers={"User-Agent": "immich-showcase"})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return r.read(2_000_000).decode("utf-8", "replace")
+
+
+WETTER_SYMBOLE = [((0,), "☀️"), ((1, 2), "🌤️"), ((3,), "☁️"), ((45, 48), "🌫️"), ((51, 53, 55, 56, 57), "🌦️"), ((61, 63, 65, 66, 67), "🌧️"),
+                  ((71, 73, 75, 77), "🌨️"), ((80, 81, 82), "🌦️"), ((85, 86), "🌨️"), ((95, 96, 99), "⛈️")]
+
+
+def wetter_symbol(code):
+    return next((sym for codes, sym in WETTER_SYMBOLE if code in codes), "🌡️")
+
+
+def zusatz_gecacht(name, sekunden, holen):
+    eintrag = ZUSATZ_CACHE.get(name)
+    if eintrag and time.time() - eintrag[0] < sekunden:
+        return eintrag[1]
+    try:
+        wert = holen()
+    except Exception as e:  # noqa: BLE001 - ohne Zusatz laeuft der Rahmen trotzdem; letzter Stand bleibt
+        H.log.warning("Zusatzanzeige %s: %s", name, e)
+        return eintrag[1] if eintrag else None
+    ZUSATZ_CACHE[name] = (time.time(), wert)
+    return wert
+
+
+def wetter_holen():
+    lat, lon = WETTER_ORT
+    d = json.loads(http_text(f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,weather_code&timezone=auto"))
+    cur = d["current"]
+    return {"temp": round(float(cur["temperature_2m"])), "symbol": wetter_symbol(int(cur["weather_code"]))}
+
+
+def _ics_zeile_entfalten(text):
+    zeilen = []
+    for z in text.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
+        if z[:1] in (" ", "\t") and zeilen:
+            zeilen[-1] += z[1:]
+        else:
+            zeilen.append(z)
+    return zeilen
+
+
+def _ics_zeit(wert, params):
+    """-> (datum, uhrzeit|None) in Ortszeit. 'YYYYMMDD' = ganztaegig, '...Z' = UTC (wird umgerechnet), sonst Ortszeit."""
+    wert = wert.strip()
+    if re.fullmatch(r"\d{8}", wert):
+        return datetime.date(int(wert[:4]), int(wert[4:6]), int(wert[6:])), None
+    m = re.fullmatch(r"(\d{8})T(\d{2})(\d{2})(\d{2})?(Z?)", wert)
+    if not m:
+        return None
+    dt = datetime.datetime(int(m.group(1)[:4]), int(m.group(1)[4:6]), int(m.group(1)[6:]), int(m.group(2)), int(m.group(3)))
+    if m.group(5) == "Z":
+        dt = dt.replace(tzinfo=datetime.timezone.utc).astimezone().replace(tzinfo=None)
+    return dt.date(), dt.time()
+
+
+def ics_termine(text, heute, tage=2, maximum=4):
+    """Termine von heute (und morgen ...) aus einer iCalendar-Datei. Einfache Wiederholungen (taeglich, woechentlich, jaehrlich) werden verstanden."""
+    fenster = [heute + datetime.timedelta(days=i) for i in range(tage)]
+    ergebnis = []
+    ereignis = None
+    for zeile in _ics_zeile_entfalten(text):
+        if zeile == "BEGIN:VEVENT":
+            ereignis = {}
+        elif zeile == "END:VEVENT" and ereignis is not None:
+            start = ereignis.get("DTSTART")
+            if start:
+                beginn = _ics_zeit(start[1], start[0])
+                if beginn:
+                    d0, uhr = beginn
+                    regel = dict(p.split("=", 1) for p in (ereignis.get("RRULE", ("", ""))[1]).split(";") if "=" in p)
+                    for tag in fenster:
+                        if tag < d0:
+                            continue
+                        frq, intervall = regel.get("FREQ"), int(regel.get("INTERVAL", "1") or 1)
+                        if not frq:
+                            treffer = tag == d0
+                        elif frq == "DAILY":
+                            treffer = (tag - d0).days % intervall == 0
+                        elif frq == "WEEKLY":
+                            tage_liste = [{"MO": 0, "TU": 1, "WE": 2, "TH": 3, "FR": 4, "SA": 5, "SU": 6}.get(x[-2:]) for x in regel.get("BYDAY", "").split(",") if x] or [d0.weekday()]
+                            treffer = tag.weekday() in tage_liste and ((tag - d0).days // 7) % intervall == 0
+                        elif frq == "YEARLY":
+                            treffer = (tag.month, tag.day) == (d0.month, d0.day)
+                        else:
+                            treffer = False
+                        ende = regel.get("UNTIL")
+                        if treffer and ende:
+                            bis = _ics_zeit(ende, {})
+                            treffer = not bis or tag <= bis[0]
+                        if treffer:
+                            titel = (ereignis.get("SUMMARY", ("", ""))[1]).replace("\\,", ",").replace("\;", ";").replace("\\n", " ").strip()
+                            ergebnis.append({"tag": "heute" if tag == heute else "morgen" if tag == heute + datetime.timedelta(days=1) else tag.isoformat(),
+                                             "zeit": uhr.strftime("%H:%M") if uhr else "", "titel": titel[:60], "_k": (tag, uhr or datetime.time.min)})
+            ereignis = None
+        elif ereignis is not None and ":" in zeile:
+            kopf, _, wert = zeile.partition(":")
+            name, _, params = kopf.partition(";")
+            ereignis[name.upper()] = (params, wert)
+    ergebnis.sort(key=lambda e: e["_k"])
+    return [{k: v for k, v in e.items() if k != "_k"} for e in ergebnis if e["titel"]][:maximum]
+
+
+def kalender_holen():
+    return ics_termine(http_text(KALENDER_URL), datetime.date.today())
+
+
+@app.get("/api/rahmen/zusatz")
+def rahmen_zusatz(_=Depends(geraet)):
+    """Wetter und Termine fuer die Zusatzanzeige am Rahmen (nur was eingerichtet ist)."""
+    out = {}
+    if "wetter" in ZUSATZ:
+        w = zusatz_gecacht("wetter", 900, wetter_holen)
+        if w:
+            out["wetter"] = w
+    if "kalender" in ZUSATZ:
+        t = zusatz_gecacht("kalender", 600, kalender_holen)
+        if t is not None:
+            out["termine"] = t
+    return out
+
+
+# --------------------------------------------------------------------------- Geraete: Uebersicht und Kopplung per Code
+@app.get("/api/geraete")
+def geraete_uebersicht(_=Depends(anmeldung)):
+    """Alle Fernseher und Rahmen mit Zustand (fuer die Geraete-Ansicht in der App)."""
+    jetzt = time.time()
+    liste = []
+    for z, n in TV_ZIELE.items():
+        if z in TV_VERSTECKT:
+            continue
+        d = TV[z]
+        online = jetzt - d["hb"] < 10
+        liste.append({"id": z, "name": n, "art": "rahmen" if z in RAHMEN_ZIELE else "tv", "online": online,
+                      "zuletzt_vor_s": int(jetzt - d["hb"]) if d["hb"] else None,
+                      "spielt": (d["tv_name"] or "Wiedergabe") if (online and d["tv_laeuft"] and not d.get("ambient")) else None,
+                      "dauerprogramm": bool(online and d.get("ambient")),
+                      "bild_alter_s": d.get("bild_alter") if online else None})
+    return {"geraete": liste}
+
+
+KOPPEL = {}                       # code -> {"t": Zeit, "ziel": None|Kennung, "ip": ...}
+KOPPEL_LOCK = threading.Lock()
+KOPPEL_ZEICHEN = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"        # ohne leicht verwechselbare Zeichen (0/O, 1/I)
+KOPPEL_LEBEN = 900
+
+
+def koppel_aufraeumen(jetzt):
+    for c in [c for c, v in KOPPEL.items() if jetzt - v["t"] > KOPPEL_LEBEN]:
+        del KOPPEL[c]
+
+
+@app.post("/api/koppeln/neu")
+def koppeln_neu(request: Request, _=Depends(csrf)):
+    """Ein noch nicht gekoppeltes Geraet (Fernseher/Tablet) holt sich einen Code, der am Handy eingegeben wird. Ohne Anmeldung, aber begrenzt."""
+    ip, jetzt = client_ip(request), time.time()
+    with KOPPEL_LOCK:
+        koppel_aufraeumen(jetzt)
+        if len(KOPPEL) >= 30 or sum(1 for v in KOPPEL.values() if v["ip"] == ip) >= 5:
+            raise HTTPException(429, "Zu viele offene Codes - bitte kurz warten")
+        code = "".join(secrets.choice(KOPPEL_ZEICHEN) for _ in range(6))
+        KOPPEL[code] = {"t": jetzt, "ziel": None, "ip": ip}
+    return {"code": code, "gueltig_s": KOPPEL_LEBEN}
+
+
+@app.get("/api/koppeln/status")
+def koppeln_status(code: str = ""):
+    with KOPPEL_LOCK:
+        koppel_aufraeumen(time.time())
+        eintrag = KOPPEL.get(code.strip().upper())
+    if not eintrag:
+        raise HTTPException(404, "Code unbekannt oder abgelaufen")
+    z = eintrag["ziel"]
+    return {"ziel": z, "name": TV_ZIELE.get(z) if z else None}
+
+
+@app.post("/api/koppeln")
+def koppeln_setzen(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
+    """Die App weist dem Geraet mit diesem Code einen Fernseher/Rahmen zu; das Geraet merkt es sich."""
+    code, ziel = str(daten.get("code", "")).strip().upper(), str(daten.get("ziel", ""))
+    if ziel not in TV_ZIELE or ziel in TV_VERSTECKT:
+        raise HTTPException(400, "Unbekanntes Ziel")
+    with KOPPEL_LOCK:
+        koppel_aufraeumen(time.time())
+        if code not in KOPPEL:
+            raise HTTPException(404, "Code unbekannt oder abgelaufen")
+        KOPPEL[code]["ziel"] = ziel
+    return {"ok": True, "name": TV_ZIELE[ziel]}
 
 
 # Ueberwachung: meldet (Pushover), wenn ein Rahmen nicht mehr erreichbar ist oder dasselbe Bild haengt, und wenn er zurueck ist

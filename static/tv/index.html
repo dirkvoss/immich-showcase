@@ -41,6 +41,18 @@ body.zuschnitt .bild { object-fit: cover; }
 #status { font-size: 24px; margin-top: 30px; color: #e0834f; min-height: 30px; }
 #uhrKlein { position: absolute; left: 36px; bottom: 28px; font-family: "Cormorant Garamond", Georgia, serif; font-size: 44px; color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,.7); opacity: 0; -webkit-transition: opacity 1s; transition: opacity 1s; }
 #uhrKlein.an { opacity: .85; }
+#zusatz { position: absolute; right: 36px; top: 28px; text-align: right; color: #fff; text-shadow: 0 1px 10px rgba(0,0,0,.85); opacity: 0; -webkit-transition: opacity 1s; transition: opacity 1s; }
+#zusatz.an { opacity: .9; }
+#zusatz .wetter { font-size: 52px; }
+#zusatz .termin { font-size: 26px; margin-top: 6px; }
+#zusatz .termin b { font-weight: 600; opacity: .8; }
+#kopplung { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0f1218; z-index: 50; text-align: center; display: none; }
+#kopplung .innen { position: absolute; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); width: 90%; }
+#kopplung h1 { font: 600 64px "Cormorant Garamond", Georgia, serif; margin: 0 0 10px; }
+#kopplung p { font-size: 28px; color: #b8c0cc; margin: 8px 0; }
+#kopplungCode { font-size: 120px; letter-spacing: 22px; font-weight: bold; margin: 18px 0 8px 22px; color: #f0a35e; }
+#kopplungQr { display: inline-block; background: #fff; padding: 14px; border-radius: 14px; margin-top: 14px; }
+#kopplungQr svg { display: block; width: 220px; height: 220px; }
 #pinpunkte { font-size: 64px; letter-spacing: 16px; margin-top: 24px; min-height: 80px; }
 </style>
 </head>
@@ -63,16 +75,64 @@ body.zuschnitt .bild { object-fit: cover; }
 </div>
 <div id="titel"></div>
 <div id="uhrKlein"></div>
+<div id="zusatz"></div>
 <div id="bildtext"></div>
 <div id="nacht"></div>
 <div id="musiktitel"></div>
 <div id="punkt"></div>
+<div id="kopplung"><div class="innen">
+  <h1 id="kopplungTitel">Gerät koppeln</h1>
+  <p id="kopplungText">Öffne am Handy Immich Showcase, tippe auf „Geräte“ und gib diesen Code ein:</p>
+  <div id="kopplungCode">······</div>
+  <div id="kopplungQr"></div>
+  <p id="kopplungHinweis">Oder scanne den Code mit der Handykamera.</p>
+</div></div>
+<script src="/qrcode.js"></script>
+<script>
+(function () {                                  // Kennung des Geraets: aus der Adresse (?ziel=...), sonst aus dem Speicher; sonst Kopplung per Code
+  var m = location.search.match(/ziel=([a-z0-9]+)/), z = m ? m[1] : null;
+  try { if (z) localStorage.setItem("showcaseZiel", z); else z = localStorage.getItem("showcaseZiel"); } catch (e) {}
+  if (z) { window.RW_ZIEL = z; return; }
+  window.RW_KOPPELN = true;
+  var T = function (t) { return window.RW_T ? window.RW_T(t) : t; };
+  function http(methode, pfad, cb) {
+    var x = new XMLHttpRequest(); x.open(methode, pfad, true); x.setRequestHeader("X-Rahmen", "1"); x.timeout = 8000;
+    x.onload = function () { var d = null; try { d = JSON.parse(x.responseText); } catch (e) {} cb(x.status, d); };
+    x.onerror = x.ontimeout = function () { cb(0, null); };
+    x.send(null);
+  }
+  var el = function (id) { return document.getElementById(id); }, code = "", timer = 0;
+  el("kopplung").style.display = "block";
+  el("kopplungTitel").textContent = T("Gerät koppeln");
+  el("kopplungText").textContent = T("Öffne am Handy Immich Showcase, tippe auf „Geräte“ und gib diesen Code ein:");
+  el("kopplungHinweis").textContent = T("Oder scanne den Code mit der Handykamera.");
+  function neuerCode() {
+    http("POST", "/api/koppeln/neu", function (st, d) {
+      if (st !== 200 || !d) { el("kopplungCode").textContent = "?"; setTimeout(neuerCode, 8000); return; }
+      code = d.code; el("kopplungCode").textContent = code;
+      try { var qr = qrcode(0, "M"); qr.addData(location.origin + "/?koppeln=" + code); qr.make(); el("kopplungQr").innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true }); } catch (e) { el("kopplungQr").style.display = "none"; }
+      abfragen();
+    });
+  }
+  function abfragen() {
+    clearTimeout(timer);
+    http("GET", "/api/koppeln/status?code=" + code, function (st, d) {
+      if (st === 200 && d && d.ziel) { try { localStorage.setItem("showcaseZiel", d.ziel); } catch (e) {} location.replace("/tv/?ziel=" + d.ziel); return; }
+      if (st === 404) { neuerCode(); return; }
+      timer = setTimeout(abfragen, 3000);
+    });
+  }
+  neuerCode();
+})();
+</script>
 <script>
 (function () {
-  var teile = location.search.match(/ziel=([a-z0-9]+)/);
-  var ziel = teile ? teile[1] : "lg";
+  if (window.RW_KOPPELN) return;
+  var ziel = window.RW_ZIEL;
   var NAMEN = { lg: "LG TV", shield: "Shield" };
   api("/api/config", function (st, d) {
+    if (st === 200 && d && d.alle_ziele && ziel !== "test" && !d.alle_ziele[ziel]) { try { localStorage.removeItem("showcaseZiel"); } catch (e) {} location.replace("/tv/"); return; }
+    if (st === 200 && d && d.rahmen_zusatz && d.rahmen_zusatz.length && d.rahmen && d.rahmen.indexOf(ziel) >= 0) zusatzLaden();
     if (st === 200 && d && d.ziele) { for (var k in d.ziele) NAMEN[k] = d.ziele[k]; }
     if (st === 200 && d && d.rahmen) { for (var r = 0; r < d.rahmen.length; r++) if (d.rahmen[r] === ziel) { rahmenModus = true; rahmenSek = d.rahmen_sek || 8; anzeige = d.rahmen_anzeige || []; nacht = d.rahmen_nacht || ""; if (!laeuft && !pinModus) startAmbient(); } }
     fuellung = (rahmenModus ? d.rahmen_fuellung : d.tv_fuellung) || "balken";
@@ -85,6 +145,25 @@ body.zuschnitt .bild { object-fit: cover; }
   var fuellung = "balken", anzeige = [], nacht = "", bgA = document.getElementById("bgA"), bgB = document.getElementById("bgB"), bildtextEl = document.getElementById("bildtext"), nachtEl = document.getElementById("nacht"), letzterWechsel = new Date().getTime(), letzterErfolg = new Date().getTime(), verbinde = true, pinModus = false, rahmenModus = false, rahmenSek = 8, ambient = false;
   var vid = document.getElementById("vid"), videoSet = {}, maxv = 60, videoTimer = 0, musikPausiert = false, imVideo = false;
   var audio = null, musikKey = "", laut = 0.3, musikBlockiert = false, fade = 1.2;
+
+  var zusatz = document.getElementById("zusatz"), zusatzTimer = 0, zusatzGestartet = false;
+  function zusatzLaden() {                                       // Wetter und Termine (alle 10 Minuten), nur wenn der Server sie eingerichtet hat
+    if (zusatzGestartet && zusatzTimer) { return; }
+    zusatzGestartet = true;
+    api("/api/rahmen/zusatz", function (st, d) {
+      if (st === 200 && d) {
+        zusatz.innerHTML = "";
+        if (d.wetter) { var w = document.createElement("div"); w.className = "wetter"; w.textContent = d.wetter.symbol + " " + d.wetter.temp + "°"; zusatz.appendChild(w); }
+        var t = d.termine || [];
+        for (var i = 0; i < t.length; i++) {
+          var r = document.createElement("div"), b = document.createElement("b");
+          r.className = "termin"; b.textContent = (t[i].tag === "heute" ? "" : window.RW_T("morgen") + " ") + t[i].zeit;
+          r.appendChild(b); r.appendChild(document.createTextNode((t[i].zeit || t[i].tag !== "heute" ? " " : "") + t[i].titel)); zusatz.appendChild(r);
+        }
+      }
+    });
+    zusatzTimer = setTimeout(function () { zusatzTimer = 0; zusatzLaden(); }, 600000);
+  }
 
   function api(pfad, cb, methode, daten) {
     var x = new XMLHttpRequest();
@@ -142,19 +221,19 @@ body.zuschnitt .bild { object-fit: cover; }
     bildA.className = "bild"; bildB.className = "bild"; vorn = null;
     mitteTitel.textContent = "Immich Showcase";
     mitteText.textContent = (NAMEN[ziel] || window.RW_T("Fernseher")) + " · bereit. Wähle am Handy Fotos und tippe auf „Auf TV“. (Für Musik einmal die OK-Taste drücken.)";
-    mitte.className = ""; titel.className = ""; ambient = false; uhrKlein.className = ""; bildtextEl.className = ""; nachtEl.style.display = "none"; bgA.className = "bg"; bgB.className = "bg";
+    mitte.className = ""; titel.className = ""; ambient = false; uhrKlein.className = zusatz.className = ""; bildtextEl.className = ""; nachtEl.style.display = "none"; bgA.className = "bg"; bgB.className = "bg";
     if (rahmenModus && !pinModus) startAmbient();
   }
   function startAmbient() {                                      // Bilderrahmen im Leerlauf: Zufallsfotos als Dauerprogramm
     if (laeuft || ambient) return;
-    api("/api/rahmen/zufall?n=40", function (st, d) {
+    api("/api/rahmen/zufall?n=40&ziel=" + ziel, function (st, d) {
       if (laeuft || pinModus) return;
       if (st !== 200 || !d || !d.ids || !d.ids.length) { setTimeout(function () { if (!laeuft) startAmbient(); }, 20000); return; }
       liste = d.ids; sek = rahmenSek; name = ""; idx = 0; fehler = 0; videoSet = {}; maxv = 0;
       fade = Math.min(1.2, sek * 0.3);
       bildA.style.webkitTransition = bildA.style.transition = "opacity " + fade + "s ease";
       bildB.style.webkitTransition = bildB.style.transition = "opacity " + fade + "s ease";
-      ambient = true; laeuft = true; pausiert = false; uhrKlein.className = "an"; nachtPruefen();
+      ambient = true; laeuft = true; pausiert = false; uhrKlein.className = zusatz.className = "an"; nachtPruefen();
       zeige(0);
     });
   }
@@ -220,7 +299,7 @@ body.zuschnitt .bild { object-fit: cover; }
     clearTimeout(timer);
     if (!liste.length) return;
     if (ambient && i >= liste.length) {                          // Dauerprogramm: naechste Zufallsauswahl holen
-      api("/api/rahmen/zufall?n=40", function (st, d) {
+      api("/api/rahmen/zufall?n=40&ziel=" + ziel, function (st, d) {
         if (!ambient) return;
         if (st === 200 && d && d.ids && d.ids.length) { liste = d.ids; zeige(0); } else zeige(0);
       });
@@ -256,7 +335,7 @@ body.zuschnitt .bild { object-fit: cover; }
   function behandle(e) {
     if (!e) return;
     if (e.typ === "start") {
-      ambient = false; uhrKlein.className = ""; nachtEl.style.display = "none";
+      ambient = false; uhrKlein.className = zusatz.className = ""; nachtEl.style.display = "none";
       liste = e.zufall ? mischen(e.ids) : e.ids.slice(); sek = e.sek || 8; name = e.name || ""; idx = 0; laeuft = true; pausiert = false; fehler = 0;
       videoSet = {}; var vi; for (vi = 0; e.videos && vi < e.videos.length; vi++) videoSet[e.videos[vi]] = true; maxv = e.maxv || 60;
       fade = Math.min(1.2, sek * 0.3);                                   // Ueberblendung: 30 % der Anzeigedauer, hoechstens 1,2 s

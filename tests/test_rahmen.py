@@ -1,4 +1,6 @@
 """Dauerprogramm des Rahmens: Quellen mit Gewicht, keine Wiederholer, Ueberwachung."""
+import datetime
+
 import conftest
 
 A, B = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa", "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb"
@@ -174,3 +176,57 @@ def test_marker_funktionieren_auch_englisch(app_laden):
     w.MARKER_CACHE["t"] = 0
     schrein.albumliste[0]["description"] = "#onlyframe"
     assert w.rahmen_alben() == ([B], True)
+
+
+# ---------------------------------------------------------------- Zeitplan, Quellen je Rahmen, "heute"
+
+def test_zeitplan_lesen_und_wochentage(app_laden):
+    w, _, _ = app_laden()
+    regeln = w.zeitplan_lesen("Mo-Fr 18:00-22:00 = *; Sa,So 08:00-20:00 = neu7:1, x; kaputt; Mo 25:00 = *")
+    assert len(regeln) == 2 and regeln[0][0] == {0, 1, 2, 3, 4} and regeln[1][0] == {5, 6}
+    assert regeln[0][1:3] == (18 * 60, 22 * 60) and regeln[1][3] == ["neu7:1", "x"]
+    assert w.zeitplan_lesen("taeglich 06:00-07:00 = *")[0][0] == set(range(7))
+    assert w.zeitplan_lesen("Fr-Mo 06:00-07:00 = *")[0][0] == {4, 5, 6, 0}
+
+
+def test_zeitplan_waehlt_nach_zeit_und_ueber_mitternacht(app_laden):
+    w, _, _ = app_laden()
+    dt = datetime.datetime
+    regeln = w.zeitplan_lesen("Mo-Fr 18:00-22:00 = A; Fr 22:00-02:00 = N")
+    assert w.zeitplan_quellen(regeln, dt(2026, 10, 5, 19, 0)) == ["A"]        # Montag 19 Uhr
+    assert w.zeitplan_quellen(regeln, dt(2026, 10, 5, 23, 0)) is None         # Montag 23 Uhr: nichts
+    assert w.zeitplan_quellen(regeln, dt(2026, 10, 9, 23, 30)) == ["N"]       # Freitag 23:30
+    assert w.zeitplan_quellen(regeln, dt(2026, 10, 10, 1, 0)) == ["N"]        # Samstag 01:00 gehoert noch zu Freitag
+    assert w.zeitplan_quellen(regeln, dt(2026, 10, 10, 3, 0)) is None
+
+
+def test_zeitplan_ersetzt_die_quellen_nur_im_zeitfenster(app_laden):
+    w, _, _ = app_laden(RAHMEN_WEB_RAHMEN_QUELLEN=f"{A}:1", RAHMEN_WEB_RAHMEN_ZEITPLAN=f"Mo-Fr 18:00-22:00 = {B}:1")
+    dt = datetime.datetime
+    assert w.rahmen_quellen(None, dt(2026, 10, 5, 19, 0))[0]["id"] == B
+    assert w.rahmen_quellen(None, dt(2026, 10, 5, 12, 0))[0]["id"] == A
+
+
+def test_quellen_je_rahmen(app_laden):
+    w, _, _ = app_laden(RAHMEN_WEB_RAHMEN_ZIELE="flur=Flur,kueche=Kueche", RAHMEN_WEB_RAHMEN_QUELLEN=f"{A}:1", RAHMEN_WEB_RAHMEN_QUELLEN_KUECHE=f"{B}:1")
+    assert w.rahmen_quellen("flur")[0]["id"] == A
+    assert w.rahmen_quellen("kueche")[0]["id"] == B
+    assert w.rahmen_quellen(None)[0]["id"] == A
+
+
+def test_heute_quelle_findet_fotos_dieses_tages(app_laden):
+    w, client, schrein = app_laden(RAHMEN_WEB_RAHMEN_QUELLEN="heute:1", **LAN)
+    a = conftest.ASSETS[0]
+    tag = datetime.date.fromisoformat(a["localDateTime"][:10])
+    ids = w.heute_ids(0, heute=datetime.date(2030, tag.month, tag.day))
+    assert a["id"] in ids
+    assert w.rahmen_quellen()[0]["typ"] == "heute"
+
+
+def test_zufall_nimmt_den_rahmen_aus_der_anfrage(app_laden):
+    w, client, schrein = app_laden(**{**LAN, "RAHMEN_WEB_RAHMEN_ZIELE": "flur=Flur,kueche=Kueche", "RAHMEN_WEB_RAHMEN_QUELLEN_FLUR": f"{A}:1", "RAHMEN_WEB_RAHMEN_QUELLEN_KUECHE": f"{B}:1"})
+    c = client()
+    flur = c.get("/api/rahmen/zufall?n=10&ziel=flur").json()["ids"]
+    kueche = c.get("/api/rahmen/zufall?n=10&ziel=kueche").json()["ids"]
+    assert flur and all(i in conftest.ALBEN[A] for i in flur)
+    assert kueche and all(i in conftest.ALBEN[B] for i in kueche)

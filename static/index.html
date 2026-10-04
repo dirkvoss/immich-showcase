@@ -178,12 +178,20 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
 #hilfeDialog { z-index: 96; }
 .hilfe { margin: 6px 0 10px; padding-left: 20px; } .hilfe li { margin: 4px 0; }
 #hilfeDialog h3 { margin: 14px 0 2px; font-size: 15px; }
-.benutzer #hilfeBtn { color: var(--muted); }
+.benutzer #hilfeBtn, .benutzer #geraeteBtn { color: var(--muted); }
+.geraet { display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin: 8px 0; border: 1px solid var(--line, rgba(255,255,255,.12)); border-radius: 12px; }
+.geraet .punkt { width: 12px; height: 12px; border-radius: 50%; background: #6b7280; flex: none; }
+.geraet.online .punkt { background: #3ecf8e; }
+.geraet .name { font-weight: 600; }
+.geraet .zustand { font-size: 13px; color: var(--muted); }
+.geraet .art { font-size: 22px; }
+#koppelCode { text-transform: uppercase; letter-spacing: 6px; font-size: 22px; font-weight: 600; }
 .tvdialog { position: fixed; inset: 0; z-index: 90; background: rgba(0,0,0,.62); display: flex; align-items: flex-end; justify-content: center; padding: 0; }
 .tvkarte { width: 100%; max-width: 520px; background: var(--card); border-radius: 18px 18px 0 0; padding: 18px 18px calc(env(safe-area-inset-bottom) + 18px); box-shadow: var(--shadow); max-height: 92vh; overflow: auto; }
 .tvkarte h2 { margin: 0 0 8px; font-size: 20px; }
 .tvtext { margin: 6px 0 12px; }
 .tvfeld { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 48px; padding: 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); }
+.tvfeld input { flex: 1; min-width: 0; min-height: 40px; border: 0; background: transparent; font: inherit; color: inherit; text-align: right; outline: none; }
 .tvfeld select { min-height: 40px; border: 0; background: transparent; font: inherit; color: inherit; }
 .tvziele { display: grid; gap: 8px; margin: 4px 0 10px; }
 .tvziel { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 14px; border: 2px solid var(--line); border-radius: 14px; background: var(--bg); cursor: pointer; }
@@ -243,7 +251,7 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
     <div class="kopf">
       <h1><button type="button" class="kopf-home" id="kopfHome" aria-label="Immich Showcase – zur Startseite"><span class="logo" id="logo" aria-hidden="true"><img alt="" src="/icon-192.png"></span><span class="kopf-name">Immich Showcase</span></button></h1>
       <button class="btn klein versteckt" id="undoKopf" title="Letzte Änderung an der Auswahl rückgängig machen" aria-label="Rückgängig"><span aria-hidden="true">↶</span><span class="undo-text"> Rückgängig</span></button>
-      <div class="benutzer" id="benutzer"><span class="versionskurz" data-version-kurz></span><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><button type="button" id="hilfeBtn" aria-label="Hilfe">❓ Hilfe</button></div>
+      <div class="benutzer" id="benutzer"><span class="versionskurz" data-version-kurz></span><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><button type="button" id="geraeteBtn" aria-label="Geräte">📡 Geräte</button><button type="button" id="hilfeBtn" aria-label="Hilfe">❓ Hilfe</button></div>
       <button class="btn klein nur-rahmen" id="normalBtn" title="Der Rahmen zeigt wieder das normale Programm">Normal</button>
       <div class="laeuft nur-rahmen" id="laeuft" aria-live="polite">
         <div class="laeuft-text">
@@ -322,6 +330,19 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
 <div id="lightbox" class="lightbox versteckt" role="dialog" aria-modal="true" aria-label="Großansicht">
   <button class="zu" id="lightboxZu" aria-label="Schließen">✕</button>
   <button class="btn primaer waehlen" id="lightboxWaehlen"></button>
+</div>
+<div id="geraeteDialog" class="tvdialog versteckt" role="dialog" aria-modal="true" aria-labelledby="geraeteTitel">
+  <div class="tvkarte">
+    <h2 id="geraeteTitel">📡 Geräte</h2>
+    <div id="geraeteListe"></div>
+    <h3>Gerät koppeln</h3>
+    <p class="tipp">Zeigt ein Fernseher oder Tablet einen Code? Gib ihn hier ein und wähle, welches Gerät es sein soll.</p>
+    <label class="tvfeld"><span>Code</span> <input id="koppelCode" maxlength="6" autocomplete="off" autocapitalize="characters" aria-label="Code"></label>
+    <label class="tvfeld"><span>Gerät</span> <select id="koppelZiel" aria-label="Gerät"></select></label>
+    <div class="tvknoepfe" style="justify-content:flex-start"><button class="btn primaer" id="koppelBtn" type="button">Koppeln</button></div>
+    <p class="tipp">Am Gerät einfach die Seite /tv/ öffnen – dann erscheint der Code (und ein QR-Code zum Scannen).</p>
+    <div class="tvknoepfe"><button class="btn" id="geraeteZu" type="button">Schließen</button></div>
+  </div>
 </div>
 <div id="hilfeDialog" class="tvdialog versteckt" role="dialog" aria-modal="true" aria-labelledby="hilfeTitel">
   <div class="tvkarte">
@@ -1155,6 +1176,43 @@ $("#diagnoseBtn").addEventListener("click", async () => {
     toast("Support-Paket gespeichert.");
   } catch (e) { fehler(e); }
 });
+// ---------------------------------------------------------------- Geraete: Zustand und Kopplung
+let geraeteTimer = 0;
+function vorZeit(sek) {
+  if (sek == null) return "";
+  return sek < 90 ? RW_T("gerade eben") : sek < 5400 ? RW_T("vor {n} min").replace("{n}", Math.round(sek / 60)) : RW_T("vor {n} h").replace("{n}", Math.round(sek / 3600));
+}
+async function geraeteLaden() {
+  try {
+    const d = await api("geraete"), box = $("#geraeteListe"); box.innerHTML = "";
+    for (const g of d.geraete) {
+      const zeile = document.createElement("div"); zeile.className = "geraet" + (g.online ? " online" : "");
+      const ik = document.createElement("span"); ik.className = "art"; ik.textContent = g.art === "rahmen" ? "🖼️" : "📺";
+      const mitte = document.createElement("div"); mitte.style.flex = "1";
+      const n = document.createElement("div"); n.className = "name"; n.textContent = g.name;
+      const z = document.createElement("div"); z.className = "zustand";
+      z.textContent = !g.online ? RW_T("offline") + (g.zuletzt_vor_s != null ? " · " + RW_T("zuletzt") + " " + vorZeit(g.zuletzt_vor_s) : "")
+        : g.spielt ? "▶ " + g.spielt : g.dauerprogramm ? RW_T("Dauerprogramm") + (g.bild_alter_s != null ? " · " + RW_T("Bild seit") + " " + g.bild_alter_s + " s" : "") : RW_T("bereit");
+      mitte.append(n, z); const punkt = document.createElement("span"); punkt.className = "punkt";
+      zeile.append(punkt, ik, mitte); box.append(zeile);
+    }
+    if (!d.geraete.length) box.textContent = RW_T("Noch keine Geräte eingerichtet.");
+  } catch (e) {}
+}
+function geraeteOeffnen(code) {
+  const sel = $("#koppelZiel"); sel.innerHTML = "";
+  for (const [id, name] of Object.entries(konfig.alle_ziele || {})) { const o = document.createElement("option"); o.value = id; o.textContent = name; sel.append(o); }
+  if (code) $("#koppelCode").value = code;
+  $("#geraeteDialog").classList.remove("versteckt"); geraeteLaden(); clearInterval(geraeteTimer); geraeteTimer = setInterval(geraeteLaden, 5000);
+}
+$("#geraeteBtn").addEventListener("click", () => geraeteOeffnen(""));
+$("#geraeteZu").addEventListener("click", () => { $("#geraeteDialog").classList.add("versteckt"); clearInterval(geraeteTimer); });
+$("#koppelBtn").addEventListener("click", async () => {
+  const code = $("#koppelCode").value.trim().toUpperCase(), ziel = $("#koppelZiel").value;
+  if (code.length !== 6) { toast(RW_T("Bitte den 6-stelligen Code eingeben."), true); return; }
+  try { const r = await api("koppeln", { method: "POST", body: JSON.stringify({ code, ziel }) }); toast(RW_T("Gekoppelt mit") + " " + r.name + "."); $("#koppelCode").value = ""; geraeteLaden(); }
+  catch (e) { toast(e.message === "Code unbekannt oder abgelaufen" ? RW_T("Code unbekannt oder abgelaufen.") : e.message, true); }
+});
 $("#abmelden").addEventListener("click", async () => {
   try { await api("logout", { method: "POST", body: "{}" }); } catch (e) {}
   location.reload();
@@ -1162,6 +1220,7 @@ $("#abmelden").addEventListener("click", async () => {
 async function start() {
   $("#loginAnsicht").classList.add("versteckt"); $("#appAnsicht").classList.remove("versteckt");
   if (!start.fertig) { start.fertig = true; konfigLaden(); laden(); try { await facettenLaden(); } catch (e) {} }
+  try { const kc = new URLSearchParams(location.search).get("koppeln"); if (kc) { await konfigLaden(); geraeteOeffnen(kc.toUpperCase()); history.replaceState(null, "", location.pathname); } } catch (e) {}
   aktualisiere(); statusLaden(); wechsle(tab); benutzerZeigen();
 }
 // ---------------------------------------------------------------- Selbst-Aktualisierung

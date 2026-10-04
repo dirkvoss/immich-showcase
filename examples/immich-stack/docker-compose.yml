@@ -1,0 +1,69 @@
+# Immich + Immich Showcase in EINEM Stack – fuer alle, die noch kein Immich haben (oder ein neues daneben ausprobieren wollen).
+#   1.  cp .env.example .env      (Passwort fuer die Datenbank setzen, Ordner fuer die Fotos waehlen)
+#   2.  docker compose up -d
+#   3.  http://<server>:2283  -> Immich einrichten (erstes Konto = Administrator), Fotos hochladen
+#   4.  http://<server>:8090  -> Immich Showcase einrichten (Code steht in:  docker compose logs showcase)
+#       Adresse von Immich im Assistenten: http://immich-server:2283
+# Immich-Teil nach der offiziellen Vorlage von Immich (https://immich.app/docs/install/docker-compose) mit getesteter Version; bei Updates
+# immer erst deren Hinweise lesen. Zum Sichern: den Foto-Ordner (UPLOAD_LOCATION) und die Datenbank (DB_DATA_LOCATION) kopieren.
+name: immich-showcase-stack
+
+services:
+  immich-server:
+    container_name: immich_server
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-v3.2.4}
+    environment:
+      DB_HOSTNAME: database
+      DB_USERNAME: postgres
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD in .env setzen}
+      DB_DATABASE_NAME: immich
+      REDIS_HOSTNAME: redis
+      TZ: ${TZ:-Europe/Berlin}
+    volumes:
+      - ${UPLOAD_LOCATION:-./upload}:/data
+      - /etc/localtime:/etc/localtime:ro
+    ports: ["2283:2283"]
+    depends_on: [redis, database]
+    restart: unless-stopped
+  immich-machine-learning:
+    container_name: immich_machine_learning
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-v3.2.4}
+    volumes: [model-cache:/cache]
+    restart: unless-stopped
+  redis:
+    image: docker.io/valkey/valkey:9@sha256:8e8d64b405ce18f41b8e5ee20aa4687a8ed0022d1298f2ce31cdcf3a76e09411
+    restart: unless-stopped
+  database:
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD in .env setzen}
+      POSTGRES_USER: postgres
+      POSTGRES_DB: immich
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    volumes: ["${DB_DATA_LOCATION:-./postgres}:/var/lib/postgresql/data"]
+    shm_size: 128mb
+    restart: unless-stopped
+
+  showcase:
+    image: ghcr.io/dirkvoss/immich-showcase:${SHOWCASE_VERSION:-latest}
+    container_name: showcase
+    restart: unless-stopped
+    user: "10001:10001"
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 768m
+    ports: ["8090:8090"]
+    environment:
+      TZ: ${TZ:-Europe/Berlin}
+      RAHMEN_IMMICH_URL: http://immich-server:2283/api
+      RAHMEN_WEB_AUTH: ${RAHMEN_WEB_AUTH:-pin}
+      RAHMEN_WEB_TV_ZIELE: ${RAHMEN_WEB_TV_ZIELE:-wohnzimmer=Wohnzimmer}
+      RAHMEN_WEB_RAHMEN_ZIELE: ${RAHMEN_WEB_RAHMEN_ZIELE:-rahmen=Bilderrahmen}
+    volumes: [showcase_data:/data]
+    depends_on: [immich-server]
+
+volumes:
+  model-cache:
+  showcase_data:

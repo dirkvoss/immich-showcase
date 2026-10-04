@@ -29,6 +29,8 @@ jobs:
           COMPOSE_FILE=docker-compose.yml:docker-compose.immich-network.yml docker compose config -q
           COMPOSE_FILE=docker-compose.yml:docker-compose.build.yml docker compose config -q
           rm .env
+          (cd examples/immich-stack && DB_PASSWORD=x docker compose config -q)
+          bash -n install.sh
 
   integration:
     # Echtes Immich (ohne Machine Learning) mit erfundenen Fotos/Personen/Konten: Immich Showcase verbindet sich, postdeploy.py + Zusatzpruefungen.

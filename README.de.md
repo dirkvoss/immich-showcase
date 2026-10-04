@@ -38,6 +38,7 @@ Der Bilderrahmen (Dauerprogramm mit unscharfem Hintergrund, Datum, Ort und Uhr):
 - Für den Bilderrahmen ein **Tablet** (oder ein anderes Gerät mit Browser). Für den Fernseher einen Fernseher mit Webbrowser.
 
 ## Installation (ca. 5 Minuten)
+Abkürzung: `./install.sh` (oder `./install.sh --with-immich`, wenn du noch kein Immich hast) erledigt die folgenden Schritte für dich.
 
 ```bash
 git clone https://github.com/dirkvoss/immich-showcase.git
@@ -76,6 +77,23 @@ Danach startet die App von selbst neu. Auf dem iPhone: Teilen → „Zum Home-Bi
 3. `docker compose up -d`
 4. Am Tablet `http://<server>:8090/tv/?ziel=rahmen` im Vollbild öffnen – oder als Startseite in Fully Kiosk eintragen.
    *Tipp (Fully Kiosk):* Nutzt du die Adresse als **Bildschirmschoner**, trage sie in der Bildschirmschoner-Playlist ein und starte die App einmal neu – Fully Kiosk liest Änderungen an der Playlist erst nach einem Neustart.
+
+## Geräte per Code koppeln (keine Adressen tippen)
+1. Am Fernseher oder Tablet **`http://<server>:8090/tv/`** öffnen (ohne `?ziel=`). Es erscheint ein 6-stelliger **Code** und ein **QR-Code**.
+2. In der App **📡 Geräte** antippen, den Code eingeben (oder den QR-Code mit der Handykamera scannen – dann ist er schon eingetragen), wählen, welcher Fernseher/Rahmen es ist, **Koppeln** tippen.
+3. Das Gerät merkt sich seine Rolle. Danach genügt `/tv/` allein. (Welche Fernseher und Rahmen es gibt, steht weiterhin in der `.env`, siehe unten.)
+
+## Die Geräte-Ansicht
+**📡 Geräte** in der App listet jeden Fernseher und Rahmen: online oder offline, was gerade läuft, seit wann das aktuelle Bild zu sehen ist und wann das Gerät zuletzt gesehen wurde.
+
+## Mehrere Rahmen, Zeitplan, „Heute vor Jahren“
+- **Eigenes Programm je Rahmen:** `RAHMEN_WEB_RAHMEN_QUELLEN_FLUR=<album-id>:70, neu14:30` (Kennung in Großbuchstaben) – siehe `.env.example`.
+- **Zeitplan:** `RAHMEN_WEB_RAHMEN_ZEITPLAN=Mo-Fr 18:00-22:00 = <album-id>:1; Sa,So 08:00-20:00 = heute:50, *:50` – zu verschiedenen Zeiten andere Quellen (auch je Rahmen, Bereiche über Mitternacht sind erlaubt).
+- **Heute vor Jahren:** die Quelle `heute` (oder `heute5` = ±5 Tage) zeigt Fotos von diesem Tag aus früheren Jahren.
+- **Wetter und Termine** oben rechts am Rahmen: `RAHMEN_WEB_WETTER_ORT=52.52,13.40` (open-meteo.com, kostenlos, ohne Konto – dein **Server** fragt ab, nur die Koordinaten werden übertragen) und `RAHMEN_WEB_KALENDER_URL=<iCalendar-Link>` (Google/Nextcloud/Apple „geheime iCal-Adresse“; einfache tägliche/wöchentliche/jährliche Wiederholungen werden verstanden). Es erscheint nur, was du einrichtest.
+
+## Installationshilfe
+`./install.sh` startet Immich Showcase und zeigt Adresse und Einrichtungs-Code. **Noch kein Immich?** `./install.sh --with-immich` startet **Immich und Immich Showcase zusammen** (siehe `examples/immich-stack/`).
 
 ## Alltag
 1. App am Handy öffnen und anmelden (PIN, oder dein Immich-Konto bei `RAHMEN_WEB_AUTH=immich`).
@@ -128,14 +146,13 @@ Oberfläche und Satzsuche gibt es auf **Deutsch, Englisch, Spanisch, Französisc
 
 ## Einschränkungen
 - Ohne Datenbankzugang nimmt die Motivsuche („am Strand“) die besten 60 Treffer der Rangliste, statt die Ähnlichkeit exakt zu prüfen. Filter sind etwas langsamer, aber gleichwertig. Datenbankzugang ist optional (`RAHMEN_DB_DSN`).
-- Noch keine Kopplung per QR-Code: Die Adresse muss einmal an jedem Gerät eingegeben werden.
 - Es wird keine Musik mitgeliefert.
 
 ## Entwicklung
 `pip install -r requirements-dev.txt && python -m pytest`. Versionen baut GitHub Actions aus Versions-Tags; siehe [RELEASING.md](RELEASING.md) und [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Lizenzen von Bestandteilen
-Schrift *Cormorant Garamond* (SIL OFL 1.1). Das Logo ist eigens erzeugt. Keine Musik im Repository.
+Schrift *Cormorant Garamond* (SIL OFL 1.1). QR-Code-Erzeuger *qrcode-generator* von Kazuhiko Arase (MIT, `static/qrcode.js`). Das Logo ist eigens erzeugt. Keine Musik im Repository.
 
 ## Lizenz
 [GNU Affero General Public License v3.0 oder neuer](LICENSE) (AGPL-3.0-or-later), wie Immich selbst. Wer die App als Dienst für andere betreibt, muss geänderten Quelltext ebenfalls bereitstellen. Schrift: siehe `static/fonts/OFL.txt`.
