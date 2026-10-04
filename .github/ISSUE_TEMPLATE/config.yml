@@ -1,1 +1,5 @@
 blank_issues_enabled: false
+contact_links:
+  - name: Frage oder Hilfe bei der Einrichtung / Question or setup help
+    url: https://github.com/dirkvoss/immich-showcase/discussions
+    about: Fragen und Austausch bitte in den Diskussionen (Fragen are welcome in German and English).

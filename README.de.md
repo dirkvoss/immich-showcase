@@ -108,6 +108,11 @@ Es wird keine mitgeliefert (Lizenzen). Zwei Wege:
 | Container erreicht Immich nicht | IP des Rechners statt `localhost` verwenden oder Immichs Docker-Netzwerk nutzen (siehe oben) |
 | Sonst | `docker compose logs showcase`; im **Hilfe**-Fenster der App lässt sich ein *Support-Paket* (Diagnose ohne Geheimnisse) für einen Fehlerbericht erzeugen |
 
+## Problem melden oder etwas vorschlagen
+- In der App: **Hilfe → 🐞 Problem melden** (öffnet GitHub mit eingetragener Version) – bitte das **Support-Paket** aus demselben Fenster anhängen (Diagnose ohne Passwörter, PIN oder Schlüssel).
+- Wünsche und Ideen: **Hilfe → 💡 Wunsch oder Idee** oder der [Issue-Tracker](https://github.com/dirkvoss/immich-showcase/issues).
+- Fragen und Hilfe bei der Einrichtung: [Diskussionen](https://github.com/dirkvoss/immich-showcase/discussions) – Deutsch und Englisch sind beide in Ordnung.
+
 ## Einstellungen
 Alles Installationsspezifische steht in der `.env` – jede Einstellung ist in [.env.example](.env.example) erklärt. Deine eigene `.env` ist nie Teil des Repositorys.
 

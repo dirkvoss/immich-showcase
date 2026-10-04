@@ -313,7 +313,10 @@
   "Personen, Zeit, Orte und Motive lassen sich kombinieren, z. B.": "People, time, places and subjects can be combined, e.g.",
   "z. B.": "e.g.",
   "Sprache / Language": "Language / Sprache",
-  "Version": "Version"
+  "Version": "Version",
+  "🐞 Problem melden": "🐞 Report a problem",
+  "💡 Wunsch oder Idee": "💡 Wish or idea",
+  "Die Meldung öffnet sich auf GitHub (Konto nötig). Bitte das Support-Paket oben anhängen.": "The report opens on GitHub (account needed). Please attach the support package above."
  },
  "muster": [
   [

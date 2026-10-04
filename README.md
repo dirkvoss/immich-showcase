@@ -108,6 +108,11 @@ None is included (licences). Two ways:
 | Containers can't reach Immich | Use the machine's IP instead of `localhost`, or join Immich's Docker network (see above) |
 | Anything else | `docker compose logs showcase`; the **Help** window in the app can create a *support package* (diagnostics without secrets) for a bug report |
 
+## Report a problem or suggest something
+- In the app: **Help → 🐞 Report a problem** (opens GitHub with your version filled in) – please attach the **support package** from the same window (diagnostics without passwords, PIN or keys).
+- Wishes and ideas: **Help → 💡 Wish or idea**, or the [issue tracker](https://github.com/dirkvoss/immich-showcase/issues).
+- Questions and setup help: [Discussions](https://github.com/dirkvoss/immich-showcase/discussions) – German and English are both fine.
+
 ## Settings
 Everything installation-specific lives in `.env` – every setting is explained in [.env.example](.env.example). Your own `.env` is never part of the repository.
 
