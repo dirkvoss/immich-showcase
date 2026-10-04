@@ -1,0 +1,11 @@
+name: Wunsch / Idee
+description: Eine neue Funktion oder Verbesserung vorschlagen
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idee
+    attributes: {label: Was wünschst du dir?, description: "Und wofür brauchst du es?"}
+    validations: {required: true}
+  - type: dropdown
+    id: einsatz
+    attributes: {label: Einsatzzweck, options: [Bilderrahmen, Fernseher, Beides, Anderes]}

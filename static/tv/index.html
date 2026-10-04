@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<script src="/i18n.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Immich Showcase TV</title>
+<style>
+@font-face { font-family: "Cormorant Garamond"; font-weight: 600; src: url(/fonts/cormorant-600.woff2) format("woff2"); }
+/* bewusst schlicht (ES5, einfaches CSS): laeuft auch im aelteren Browser von LG webOS / Android TV */
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; color: #fff; overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif; cursor: none; }
+.bild { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0;
+  -webkit-transition: opacity 1.2s ease; transition: opacity 1.2s ease; }
+.bild.an { opacity: 1; }
+.bg { position: absolute; top: -6%; left: -6%; width: 112%; height: 112%; background-size: cover; background-position: center; opacity: 0;
+  -webkit-filter: blur(46px) brightness(.55); filter: blur(46px) brightness(.55); -webkit-transition: opacity 1.2s ease; transition: opacity 1.2s ease; }
+.bg.an { opacity: 1; }
+body.zuschnitt .bild { object-fit: cover; }
+#bildtext { position: absolute; right: 36px; bottom: 28px; max-width: 55%; text-align: right; font-size: 30px; color: #fff; text-shadow: 0 1px 10px rgba(0,0,0,.85); opacity: 0; -webkit-transition: opacity 1s; transition: opacity 1s; }
+#bildtext.an { opacity: .92; }
+#nacht { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 40; display: none; }
+#mitte { background: -webkit-radial-gradient(50% 38%, circle, #2b3a52 0%, #151b27 55%, #07090e 100%); background: radial-gradient(circle at 50% 38%, #2b3a52 0%, #151b27 55%, #07090e 100%); position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: -webkit-flex; display: flex;
+  -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center;
+  text-align: center; padding: 0 8%; }
+#mitteLogo { display: block; margin: 0 auto 26px; border-radius: 56px; -webkit-box-shadow: 0 0 90px rgba(214,174,85,.35); box-shadow: 0 0 90px rgba(214,174,85,.35); }
+#mitte h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: 132px; line-height: 1; margin: 0 0 22px; font-weight: 600; letter-spacing: 2px; color: #f3e3b3; }
+#mitte p { font-size: 32px; line-height: 1.4; margin: 0; color: #c9ced6; }
+#titel { position: absolute; left: 40px; bottom: 36px; font-size: 30px; padding: 10px 18px; border-radius: 10px;
+  background: rgba(0,0,0,.55); opacity: 0; -webkit-transition: opacity .8s; transition: opacity .8s; }
+#titel.an { opacity: 1; }
+#musiktitel { position: absolute; right: 40px; bottom: 36px; max-width: 60%; font-size: 24px; padding: 8px 16px; border-radius: 10px; background: rgba(0,0,0,.55); color: #e6e9ee;
+  opacity: 0; -webkit-transition: opacity .8s; transition: opacity .8s; text-align: right; }
+#musiktitel.an { opacity: 1; }
+#punkt { position: absolute; right: 28px; top: 24px; width: 18px; height: 18px; border-radius: 9px; background: #2f7d4f; opacity: .0;
+  -webkit-transition: opacity .6s; transition: opacity .6s; }
+#punkt.warn { background: #e0834f; opacity: .9; }
+.versteckt { display: none !important; }
+#uhr { font-family: "Cormorant Garamond", Georgia, serif; font-size: 84px; line-height: 1; margin-top: 54px; color: #f3e3b3; letter-spacing: 2px; }
+#datum { font-size: 28px; margin-top: 10px; color: #9aa4b2; }
+#status { font-size: 24px; margin-top: 30px; color: #e0834f; min-height: 30px; }
+#uhrKlein { position: absolute; left: 36px; bottom: 28px; font-family: "Cormorant Garamond", Georgia, serif; font-size: 44px; color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,.7); opacity: 0; -webkit-transition: opacity 1s; transition: opacity 1s; }
+#uhrKlein.an { opacity: .85; }
+#pinpunkte { font-size: 64px; letter-spacing: 16px; margin-top: 24px; min-height: 80px; }
+</style>
+</head>
+<body>
+<div class="bg" id="bgA"></div>
+<div class="bg" id="bgB"></div>
+<img class="bild" id="bildA" alt="">
+<img class="bild" id="bildB" alt="">
+<video class="bild" id="vid" playsinline></video>
+<div id="mitte">
+  <div>
+    <img id="mitteLogo" src="/icon-512.png" alt="" width="280" height="280">
+    <h1 id="mitteTitel">Immich Showcase</h1>
+    <p id="mitteText">Verbinde …</p>
+    <div id="uhr"></div>
+    <div id="datum"></div>
+    <div id="status"></div>
+    <div id="pinpunkte" class="versteckt"></div>
+  </div>
+</div>
+<div id="titel"></div>
+<div id="uhrKlein"></div>
+<div id="bildtext"></div>
+<div id="nacht"></div>
+<div id="musiktitel"></div>
+<div id="punkt"></div>
+<script>
+(function () {
+  var teile = location.search.match(/ziel=([a-z0-9]+)/);
+  var ziel = teile ? teile[1] : "lg";
+  var NAMEN = { lg: "LG TV", shield: "Shield" };
+  api("/api/config", function (st, d) {
+    if (st === 200 && d && d.ziele) { for (var k in d.ziele) NAMEN[k] = d.ziele[k]; }
+    if (st === 200 && d && d.rahmen) { for (var r = 0; r < d.rahmen.length; r++) if (d.rahmen[r] === ziel) { rahmenModus = true; rahmenSek = d.rahmen_sek || 8; anzeige = d.rahmen_anzeige || []; nacht = d.rahmen_nacht || ""; if (!laeuft && !pinModus) startAmbient(); } }
+    fuellung = (rahmenModus ? d.rahmen_fuellung : d.tv_fuellung) || "balken";
+    document.body.className = fuellung === "zuschnitt" ? "zuschnitt" : "";
+  });
+  var seq = -1, liste = [], idx = 0, sek = 8, laeuft = false, pausiert = false, timer = 0, marke = 0, vorn = null, name = "", titelTimer = 0, pin = "";
+  var bildA = document.getElementById("bildA"), bildB = document.getElementById("bildB");
+  var mitte = document.getElementById("mitte"), mitteTitel = document.getElementById("mitteTitel"), mitteText = document.getElementById("mitteText");
+  var titel = document.getElementById("titel"), punkt = document.getElementById("punkt"), pinpunkte = document.getElementById("pinpunkte");
+  var fuellung = "balken", anzeige = [], nacht = "", bgA = document.getElementById("bgA"), bgB = document.getElementById("bgB"), bildtextEl = document.getElementById("bildtext"), nachtEl = document.getElementById("nacht"), letzterWechsel = new Date().getTime(), letzterErfolg = new Date().getTime(), verbinde = true, pinModus = false, rahmenModus = false, rahmenSek = 8, ambient = false;
+  var vid = document.getElementById("vid"), videoSet = {}, maxv = 60, videoTimer = 0, musikPausiert = false, imVideo = false;
+  var audio = null, musikKey = "", laut = 0.3, musikBlockiert = false, fade = 1.2;
+
+  function api(pfad, cb, methode, daten) {
+    var x = new XMLHttpRequest();
+    x.open(methode || "GET", pfad, true);
+    x.setRequestHeader("X-Rahmen", "1");
+    if (daten) x.setRequestHeader("Content-Type", "application/json");
+    x.timeout = 8000;
+    x.onload = function () { var d = null; try { d = JSON.parse(x.responseText); } catch (e) {} cb(x.status, d); };
+    x.onerror = function () { cb(0, null); };
+    x.ontimeout = x.onerror;
+    x.send(daten ? JSON.stringify(daten) : null);
+  }
+  var musikListe = [], musikIdx = 0, musikTimer = 0, musikTitelTimer = 0;
+  var musikTitelEl = document.getElementById("musiktitel");
+  function musikZeigeTitel(t) {
+    musikTitelEl.textContent = "🎵 " + t; musikTitelEl.className = "an"; clearTimeout(musikTitelTimer);
+    musikTitelTimer = setTimeout(function () { musikTitelEl.className = ""; }, 9000);
+  }
+  function musikStopp() {
+    clearTimeout(musikTimer);
+    if (audio) { try { audio.onerror = null; audio.onended = null; audio.pause(); audio.src = ""; } catch (e) {} }
+    audio = null; musikKey = ""; musikBlockiert = false; musikListe = []; musikTitelEl.className = "";
+  }
+  function musikSpiele(i) {                                      // naechstes Stueck der gemischten Liste
+    if (!musikKey || !musikListe.length) return;
+    musikIdx = ((i % musikListe.length) + musikListe.length) % musikListe.length;
+    var st = musikListe[musikIdx], k = musikKey;
+    if (!audio) { audio = new Audio(); audio.preload = "auto"; }
+    audio.volume = laut;
+    audio.onended = function () { if (musikKey === k) musikSpiele(musikIdx + 1); };
+    audio.onerror = function () { if (musikKey === k) { clearTimeout(musikTimer); musikTimer = setTimeout(function () { if (musikKey === k) musikSpiele(musikIdx + 1); }, 2000); } };
+    audio.src = "/api/tv/musikdatei/" + (st.kat || k) + "/" + encodeURIComponent(st.datei);
+    if (imVideo || pausiert) { musikPausiert = true; musikZeigeTitel(st.titel); return; }       // Video laeuft: Stueck vorbereiten, aber erst danach spielen
+    var p = audio.play();
+    if (p && p.catch) p.catch(function () { musikBlockiert = true; zeigeTitel("🎵 Für Musik einmal die OK-Taste drücken"); });
+    musikZeigeTitel(st.titel + (st.urheber ? " · " + st.urheber : "") + (st.lizenz ? " · " + st.lizenz : ""));
+  }
+  function musikPause(an) {                                      // Pause/Weiter gilt auch fuer die Hintergrundmusik
+    if (!audio || !musikKey) return;
+    if (an) { try { audio.pause(); } catch (e) {} }
+    else if (!imVideo) { musikPausiert = false; try { var p = audio.play(); if (p && p.catch) p.catch(function () {}); } catch (e2) {} }
+  }
+  function musikStart(key) {
+    musikStopp();
+    if (!key) return;
+    musikKey = key;
+    api("/api/tv/musikliste?k=" + encodeURIComponent(key), function (stt, d) {
+      if (stt !== 200 || !d || !d.stuecke || musikKey !== key) return;
+      musikListe = mischen(d.stuecke); musikSpiele(0);
+    });
+  }
+  function bereit() {
+    musikStopp(); try { videoAus(); } catch (e) {}
+    laeuft = false; pausiert = false; clearTimeout(timer); marke++;
+    bildA.className = "bild"; bildB.className = "bild"; vorn = null;
+    mitteTitel.textContent = "Immich Showcase";
+    mitteText.textContent = (NAMEN[ziel] || window.RW_T("Fernseher")) + " · bereit. Wähle am Handy Fotos und tippe auf „Auf TV“. (Für Musik einmal die OK-Taste drücken.)";
+    mitte.className = ""; titel.className = ""; ambient = false; uhrKlein.className = ""; bildtextEl.className = ""; nachtEl.style.display = "none"; bgA.className = "bg"; bgB.className = "bg";
+    if (rahmenModus && !pinModus) startAmbient();
+  }
+  function startAmbient() {                                      // Bilderrahmen im Leerlauf: Zufallsfotos als Dauerprogramm
+    if (laeuft || ambient) return;
+    api("/api/rahmen/zufall?n=40", function (st, d) {
+      if (laeuft || pinModus) return;
+      if (st !== 200 || !d || !d.ids || !d.ids.length) { setTimeout(function () { if (!laeuft) startAmbient(); }, 20000); return; }
+      liste = d.ids; sek = rahmenSek; name = ""; idx = 0; fehler = 0; videoSet = {}; maxv = 0;
+      fade = Math.min(1.2, sek * 0.3);
+      bildA.style.webkitTransition = bildA.style.transition = "opacity " + fade + "s ease";
+      bildB.style.webkitTransition = bildB.style.transition = "opacity " + fade + "s ease";
+      ambient = true; laeuft = true; pausiert = false; uhrKlein.className = "an"; nachtPruefen();
+      zeige(0);
+    });
+  }
+  function bildUnterschrift(id) {                                         // Datum/Ort (Konfiguration RAHMEN_WEB_RAHMEN_ANZEIGE), nur am Rahmen
+    if (!rahmenModus || !anzeige.length) { bildtextEl.className = ""; return; }
+    api("/api/bildinfo/" + id + "?lang=" + (window.RW_LANG || "de"), function (st, d) {
+      if (st !== 200 || !d) { bildtextEl.className = ""; return; }
+      var teile = [], dt = d.datum ? new Date(d.datum + "T12:00:00") : null, i;
+      for (i = 0; i < anzeige.length; i++) {
+        if (anzeige[i] === "datum" && dt && !isNaN(dt.getTime())) { try { teile.push(dt.toLocaleDateString(window.RW_LOCALE || "de-DE", { day: "numeric", month: "long", year: "numeric" })); } catch (e) { teile.push(d.datum); } }
+        if (anzeige[i] === "ort" && d.ort) teile.push(d.ort);
+      }
+      bildtextEl.textContent = teile.join(" · "); bildtextEl.className = teile.length ? "an" : "";
+    });
+  }
+  function nachtPruefen() {                                                // Nachtruhe: im Dauerprogramm schwarzer Schirm
+    var an = false, m, h1, m1, h2, m2, jetzt, a, b;
+    if (nacht && ambient) {
+      m = nacht.match(/^(\d+):(\d+)-(\d+):(\d+)$/);
+      if (m) { h1 = +m[1]; m1 = +m[2]; h2 = +m[3]; m2 = +m[4]; var d = new Date(); jetzt = d.getHours() * 60 + d.getMinutes(); a = h1 * 60 + m1; b = h2 * 60 + m2; an = a <= b ? (jetzt >= a && jetzt < b) : (jetzt >= a || jetzt < b); }
+    }
+    nachtEl.style.display = an ? "block" : "none";
+  }
+  setInterval(nachtPruefen, 20000);
+  function zeigeTitel(text) {
+    titel.textContent = text; titel.className = "an"; clearTimeout(titelTimer);
+    titelTimer = setTimeout(function () { titel.className = ""; }, 6000);
+  }
+  function mischen(a) { var l = a.slice(), i, j, t; for (i = l.length - 1; i > 0; i--) { j = Math.floor(Math.random() * (i + 1)); t = l[i]; l[i] = l[j]; l[j] = t; } return l; }
+  function quelle(i) { return "/api/vorschau/" + liste[i] + "?s=gross"; }
+  function plane() { clearTimeout(timer); if (laeuft && !pausiert) timer = setTimeout(function () { zeige(idx + 1); }, sek * 1000); }
+  var fehler = 0;
+  function videoAus() {                                          // Video beenden/ausblenden und Musik wieder aufnehmen
+    clearTimeout(videoTimer);
+    try { vid.onended = null; vid.onerror = null; vid.pause(); vid.removeAttribute("src"); vid.load(); } catch (e) {}
+    vid.className = "bild"; imVideo = false;
+    if (musikPausiert) { musikPausiert = false; if (audio) { try { audio.play(); } catch (e2) {} } }
+  }
+  function zeigeVideo(m, alt, id) {                              // Video mit eigenem Ton; Musik pausiert solange
+    imVideo = true;
+    if (audio && musikKey) { musikPausiert = true; try { audio.pause(); } catch (e) {} }
+    var fertig = false;
+    function weiter() { if (fertig || m !== marke) return; fertig = true; videoAus(); zeige(idx + 1); }
+    vid.onended = weiter;
+    vid.onerror = function () { if (m !== marke || fertig) return; fertig = true; videoAus(); if (++fehler > 6) { bereit(); mitteText.textContent = "Die Videos lassen sich gerade nicht laden."; } else zeige(idx + 1); };
+    vid.muted = false; vid.volume = 1;
+    vid.src = "/api/tv/videodatei/" + id;
+    videoTimer = setTimeout(function () {                      // Video laedt nicht rechtzeitig (z. B. noch in Umwandlung) -> naechstes Foto
+      if (m !== marke || fertig) return; fertig = true; videoAus(); zeige(idx + 1);
+    }, 30000);
+    vid.oncanplay = function () {
+      if (m !== marke) return;
+      clearTimeout(videoTimer); vid.oncanplay = null; fehler = 0;
+      var p = vid.play();
+      if (p && p.catch) p.catch(function () { vid.muted = true; try { vid.play(); } catch (e) {} zeigeTitel("🔇 Für Video-Ton einmal die OK-Taste drücken"); musikBlockiert = true; });
+      vid.className = "bild an"; if (alt) alt.className = "bild";
+      vorn = vid; mitte.className = "versteckt";
+      videoTimer = setTimeout(weiter, (maxv || 60) * 1000);       // Sicherheitsgrenze
+    };
+    vid.load();
+  }
+  function zeige(i) {
+    clearTimeout(timer);
+    if (!liste.length) return;
+    if (ambient && i >= liste.length) {                          // Dauerprogramm: naechste Zufallsauswahl holen
+      api("/api/rahmen/zufall?n=40", function (st, d) {
+        if (!ambient) return;
+        if (st === 200 && d && d.ids && d.ids.length) { liste = d.ids; zeige(0); } else zeige(0);
+      });
+      return;
+    }
+    idx = ((i % liste.length) + liste.length) % liste.length;
+    var m = ++marke, neu = (vorn === bildA) ? bildB : bildA, alt = vorn;
+    clearTimeout(videoTimer);
+    if (vorn !== vid) { try { vid.pause(); } catch (e) {} } else { videoAus(); }
+    if (videoSet[liste[idx]]) { zeigeVideo(m, (alt === vid ? null : alt), liste[idx]); return; }
+    neu.onload = function () {
+      if (m !== marke) return;
+      fehler = 0; letzterWechsel = new Date().getTime();
+      neu.className = "bild an";
+      if (alt) alt.className = "bild";
+      if (fuellung === "unscharf") {                                       // unscharfe Fortsetzung des Fotos statt schwarzer Raender
+        var bn = (neu === bildA) ? bgA : bgB, ba = (neu === bildA) ? bgB : bgA;
+        bn.style.backgroundImage = "url(" + neu.src + ")"; bn.className = "bg an"; ba.className = "bg";
+      }
+      bildUnterschrift(liste[idx]);
+      if (musikPausiert) { musikPausiert = false; if (audio) { try { audio.play(); } catch (e3) {} } }
+      vorn = neu; mitte.className = "versteckt";
+      var n = new Image(); n.src = quelle((idx + 1) % liste.length);          // naechstes vorladen
+      plane();
+    };
+    neu.onerror = function () {
+      if (m !== marke) return;
+      if (++fehler > 6) { var rm = rahmenModus; rahmenModus = false; bereit(); rahmenModus = rm; mitteText.textContent = "Die Fotos lassen sich gerade nicht laden."; if (rm) setTimeout(function () { if (!laeuft) startAmbient(); }, 30000); return; }
+      zeige(idx + 1);
+    };
+    neu.src = quelle(idx);
+  }
+  function behandle(e) {
+    if (!e) return;
+    if (e.typ === "start") {
+      ambient = false; uhrKlein.className = ""; nachtEl.style.display = "none";
+      liste = e.zufall ? mischen(e.ids) : e.ids.slice(); sek = e.sek || 8; name = e.name || ""; idx = 0; laeuft = true; pausiert = false; fehler = 0;
+      videoSet = {}; var vi; for (vi = 0; e.videos && vi < e.videos.length; vi++) videoSet[e.videos[vi]] = true; maxv = e.maxv || 60;
+      fade = Math.min(1.2, sek * 0.3);                                   // Ueberblendung: 30 % der Anzeigedauer, hoechstens 1,2 s
+      bildA.style.webkitTransition = bildA.style.transition = "opacity " + fade + "s ease";
+      bildB.style.webkitTransition = bildB.style.transition = "opacity " + fade + "s ease";
+      laut = e.laut || 0.3; musikStart(e.musik || "");
+      zeige(0); zeigeTitel(name);
+    } else if (e.typ === "steuer") {
+      if (e.aktion === "stopp") bereit();
+      else if (!laeuft) return;
+      else if (e.aktion === "pause") { pausiert = true; clearTimeout(timer); musikPause(true); if (vorn === vid) { try { vid.pause(); } catch (e4) {} } }
+      else if (e.aktion === "weiter") { pausiert = false; musikPause(false); if (vorn === vid) { try { vid.play(); } catch (e5) {} } else plane(); }
+      else if (e.aktion === "vor") zeige(idx + 1);
+      else if (e.aktion === "zurueck") zeige(idx - 1);
+      else if (e.aktion === "musik") musikStart(e.wert || "");
+      else if (e.aktion === "naechster") { if (musikKey) musikSpiele(musikIdx + 1); }
+      else if (e.aktion === "titel") { var ti, w = e.wert || ""; for (ti = 0; ti < musikListe.length; ti++) if (musikListe[ti].datei === w) { musikPausiert = false; musikSpiele(ti); break; } }
+      else if (e.aktion === "lauter" || e.aktion === "leiser") {
+        laut = Math.max(0.05, Math.min(1, laut + (e.aktion === "lauter" ? 0.1 : -0.1)));
+        if (audio) audio.volume = laut;
+        zeigeTitel("🔊 Musik-Lautstärke " + Math.round(laut * 100) + " %");
+      }
+    }
+  }
+  var uhrKlein = document.getElementById("uhrKlein");
+  var statusEl = document.getElementById("status"), uhrEl = document.getElementById("uhr"), datumEl = document.getElementById("datum");
+  function uhrZeigen() {                                         // Ruhebild: Uhrzeit und Datum, damit der Fernseher nie "leer" wirkt
+    var d = new Date(), h = d.getHours(), m = d.getMinutes();
+    uhrEl.textContent = uhrKlein.textContent = (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
+    try { datumEl.textContent = d.toLocaleDateString(window.RW_LOCALE || "de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric" }); } catch (e) { datumEl.textContent = d.toLocaleDateString(); }
+  }
+  uhrZeigen(); setInterval(uhrZeigen, 10000);
+  function verbunden(ok) { punkt.className = ok ? "" : "warn"; }
+  function abfrage() {
+    if (pinModus) return;
+    var meldung = "&ra=" + (laeuft ? Math.round((new Date().getTime() - letzterWechsel) / 1000) : -1) + "&a=" + (ambient ? 1 : 0) + "&s=" + (laeuft && !ambient ? 1 : 0) + "&n=" + encodeURIComponent(laeuft && !ambient ? name : "") + "&m=" + (audio && !audio.paused ? musikKey : "");
+    api("/api/tv/abfrage?ziel=" + ziel + "&seq=" + seq + meldung, function (st, d) {
+      if (st === 401) { zeigePin(); return; }
+      if (st === 200 && d) {
+        verbunden(true); statusEl.textContent = ""; letzterErfolg = new Date().getTime();
+        var i;
+        for (i = 0; i < d.events.length; i++) behandle(d.events[i]);
+        seq = d.seq;
+        if (!laeuft && verbinde) { verbinde = false; bereit(); }
+      } else {
+        verbunden(false);
+        statusEl.textContent = "Keine Verbindung zum Server – ich versuche es weiter …";
+      }
+      setTimeout(abfrage, 2000);
+    });
+  }
+  // Falls diese Adresse nicht im vertrauten Netz liegt: PIN mit der Fernbedienung eingeben
+  function zeigePin() {
+    pinModus = true; pin = ""; mitte.className = "";
+    mitteTitel.textContent = "PIN eingeben"; mitteText.textContent = "6 Ziffern mit der Fernbedienung";
+    pinpunkte.className = ""; pinpunkte.textContent = "";
+  }
+  function pinTaste(z) {
+    pin += z; pinpunkte.textContent = new Array(pin.length + 1).join("•");
+    if (pin.length === 6) {
+      api("/api/login", function (st) {
+        if (st === 200) { pinModus = false; pinpunkte.className = "versteckt"; seq = -1; mitteText.textContent = "Verbinde …"; verbinde = true; abfrage(); }
+        else { pin = ""; pinpunkte.textContent = ""; mitteText.textContent = st === 429 ? "Zu viele Versuche – bitte später erneut." : "PIN falsch – nochmal versuchen"; }
+      }, "POST", { pin: pin });
+    }
+  }
+  document.addEventListener("keydown", function (e) {
+    var k = e.keyCode;
+    if (pinModus) { if (k >= 48 && k <= 57) pinTaste(String(k - 48)); else if (k >= 96 && k <= 105) pinTaste(String(k - 96)); return; }
+    if (musikBlockiert && audio) { musikBlockiert = false; try { audio.play(); } catch (e2) {} }   // erste Taste erlaubt den Ton
+    if (vorn === vid && vid.muted) { vid.muted = false; }                                             // Video-Ton freigeben
+    if (!laeuft) return;
+    if (k === 39) zeige(idx + 1);                       // Pfeil rechts
+    else if (k === 37) zeige(idx - 1);                  // Pfeil links
+    else if (k === 13 || k === 415 || k === 19) { pausiert = !pausiert; musikPause(pausiert); if (vorn === vid) { try { if (pausiert) vid.pause(); else vid.play(); } catch (e6) {} } else if (pausiert) clearTimeout(timer); else plane(); zeigeTitel(pausiert ? "Pause" : name); }
+  });
+  var stand = null;
+  function standPruefen() {                                    // neue Version auf dem Server? Dann (im Ruhebild) neu laden
+    api("/api/version", function (st, d) { if (st === 200 && d) { if (stand === null) stand = d.v; else if (d.v !== stand && (!laeuft || ambient)) location.reload(); } });
+  }
+  standPruefen(); setInterval(standPruefen, 60000);
+  // Selbstheilung: haengt das Dauerprogramm (kein Bildwechsel) oder bricht die Verbindung lange ab, Seite neu laden
+  setInterval(function () {
+    var jetzt = new Date().getTime();
+    if (ambient && !pausiert && jetzt - letzterWechsel > (sek * 4 + 90) * 1000) location.reload();
+    else if (jetzt - letzterErfolg > 10 * 60 * 1000) location.reload();
+  }, 30000);
+  mitteTitel.textContent = "Immich Showcase";
+  abfrage();
+})();
+</script>
+</body>
+</html>

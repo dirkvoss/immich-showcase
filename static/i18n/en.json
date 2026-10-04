@@ -1,0 +1,640 @@
+{
+ "texte": {
+  "Dein Blick in die Fotos": "Your window into your photos",
+  "Bitte PIN eingeben": "Please enter your PIN",
+  "PIN, 6 Ziffern": "PIN, 6 digits",
+  "Neueste": "Latest",
+  "Suchen": "Search",
+  "Meine Shows": "My shows",
+  "Normal": "Normal",
+  "Immich Showcase – zur Startseite": "Immich Showcase – back to start",
+  "Rückgängig": "Undo",
+  "↶ Rückgängig": "↶ Undo",
+  "Letzte Änderung an der Auswahl rückgängig machen": "Undo the last change to the selection",
+  "Der Rahmen zeigt wieder das normale Programm": "The frame goes back to its normal programme",
+  "Reihenfolge auf dem Rahmen": "Order on the frame",
+  "Zeitlich: ältestes zuerst": "By date: oldest first",
+  "Zeitlich: neuestes zuerst": "By date: newest first",
+  "Zufällig": "Random",
+  "Zufall": "Random",
+  "Reihenfolge": "Order",
+  "Alle Personen": "All people",
+  "Alle Jahre": "All years",
+  "Alle Länder": "All countries",
+  "Nur Fotos": "Photos only",
+  "Nur Videos": "Videos only",
+  "Fotos & Videos": "Photos & videos",
+  "Fotos &amp; Videos": "Photos & videos",
+  "Person": "Person",
+  "Jahr": "Year",
+  "Land": "Country",
+  "Medien": "Media",
+  "✕ Filter zurücksetzen": "✕ Reset filters",
+  "Alle Filter zurücksetzen": "Reset all filters",
+  "✓ Alle auswählen": "✓ Select all",
+  "✕ Alle abwählen": "✕ Deselect all",
+  "✓ Alle Treffer auswählen": "✓ Select all results",
+  "✕ Alle Treffer abwählen": "✕ Deselect all results",
+  "Alle Fotos abwählen (es werden keine Fotos gelöscht)": "Deselect all photos (no photos are deleted)",
+  "▶ Diashow": "▶ Slideshow",
+  "Diashow": "Slideshow",
+  "Die Fotos dieser Ansicht als Diashow abspielen": "Play the photos in this view as a slideshow",
+  "Die Treffer als Diashow abspielen": "Play the results as a slideshow",
+  "Tag wählen": "Select day",
+  "Ohne Datum": "No date",
+  "Lade …": "Loading …",
+  "Lade alle …": "Loading all …",
+  "Das waren alle Fotos.": "That was all of them.",
+  "Keine Fotos gefunden.": "No photos found.",
+  "Großansicht": "Enlarged view",
+  "Foto groß ansehen": "View photo larger",
+  "Foto": "Photo",
+  "Video": "Video",
+  "Suchtext": "Search text",
+  "Suche läuft …": "Searching …",
+  "🎤 Tipp: Auf der Tastatur das Mikrofon antippen und einfach sprechen, z. B.": "🎤 Tip: tap the microphone on the keyboard and just speak, e.g.",
+  "Dauer-Diashow, keine Wunsch-Show aktiv": "Continuous slideshow, no requested show active",
+  "Bilderrahmen": "Picture frame",
+  "Rahmen": "Frame",
+  "● Läuft gerade auf dem Rahmen": "● Now playing on the frame",
+  "Normales Programm": "Normal programme",
+  "Neueste Fotos": "Latest photos",
+  "Zurück zu": "Back to",
+  "⭐ Gemerkt": "⭐ Saved",
+  "🕘 Zuletzt gezeigt": "🕘 Recently shown",
+  "läuft": "playing",
+  "Noch nichts dauerhaft gemerkt. Tippe bei einer Show auf „⭐ Merken“.": "Nothing saved permanently yet. Tap “⭐ Save” on a show.",
+  "Alles, was du auf den Rahmen schickst, erscheint hier automatisch.": "Everything you send to the frame appears here automatically.",
+  "▶ Auf den Rahmen": "▶ On the frame",
+  "📺 Auf TV": "📺 On TV",
+  "🖥 Diashow hier": "🖥 Slideshow here",
+  "Bearbeiten": "Edit",
+  "☆ Nicht mehr merken": "☆ Unsave",
+  "⭐ Merken": "⭐ Save",
+  "⭐ merken": "⭐ save",
+  "Löschen": "Delete",
+  "Dauerhaft unter „Gemerkt“ speichern – sonst steht die Show nur unter „Zuletzt gezeigt“": "Save permanently under “Saved” – otherwise the show only appears under “Recently shown”",
+  "Name der Show": "Name of the show",
+  "Noch nichts ausgewählt.": "Nothing selected yet.",
+  "Ausgewählte Fotos": "Selected photos",
+  "✕ Leeren": "✕ Clear",
+  "Leeren": "Clear",
+  "Auf den Rahmen": "On the frame",
+  "Sende …": "Sending …",
+  "Schließen": "Close",
+  "Abbrechen": "Cancel",
+  "Auswählen": "Select",
+  "✓ Ausgewählt – abwählen": "✓ Selected – deselect",
+  "Bitte gib der Show einen Namen.": "Please give the show a name.",
+  "Es sind keine Fotos ausgewählt.": "No photos are selected.",
+  "Auf den Rahmen gehen nur Fotos – diese Auswahl enthält nur Videos. Nutze „📺 Auf den TV“.": "Only photos can go to the frame – this selection contains only videos. Use “📺 On TV”.",
+  "Auswahl geleert – mit „↶ Rückgängig“ holst du sie zurück.": "Selection cleared – use “↶ Undo” to get it back.",
+  "Rückgängig gemacht.": "Undone.",
+  "Der Rahmen soll wieder das normale Programm zeigen?": "Should the frame go back to its normal programme?",
+  "Es sind höchstens 1000 Fotos pro Show möglich.": "A show can have at most 1000 photos.",
+  "Höchstens 1000 Fotos pro Show.": "At most 1000 photos per show.",
+  "Die Diashow hier zeigt nur Fotos – Videos laufen über „📺 Auf den TV“.": "The slideshow here only shows photos – videos play via “📺 On TV”.",
+  "Die Fotos lassen sich gerade nicht laden.": "The photos can't be loaded right now.",
+  "Die Auswahl hier als Diashow abspielen – der Bilderrahmen bleibt unverändert": "Play the selection here as a slideshow – the picture frame stays unchanged",
+  "Die Auswahl per AirPlay auf LG TV oder Shield abspielen": "Play the selection via AirPlay on LG TV or Shield",
+  "Diashow beenden": "End slideshow",
+  "Vollbild": "Fullscreen",
+  "Pause": "Pause",
+  "Tempo": "Speed",
+  "Fertig": "Done",
+  "3 s": "3 s",
+  "5 s": "5 s",
+  "8 s": "8 s",
+  "15 s": "15 s",
+  "30 s": "30 s",
+  "60 s": "60 s",
+  "📺 Auf den Fernseher": "📺 On the TV",
+  "📺 Auf den TV": "📺 On TV",
+  "Fernseher": "TV",
+  "Fernseher stoppen": "Stop TV",
+  "Fernbedienung für den Fernseher öffnen": "Open the remote for the TV",
+  "Fernbedienung": "Remote",
+  "Zeit pro Foto": "Time per photo",
+  "3 Sekunden": "3 seconds",
+  "5 Sekunden": "5 seconds",
+  "8 Sekunden": "8 seconds",
+  "12 Sekunden": "12 seconds",
+  "20 Sekunden": "20 seconds",
+  "30 Sekunden": "30 seconds",
+  "60 Sekunden": "60 seconds",
+  "3 Minuten": "3 minutes",
+  "🎬 Videos höchstens": "🎬 Videos at most",
+  "🎵 Hintergrundmusik": "🎵 Background music",
+  "Hintergrundmusik": "Background music",
+  "Keine": "None",
+  "Aus": "Off",
+  "Frei lizenzierte Musik (gemeinfrei oder CC BY, Titel und Urheber erscheinen am Fernseher) – leise im Hintergrund, Reihenfolge zufällig.": "Freely licensed music (public domain or CC BY; title and artist are shown on the TV) – quietly in the background, in random order.",
+  "Lautstärke der Musik": "Music volume",
+  "Sehr leise": "Very quiet",
+  "Leise": "Quiet",
+  "Mittel": "Medium",
+  "▶ Starten": "▶ Start",
+  "⏹ Stopp": "⏹ Stop",
+  "Am Fernseher einmal die Fernseher-Seite dieser App (…/tv/) im Browser öffnen": "On the TV, open this app's TV page (…/tv/) in the browser once",
+  "und offen lassen.": "and leave it open.",
+  "und offen lassen. ·": "and leave it open. ·",
+  "Stattdessen als AirPlay-Video senden (nur Safari)": "Send as an AirPlay video instead (Safari only)",
+  "Die Auswahl hier als Diashow": "The selection as a slideshow",
+  "Musik lauter": "Music louder",
+  "Musik leiser": "Music quieter",
+  "Nächster Musiktitel": "Next music track",
+  "Nächster Titel": "Next track",
+  "Nächstes Foto": "Next photo",
+  "Vorheriges Foto": "Previous photo",
+  "🎵 Titel": "🎵 Track",
+  "– zufällig weiter –": "– continue randomly –",
+  "Musik aus.": "Music off.",
+  "Fernseher gestoppt.": "TV stopped.",
+  "Bitte einen Fernseher wählen.": "Please choose a TV.",
+  "Video vorbereiten": "Prepare video",
+  "Video wird vorbereitet …": "Preparing video …",
+  "📺 Fernseher wählen (AirPlay)": "📺 Choose TV (AirPlay)",
+  "AirPlay lässt sich hier nicht öffnen.": "AirPlay can't be opened here.",
+  "Das Video wird auf dem Server gebaut – das dauert je nach Anzahl etwa 10 bis 90 Sekunden. Danach wählst du den Fernseher im AirPlay-Fenster (nur Safari).": "The video is being built on the server – this takes roughly 10 to 90 seconds depending on the number of photos. Then choose the TV in the AirPlay window (Safari only).",
+  "AirPlay-Auswahl gibt es nur in Safari (iPhone, iPad, Mac). Hier kannst du das Video nur auf diesem Gerät ansehen.": "The AirPlay picker only exists in Safari (iPhone, iPad, Mac). Here you can only watch the video on this device.",
+  "Im AirPlay-Fenster LG TV oder SHIELDAndroidTV auswählen – die Fotos laufen dann auf dem Fernseher. Falls beide fehlen: Fernseher an und im selben WLAN?": "In the AirPlay window choose LG TV or SHIELDAndroidTV – the photos then play on the TV. If both are missing: is the TV on and on the same Wi-Fi?",
+  "Fehler beim Vorbereiten": "Error while preparing",
+  "Suche Fernseher …": "Looking for TVs …",
+  "Für ein AirPlay-Video höchstens 150 Fotos – bitte weniger auswählen oder den Fernseher-Weg nutzen.": "At most 150 photos for an AirPlay video – please select fewer or use the TV page.",
+  "Der Fernseher hat die Seite /tv noch nicht geöffnet – es startet, sobald sie offen ist.": "The TV hasn't opened the /tv page yet – it will start as soon as it is open.",
+  "● bereit": "● ready",
+  "○ nicht geöffnet": "○ not open",
+  "Update": "Update",
+  "↻ Neue Version verfügbar – tippen zum Aktualisieren": "↻ New version available – tap to update",
+  "Neue Version verfügbar – tippen zum Aktualisieren": "New version available – tap to update",
+  "PIN erforderlich": "PIN required",
+  "PIN falsch": "Wrong PIN",
+  "Anfrage nicht zugelassen": "Request not allowed",
+  "Es ist ein Fehler aufgetreten. Bitte nochmal versuchen.": "An error occurred. Please try again.",
+  "Video nicht verfuegbar": "Video not available",
+  "Show nicht gefunden": "Show not found",
+  "Datei nicht gefunden": "File not found",
+  "nicht gefunden": "not found",
+  "Unbekannte Aktion": "Unknown action",
+  "Unbekannter Titel": "Unknown track",
+  "Unbekanntes Ziel": "Unknown target",
+  "Unbekannte Musikauswahl": "Unknown music selection",
+  "Musikauswahl unbekannt": "Music selection unknown",
+  "Unbekannter Medientyp": "Unknown media type",
+  "Ungueltige Filter": "Invalid filters",
+  "Ungueltige Foto-ID": "Invalid photo ID",
+  "Person unbekannt": "Person unknown",
+  "Ort unbekannt": "Place unknown",
+  "Album ungueltig": "Invalid album",
+  "ungueltig": "invalid",
+  "Suchtext fehlt oder ist zu lang": "Search text missing or too long",
+  "Auftrag nicht gefunden": "Job not found",
+  "Die vorherige Show gibt es nicht mehr.": "The previous show no longer exists.",
+  "Es gibt noch nichts, wohin ich zurückgehen könnte.": "There is nothing to go back to yet.",
+  "Es wird gerade schon ein Video vorbereitet. Bitte kurz warten.": "A video is already being prepared. Please wait a moment.",
+  "Dazu habe ich keine Fotos gefunden.": "I didn't find any photos for that.",
+  "Dazu habe ich keine Fotos gefunden. Der Bilderrahmen bleibt wie er ist.": "I didn't find any photos for that. The picture frame stays as it is.",
+  "Der Bilderrahmen zeigt das normale Programm.": "The picture frame shows its normal programme.",
+  "Der Bilderrahmen zeigt wieder das normale Programm.": "The picture frame shows its normal programme again.",
+  "Es läuft gerade kein Wunsch, den ich merken könnte.": "No requested show is running that I could save.",
+  "Der Rahmen zeigt jetzt zeitlich: ältestes zuerst.": "The frame now shows by date: oldest first.",
+  "Der Rahmen zeigt jetzt zeitlich: neuestes zuerst.": "The frame now shows by date: newest first.",
+  "Der Rahmen zeigt jetzt in zufälliger Reihenfolge.": "The frame now shows in random order.",
+  "(keine Favoriten markiert – ich zeige alle passenden)": "(no favourites marked – showing all matches)",
+  "Synchronisation angestossen": "Sync triggered",
+  "nicht berechtigt": "not authorised",
+  "Bitte einen Namen (1-60 Zeichen)": "Please enter a name (1-60 characters)",
+  "Immich Showcase TV": "Immich Showcase TV",
+  "Verbinde …": "Connecting …",
+  "Keine Verbindung zum Server – ich versuche es weiter …": "No connection to the server – retrying …",
+  "PIN eingeben": "Enter PIN",
+  "6 Ziffern mit der Fernbedienung": "6 digits with the remote",
+  "PIN falsch – nochmal versuchen": "Wrong PIN – try again",
+  "Zu viele Versuche – bitte später erneut.": "Too many attempts – please try again later.",
+  "Die Videos lassen sich gerade nicht laden.": "The videos can't be loaded right now.",
+  "🎵 Für Musik einmal die OK-Taste drücken": "🎵 Press OK once for music",
+  "🔇 Für Video-Ton einmal die OK-Taste drücken": "🔇 Press OK once for video sound",
+  "Alle abwählen": "Deselect all",
+  "Alle auswählen": "Select all",
+  "Alle Treffer auswählen": "Select all results",
+  "Alle Treffer abwählen": "Deselect all results",
+  "Am Fernseher einmal im Browser": "On the TV, in the browser, open",
+  "öffnen (Shield:": "once (Shield:",
+  "Auswahl": "Selection",
+  "läuft auf": "is playing on",
+  "· Auswahl": "· Selection",
+  "🎲 Alles bunt gemischt": "🎲 Everything shuffled",
+  "Test (nur Entwicklung)": "Test (development only)",
+  "E-Mail-Adresse (Immich)": "Email address (Immich)",
+  "E-Mail-Adresse": "Email address",
+  "Passwort": "Password",
+  "Anmelden": "Sign in",
+  "oder mit der PIN": "or with the PIN",
+  "Abmelden": "Sign out",
+  "Anmeldung erforderlich": "Sign-in required",
+  "E-Mail oder Passwort falsch": "Wrong email or password",
+  "Bitte mit dem Immich-Konto anmelden": "Please sign in with your Immich account",
+  "Immich ist gerade nicht erreichbar": "Immich is not reachable right now",
+  "Immich hat die Anfrage abgelehnt oder ist nicht erreichbar.": "Immich rejected the request or is not reachable.",
+  "Eigene Musik: Titel und Künstler erscheinen am Fernseher, die Reihenfolge ist zufällig.": "Your own music: title and artist are shown on the TV, the order is random.",
+  "Noch keine Musik eingerichtet. Füge eigene Titel hinzu.": "No music set up yet. Add your own tracks.",
+  "Noch keine Musik eingerichtet. Lege Musikdateien in den Musikordner des Servers (siehe Anleitung).": "No music set up yet. Put music files into the server's music folder (see the guide).",
+  "🎵 Eigene Musik hinzufügen …": "🎵 Add your own music …",
+  "🎵 Eigene Musik": "🎵 Your own music",
+  "Nur eigene oder frei lizenzierte Musik (mp3, ogg, m4a). Du bist für die Rechte verantwortlich.": "Only your own or freely licensed music (mp3, ogg, m4a). You are responsible for the rights.",
+  "Sammlung": "Collection",
+  "Name der neuen Sammlung": "Name of the new collection",
+  "z. B. Urlaub 2024": "e.g. Holiday 2024",
+  "Dateien": "Files",
+  "⬆ Hinzufügen": "⬆ Add",
+  "➕ Neue Sammlung …": "➕ New collection …",
+  "Titel entfernen": "Remove track",
+  "Bitte Dateien auswählen.": "Please choose files.",
+  "Bitte einen Namen für die neue Sammlung eingeben.": "Please enter a name for the new collection.",
+  "Hochladen fehlgeschlagen": "Upload failed",
+  "Hochladen ist nicht aktiviert": "Uploading is not enabled",
+  "Verwalten ist nicht aktiviert": "Managing is not enabled",
+  "Nur mp3-, ogg- und m4a-Dateien": "Only mp3, ogg and m4a files",
+  "Das ist keine abspielbare Audiodatei": "This is not a playable audio file",
+  "Die Musiksammlung ist voll": "The music collection is full",
+  "Eigene Musik": "Your own music",
+  "Immich Showcase – Einrichtung": "Immich Showcase – Setup",
+  "Einrichtung": "Setup",
+  "Willkommen! In drei Schritten verbindest du Immich Showcase mit deinem Immich.": "Welcome! In three steps you connect Immich Showcase to your Immich.",
+  "Einrichtungs-Code": "Setup code",
+  "6 Ziffern": "6 digits",
+  "Weiter": "Next",
+  "Zurück": "Back",
+  "Adresse von Immich": "Immich address",
+  "Mit Immich-Konto": "With Immich account",
+  "Mit API-Schlüssel": "With API key",
+  "API-Schlüssel": "API key",
+  "Immich Showcase legt damit einmalig einen eigenen Schlüssel „Immich Showcase (Dienst)“ ohne Lösch-Rechte an. Das Passwort wird nicht gespeichert.": "Immich Showcase uses it once to create its own key “Immich Showcase (service)” without delete rights. The password is not stored.",
+  "PIN für die App (6 Ziffern, optional)": "PIN for the app (6 digits, optional)",
+  "leer lassen = zufällige PIN": "leave empty = random PIN",
+  "Name der App (optional)": "App name (optional)",
+  "Einrichtung abschließen": "Finish setup",
+  "Geschafft. Immich Showcase startet jetzt neu …": "Done. Immich Showcase is restarting now …",
+  "Geschafft.": "Done.",
+  "Deine PIN (bitte merken, sie wird nur jetzt angezeigt):": "Your PIN (please remember it, it is only shown now):",
+  "Einen Moment, die Seite öffnet sich gleich von selbst.": "One moment, the page opens by itself.",
+  "Fertig – du kannst jetzt starten.": "Done – you can start now.",
+  "Immich Showcase öffnen": "Open Immich Showcase",
+  "Bitte E-Mail und Passwort eingeben.": "Please enter email and password.",
+  "Bitte den API-Schlüssel eingeben.": "Please enter the API key.",
+  "Stattdessen mit API-Schlüssel anmelden": "Sign in with an API key instead",
+  "Stattdessen mit E-Mail und Passwort anmelden": "Sign in with email and password instead",
+  "Immich-API-Schlüssel": "Immich API key",
+  "Der Einrichtungs-Code stimmt nicht (er steht im Protokoll: docker compose logs)": "The setup code is wrong (it is in the log: docker compose logs)",
+  "Bitte eine Adresse wie http://192.168.1.10:2283 eingeben": "Please enter an address like http://192.168.1.10:2283",
+  "Unter dieser Adresse antwortet kein Immich": "No Immich answers at this address",
+  "Immich ist unter dieser Adresse nicht erreichbar": "Immich is not reachable at this address",
+  "Der Schluessel wird von Immich nicht akzeptiert": "Immich does not accept the key",
+  "Die PIN muss genau 6 Ziffern haben": "The PIN must have exactly 6 digits",
+  "Zu viele Versuche. Bitte spaeter erneut versuchen.": "Too many attempts. Please try again later.",
+  "Einrichtung erforderlich": "Setup required",
+  "öffnen": "once",
+  "Die Bildsuche (Immich Machine Learning) ist gerade nicht verfuegbar. Suchen nach Person, Zeit oder Ort geht weiter.": "Image search (Immich Machine Learning) is not available right now. Searching by person, time or place still works.",
+  "❓ Hilfe": "❓ Help",
+  "Hilfe": "Help",
+  "So geht es": "How it works",
+  "Suchtipps": "Search tips",
+  "Fernseher und Rahmen": "TV and picture frame",
+  "Etwas funktioniert nicht?": "Something not working?",
+  "Fotos durchblättern (Neueste) oder suchen – auch in ganzen Sätzen.": "Browse photos (Latest) or search – also in whole sentences.",
+  "Fotos antippen, um sie auszuwählen. „Alle auswählen“ und „Tag wählen“ sparen Zeit.": "Tap photos to select them. “Select all” and “Select day” save time.",
+  "Der Auswahl einen Namen geben und auf den Rahmen oder den Fernseher schicken. Gespeichert wird sie unter „Meine Shows“.": "Give the selection a name and send it to the frame or the TV. It is saved under “My shows”.",
+  "Personen, Zeit, Orte und Motive lassen sich kombinieren, z. B. „Sommer 2022 am Strand“.": "People, time, places and subjects can be combined, e.g. “Summer 2022 at the beach”.",
+  "Am Fernseher oder Tablet einmal die Seite /tv/ im Browser öffnen und offen lassen. Den Namen des Geräts wählst du beim Senden.": "On the TV or tablet, open the page /tv/ in the browser once and leave it open. You choose the device when sending.",
+  "Das Support-Paket enthält Version, Einstellungen und das Protokoll – ohne Passwörter, PIN oder Schlüssel. Es hilft bei einem Fehlerbericht.": "The support package contains the version, settings and the log – without passwords, PIN or keys. It helps with a bug report.",
+  "⬇ Support-Paket herunterladen": "⬇ Download support package",
+  "Support-Paket gespeichert.": "Support package saved.",
+  "Support-Paket nicht verfügbar": "Support package not available",
+  "Personen, Zeit, Orte und Motive lassen sich kombinieren, z. B.": "People, time, places and subjects can be combined, e.g.",
+  "z. B.": "e.g.",
+  "Sprache / Language": "Language / Sprache"
+ },
+ "muster": [
+  [
+   "^1 Foto ausgewählt ›$",
+   "1 photo selected ›"
+  ],
+  [
+   "^1 Fotos$",
+   "1 photo"
+  ],
+  [
+   "^1 Foto werden zu einem Video für den Fernseher\\.$",
+   "1 photo will be turned into a video for the TV."
+  ],
+  [
+   "^1 Fotos – (.*)$",
+   "1 photo – $1",
+   "beschreibung"
+  ],
+  [
+   "^(.*) · bereit\\. Wähle am Handy Fotos und tippe auf „Auf TV“\\. \\(Für Musik einmal die OK-Taste drücken\\.\\)$",
+   "$1 · ready. Choose photos on your phone and tap “On TV”. (Press OK once for music.)"
+  ],
+  [
+   "^🔊 Musik-Lautstärke (\\d+) %$",
+   "🔊 Music volume $1 %"
+  ],
+  [
+   "^(\\d+) Fotos ausgewählt ›$",
+   "$1 photos selected ›"
+  ],
+  [
+   "^· sehr viele$",
+   "· very many"
+  ],
+  [
+   "^Foto vom (.*)$",
+   "Photo from $1"
+  ],
+  [
+   "^Zurück zu: (.*)$",
+   "Back to: $1"
+  ],
+  [
+   "^↩ Zurück zu „(.*)“$",
+   "↩ Back to “$1”"
+  ],
+  [
+   "^↩ Zurück zu „(.*)“ jederzeit oben möglich\\.$",
+   "↩ Back to “$1” is possible at any time at the top."
+  ],
+  [
+   "^(\\d+) Fotos · seit (.*) Uhr$",
+   "$1 photos · since $2"
+  ],
+  [
+   "^(\\d+) Fotos$",
+   "$1 photos"
+  ],
+  [
+   "^(\\d+) Fotos · (.*)$",
+   "$1 photos · $2"
+  ],
+  [
+   "^· seit (.*) Uhr$",
+   "· since $1"
+  ],
+  [
+   "^([\\d.,]+) Fotos in dieser Ansicht$",
+   "$1 photos in this view"
+  ],
+  [
+   "^([\\d.,]+) Medien in dieser Ansicht$",
+   "$1 media items in this view"
+  ],
+  [
+   "^([\\d.,+]+) in dieser Ansicht$",
+   "$1 in this view"
+  ],
+  [
+   "^Alle (\\d+) ausgewählten Fotos wieder abwählen\\? Dabei wird kein Foto gelöscht – nur die Auswahl wird geleert\\.$",
+   "Deselect all $1 selected photos again? No photo is deleted – only the selection is cleared."
+  ],
+  [
+   "^Die aktuelle Auswahl \\((\\d+) Fotos\\) wird durch die Treffer ersetzt\\. Weiter\\?$",
+   "The current selection ($1 photos) will be replaced by the results. Continue?"
+  ],
+  [
+   "^Die aktuelle Auswahl \\((\\d+) Fotos\\) wird durch „(.*)“ ersetzt\\. Weiter\\?$",
+   "The current selection ($1 photos) will be replaced by “$2”. Continue?"
+  ],
+  [
+   "^„(.*)“ aus der Liste löschen\\? Dabei wird kein Foto gelöscht\\.$",
+   "Remove “$1” from the list? No photo is deleted."
+  ],
+  [
+   "^Es sind höchstens (\\d+) Fotos pro Show möglich – die ersten wurden ausgewählt\\.$",
+   "At most $1 photos per show are possible – the first ones were selected."
+  ],
+  [
+   "^Höchstens (\\d+) Fotos pro Show\\.$",
+   "At most $1 photos per show."
+  ],
+  [
+   "^(\\d+) Video\\(s\\) wurden nicht auf den Rahmen geschickt \\(er zeigt nur Fotos\\)\\.$",
+   "$1 video(s) were not sent to the frame (it only shows photos)."
+  ],
+  [
+   "^(\\d+) gefunden, (\\d+) davon sinnvoll verteilt$",
+   "$1 found, $2 of them sensibly spread out"
+  ],
+  [
+   "^· (\\d+) gefunden, (\\d+) davon sinnvoll verteilt$",
+   "· $1 found, $2 of them sensibly spread out"
+  ],
+  [
+   "^Alle Treffer sind schon ausgewählt – tippe ein Foto an, um es abzuwählen\\.$",
+   "All results are already selected – tap a photo to deselect it."
+  ],
+  [
+   "^Musik: (.*)$",
+   "Music: $1"
+  ],
+  [
+   "^Spielt: (.*)$",
+   "Playing: $1"
+  ],
+  [
+   "^Fertig: (\\d+) Fotos, (.*) Laufzeit\\.$",
+   "Done: $1 photos, $2 running time."
+  ],
+  [
+   "^(\\d+) Fotos werden zu einem Video für den Fernseher\\.$",
+   "$1 photos will be turned into a video for the TV."
+  ],
+  [
+   "^Video wird vorbereitet … (\\d+) %$",
+   "Preparing video … $1 %"
+  ],
+  [
+   "^(.*) läuft auf (.*)\\.$",
+   "$1 is playing on $2."
+  ],
+  [
+   "^(\\d+) Videos? wird?e?n? ?vorbereitet.*$",
+   "$1 video(s) being prepared"
+  ],
+  [
+   "^📺 (.*) · (.*)$",
+   "📺 $1 · $2"
+  ],
+  [
+   "^● bereit · zeigt (.*)$",
+   "● ready · showing $1"
+  ],
+  [
+   "^Am Fernseher einmal im Browser (.*) öffnen$",
+   "On the TV, open $1 in the browser once"
+  ],
+  [
+   "^\\((.*): (.*)\\)$",
+   "($1: $2)"
+  ],
+  [
+   "^„(.*)“ mit (\\d+) Fotos läuft gleich auf dem Bilderrahmen\\.$",
+   "“$1” with $2 photos will play on the picture frame shortly."
+  ],
+  [
+   "^\\(Test\\) (\\d+) Fotos als „?\\\"?(.*?)\\\"?“? wuerden auf den Rahmen gehen\\.$",
+   "(Test) $1 photos as “$2” would go to the frame."
+  ],
+  [
+   "^\\\"(.*)\\\" mit (\\d+) Fotos läuft gleich auf dem Bilderrahmen\\.$",
+   "“$1” with $2 photos will play on the picture frame shortly."
+  ],
+  [
+   "^\\\"(.*)\\\" \\((\\d+) Medien\\) wurde an (.*) geschickt\\.(.*)$",
+   "“$1” ($2 items) was sent to $3.$4"
+  ],
+  [
+   "^ ?(.*) ist gerade nicht bereit – es startet, sobald die Seite (.*) dort geöffnet ist\\.$",
+   "$1 isn't ready right now – it will start as soon as the page $2 is opened there."
+  ],
+  [
+   "^(\\d+) Video\\(s\\) werden für den Fernseher vorbereitet – \\\"(.*)\\\" startet gleich auf (.*)\\.$",
+   "$1 video(s) are being prepared for the TV – “$2” will start on $3 shortly."
+  ],
+  [
+   "^Zu viele Versuche\\. Bitte in (\\d+) Minuten? erneut\\.?$",
+   "Too many attempts. Please try again in $1 minute(s)."
+  ],
+  [
+   "^Zu viele Versuche\\. Bitte in (\\d+) Minuten? erneut versuchen\\.$",
+   "Too many attempts. Please try again in $1 minute(s)."
+  ],
+  [
+   "^Bitte 1 bis (\\d+) Fotos auswaehlen$",
+   "Please select 1 to $1 photos"
+  ],
+  [
+   "^Für den Fernseher höchstens (\\d+) Fotos pro Video\\.$",
+   "At most $1 photos per video for the TV."
+  ],
+  [
+   "^Gemerkt: „(.*)“ – steht jetzt unter „Meine Diashows“\\.$",
+   "Saved: “$1” – now listed under “My slideshows”."
+  ],
+  [
+   "^„(.*)“ entfernt\\.$",
+   "“$1” removed."
+  ],
+  [
+   "^„(.*)“ war nicht gemerkt \\(aus dem Verlauf entfernt\\)\\.$",
+   "“$1” wasn't saved (removed from history)."
+  ],
+  [
+   "^Läuft gerade: \\\"(.*)\\\" \\((.*) Fotos, seit (.*)\\)$",
+   "Now playing: “$1” ($2 photos, since $3)"
+  ],
+  [
+   "^(.*) – läuft gleich auf dem Bilderrahmen\\.$",
+   "$1 – will play on the picture frame shortly."
+  ],
+  [
+   "^\\(Test\\) (.*)$",
+   "(Test) $1"
+  ],
+  [
+   "^Das habe ich nicht verstanden\\. Beispiel: (.*)\\.$",
+   "I didn't understand that. Example: $1."
+  ],
+  [
+   "^Es gibt mehrere Personen namens (.*)\\. Bitte in Immich eindeutig benennen\\.$",
+   "There are several people named $1. Please name them uniquely in Immich."
+  ],
+  [
+   "^Welche Person meinst du mit \\\"(.*)\\\"\\? (.*)$",
+   "Which person do you mean by “$1”? $2"
+  ],
+  [
+   "^(\\d+) Fotos – (.*)$",
+   "$1 photos – $2",
+   "beschreibung"
+  ],
+  [
+   "^(.*) oder (.*)$",
+   "$1 or $2"
+  ],
+  [
+   "^z\\. B\\. (.*)$",
+   "e.g. $1"
+  ],
+  [
+   "^„(.*)“$",
+   "“$1”"
+  ],
+  [
+   "^· (\\d+) Fotos$",
+   "· $1 photos"
+  ],
+  [
+   "^· 1 Foto$",
+   "· 1 photo"
+  ],
+  [
+   "^(\\d+) Titel hinzugefügt\\.$",
+   "$1 track(s) added."
+  ],
+  [
+   "^Lade (\\d+) von (\\d+): (.*) …$",
+   "Uploading $1 of $2: $3 …"
+  ],
+  [
+   "^„(.*)“ von diesem Server entfernen\\?$",
+   "Remove “$1” from this server?"
+  ],
+  [
+   "^Die Datei ist groesser als (\\d+) MB$",
+   "The file is larger than $1 MB"
+  ],
+  [
+   "^Immich (\\d+\\.\\d+\\.\\d+) gefunden\\.$",
+   "Immich $1 found."
+  ],
+  [
+   "^Fehler (\\d+)$",
+   "Error $1"
+  ],
+  [
+   "^(.*) \\(Die Motivsuche nach \\\"(.*)\\\" ist gerade nicht verfuegbar – ohne Motiv gesucht\\)$",
+   "$1 (Search for “$2” is not available right now – searched without it)"
+  ],
+  [
+   "^(\\d+) Fotos – (.*) \\(Die Motivsuche nach \\\"(.*)\\\" ist gerade nicht verfuegbar – ohne Motiv gesucht\\)$",
+   "$1 photos – $2 (Search for “$3” is not available right now – searched without it)",
+   "beschreibung"
+  ],
+  [
+   "^Immich Showcase(?: \\(.*\\))? ([\\w.\\-]+)$",
+   "Immich Showcase $1"
+  ]
+ ],
+ "beschreibung": [
+  [
+   " und ",
+   " and "
+  ],
+  [
+   "(^| |, )aus (\\d{4})",
+   "$1from $2"
+  ],
+  [
+   "vom (\\S+) bis (\\S+)",
+   "from $1 to $2"
+  ],
+  [
+   "\\((\\d+) Zeitraeume\\)",
+   "($1 periods)"
+  ],
+  [
+   "nur Favoriten",
+   "favourites only"
+  ]
+ ]
+}

@@ -1,0 +1,1175 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<script src="/i18n.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f4ef">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#14181f">
+<meta name="color-scheme" content="light dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Immich Showcase">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<title>Immich Showcase</title>
+<style>
+@font-face { font-family: "Cormorant Garamond"; font-weight: 600; font-style: normal; font-display: swap; src: url(/fonts/cormorant-600.woff2) format("woff2"); }
+:root {
+  --schrift-logo: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  --bg: #f6f4ef; --card: #ffffff; --text: #1e2430; --muted: #6b7280; --line: #e3dfd6;
+  --accent: #b4532a; --accent-text: #ffffff; --accent-soft: #f6e4da; --ok: #2f7d4f; --danger: #b42318;
+  --shadow: 0 1px 2px rgba(20,24,32,.08), 0 6px 18px rgba(20,24,32,.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14181f; --card: #1e242e; --text: #eceff4; --muted: #9aa4b2; --line: #2e3643;
+    --accent: #e0834f; --accent-text: #1a1208; --accent-soft: #3a2a20; --ok: #5cc28a; --danger: #ff8a7a;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.35);
+  }
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+button, .foto, select, label, .tab { touch-action: manipulation; }
+.foto { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+html { -webkit-text-size-adjust: 100%; overscroll-behavior-y: none; }
+html, body { margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+body { padding-bottom: calc(env(safe-area-inset-bottom) + 20px); }
+body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 250px); }
+button, select, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+.versteckt { display: none !important; }
+/* Einsatzzweck der Installation (Konfiguration RAHMEN_WEB_MODUS): Elemente nur fuer Rahmen / nur fuer Fernseher */
+body.modus-rahmen .nur-tv, body.modus-tv .nur-rahmen, body.modus-laden .nur-tv, body.modus-laden .nur-rahmen { display: none !important; }
+
+header { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: 1px solid var(--line);
+  padding: calc(env(safe-area-inset-top) + 10px) 16px 0; }
+.kopf { display: flex; align-items: center; gap: 12px; }
+.kopf h1 { font: 600 34px/1 var(--schrift-logo); margin: 0; letter-spacing: .01em; }
+.kopf { flex-wrap: wrap; }
+.kopf h1 { flex: 1; display: flex; align-items: center; gap: 8px; }
+#undoKopf { min-width: 44px; padding: 0 12px; font-size: 18px; }
+#undoKopf .undo-text { display: none; font-size: 14px; }
+@media (min-width: 520px) { #undoKopf .undo-text { display: inline; } }
+.kopf h1 { min-width: 0; }
+.kopf-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kopf-home { display: flex; align-items: center; gap: 10px; padding: 0; margin: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; min-height: 60px; border-radius: 12px; }
+.kopf-home:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.kopf-home:active { opacity: .75; }
+.logo { display: inline-flex; width: 60px; height: 60px; border-radius: 15px; overflow: hidden; align-items: center; justify-content: center; font-size: 30px; background: var(--card); flex: none; box-shadow: var(--shadow); }
+.logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.laeuft { order: 3; flex-basis: 100%; display: flex; align-items: center; gap: 10px; margin-top: 2px; padding: 8px 12px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); }
+.laeuft.aktiv { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.laeuft-text { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.laeuft-label { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.laeuft.aktiv .laeuft-label { color: var(--accent); }
+.laeuft-name { font-size: 18px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.laeuft-meta { font-size: 12px; color: var(--muted); }
+.reihe-sel { margin-top: 6px; align-self: flex-start; max-width: 100%; min-height: 36px; padding: 0 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); font-size: 14px; }
+.btn.zurueck { flex: 0 1 44%; max-width: 44%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-color: var(--accent); color: var(--accent); }
+.status b { color: var(--text); font-weight: 600; }
+.tabs { display: flex; gap: 4px; margin-top: 8px; }
+.tab { flex: 1; padding: 11px 6px; border: 0; background: none; border-bottom: 3px solid transparent;
+  font-weight: 600; color: var(--muted); min-height: 44px; }
+.tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.tab .zahl { display: inline-block; min-width: 20px; padding: 0 6px; margin-left: 4px; border-radius: 10px;
+  background: var(--accent); color: var(--accent-text); font-size: 12px; line-height: 20px; }
+
+main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
+.btn { min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); font-weight: 600; }
+.btn.primaer { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.btn.klein { min-height: 36px; padding: 0 12px; font-size: 14px; border-radius: 10px; }
+.btn.gefahr { color: var(--danger); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn:focus-visible, select:focus-visible, input:focus-visible, .foto:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.filter select, .suche input { min-height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); }
+.filter select { flex: 1 1 140px; min-width: 0; }
+.filter label.fav { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); }
+.suche { display: flex; gap: 8px; margin-bottom: 10px; }
+.suche input { flex: 1; min-width: 0; }
+.alle { display: flex; align-items: center; gap: 10px; margin: 2px 0 4px; flex-wrap: wrap; }
+.alle .tipp { margin: 0; }
+.tipp { margin: 0 0 10px; font-size: 13px; color: var(--muted); }
+.hinweis { margin: 4px 0 12px; padding: 10px 12px; border-radius: 12px; background: var(--accent-soft); font-size: 14px; }
+.leer { text-align: center; color: var(--muted); padding: 40px 12px; }
+
+.tag { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 18px 0 8px; }
+.tag h2 { margin: 0; font-size: 15px; font-weight: 700; }
+.raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 6px; }
+.foto { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: var(--line); border: 0; padding: 0; }
+.foto img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .12s, opacity .12s; }
+.foto .haken { position: absolute; right: 6px; bottom: 6px; width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid #fff; background: rgba(0,0,0,.28); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; font-weight: 700; }
+.foto.an img { transform: scale(.86); border-radius: 8px; }
+.foto.an { background: var(--accent-soft); box-shadow: inset 0 0 0 3px var(--accent); }
+.foto.an .haken { background: var(--accent); border-color: var(--accent); }
+.foto .gross { position: absolute; left: 4px; top: 4px; width: 30px; height: 30px; border-radius: 50%; border: 0;
+  background: rgba(0,0,0,.45); color: #fff; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+.foto .vid { position: absolute; right: 6px; top: 6px; padding: 2px 8px; border-radius: 10px; background: rgba(0,0,0,.65); color: #fff; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.foto .stern { position: absolute; left: 6px; bottom: 4px; color: #ffd24a; font-size: 14px; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+.laden { text-align: center; color: var(--muted); padding: 18px; font-size: 14px; }
+
+.karte { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; margin-bottom: 10px; box-shadow: var(--shadow); }
+.karte .zeile { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.karte h3 { margin: 0; font-size: 17px; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.karte .meta { color: var(--muted); font-size: 13px; margin: 2px 0 10px; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; background: var(--ok); color: #fff; font-size: 12px; font-weight: 600; }
+.aktionen { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.leiste { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--card); border-top: 1px solid var(--line);
+  box-shadow: 0 -6px 20px rgba(20,24,32,.12); padding: 10px 16px calc(env(safe-area-inset-bottom) + 10px); }
+.leiste .innen { max-width: 1100px; margin: 0 auto; display: grid; gap: 8px; }
+.leiste .zeile1 { display: flex; align-items: center; gap: 10px; }
+.leiste .zaehler { flex: 1; border: 0; background: none; text-align: left; font-weight: 700; padding: 6px 0; min-height: 36px; font-size: 16px; }
+.leiste .zaehler small { font-weight: 400; color: var(--muted); }
+.leiste .zeile2 { display: flex; gap: 8px; }
+.leiste input[type=text] { flex: 1; min-width: 0; min-height: 46px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); }
+.leiste .merken { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); white-space: nowrap; min-height: 36px; }
+.leiste .zeile1b { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.leiste .zeile1b .btn { padding: 0 6px; white-space: nowrap; }
+
+.login { max-width: 340px; margin: 0 auto; text-align: center; padding: 11vh 16px 0; }
+.login-logo { display: block; width: 132px; height: 132px; margin: 0 auto 14px; border-radius: 30px; box-shadow: 0 10px 28px rgba(0,0,0,.28), 0 2px 6px rgba(0,0,0,.2); }
+.login h1 { font: 600 60px/1 var(--schrift-logo); letter-spacing: .01em; margin: 0 0 8px; }
+.login .untertitel { font: 600 19px/1.3 var(--schrift-logo); font-style: normal; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 30px; }
+.login p { color: var(--muted); margin-top: 0; }
+.login input { width: 100%; min-height: 56px; border-radius: 14px; border: 1px solid var(--line); background: var(--card);
+  text-align: center; font-size: 28px; letter-spacing: .5em; padding-left: .5em; }
+.login form { display: flex; flex-direction: column; gap: 10px; }
+.login form input { text-align: left; font-size: 17px; letter-spacing: normal; padding: 0 16px; min-height: 52px; }
+.login form .btn { min-height: 52px; font-size: 17px; }
+.login .oder { margin: 18px 0 10px; font-size: 14px; }
+.benutzer { display: flex; align-items: center; justify-content: flex-end; gap: 8px; font-size: 13px; color: var(--muted); order: 6; flex-basis: 100%; margin: -2px 0 2px; }
+.benutzer button { border: 0; background: none; color: var(--accent); font-size: 14px; cursor: pointer; padding: 4px 6px; }
+.fehler { color: var(--danger); min-height: 1.4em; margin-top: 10px; font-size: 14px; }
+
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom) + 190px); z-index: 60;
+  background: #1f2a37; color: #fff; padding: 12px 16px; border-radius: 12px; max-width: 90vw; box-shadow: var(--shadow); font-size: 15px; }
+.toast.schlecht { background: var(--danger); }
+.diashow { position: fixed; inset: 0; z-index: 100; background: #000; color: #fff; user-select: none; -webkit-user-select: none; touch-action: none; }
+.ds-buehne { position: absolute; inset: 0; }
+.ds-bild { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity .9s ease; }
+.ds-bild.an { opacity: 1; animation: ds-zoom 14s ease-out forwards; }
+@keyframes ds-zoom { from { transform: scale(1); } to { transform: scale(1.045); } }
+@media (prefers-reduced-motion: reduce) { .ds-bild.an { animation: none; } .ds-bild { transition-duration: .01s; } }
+.ds-ui { position: absolute; left: 0; right: 0; display: flex; align-items: center; gap: 10px; padding: 12px 14px; transition: opacity .35s; }
+.ds-ui.weg { opacity: 0; pointer-events: none; }
+.ds-oben { top: 0; padding-top: calc(env(safe-area-inset-top) + 12px); background: linear-gradient(rgba(0,0,0,.65), transparent); }
+.ds-oben #dsTitel { flex: 1; min-width: 0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ds-oben #dsZaehler { font-variant-numeric: tabular-nums; opacity: .85; }
+.ds-unten { bottom: 0; padding-bottom: calc(env(safe-area-inset-bottom) + 14px); flex-wrap: wrap; justify-content: center; background: linear-gradient(transparent, rgba(0,0,0,.7)); }
+.ds-knopf { width: 48px; height: 48px; border-radius: 50%; border: 0; background: rgba(255,255,255,.2); color: #fff; font-size: 20px; backdrop-filter: blur(6px); }
+.ds-knopf.gross { width: 60px; height: 60px; font-size: 24px; background: rgba(255,255,255,.3); }
+.ds-knopf.klein { width: 44px; height: 44px; font-size: 18px; }
+.ds-knopf:focus-visible, .ds-feld select:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.ds-feld { display: flex; align-items: center; gap: 6px; font-size: 14px; background: rgba(255,255,255,.2); padding: 0 12px; min-height: 44px; border-radius: 22px; }
+.ds-feld select { background: transparent; color: #fff; border: 0; font-size: 14px; }
+.ds-feld select option { color: #000; }
+#musikDialog { z-index: 95; }
+#hilfeDialog { z-index: 96; }
+.hilfe { margin: 6px 0 10px; padding-left: 20px; } .hilfe li { margin: 4px 0; }
+#hilfeDialog h3 { margin: 14px 0 2px; font-size: 15px; }
+.benutzer #hilfeBtn { color: var(--muted); }
+.tvdialog { position: fixed; inset: 0; z-index: 90; background: rgba(0,0,0,.62); display: flex; align-items: flex-end; justify-content: center; padding: 0; }
+.tvkarte { width: 100%; max-width: 520px; background: var(--card); border-radius: 18px 18px 0 0; padding: 18px 18px calc(env(safe-area-inset-bottom) + 18px); box-shadow: var(--shadow); max-height: 92vh; overflow: auto; }
+.tvkarte h2 { margin: 0 0 8px; font-size: 20px; }
+.tvtext { margin: 6px 0 12px; }
+.tvfeld { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 48px; padding: 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); }
+.tvfeld select { min-height: 40px; border: 0; background: transparent; font: inherit; color: inherit; }
+.tvziele { display: grid; gap: 8px; margin: 4px 0 10px; }
+.tvziel { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 14px; border: 2px solid var(--line); border-radius: 14px; background: var(--bg); cursor: pointer; }
+.tvziel input { width: 20px; height: 20px; accent-color: var(--accent); }
+.tvziel .tvname { flex: 1; font-weight: 700; font-size: 17px; }
+.tvziel .tvstatus { font-size: 13px; color: var(--muted); }
+.tvziel .tvstatus.an { color: var(--ok); }
+.tvziel.gewaehlt { border-color: var(--accent); background: var(--accent-soft); }
+.tvfern { display: grid; grid-template-columns: 1fr 1fr 1fr 1.4fr; gap: 8px; margin: 6px 0; }
+.tvfern .btn { min-height: 52px; font-size: 20px; padding: 0 6px; }
+.tvfern2 { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,2.6fr) minmax(0,1fr) minmax(0,1fr); gap: 8px; margin: 8px 0; align-items: stretch; }
+.tvfern2 .btn { min-height: 48px; font-size: 20px; padding: 0 6px; }
+.tvmusikwahl { display: flex; align-items: center; gap: 6px; padding: 0 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); min-height: 48px; font-size: 18px; }
+.tvmusikwahl select { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; font-size: 16px; color: inherit; min-height: 44px; }
+.tvchip { order: 4; flex-basis: 100%; display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; border-radius: 12px; background: var(--card); border: 1px solid color-mix(in srgb, var(--ok) 55%, transparent); }
+.tvchip .tvchip-text { flex: 1; min-width: 0; border: 0; background: none; color: inherit; font: inherit; font-size: 14px; text-align: left; padding: 6px 0; min-height: 40px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tvchip .tvchip-text b { color: var(--ok); }
+.tvknoepfe { display: flex; gap: 10px; justify-content: flex-end; margin-top: 12px; }
+.tvgross { width: 100%; min-height: 54px; font-size: 18px; margin-top: 10px; }
+.tvbalken { height: 12px; border-radius: 6px; background: var(--line); overflow: hidden; margin: 10px 0; }
+.tvbalken div { height: 100%; width: 100%; background: var(--accent); transform-origin: left center; transform: scaleX(.03); transition: transform .4s ease; }
+@media (prefers-reduced-motion: reduce) { .tvbalken div { transition: none; } }
+#tvVideoBox video { width: 100%; border-radius: 12px; background: #000; max-height: 32vh; }
+.updatebanner { position: fixed; left: 12px; right: 12px; top: calc(env(safe-area-inset-top) + 10px); z-index: 120; box-shadow: var(--shadow); min-height: 48px; }
+.lightbox { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.92); display: flex; align-items: center; justify-content: center; }
+.lightbox img { max-width: 100vw; max-height: 100vh; object-fit: contain; }
+.lightbox .zu { position: absolute; top: calc(env(safe-area-inset-top) + 12px); right: 14px; width: 44px; height: 44px; border-radius: 50%;
+  border: 0; background: rgba(255,255,255,.18); color: #fff; font-size: 22px; }
+.lightbox .waehlen { position: absolute; bottom: calc(env(safe-area-inset-bottom) + 24px); left: 50%; transform: translateX(-50%); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body class="modus-laden">
+
+<div id="loginAnsicht" class="login versteckt">
+  <img class="login-logo" src="/icon-512.png" alt="">
+  <h1>Immich Showcase</h1>
+  <p class="untertitel">Dein Blick in die Fotos</p>
+  <form id="immichForm" class="versteckt">
+    <input id="mail" type="email" autocomplete="username" autocapitalize="none" placeholder="E-Mail-Adresse (Immich)" aria-label="E-Mail-Adresse" required>
+    <input id="pw" type="password" autocomplete="current-password" placeholder="Passwort" aria-label="Passwort" required>
+    <input id="schluesselFeld" class="versteckt" type="password" autocomplete="off" autocapitalize="none" placeholder="Immich-API-Schlüssel" aria-label="Immich-API-Schlüssel">
+    <button class="btn primaer" type="submit">Anmelden</button>
+    <button class="btn klein" type="button" id="keyUmschalten" style="background:none;border:0;color:var(--accent)">Stattdessen mit API-Schlüssel anmelden</button>
+  </form>
+  <p id="pinOder" class="oder versteckt">oder mit der PIN</p>
+  <div id="pinBlock">
+    <p>Bitte PIN eingeben</p>
+    <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" aria-label="PIN, 6 Ziffern">
+  </div>
+  <div id="loginFehler" class="fehler" role="alert"></div>
+</div>
+
+<div id="appAnsicht" class="versteckt">
+  <header>
+    <div class="kopf">
+      <h1><button type="button" class="kopf-home" id="kopfHome" aria-label="Immich Showcase – zur Startseite"><span class="logo" id="logo" aria-hidden="true"><img alt="" src="/icon-192.png"></span><span class="kopf-name">Immich Showcase</span></button></h1>
+      <button class="btn klein versteckt" id="undoKopf" title="Letzte Änderung an der Auswahl rückgängig machen" aria-label="Rückgängig"><span aria-hidden="true">↶</span><span class="undo-text"> Rückgängig</span></button>
+      <div class="benutzer" id="benutzer"><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><button type="button" id="hilfeBtn" aria-label="Hilfe">❓ Hilfe</button></div>
+      <button class="btn klein nur-rahmen" id="normalBtn" title="Der Rahmen zeigt wieder das normale Programm">Normal</button>
+      <div class="laeuft nur-rahmen" id="laeuft" aria-live="polite">
+        <div class="laeuft-text">
+          <span class="laeuft-label" id="laeuftLabel">Rahmen</span>
+          <span class="laeuft-name" id="laeuftName">…</span>
+          <span class="laeuft-meta" id="laeuftMeta"></span>
+          <select id="rahmenReihe" class="reihe-sel versteckt" aria-label="Reihenfolge auf dem Rahmen"><option value="alt">Zeitlich: ältestes zuerst</option><option value="neu">Zeitlich: neuestes zuerst</option><option value="zufall">Zufällig</option></select>
+        </div>
+        <button class="btn klein zurueck versteckt" id="zurueckBtn"></button>
+      </div>
+      <div class="tvchip versteckt nur-tv" id="tvChip"><button class="tvchip-text" id="tvChipOpen" aria-label="Fernbedienung für den Fernseher öffnen"></button><button class="btn klein gefahr" id="tvChipStopp" aria-label="Fernseher stoppen">⏹ Stopp</button></div>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="neueste" aria-selected="true">Neueste</button>
+      <button class="tab" role="tab" data-tab="suchen" aria-selected="false">Suchen</button>
+      <button class="tab" role="tab" data-tab="shows" aria-selected="false">Meine Shows</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="neuesteTab">
+      <div class="filter">
+        <select id="fPerson" aria-label="Person"><option value="">Alle Personen</option></select>
+        <select id="fJahr" aria-label="Jahr"><option value="">Alle Jahre</option></select>
+        <select id="fLand" aria-label="Land"><option value="">Alle Länder</option></select>
+        <select id="fTyp" aria-label="Medien"><option value="foto">Nur Fotos</option><option value="alle">Fotos &amp; Videos</option><option value="video">Nur Videos</option></select>
+        <button class="btn klein versteckt" id="fReset" title="Alle Filter zurücksetzen">✕ Filter zurücksetzen</button>
+      </div>
+      <div class="alle"><button class="btn klein" id="alleNeueste">✓ Alle auswählen</button><button class="btn klein primaer" id="diaNeueste" title="Die Fotos dieser Ansicht als Diashow abspielen">▶ Diashow</button><span id="alleNeuesteInfo" class="tipp"></span></div>
+      <div id="neuesteListe"></div>
+      <div id="neuesteLaden" class="laden"></div>
+    </section>
+
+    <section id="suchenTab" class="versteckt">
+      <form class="suche" id="sucheForm">
+        <input id="sucheText" type="search" enterkeyhint="search" placeholder="z. B. Sommer 2022, Strand" aria-label="Suchtext" autocomplete="off">
+        <button class="btn primaer" type="submit">Suchen</button>
+      </form>
+      <p class="tipp">🎤 Tipp: Auf der Tastatur das Mikrofon antippen und einfach sprechen, z. B. <span id="sucheBsp">„Sommer 2022 am Strand“</span>.</p>
+      <div id="sucheHinweis"></div>
+      <div class="alle versteckt" id="alleSucheZeile"><button class="btn klein" id="alleSuche">✓ Alle Treffer auswählen</button><button class="btn klein primaer" id="diaSuche" title="Die Treffer als Diashow abspielen">▶ Diashow</button></div>
+      <div id="sucheListe"></div>
+    </section>
+
+    <section id="showsTab" class="versteckt">
+      <div id="showsListe"></div>
+    </section>
+
+    <section id="auswahlTab" class="versteckt">
+      <div class="tag"><h2>Ausgewählte Fotos</h2><button class="btn klein gefahr" id="auswahlLeeren">Alle abwählen</button></div>
+      <div id="auswahlListe"></div>
+    </section>
+  </main>
+
+  <div class="leiste versteckt" id="leiste">
+    <div class="innen">
+      <div class="zeile1">
+        <button class="zaehler" id="zaehler"></button>
+        <label class="merken" title="Dauerhaft unter „Gemerkt“ speichern – sonst steht die Show nur unter „Zuletzt gezeigt“"><input type="checkbox" id="merken"> ⭐ merken</label>
+      </div>
+      <div class="zeile1b">
+        <button class="btn klein primaer" id="diashowBtn" title="Die Auswahl hier als Diashow abspielen – der Bilderrahmen bleibt unverändert">▶ Diashow</button>
+        <button class="btn klein primaer nur-tv" id="tvBtn" title="Die Auswahl per AirPlay auf LG TV oder Shield abspielen">📺 Auf den TV</button>
+        <button class="btn klein" id="undo" title="Letzte Änderung an der Auswahl rückgängig machen">↶ Rückgängig</button>
+        <button class="btn klein gefahr" id="leeren" title="Alle Fotos abwählen (es werden keine Fotos gelöscht)">✕ Leeren</button>
+      </div>
+      <div class="zeile2">
+        <input type="text" id="showName" maxlength="60" placeholder="Name der Show" aria-label="Name der Show" enterkeyhint="send">
+        <button class="btn primaer nur-rahmen" id="senden">Auf den Rahmen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="lightbox" class="lightbox versteckt" role="dialog" aria-modal="true" aria-label="Großansicht">
+  <button class="zu" id="lightboxZu" aria-label="Schließen">✕</button>
+  <button class="btn primaer waehlen" id="lightboxWaehlen"></button>
+</div>
+<div id="hilfeDialog" class="tvdialog versteckt" role="dialog" aria-modal="true" aria-labelledby="hilfeTitel">
+  <div class="tvkarte">
+    <h2 id="hilfeTitel">❓ Hilfe</h2>
+    <h3>So geht es</h3>
+    <ol class="hilfe">
+      <li>Fotos durchblättern (Neueste) oder suchen – auch in ganzen Sätzen.</li>
+      <li>Fotos antippen, um sie auszuwählen. „Alle auswählen“ und „Tag wählen“ sparen Zeit.</li>
+      <li>Der Auswahl einen Namen geben und auf den Rahmen oder den Fernseher schicken. Gespeichert wird sie unter „Meine Shows“.</li>
+    </ol>
+    <h3>Suchtipps</h3>
+    <p class="tipp" id="hilfeBeispiele">Personen, Zeit, Orte und Motive lassen sich kombinieren, z. B. „Sommer 2022 am Strand“.</p>
+    <h3>Fernseher und Rahmen</h3>
+    <p class="tipp">Am Fernseher oder Tablet einmal die Seite /tv/ im Browser öffnen und offen lassen. Den Namen des Geräts wählst du beim Senden.</p>
+    <h3>Sprache / Language</h3>
+    <label class="tvfeld"><span>🌐</span> <select id="sprache" aria-label="Sprache / Language"><option value="de">Deutsch</option><option value="en">English</option><option value="es">Español</option><option value="fr">Français</option><option value="nl">Nederlands</option></select></label>
+    <h3>Etwas funktioniert nicht?</h3>
+    <p class="tipp">Das Support-Paket enthält Version, Einstellungen und das Protokoll – ohne Passwörter, PIN oder Schlüssel. Es hilft bei einem Fehlerbericht.</p>
+    <div class="tvknoepfe" style="justify-content:flex-start"><button class="btn" id="diagnoseBtn" type="button">⬇ Support-Paket herunterladen</button></div>
+    <p class="tipp" id="hilfeVersion"></p>
+    <div class="tvknoepfe"><button class="btn" id="hilfeZu" type="button">Schließen</button></div>
+  </div>
+</div>
+
+<div id="musikDialog" class="tvdialog versteckt" role="dialog" aria-modal="true" aria-labelledby="musikTitel">
+  <div class="tvkarte">
+    <h2 id="musikTitel">🎵 Eigene Musik</h2>
+    <p class="tipp">Nur eigene oder frei lizenzierte Musik (mp3, ogg, m4a). Du bist für die Rechte verantwortlich.</p>
+    <label class="tvfeld">Sammlung <select id="musikSammlung"></select></label>
+    <label class="tvfeld versteckt" id="musikNeuZeile">Name der neuen Sammlung <input id="musikNeu" type="text" maxlength="40" placeholder="z. B. Urlaub 2024"></label>
+    <label class="tvfeld">Dateien <input id="musikDateien" type="file" accept=".mp3,.ogg,.m4a,audio/mpeg,audio/ogg,audio/mp4" multiple></label>
+    <div class="tvknoepfe" style="justify-content:flex-start"><button class="btn primaer" id="musikHoch" type="button">⬆ Hinzufügen</button></div>
+    <div id="musikStatus" class="tipp" role="status"></div>
+    <div id="musikListe"></div>
+    <div class="tvknoepfe"><button class="btn" id="musikZu" type="button">Schließen</button></div>
+  </div>
+</div>
+
+<div id="tvDialog" class="tvdialog versteckt" role="dialog" aria-modal="true" aria-labelledby="tvTitel">
+  <div class="tvkarte">
+    <h2 id="tvTitel">📺 Auf den Fernseher</h2>
+    <div id="tvSchritt0">
+      <p id="tvInfo0" class="tvtext"></p>
+      <div id="tvZiele" class="tvziele" role="radiogroup" aria-label="Fernseher"></div>
+      <label class="tvfeld">Zeit pro Foto <select id="tvSek0"><option value="3">3 Sekunden</option><option value="5" selected>5 Sekunden</option><option value="8">8 Sekunden</option><option value="12">12 Sekunden</option><option value="20">20 Sekunden</option><option value="30">30 Sekunden</option></select></label>
+      <label class="tvfeld">Reihenfolge <select id="tvReihe"><option value="alt" selected>Zeitlich: ältestes zuerst</option><option value="neu">Zeitlich: neuestes zuerst</option><option value="zufall">Zufällig</option></select></label>
+      <label class="tvfeld" id="tvVideoZeile">🎬 Videos höchstens <select id="tvMaxV"><option value="20">20 Sekunden</option><option value="60" selected>60 Sekunden</option><option value="180">3 Minuten</option></select></label>
+      <label class="tvfeld">🎵 Hintergrundmusik <select id="tvMusik0"><option value="">Keine</option></select></label>
+      <p class="tipp" id="musikHinweis" style="margin:-4px 2px 6px">Eigene Musik: Titel und Künstler erscheinen am Fernseher, die Reihenfolge ist zufällig.</p>
+      <button class="btn klein versteckt" id="musikVerwalten" type="button">🎵 Eigene Musik hinzufügen …</button>
+      <label class="tvfeld">Lautstärke der Musik <select id="tvLaut0"><option value="0.15">Sehr leise</option><option value="0.3" selected>Leise</option><option value="0.5">Mittel</option></select></label>
+      <div class="tvknoepfe"><button class="btn" id="tvAbbrechen0">Abbrechen</button><button class="btn primaer" id="tvLos">▶ Starten</button></div>
+      <p class="tipp" id="tvTipp0"><span id="tvTippAdr">Am Fernseher einmal die Fernseher-Seite dieser App (…/tv/) im Browser öffnen</span> und offen lassen. · <a href="#" id="tvAirplay">Stattdessen als AirPlay-Video senden (nur Safari)</a></p>
+    </div>
+    <div id="tvSchritt4" class="versteckt">
+      <p class="tvtext" id="tvLaeuft"></p>
+      <div class="tvfern"><button class="btn" data-a="zurueck" aria-label="Vorheriges Foto">◀</button><button class="btn" data-a="pause" id="tvPause" aria-label="Pause">⏸</button><button class="btn" data-a="vor" aria-label="Nächstes Foto">▶</button><button class="btn gefahr" data-a="stopp">⏹ Stopp</button></div>
+      <div class="tvfern2"><button class="btn" data-a="leiser" aria-label="Musik leiser">🔉</button><label class="tvmusikwahl">🎵 <select id="tvMusikFern" aria-label="Hintergrundmusik"><option value="">Aus</option></select></label><button class="btn" data-a="naechster" aria-label="Nächster Musiktitel" title="Nächster Titel">⏭</button><button class="btn" data-a="lauter" aria-label="Musik lauter">🔊</button></div>
+      <label class="tvfeld versteckt" id="tvTitelZeile">🎵 Titel <select id="tvTitelFern"></select></label>
+      <div class="tvknoepfe"><button class="btn" id="tvSchliessen4">Schließen</button></div>
+    </div>
+    <div id="tvSchritt1" class="versteckt">
+      <p id="tvInfo" class="tvtext"></p>
+      <label class="tvfeld">Zeit pro Foto <select id="tvSek"><option value="3">3 Sekunden</option><option value="5" selected>5 Sekunden</option><option value="8">8 Sekunden</option><option value="12">12 Sekunden</option><option value="20">20 Sekunden</option></select></label>
+      <p class="tipp">Das Video wird auf dem Server gebaut – das dauert je nach Anzahl etwa 10 bis 90 Sekunden. Danach wählst du den Fernseher im AirPlay-Fenster (nur Safari).</p>
+      <div class="tvknoepfe"><button class="btn" id="tvAbbrechen">Abbrechen</button><button class="btn primaer" id="tvStart">Video vorbereiten</button></div>
+    </div>
+    <div id="tvSchritt2" class="versteckt">
+      <p class="tvtext" id="tvFortschrittText">Video wird vorbereitet …</p>
+      <div class="tvbalken"><div id="tvBalken"></div></div>
+      <div class="tvknoepfe"><button class="btn" id="tvAbbrechen2">Abbrechen</button></div>
+    </div>
+    <div id="tvSchritt3" class="versteckt">
+      <p class="tvtext" id="tvFertig"></p>
+      <div id="tvVideoBox"></div>
+      <button class="btn primaer tvgross" id="tvWaehlen">📺 Fernseher wählen (AirPlay)</button>
+      <p class="tipp" id="tvHinweis"></p>
+      <div class="tvknoepfe"><button class="btn" id="tvSchliessen">Schließen</button></div>
+    </div>
+  </div>
+</div>
+<div id="diashow" class="diashow versteckt" role="dialog" aria-modal="true" aria-label="Diashow">
+  <div class="ds-buehne" id="dsBuehne"></div>
+  <div class="ds-oben ds-ui" id="dsOben"><button class="ds-knopf" id="dsZu" aria-label="Diashow beenden">✕</button><span id="dsTitel"></span><span id="dsZaehler"></span></div>
+  <div class="ds-unten ds-ui" id="dsUnten">
+    <button class="ds-knopf" id="dsZurueck" aria-label="Vorheriges Foto">◀</button>
+    <button class="ds-knopf gross" id="dsPlay" aria-label="Pause">⏸</button>
+    <button class="ds-knopf" id="dsWeiter" aria-label="Nächstes Foto">▶</button>
+    <label class="ds-feld">Tempo <select id="dsTempo"><option value="3">3 s</option><option value="4">4 s</option><option value="5">5 s</option><option value="8">8 s</option><option value="15">15 s</option><option value="30">30 s</option><option value="60">60 s</option></select></label>
+    <label class="ds-feld"><input type="checkbox" id="dsMisch"> Zufall</label>
+    <button class="ds-knopf klein versteckt" id="dsVoll" aria-label="Vollbild">⛶</button>
+  </div>
+</div>
+<button id="updateBanner" class="btn primaer updatebanner versteckt">↻ Neue Version verfügbar – tippen zum Aktualisieren</button>
+<div id="toast" class="toast versteckt" role="status"></div>
+
+<script>
+"use strict";
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const MAX_AUSWAHL = 1000, EMPFEHLUNG = 300;
+
+// ---------------------------------------------------------------- Zustand
+const auswahl = new Map();          // id -> {tag, fav}
+let tab = "neueste", sucheErgebnis = [], showBearbeiten = null;
+const neueste = { cursor: 1, weiter: true, laedt: false, fotos: [], filterKey: "" };
+const rueck = [];                    // Schnappschuesse der Auswahl fuer "Rueckgaengig" (nur im Speicher)
+function merke() { rueck.push({ a: [...auswahl], n: $("#showName").value, b: showBearbeiten }); if (rueck.length > 30) rueck.shift(); }
+function rueckgaengig() {
+  const z = rueck.pop(); if (!z) return;
+  auswahl.clear(); z.a.forEach(([id, v]) => auswahl.set(id, v));
+  $("#showName").value = z.n; showBearbeiten = z.b;
+  ["#neuesteListe", "#sucheListe"].forEach(markiereAn);
+  if (tab === "auswahl") auswahlZeigen();
+  aktualisiere(); toast("Rückgängig gemacht.");
+}
+
+function sichern() {
+  try { sessionStorage.setItem("rw", JSON.stringify({ a: [...auswahl], n: $("#showName").value, b: showBearbeiten })); } catch (e) {}
+}
+function laden() {
+  try {
+    const s = JSON.parse(sessionStorage.getItem("rw") || "null");
+    if (!s) return;
+    s.a.forEach(([id, v]) => auswahl.set(id, v));
+    $("#showName").value = s.n || ""; showBearbeiten = s.b || null;
+  } catch (e) {}
+}
+
+// ---------------------------------------------------------------- API
+async function api(pfad, opt = {}) {
+  const r = await fetch("/api/" + pfad, {
+    credentials: "same-origin", ...opt,
+    headers: { "X-Rahmen": "1", ...(opt.body ? { "Content-Type": "application/json" } : {}), ...(opt.headers || {}) },
+  });
+  let d = null; try { d = await r.json(); } catch (e) {}
+  if (r.status === 401 && pfad !== "login") { zeigeLogin(); throw new Error("PIN erforderlich"); }
+  if (!r.ok) throw new Error((d && d.nachricht) || "Fehler " + r.status);
+  return d;
+}
+function fehler(e) { toast(e.message || String(e), true); }
+
+let toastTimer;
+function toast(text, schlecht = false) {
+  const t = $("#toast"); t.textContent = text; t.classList.toggle("schlecht", schlecht); t.classList.remove("versteckt");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.add("versteckt"), schlecht ? 6000 : 4000);
+}
+
+// ---------------------------------------------------------------- Anmeldung
+async function zeigeLogin() {
+  $("#appAnsicht").classList.add("versteckt"); $("#loginAnsicht").classList.remove("versteckt"); $("#pin").value = "";
+  let art = "pin"; try { art = (await (await fetch("/api/config", { cache: "no-store" })).json()).auth || "pin"; } catch (e) {}
+  const mitImmich = art !== "pin", mitPin = art !== "immich";
+  $("#immichForm").classList.toggle("versteckt", !mitImmich); $("#pinBlock").classList.toggle("versteckt", !mitPin);
+  $("#pinOder").classList.toggle("versteckt", !(mitImmich && mitPin));
+  (mitImmich ? $("#mail") : $("#pin")).focus();
+}
+$("#keyUmschalten").addEventListener("click", () => {
+  const an = $("#schluesselFeld").classList.contains("versteckt");                      // true: jetzt auf Schluessel umstellen
+  $("#schluesselFeld").classList.toggle("versteckt", !an); $("#mail").classList.toggle("versteckt", an); $("#pw").classList.toggle("versteckt", an);
+  $("#mail").required = !an; $("#pw").required = !an; $("#schluesselFeld").required = an;
+  $("#keyUmschalten").textContent = an ? "Stattdessen mit E-Mail und Passwort anmelden" : "Stattdessen mit API-Schlüssel anmelden";
+  (an ? $("#schluesselFeld") : $("#mail")).focus();
+});
+$("#immichForm").addEventListener("submit", async e => {
+  e.preventDefault(); $("#loginFehler").textContent = "";
+  const mitKey = !$("#schluesselFeld").classList.contains("versteckt");
+  try { await api("login", { method: "POST", body: JSON.stringify(mitKey ? { schluessel: $("#schluesselFeld").value.trim() } : { email: $("#mail").value.trim(), passwort: $("#pw").value }) }); $("#pw").value = ""; $("#schluesselFeld").value = ""; start(); }
+  catch (err) { $("#loginFehler").textContent = err.message; $("#pw").value = ""; }
+});
+$("#pin").addEventListener("input", async e => {
+  const v = e.target.value.replace(/\D/g, "").slice(0, 6); e.target.value = v;
+  if (v.length < 6) { $("#loginFehler").textContent = ""; return; }
+  try { await api("login", { method: "POST", body: JSON.stringify({ pin: v }) }); start(); }
+  catch (err) { $("#loginFehler").textContent = err.message; e.target.value = ""; }
+});
+
+// ---------------------------------------------------------------- Raster
+function datumText(tag) {
+  if (!tag) return "Ohne Datum";
+  const [y, m, d] = tag.split("-").map(Number);
+  return new Intl.DateTimeFormat(RW_LOCALE, { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date(y, m - 1, d));
+}
+const vorschau = (id, gross) => `/api/vorschau/${id}${gross ? "?s=gross" : ""}`;
+
+function fotoKnopf(f) {
+  const b = document.createElement("div");
+  b.className = "foto"; b.tabIndex = 0; b.dataset.id = f.id; b.setAttribute("role", "checkbox");
+  b.innerHTML = `<img loading="lazy" decoding="async" alt="Foto vom ${f.tag || ""}" src="${vorschau(f.id)}">
+    ${f.fav ? '<span class="stern">★</span>' : ""}${f.v ? `<span class="vid" title="Video">▶ ${f.dauer ? Math.floor(f.dauer / 60) + ":" + String(f.dauer % 60).padStart(2, "0") : "Video"}</span>` : ""}
+    <button class="gross" aria-label="Foto groß ansehen" tabindex="-1">⤢</button><span class="haken">✓</span>`;
+  const sync = () => { const an = auswahl.has(f.id); b.classList.toggle("an", an); b.setAttribute("aria-checked", an); };
+  sync();
+  b.addEventListener("click", e => { if (e.target.closest(".gross")) { lightbox(f); return; } umschalten(f); });
+  b.addEventListener("keydown", e => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); umschalten(f); } });
+  return b;
+}
+function umschalten(f, an, still = false) {
+  const will = an === undefined ? !auswahl.has(f.id) : an;
+  if (!still && will !== auswahl.has(f.id)) merke();
+  if (will) {
+    if (auswahl.size >= MAX_AUSWAHL) { toast(`Höchstens ${MAX_AUSWAHL} Fotos pro Show.`, true); return; }
+    auswahl.set(f.id, { tag: f.tag, fav: f.fav, v: f.v, d: f.dauer });
+  } else auswahl.delete(f.id);
+  $$(`.foto[data-id="${f.id}"]`).forEach(el => { el.classList.toggle("an", will); el.setAttribute("aria-checked", will); });
+  aktualisiere();
+}
+function rasterNachTagen(container, fotos) {
+  // ergaenzt Fotos in Tagesbloecken (fotos sind bereits nach Datum sortiert)
+  for (const f of fotos) {
+    let blk = container.lastElementChild;
+    if (!blk || blk.dataset.tag !== (f.tag || "")) {
+      blk = document.createElement("div"); blk.dataset.tag = f.tag || "";
+      blk.innerHTML = `<div class="tag"><h2>${datumText(f.tag)}</h2><button class="btn klein">Tag wählen</button></div><div class="raster"></div>`;
+      $(".btn", blk).addEventListener("click", () => {
+        const alle = $$(".foto", blk).map(el => el.dataset.id);
+        const volle = alle.every(id => auswahl.has(id));
+        merke(); alle.forEach(id => { const ft = container._fotos.get(id); umschalten(ft, !volle, true); });
+      });
+      container.appendChild(blk);
+    }
+    container._fotos = container._fotos || new Map(); container._fotos.set(f.id, f);
+    $(".raster", blk).appendChild(fotoKnopf(f));
+  }
+}
+
+// ---------------------------------------------------------------- Neueste
+function filterKey() { return ["fPerson", "fJahr", "fLand", "fTyp"].map(i => $("#" + i).value).join("|"); }
+async function neuesteLaden(neu = false) {
+  if (neueste.laedt || (!neueste.weiter && !neu)) return;
+  if (neu) { Object.assign(neueste, { cursor: 1, weiter: true, fotos: [] }); const l = $("#neuesteListe"); l.innerHTML = ""; l._fotos = null; }
+  neueste.laedt = true; $("#neuesteLaden").textContent = "Lade …";
+  try {
+    const q = new URLSearchParams({ cursor: neueste.cursor, limit: 90 });
+    if ($("#fPerson").value) q.set("person", $("#fPerson").value);
+    if ($("#fJahr").value) q.set("jahr", $("#fJahr").value);
+    if ($("#fLand").value) q.set("ort", $("#fLand").value);
+    q.set("typ", $("#fTyp").value);
+    const d = await api("neueste?" + q);
+    rasterNachTagen($("#neuesteListe"), d.fotos);
+    neueste.fotos.push(...d.fotos);
+    neueste.weiter = !!d.weiter; neueste.cursor = d.weiter || neueste.cursor;
+    $("#neuesteLaden").textContent = neueste.fotos.length ? (neueste.weiter ? "" : "Das waren alle Fotos.") : "Keine Fotos gefunden.";
+    alleKnopf();
+  } catch (e) { $("#neuesteLaden").textContent = ""; fehler(e); }
+  neueste.laedt = false;
+  if (neueste.weiter && tab === "neueste" && $("#neuesteLaden").getBoundingClientRect().top < innerHeight + 300) neuesteLaden();
+}
+new IntersectionObserver(es => { if (es.some(e => e.isIntersecting) && tab === "neueste") neuesteLaden(); }, { rootMargin: "600px" }).observe($("#neuesteLaden"));
+["fPerson", "fJahr", "fLand", "fTyp"].forEach(i => $("#" + i).addEventListener("change", async () => { await facettenLaden(); neuesteLaden(true); }));
+$("#fReset").addEventListener("click", async () => { ["fPerson", "fJahr", "fLand"].forEach(i => { $("#" + i).value = ""; }); await facettenLaden(); neuesteLaden(true); });
+
+// Verkoppelte Filter: jede Auswahl schraenkt die anderen auf das ein, wofuer es noch Treffer gibt (mit Anzahl)
+const zahl = n => n.toLocaleString(RW_LOCALE);
+async function facettenLaden(nochmal = true) {
+  const q = new URLSearchParams({ typ: $("#fTyp").value });
+  if ($("#fJahr").value) q.set("jahr", $("#fJahr").value);
+  if ($("#fLand").value) q.set("ort", $("#fLand").value);
+  if ($("#fPerson").value) q.set("person", $("#fPerson").value);
+  let d; try { d = await api("facetten?" + q); } catch (e) { return; }
+  let weg = false;
+  const fuelle = (sel, leer, liste, wert, text) => {
+    const el = $(sel), alt = el.value; el.innerHTML = "";
+    el.appendChild(new Option(leer, ""));
+    liste.forEach(x => el.appendChild(new Option(text(x), wert(x))));
+    const da = [...el.options].some(o => o.value === alt);
+    el.value = da ? alt : ""; if (!da && alt) weg = true;
+  };
+  fuelle("#fJahr", "Alle Jahre", d.jahre, x => String(x.wert), x => `${x.wert} (${zahl(x.anzahl)})`);
+  fuelle("#fLand", "Alle Länder", RW_LANG === "en" ? [...d.laender].sort((a, b) => a.wert.localeCompare(b.wert)) : d.laender, x => x.wert, x => `${RW_LANG === "en" ? x.wert : x.name} (${zahl(x.anzahl)})`);
+  fuelle("#fPerson", "Alle Personen", d.personen, x => x.name, x => `${x.name} (${zahl(x.anzahl)})`);
+  neueste.gesamt = d.gesamt;
+  $("#fReset").classList.toggle("versteckt", !($("#fJahr").value || $("#fLand").value || $("#fPerson").value));
+  alleKnopf();
+  if (weg && nochmal) await facettenLaden(false);          // eine Auswahl passt nicht mehr (z. B. nach Medientyp-Wechsel) -> zurueckgesetzt, Listen neu
+}
+
+// ---------------------------------------------------------------- "Alle auswaehlen"
+function markiereAn(sel) { $$(sel + " .foto").forEach(el => { const an = auswahl.has(el.dataset.id); el.classList.toggle("an", an); el.setAttribute("aria-checked", an); }); }
+function alleKnopf() {
+  const f = neueste.fotos, b = $("#alleNeueste"), info = $("#alleNeuesteInfo");
+  const alleAn = f.length > 0 && f.every(x => auswahl.has(x.id));
+  b.textContent = alleAn ? "✕ Alle abwählen" : "✓ Alle auswählen";
+  b.disabled = !f.length;
+  info.textContent = neueste.gesamt !== undefined ? `${zahl(neueste.gesamt)} ${$("#fTyp").value === "foto" ? "Fotos" : "Medien"} in dieser Ansicht` : (f.length ? `${f.length}${neueste.weiter ? "+" : ""} in dieser Ansicht` : "");
+  const sb = $("#alleSuche"); if (sb && sucheErgebnis.length) {
+    const sa = sucheErgebnis.every(x => auswahl.has(x.id));
+    sb.textContent = sa ? "✕ Alle Treffer abwählen" : "✓ Alle Treffer auswählen";
+  }
+}
+$("#alleNeueste").addEventListener("click", async () => {
+  const b = $("#alleNeueste"); b.disabled = true; merke();
+  try {
+    if (neueste.fotos.length && neueste.fotos.every(x => auswahl.has(x.id))) {
+      neueste.fotos.forEach(x => auswahl.delete(x.id));
+    } else {
+      b.textContent = "Lade alle …";
+      let zuletzt = -1;
+      while (neueste.weiter && neueste.fotos.length < MAX_AUSWAHL && neueste.fotos.length !== zuletzt) { zuletzt = neueste.fotos.length; await neuesteLaden(); }
+      let uebrig = MAX_AUSWAHL - auswahl.size, zu = 0;
+      for (const x of neueste.fotos) { if (auswahl.has(x.id)) continue; if (uebrig <= 0) { zu++; continue; } auswahl.set(x.id, { tag: x.tag, fav: x.fav, v: x.v, d: x.dauer }); uebrig--; }
+      if (zu || neueste.weiter) toast(`Es sind höchstens ${MAX_AUSWAHL} Fotos pro Show möglich – die ersten wurden ausgewählt.`);
+    }
+  } catch (e) { fehler(e); }
+  markiereAn("#neuesteListe"); aktualisiere();
+});
+$("#alleSuche").addEventListener("click", () => {
+  merke();
+  if (sucheErgebnis.every(x => auswahl.has(x.id))) sucheErgebnis.forEach(x => auswahl.delete(x.id));
+  else sucheErgebnis.forEach(x => { if (auswahl.size < MAX_AUSWAHL) auswahl.set(x.id, { tag: x.tag, fav: x.fav, v: x.v, d: x.dauer }); });
+  markiereAn("#sucheListe"); aktualisiere();
+});
+
+// ---------------------------------------------------------------- Suchen
+$("#sucheForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const text = $("#sucheText").value.trim(); if (!text) return;
+  if (auswahl.size && !confirm(`Die aktuelle Auswahl (${auswahl.size} Fotos) wird durch die Treffer ersetzt. Weiter?`)) return;
+  const l = $("#sucheListe"), h = $("#sucheHinweis");
+  l.innerHTML = ""; l._fotos = null; h.innerHTML = '<div class="laden">Suche läuft …</div>';
+  try {
+    const d = await api("suche?" + new URLSearchParams({ text, lang: RW_LANG }));
+    sucheErgebnis = d.fotos;
+    h.innerHTML = `<div class="hinweis">${esc(d.nachricht)}${d.gesamt > d.fotos.length ? ` · ${d.gesamt} gefunden, ${d.fotos.length} davon sinnvoll verteilt` : ""}${d.fotos.length ? "<br>Alle Treffer sind schon ausgewählt – tippe ein Foto an, um es abzuwählen." : ""}</div>`;
+    merke(); auswahl.clear(); showBearbeiten = null;
+    $("#alleSucheZeile").classList.toggle("versteckt", !d.fotos.length);
+    if (d.fotos.length) {
+      d.fotos.forEach(f => auswahl.set(f.id, { tag: f.tag, fav: f.fav }));
+      if (!$("#showName").value) $("#showName").value = text.slice(0, 60);
+      rasterNachTagen(l, d.fotos);
+    } else if (!d.ok) h.innerHTML = `<div class="hinweis">${esc(d.nachricht)}</div>`;
+    aktualisiere();
+  } catch (err) { h.innerHTML = ""; fehler(err); }
+});
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// ---------------------------------------------------------------- Meine Shows
+function showKarte(s) {
+  const k = document.createElement("div"); k.className = "karte";
+  k.innerHTML = `<div class="zeile"><h3>${esc(s.name)}</h3>${s.laeuft ? '<span class="badge">läuft</span>' : ""}</div>
+    <div class="meta">${s.anzahl} Fotos${s.zeit ? " · " + new Date(s.zeit).toLocaleString(RW_LOCALE, { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) : ""}</div>
+    <div class="aktionen"><button class="btn primaer klein nur-rahmen" data-a="an">▶ Auf den Rahmen</button><button class="btn klein primaer nur-tv" data-a="tv">📺 Auf TV</button><button class="btn klein" data-a="dia">🖥 Diashow hier</button><button class="btn klein" data-a="edit">Bearbeiten</button>
+    <button class="btn klein" data-a="stern">${s.gemerkt ? "☆ Nicht mehr merken" : "⭐ Merken"}</button><button class="btn klein gefahr" data-a="weg">Löschen</button></div>`;
+  k.addEventListener("click", async e => {
+    const a = e.target.dataset.a; if (!a) return;
+    try {
+      if (a === "an") { e.target.disabled = true; const r = await api(`shows/${s.id}/anzeigen`, { method: "POST", body: "{}" }); toast(r.nachricht); statusLaden(); showsLaden(); }
+      if (a === "tv") { const d4 = await api(`shows/${s.id}`); tvOeffnen(d4.fotos.map(f => ({ id: f.id, tag: "" })), d4.name); }
+      if (a === "dia") { const d3 = await api(`shows/${s.id}`); diashow(d3.fotos.map(f => ({ id: f.id, tag: "" })), d3.name); }
+      if (a === "stern") { await api(`shows/${s.id}`, { method: "PUT", body: JSON.stringify({ gemerkt: !s.gemerkt }) }); showsLaden(); }
+      if (a === "weg" && confirm(`„${s.name}“ aus der Liste löschen?\n\nDabei wird kein Foto gelöscht.`)) { await api(`shows/${s.id}`, { method: "DELETE" }); showsLaden(); statusLaden(); }
+      if (a === "edit") {
+        if (auswahl.size && !confirm(`Die aktuelle Auswahl (${auswahl.size} Fotos) wird durch „${s.name}“ ersetzt. Weiter?`)) return;
+        const d2 = await api(`shows/${s.id}`); merke(); auswahl.clear();
+        d2.fotos.forEach(f => auswahl.set(f.id, { tag: "", fav: false }));
+        $("#showName").value = d2.name; $("#merken").checked = !!d2.gemerkt; showBearbeiten = d2.id; aktualisiere(); wechsle("auswahl");
+      }
+    } catch (err) { fehler(err); e.target.disabled = false; }
+  });
+  return k;
+}
+async function showsLaden() {
+  const l = $("#showsListe"); l.innerHTML = '<div class="laden">Lade …</div>';
+  try {
+    const d = await api("shows");
+    zurueckZeigen(d.zurueck);
+    l.innerHTML = "";
+    const gruppe = (titel, liste, leer) => {
+      const h = document.createElement("div"); h.className = "tag"; h.innerHTML = `<h2>${titel}</h2>`; l.appendChild(h);
+      if (!liste.length) { const p = document.createElement("div"); p.className = "leer"; p.style.padding = "14px 8px"; p.innerHTML = leer; l.appendChild(p); }
+      liste.forEach(s => l.appendChild(showKarte(s)));
+    };
+    gruppe("⭐ Gemerkt", d.shows.filter(s => s.gemerkt), "Noch nichts dauerhaft gemerkt. Tippe bei einer Show auf „⭐ Merken“.");
+    gruppe("🕘 Zuletzt gezeigt", d.shows.filter(s => !s.gemerkt), "Alles, was du auf den Rahmen schickst, erscheint hier automatisch.");
+  } catch (e) { l.innerHTML = ""; fehler(e); }
+}
+
+// ---------------------------------------------------------------- Auswahl / Leiste
+function auswahlZeigen() {
+  const l = $("#auswahlListe"); l.innerHTML = ""; l._fotos = null;
+  const fotos = [...auswahl].map(([id, v]) => ({ id, tag: v.tag, fav: v.fav, v: v.v, dauer: v.d }));
+  if (!fotos.length) { l.innerHTML = '<div class="leer">Noch nichts ausgewählt.</div>'; return; }
+  const raster = document.createElement("div"); raster.className = "raster";
+  fotos.forEach(f => raster.appendChild(fotoKnopf(f))); l.appendChild(raster);
+}
+function leeren() {
+  const n = auswahl.size; if (!n) return;
+  if (!confirm(`Alle ${n} ausgewählten Fotos wieder abwählen?\n\nDabei wird kein Foto gelöscht – nur die Auswahl wird geleert.`)) return;
+  merke(); auswahl.clear(); showBearbeiten = null; $("#showName").value = "";
+  $$(".foto.an").forEach(e => { e.classList.remove("an"); e.setAttribute("aria-checked", "false"); });
+  aktualisiere(); if (tab === "auswahl") auswahlZeigen(); toast("Auswahl geleert – mit „↶ Rückgängig“ holst du sie zurück.");
+}
+$("#auswahlLeeren").addEventListener("click", leeren);
+$("#leeren").addEventListener("click", leeren);
+$("#undo").addEventListener("click", rueckgaengig);
+$("#undoKopf").addEventListener("click", rueckgaengig);
+
+function aktualisiere() {
+  const n = auswahl.size;
+  $("#leiste").classList.toggle("versteckt", n === 0);
+  document.body.classList.toggle("mit-leiste", n > 0);
+  $("#zaehler").innerHTML = `${n} Foto${n === 1 ? "" : "s"} ausgewählt › ${n > EMPFEHLUNG ? "<small>· sehr viele</small>" : ""}`;
+  $("#senden").disabled = n === 0;
+  $("#undo").disabled = !rueck.length;
+  $("#undoKopf").classList.toggle("versteckt", !(n === 0 && rueck.length));   // Leiste unten ist weg -> Knopf oben im Kopf
+  alleKnopf();
+  const z = $(".tab[data-tab='neueste'] .zahl"); if (z) z.remove();
+  sichern();
+}
+$("#zaehler").addEventListener("click", () => wechsle("auswahl"));
+$("#showName").addEventListener("input", sichern);
+$("#showName").addEventListener("keydown", e => { if (e.key === "Enter") $("#senden").click(); });
+
+$("#senden").addEventListener("click", async () => {
+  const name = $("#showName").value.trim();
+  if (!auswahl.size) return;
+  if (!name) { toast("Bitte gib der Show einen Namen.", true); $("#showName").focus(); return; }
+  const nurFotos = [...auswahl].filter(([, v]) => !v.v).map(([id]) => id);
+  if (!nurFotos.length) { toast("Auf den Rahmen gehen nur Fotos – diese Auswahl enthält nur Videos. Nutze „📺 Auf den TV“.", true); return; }
+  const b = $("#senden"); b.disabled = true; b.textContent = "Sende …";
+  try {
+    const r = await api("anzeigen", { method: "POST", body: JSON.stringify({ name, ids: nurFotos, speichern: $("#merken").checked }) });
+    if (nurFotos.length < auswahl.size) toast(`${auswahl.size - nurFotos.length} Video(s) wurden nicht auf den Rahmen geschickt (er zeigt nur Fotos).`);
+    toast(r.nachricht + (r.zurueck ? `  ↩ Zurück zu „${r.zurueck}“ jederzeit oben möglich.` : ""));
+    merke(); auswahl.clear(); showBearbeiten = null; $("#showName").value = ""; $("#merken").checked = false;
+    $$(".foto.an").forEach(e => e.classList.remove("an")); aktualisiere(); statusLaden(); if (tab === "auswahl") wechsle("shows");
+  } catch (e) { fehler(e); }
+  b.textContent = "Auf den Rahmen"; b.disabled = auswahl.size === 0;
+});
+$("#normalBtn").addEventListener("click", async () => {
+  if (!confirm("Der Rahmen soll wieder das normale Programm zeigen?")) return;
+  try { const r = await api("normal", { method: "POST", body: "{}" }); toast(r.nachricht); statusLaden(); } catch (e) { fehler(e); }
+});
+
+// ---------------------------------------------------------------- Diashow (im Browser, ohne den Rahmen zu aendern)
+const ds = { quelle: [], fotos: [], i: 0, timer: 0, ui: 0, spielt: true, tempo: 5, misch: false, lock: null, vorn: null, marke: 0, fehler: 0, name: "" };
+try { const e = JSON.parse(localStorage.getItem("rwDs") || "{}"); if (e.tempo) ds.tempo = e.tempo; ds.misch = !!e.misch; } catch (e) {}
+const dsSpeichern = () => { try { localStorage.setItem("rwDs", JSON.stringify({ tempo: ds.tempo, misch: ds.misch })); } catch (e) {} };
+const dsOffen = () => !$("#diashow").classList.contains("versteckt");
+
+function dsOrdnen(aktuell) {
+  let l = [...ds.quelle];
+  if (ds.misch) { for (let k = l.length - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [l[k], l[j]] = [l[j], l[k]]; } }
+  else if (ds.nachDatum !== false && l.every(f => f.tag)) l.sort((a, b) => a.tag.localeCompare(b.tag));   // wie auf dem Rahmen: nach Datum
+  if (aktuell) { const p = l.findIndex(f => f.id === aktuell); if (p > 0) { const [x] = l.splice(p, 1); l.unshift(x); } }
+  ds.fotos = l; ds.i = 0;
+}
+function diashow(liste, name, nachDatum = true) {
+  if (!liste || !liste.length) { toast("Es sind keine Fotos ausgewählt.", true); return; }
+  ds.quelle = liste.map(f => ({ id: f.id, tag: f.tag || "" })); ds.name = name || "Diashow"; ds.spielt = true; ds.fehler = 0; ds.nachDatum = nachDatum;
+  dsOrdnen(); $("#dsTitel").textContent = ds.name; $("#dsTempo").value = String(ds.tempo); $("#dsMisch").checked = ds.misch;
+  const b = $("#dsBuehne"); b.innerHTML = "";
+  for (let k = 0; k < 2; k++) { const im = document.createElement("img"); im.className = "ds-bild"; im.alt = ""; im.decoding = "async"; b.appendChild(im); }
+  ds.vorn = null; $("#diashow").classList.remove("versteckt"); document.body.style.overflow = "hidden";
+  $("#dsVoll").classList.toggle("versteckt", !(document.fullscreenEnabled || document.webkitFullscreenEnabled));
+  dsPlayAnzeige(); dsUiZeigen(); dsZeige(0); dsWachhalten();
+  $("#dsPlay").focus({ preventScroll: true });
+}
+function dsZeige(i) {
+  clearTimeout(ds.timer); const n = ds.fotos.length; if (!n) return;
+  ds.i = (i % n + n) % n; const f = ds.fotos[ds.i], marke = ++ds.marke;
+  const [a, b] = $$("#dsBuehne .ds-bild"); const neu = ds.vorn === a ? b : a, alt = ds.vorn;
+  neu.onload = () => {
+    if (marke !== ds.marke) return;
+    ds.fehler = 0; neu.classList.remove("an"); void neu.offsetWidth; neu.classList.add("an");
+    if (alt) alt.classList.remove("an");
+    ds.vorn = neu; $("#dsZaehler").textContent = `${ds.i + 1} / ${n}`; neu.alt = f.tag ? `Foto vom ${f.tag}` : "Foto";
+    for (const k of [1, 2]) { const nf = ds.fotos[(ds.i + k) % n]; if (nf) new Image().src = vorschau(nf.id, true); }   // vorladen
+    dsPlanen();
+  };
+  neu.onerror = () => { if (marke !== ds.marke) return; if (++ds.fehler > 5) { toast("Die Fotos lassen sich gerade nicht laden.", true); dsEnde(); return; } dsZeige(ds.i + 1); };
+  neu.src = vorschau(f.id, true);
+}
+function dsPlanen() { clearTimeout(ds.timer); if (ds.spielt && dsOffen()) ds.timer = setTimeout(() => dsZeige(ds.i + 1), ds.tempo * 1000); }
+function dsPlayAnzeige() { const p = $("#dsPlay"); p.textContent = ds.spielt ? "⏸" : "▶"; p.setAttribute("aria-label", ds.spielt ? "Pause" : "Abspielen"); }
+function dsUiZeigen() {
+  $$(".ds-ui").forEach(e => e.classList.remove("weg")); clearTimeout(ds.ui);
+  if (ds.spielt) ds.ui = setTimeout(() => $$(".ds-ui").forEach(e => e.classList.add("weg")), 3500);
+}
+async function dsWachhalten() { try { if ("wakeLock" in navigator && dsOffen()) ds.lock = await navigator.wakeLock.request("screen"); } catch (e) {} }
+function dsEnde() {
+  clearTimeout(ds.timer); clearTimeout(ds.ui); ds.marke++; $("#diashow").classList.add("versteckt"); $("#dsBuehne").innerHTML = ""; document.body.style.overflow = "";
+  try { if (ds.lock) ds.lock.release(); } catch (e) {} ds.lock = null;
+  try { if (document.fullscreenElement) document.exitFullscreen(); else if (document.webkitFullscreenElement) document.webkitExitFullscreen(); } catch (e) {}
+}
+$("#dsZu").addEventListener("click", dsEnde);
+$("#dsWeiter").addEventListener("click", () => { dsZeige(ds.i + 1); dsUiZeigen(); });
+$("#dsZurueck").addEventListener("click", () => { dsZeige(ds.i - 1); dsUiZeigen(); });
+$("#dsPlay").addEventListener("click", () => { ds.spielt = !ds.spielt; dsPlayAnzeige(); dsUiZeigen(); ds.spielt ? dsPlanen() : clearTimeout(ds.timer); });
+$("#dsTempo").addEventListener("change", e => { ds.tempo = +e.target.value; dsSpeichern(); dsPlanen(); });
+$("#dsMisch").addEventListener("change", e => { ds.misch = e.target.checked; dsSpeichern(); const akt = ds.fotos[ds.i] && ds.fotos[ds.i].id; dsOrdnen(akt); $("#dsZaehler").textContent = `1 / ${ds.fotos.length}`; dsPlanen(); });
+$("#dsVoll").addEventListener("click", () => { const el = $("#diashow"); try { (el.requestFullscreen || el.webkitRequestFullscreen).call(el); } catch (e) {} });
+// Tippen auf das Bild blendet die Bedienung ein/aus, Wischen blaettert
+let wisch = null;
+$("#dsBuehne").addEventListener("pointerdown", e => { wisch = { x: e.clientX, y: e.clientY, t: Date.now() }; });
+$("#dsBuehne").addEventListener("pointerup", e => {
+  if (!wisch) return; const dx = e.clientX - wisch.x, dy = e.clientY - wisch.y; const w = wisch; wisch = null;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) { dsZeige(ds.i + (dx < 0 ? 1 : -1)); dsUiZeigen(); }
+  else if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && Date.now() - w.t < 500) { const aus = $("#dsOben").classList.contains("weg"); aus ? dsUiZeigen() : $$(".ds-ui").forEach(x => x.classList.add("weg")); }
+});
+$("#diashow").addEventListener("pointermove", e => { if (e.pointerType === "mouse") dsUiZeigen(); });
+document.addEventListener("keydown", e => {
+  if (!dsOffen()) return;
+  if (e.key === "Escape") dsEnde();
+  else if (e.key === "ArrowRight") { dsZeige(ds.i + 1); dsUiZeigen(); }
+  else if (e.key === "ArrowLeft") { dsZeige(ds.i - 1); dsUiZeigen(); }
+  else if (e.key === " " && e.target.tagName !== "BUTTON") { e.preventDefault(); $("#dsPlay").click(); }
+  else if (e.key === "f" || e.key === "F") $("#dsVoll").click();
+});
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") dsWachhalten(); });
+$("#diaNeueste").addEventListener("click", async () => {
+  const b = $("#diaNeueste"); b.disabled = true;
+  try { let z = -1; while (neueste.weiter && neueste.fotos.length < 300 && neueste.fotos.length !== z) { z = neueste.fotos.length; await neuesteLaden(); } } catch (e) {}
+  b.disabled = false;
+  diashow(neueste.fotos.slice(0, 300), "Neueste Fotos", false);     // Reihenfolge wie in der Ansicht (neueste zuerst)
+});
+$("#diaSuche").addEventListener("click", () => diashow(sucheErgebnis, $("#sucheText").value.trim() || "Suche"));
+$("#diashowBtn").addEventListener("click", () => {
+  const fotos = [...auswahl].filter(([, v]) => !v.v).map(([id, v]) => ({ id, tag: v.tag }));
+  if (fotos.length < auswahl.size) toast("Die Diashow hier zeigt nur Fotos – Videos laufen über „📺 Auf den TV“.");
+  diashow(fotos, $("#showName").value.trim() || "Auswahl");
+});
+
+// ---------------------------------------------------------------- Auf den Fernseher
+// Weg 1 (Standard): Empfaengerseite /tv/ im Browser des Fernsehers, Fotos laufen direkt (kein Video).
+// Weg 2: AirPlay-Video (nur Safari) fuer Geraete ohne Empfaengerseite.
+const tv = { job: 0, timer: 0, quelle: null, ziel: "", pause: false };
+const TESTMODUS = location.search.indexOf("test=1") >= 0;           // nur fuer Automatiktests: zeigt das versteckte Testziel statt des echten Fernsehers
+const zieleUrl = "tv/ziele" + (TESTMODUS ? "?alle=1" : "");
+const tvSchritt = n => [0, 1, 2, 3, 4].forEach(i => $("#tvSchritt" + i).classList.toggle("versteckt", i !== n));
+function tvZu() { clearTimeout(tv.timer); tv.job = 0; $("#tvDialog").classList.add("versteckt"); const v = $("#tvVideo"); if (v) v.pause(); $("#tvVideoBox").innerHTML = ""; }
+function sortiere(fotos) { const l = fotos.slice(); if (l.every(f => f.tag)) l.sort((a, b) => a.tag.localeCompare(b.tag)); return l; }   // chronologisch wie auf dem Rahmen
+async function tvOeffnen(fotos, name) {
+  fotos = fotos || [...auswahl].map(([id, v]) => ({ id, tag: v.tag, v: v.v }));
+  if (!fotos.length) return;
+  if (fotos.length > 1000) { toast("Höchstens 1000 Fotos pro Show.", true); return; }
+  tv.quelle = { fotos: sortiere(fotos), name: (name || $("#showName").value.trim() || "Auswahl").slice(0, 60) };
+  const n = fotos.length;
+  const nv = fotos.filter(f => f.v).length;
+  $("#tvInfo0").innerHTML = `<b>${esc(tv.quelle.name)}</b> · ${n - nv} Foto${n - nv === 1 ? "" : "s"}${nv ? ` + ${nv} Video${nv === 1 ? "" : "s"}` : ""}`;
+  $("#tvVideoZeile").classList.toggle("versteckt", !nv);
+  $("#tvTipp0").dataset.video = nv ? "1" : "";
+  $("#tvReihe").value = "alt";                                   // Standard: zeitlich, aeltestes zuerst
+  tvSchritt(0); $("#tvDialog").classList.remove("versteckt");
+  await tvZieleLaden();
+}
+function musikOptionen(radio) {
+  ["#tvMusik0", "#tvMusikFern"].forEach(sel => {
+    const el = $(sel), alt = el.value; el.innerHTML = sel === "#tvMusik0" ? '<option value="">Keine</option>' : '<option value="">Aus</option>';
+    radio.forEach(r => { const o = document.createElement("option"); o.value = r.id; o.textContent = r.name; el.appendChild(o); });
+    el.value = alt;
+  });
+}
+// ---- Eigene Musik hinzufuegen/entfernen (nur wenn der Server es erlaubt: RAHMEN_WEB_MUSIK_UPLOAD)
+function musikHinweisZeigen(liste) {
+  const leer = !liste.length;
+  $("#musikHinweis").textContent = leer ? (konfig.musik_upload ? "Noch keine Musik eingerichtet. Füge eigene Titel hinzu." : "Noch keine Musik eingerichtet. Lege Musikdateien in den Musikordner des Servers (siehe Anleitung).") : "Eigene Musik: Titel und Künstler erscheinen am Fernseher, die Reihenfolge ist zufällig.";
+  $("#musikVerwalten").classList.toggle("versteckt", !konfig.musik_upload);
+}
+async function musikSammlungen() {
+  const d = await api(zieleUrl); musikOptionen(d.musik || []); musikHinweisZeigen(d.musik || []);
+  return (d.musik || []).filter(m => m.id !== "alle");
+}
+async function musikListeZeigen() {
+  const kat = $("#musikSammlung").value, box = $("#musikListe"); box.innerHTML = "";
+  $("#musikNeuZeile").classList.toggle("versteckt", kat !== "");
+  if (!kat) return;
+  try {
+    const d = await api("tv/musikliste?k=" + encodeURIComponent(kat));
+    d.stuecke.forEach(st => {
+      const z = document.createElement("div"); z.className = "tvziel";
+      z.innerHTML = `<span class="tvname">${esc(st.titel)}${st.urheber ? " · " + esc(st.urheber) : ""}</span><button class="btn klein gefahr" type="button" aria-label="Titel entfernen" title="Titel entfernen">✕</button>`;
+      $("button", z).addEventListener("click", async () => {
+        if (!confirm(`„${st.titel}“ von diesem Server entfernen?`)) return;
+        try { await api(`musik/${encodeURIComponent(kat)}/${encodeURIComponent(st.datei)}`, { method: "DELETE" }); await musikOeffnen(kat); } catch (e) { fehler(e); }
+      });
+      box.appendChild(z);
+    });
+  } catch (e) { fehler(e); }
+}
+async function musikOeffnen(waehle) {
+  const liste = await musikSammlungen(), sel = $("#musikSammlung");
+  sel.innerHTML = ""; liste.forEach(m => sel.appendChild(new Option(`${m.name} (${m.anzahl})`, m.id))); sel.appendChild(new Option("➕ Neue Sammlung …", ""));
+  sel.value = waehle && liste.some(m => m.id === waehle) ? waehle : (liste[0] ? liste[0].id : "");
+  $("#musikDialog").classList.remove("versteckt"); await musikListeZeigen();
+}
+$("#musikVerwalten").addEventListener("click", () => musikOeffnen().catch(fehler));
+$("#musikSammlung").addEventListener("change", musikListeZeigen);
+$("#musikZu").addEventListener("click", () => { $("#musikDialog").classList.add("versteckt"); $("#musikStatus").textContent = ""; });
+$("#musikHoch").addEventListener("click", async () => {
+  const dateien = [...$("#musikDateien").files]; if (!dateien.length) { toast("Bitte Dateien auswählen.", true); return; }
+  let kat = $("#musikSammlung").value; if (kat === "") { kat = $("#musikNeu").value.trim(); if (!kat) { toast("Bitte einen Namen für die neue Sammlung eingeben.", true); return; } }
+  const b = $("#musikHoch"); b.disabled = true; let ok = 0, letzte = kat;
+  for (const [i, f] of dateien.entries()) {
+    $("#musikStatus").textContent = `Lade ${i + 1} von ${dateien.length}: ${f.name} …`;
+    try {
+      const r = await fetch(`/api/musik/${encodeURIComponent(kat)}/${encodeURIComponent(f.name)}`, { method: "PUT", body: f, credentials: "same-origin", headers: { "X-Rahmen": "1" } });
+      const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.nachricht || "Hochladen fehlgeschlagen");
+      ok++; letzte = d.sammlung;
+    } catch (e) { toast(`${f.name}: ${e.message}`, true); }
+  }
+  b.disabled = false; $("#musikDateien").value = ""; $("#musikNeu").value = ""; $("#musikStatus").textContent = ok ? `${ok} Titel hinzugefügt.` : "";
+  await musikOeffnen(letzte);
+});
+async function tvZieleLaden() {
+  const box = $("#tvZiele"); box.innerHTML = '<div class="laden">Suche Fernseher …</div>';
+  try {
+    const d = await api(zieleUrl); musikOptionen(d.musik || []); musikHinweisZeigen(d.musik || []);
+    try { $("#tvMusik0").value = localStorage.getItem("rwTvMusik") || ""; $("#tvLaut0").value = localStorage.getItem("rwTvLaut") || "0.3"; } catch (e) {}
+    let gemerkt = ""; try { gemerkt = localStorage.getItem("rwTvZiel") || ""; } catch (e) {}
+    const vorwahl = TESTMODUS ? "test" : (d.ziele.some(z => z.id === gemerkt) ? gemerkt : "lg");
+    box.innerHTML = "";
+    d.ziele.forEach(z => {
+      const l = document.createElement("label"); l.className = "tvziel" + (z.id === vorwahl ? " gewaehlt" : "");
+      l.innerHTML = `<input type="radio" name="tvz" value="${z.id}" ${z.id === vorwahl ? "checked" : ""}><span class="tvname">📺 ${esc(z.name)}</span><span class="tvstatus ${z.online ? "an" : ""}">${z.online ? "● bereit" + (z.spielt ? " · zeigt " + esc(z.spielt) : "") : "○ nicht geöffnet"}</span>`;
+      l.querySelector("input").addEventListener("change", () => { $$(".tvziel").forEach(x => x.classList.toggle("gewaehlt", x === l)); });
+      box.appendChild(l);
+    });
+  } catch (e) { box.innerHTML = ""; fehler(e); }
+}
+$("#tvBtn").addEventListener("click", () => tvOeffnen());
+["#tvAbbrechen0", "#tvAbbrechen", "#tvAbbrechen2", "#tvSchliessen", "#tvSchliessen4"].forEach(s => $(s).addEventListener("click", tvZu));
+$("#tvDialog").addEventListener("click", e => { if (e.target.id === "tvDialog") tvZu(); });
+$("#tvLos").addEventListener("click", async () => {
+  const wahl = document.querySelector('input[name="tvz"]:checked'); if (!wahl) { toast("Bitte einen Fernseher wählen.", true); return; }
+  tv.ziel = wahl.value; try { localStorage.setItem("rwTvZiel", tv.ziel); localStorage.setItem("rwTvMusik", $("#tvMusik0").value); localStorage.setItem("rwTvLaut", $("#tvLaut0").value); } catch (e) {}
+  const b = $("#tvLos"); b.disabled = true;
+  try {
+    const r = await api("tv/senden", { method: "POST", body: JSON.stringify({ ziel: tv.ziel, ids: tv.quelle.fotos.map(f => f.id), name: tv.quelle.name, sekunden: +$("#tvSek0").value, reihenfolge: $("#tvReihe").value, musik: $("#tvMusik0").value, laut: +$("#tvLaut0").value,
+      videos: tv.quelle.fotos.filter(f => f.v).map(f => f.id), maxv: +$("#tvMaxV").value }) });
+    $("#tvMusikFern").value = $("#tvMusik0").value; tvTitelLaden($("#tvMusik0").value);
+    tv.pause = false; $("#tvPause").textContent = "⏸";
+    $("#tvLaeuft").innerHTML = `<b>${esc(tv.quelle.name)}</b> läuft auf <b>${esc(wahl.closest(".tvziel").querySelector(".tvname").textContent.replace("📺", "").trim())}</b>.${r.wartet ? `<br><span class="tipp">${r.wartet} Video${r.wartet === 1 ? " wird" : "s werden"} für den Fernseher vorbereitet – es startet gleich.</span>` : ""}${r.online ? "" : '<br><span class="tipp">Der Fernseher hat die Seite /tv noch nicht geöffnet – es startet, sobald sie offen ist.</span>'}`;
+    tvSchritt(4);
+  } catch (e) { fehler(e); }
+  b.disabled = false;
+});
+$("#tvMusikFern").addEventListener("change", async e => {
+  try { await api("tv/steuer", { method: "POST", body: JSON.stringify({ ziel: tv.ziel, aktion: "musik", wert: e.target.value }) }); toast(e.target.value ? "Musik: " + e.target.selectedOptions[0].textContent : "Musik aus."); tvTitelLaden(e.target.value); }
+  catch (err) { fehler(err); }
+});
+async function tvTitelLaden(k) {
+  const zeile = $("#tvTitelZeile"), el = $("#tvTitelFern");
+  if (!k) { zeile.classList.add("versteckt"); return; }
+  try {
+    const d = await api("tv/musikliste?k=" + encodeURIComponent(k));
+    el.innerHTML = '<option value="">– zufällig weiter –</option>';
+    d.stuecke.forEach(st => { const o = document.createElement("option"); o.value = st.datei; o.textContent = st.titel + (st.urheber ? " · " + st.urheber.split(" · ")[0] : ""); el.appendChild(o); });
+    zeile.classList.remove("versteckt");
+  } catch (e) { zeile.classList.add("versteckt"); }
+}
+$("#tvTitelFern").addEventListener("change", async e => {
+  if (!e.target.value) return;
+  try { await api("tv/steuer", { method: "POST", body: JSON.stringify({ ziel: tv.ziel, aktion: "titel", wert: e.target.value }) }); toast("Spielt: " + e.target.selectedOptions[0].textContent); } catch (err) { fehler(err); }
+  e.target.value = "";
+});
+$("#tvSchritt4").addEventListener("click", async e => {
+  const a = e.target.dataset.a; if (!a) return;
+  try {
+    await api("tv/steuer", { method: "POST", body: JSON.stringify({ ziel: tv.ziel, aktion: a === "pause" ? (tv.pause ? "weiter" : "pause") : a }) });
+    if (a === "pause") { tv.pause = !tv.pause; $("#tvPause").textContent = tv.pause ? "▶" : "⏸"; $("#tvPause").setAttribute("aria-label", tv.pause ? "Weiter" : "Pause"); }
+    if (a === "stopp") { toast("Fernseher gestoppt."); tvZu(); $("#tvChip").classList.add("versteckt"); setTimeout(tvChipAktualisieren, 2500); }
+  } catch (err) { fehler(err); }
+});
+// ---- Dauerhaftes Fernseher-Feld oben: zeigt, was der Fernseher WIRKLICH spielt, mit Stopp und Fernbedienung
+let tvLauf = null;
+async function tvChipAktualisieren() {
+  if (document.visibilityState === "hidden") return;
+  try {
+    const d = await api(zieleUrl); const z = d.ziele.find(x => x.spielt), chip = $("#tvChip");
+    tvLauf = z || null; chip.classList.toggle("versteckt", !z);
+    if (z) $("#tvChipOpen").innerHTML = `📺 <b>${esc(z.name)}</b> · ${esc(z.spielt)}${z.musik ? " · 🎵" : ""}`;
+  } catch (e) {}
+}
+$("#tvChipOpen").addEventListener("click", () => {
+  if (!tvLauf) return; tv.ziel = tvLauf.id; tv.pause = false; $("#tvPause").textContent = "⏸";
+  $("#tvLaeuft").innerHTML = `<b>${esc(tvLauf.spielt)}</b> läuft auf <b>${esc(tvLauf.name)}</b>.`;
+  musikOptionen([...$("#tvMusik0").options].filter(o => o.value).map(o => ({ id: o.value, name: o.textContent })));
+  $("#tvMusikFern").value = tvLauf.musik || ""; tvTitelLaden(tvLauf.musik || "");
+  tvSchritt(4); $("#tvDialog").classList.remove("versteckt");
+});
+$("#tvChipStopp").addEventListener("click", async () => {
+  if (!tvLauf) return;
+  try { await api("tv/steuer", { method: "POST", body: JSON.stringify({ ziel: tvLauf.id, aktion: "stopp" }) }); toast(tvLauf.name + " gestoppt."); $("#tvChip").classList.add("versteckt"); setTimeout(tvChipAktualisieren, 2500); }
+  catch (e) { fehler(e); }
+});
+tvChipAktualisieren(); setInterval(tvChipAktualisieren, 5000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") tvChipAktualisieren(); });
+// ---- Weg 2: AirPlay-Video
+$("#tvAirplay").addEventListener("click", e => { e.preventDefault(); const n = tv.quelle.fotos.length;
+  if (n > 150) { toast("Für ein AirPlay-Video höchstens 150 Fotos – bitte weniger auswählen oder den Fernseher-Weg nutzen.", true); return; }
+  $("#tvInfo").textContent = `${n} Foto${n === 1 ? "" : "s"} werden zu einem Video für den Fernseher.`; tvSchritt(1); });
+$("#tvStart").addEventListener("click", async () => {
+  tvSchritt(2); $("#tvBalken").style.transform = "scaleX(.03)"; $("#tvFortschrittText").textContent = "Video wird vorbereitet …";
+  try {
+    const r = await api("tv/video", { method: "POST", body: JSON.stringify({ ids: tv.quelle.fotos.filter(f => !f.v).map(f => f.id), sekunden: +$("#tvSek").value }) });
+    tv.job = r.job; tvPruefen(r.job);
+  } catch (e) { fehler(e); tvSchritt(1); }
+});
+async function tvPruefen(job) {
+  if (tv.job !== job) return;
+  try {
+    const d = await api("tv/job/" + job);
+    $("#tvBalken").style.transform = `scaleX(${Math.max(.03, d.fortschritt)})`;
+    $("#tvFortschrittText").textContent = `Video wird vorbereitet … ${Math.round(d.fortschritt * 100)} %`;
+    if (d.status === "fertig") { tvFertig(d); return; }
+    if (d.status === "fehler") { toast(d.nachricht || "Fehler beim Vorbereiten", true); tvSchritt(1); return; }
+  } catch (e) { fehler(e); tvSchritt(1); return; }
+  tv.timer = setTimeout(() => tvPruefen(job), 1000);
+}
+function tvFertig(d) {
+  const min = Math.floor(d.dauer / 60), sek = d.dauer % 60;
+  $("#tvFertig").textContent = `Fertig: ${d.anzahl} Fotos, ${min ? min + " Min " : ""}${sek ? sek + " s" : ""} Laufzeit.`;
+  const v = document.createElement("video");
+  v.id = "tvVideo"; v.controls = true; v.playsInline = true; v.preload = "metadata"; v.setAttribute("x-webkit-airplay", "allow"); v.src = d.url;
+  $("#tvVideoBox").innerHTML = ""; $("#tvVideoBox").appendChild(v);
+  const geht = typeof v.webkitShowPlaybackTargetPicker === "function";
+  $("#tvWaehlen").classList.toggle("versteckt", !geht);
+  $("#tvHinweis").innerHTML = geht ? "Im AirPlay-Fenster <b>LG TV</b> oder <b>SHIELDAndroidTV</b> auswählen – die Fotos laufen dann auf dem Fernseher. Falls beide fehlen: Fernseher an und im selben WLAN?"
+    : "AirPlay-Auswahl gibt es nur in <b>Safari</b> (iPhone, iPad, Mac). Hier kannst du das Video nur auf diesem Gerät ansehen.";
+  tvSchritt(3);
+}
+$("#tvWaehlen").addEventListener("click", () => { const v = $("#tvVideo"); try { v.webkitShowPlaybackTargetPicker(); } catch (e) { toast("AirPlay lässt sich hier nicht öffnen.", true); } });
+
+// ---------------------------------------------------------------- Lightbox
+let lbFoto = null;
+function lightbox(f) {
+  lbFoto = f;
+  const bild = document.createElement("img"); bild.id = "lightboxBild"; bild.alt = `Foto vom ${f.tag || ""}`; bild.src = vorschau(f.id, true);
+  $("#lightbox").prepend(bild); $("#lightbox").classList.remove("versteckt");
+  $("#lightboxWaehlen").textContent = auswahl.has(f.id) ? "✓ Ausgewählt – abwählen" : "Auswählen";
+  $("#lightboxZu").focus();
+}
+$("#lightboxZu").addEventListener("click", () => { $("#lightbox").classList.add("versteckt"); const b = $("#lightboxBild"); if (b) b.remove(); });
+$("#lightbox").addEventListener("click", e => { if (e.target.id === "lightbox") $("#lightboxZu").click(); });
+$("#lightboxWaehlen").addEventListener("click", () => { umschalten(lbFoto); $("#lightboxZu").click(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#lightbox").classList.contains("versteckt")) $("#lightboxZu").click(); });
+
+// ---------------------------------------------------------------- Tabs / Status
+function wechsle(neuerTab) {
+  tab = neuerTab;
+  $$(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.tab === neuerTab));
+  for (const t of ["neueste", "suchen", "shows", "auswahl"]) $("#" + t + "Tab").classList.toggle("versteckt", t !== neuerTab);
+  if (neuerTab === "shows") showsLaden();
+  if (neuerTab === "auswahl") auswahlZeigen();
+  if (neuerTab === "neueste") { $$("#neuesteListe .foto").forEach(el => el.classList.toggle("an", auswahl.has(el.dataset.id))); neuesteLaden(); }
+  if (neuerTab === "suchen") $$("#sucheListe .foto").forEach(el => el.classList.toggle("an", auswahl.has(el.dataset.id)));
+  scrollTo({ top: 0 });
+}
+$$(".tab").forEach(t => t.addEventListener("click", () => wechsle(t.dataset.tab)));
+// Titel oder Bild im Kopf: immer zurueck auf die Hauptseite (Neueste, ganz oben); Diashow/Fenster werden geschlossen
+$("#kopfHome").addEventListener("click", () => {
+  if (dsOffen()) dsEnde();
+  if (!$("#tvDialog").classList.contains("versteckt")) tvZu();
+  if (!$("#lightbox").classList.contains("versteckt")) $("#lightboxZu").click();
+  wechsle("neueste"); scrollTo({ top: 0, behavior: "smooth" }); statusLaden();
+});
+
+function zurueckZeigen(name) {
+  const b = $("#zurueckBtn"); b.classList.toggle("versteckt", !name);
+  if (name) { b.textContent = `↩ Zurück zu „${name}“`; b.title = `Zurück zu: ${name}`; }
+}
+$("#rahmenReihe").addEventListener("change", async e => {
+  try { const r = await api("reihenfolge", { method: "POST", body: JSON.stringify({ reihenfolge: e.target.value }) }); toast(r.nachricht); } catch (err) { fehler(err); }
+});
+async function statusLaden() {
+  try {
+    const d = await api("status"), box = $("#laeuft");
+    box.classList.toggle("aktiv", !!d.laeuft);
+    $("#laeuftLabel").textContent = d.laeuft ? "● Läuft gerade auf dem Rahmen" : "Bilderrahmen";
+    $("#laeuftName").textContent = d.laeuft ? d.laeuft : "Normales Programm";
+    $("#laeuftMeta").textContent = d.laeuft ? `${d.anzahl} Fotos${d.seit ? " · seit " + new Date(d.seit).toLocaleTimeString(RW_LOCALE, { hour: "2-digit", minute: "2-digit" }) + " Uhr" : ""}` : "Dauer-Diashow, keine Wunsch-Show aktiv";
+    const rr = $("#rahmenReihe"); rr.classList.toggle("versteckt", !d.laeuft); if (d.reihenfolge && document.activeElement !== rr) rr.value = d.reihenfolge;
+    zurueckZeigen(d.zurueck);
+  } catch (e) { $("#laeuftName").textContent = ""; }
+}
+$("#zurueckBtn").addEventListener("click", async () => {
+  const b = $("#zurueckBtn"); b.disabled = true;
+  try { const r = await api("zurueck", { method: "POST", body: "{}" }); toast(r.nachricht); await statusLaden(); if (tab === "shows") showsLaden(); }
+  catch (e) { fehler(e); }
+  b.disabled = false;
+});
+
+let konfig = { name: "Immich Showcase", tv_url: "", beispiele: [], ziele: {} };
+const BEISPIELE_SPRACHE = { es: ["Verano 2022", "Cumpleaños", "Playa"], fr: ["Été 2022", "Anniversaire", "Plage"], nl: ["Zomer 2022", "Verjaardag", "Strand"] };
+function beispielListe() {
+  if (RW_LANG === "de") return konfig.beispiele || [];
+  if (RW_LANG === "en") return konfig.beispiele_en && konfig.beispiele_en.length ? konfig.beispiele_en : (konfig.beispiele || []);
+  return BEISPIELE_SPRACHE[RW_LANG] || konfig.beispiele_en || [];
+}
+async function konfigLaden() {
+  try {
+    konfig = await (await fetch("/api/config", { cache: "no-store" })).json();
+    document.body.classList.remove("modus-laden"); document.body.classList.add("modus-" + (konfig.modus || "beides"));
+    const bsp = beispielListe(), q = RW_LANG === "de" ? ["„", "“"] : (RW_LANG === "es" || RW_LANG === "fr") ? ["«", "»"] : ["“", "”"];
+    if (bsp.length) {
+      $("#sucheText").placeholder = RW_T("z. B.") + " " + bsp.slice(0, 2).join(", ");
+      $("#sucheBsp").textContent = q[0] + bsp[0] + q[1];
+    }
+    if (konfig.tv_url) $("#tvTippAdr").innerHTML = `Am Fernseher einmal im Browser <b>${esc(konfig.tv_url)}</b> öffnen` + (konfig.ziele.shield ? ` (${esc(konfig.ziele.shield)}: <b>${esc(konfig.tv_url)}/s</b>)` : "");
+  } catch (e) { document.body.classList.remove("modus-laden"); }
+}
+async function benutzerZeigen() {
+  try {
+    const m = await (await fetch("/api/me")).json();
+    $("#benutzerName").classList.toggle("versteckt", !m.name); $("#abmelden").classList.toggle("versteckt", !m.name); $("#benutzerName").textContent = m.name || "";
+  } catch (e) {}
+}
+$("#hilfeBtn").addEventListener("click", () => {
+  const b = beispielListe(), q = RW_LANG === "de" ? ["„", "“"] : (RW_LANG === "es" || RW_LANG === "fr") ? ["«", "»"] : ["“", "”"];
+  $("#sprache").value = RW_LANG;
+  if (b.length) $("#hilfeBeispiele").textContent = RW_T("Personen, Zeit, Orte und Motive lassen sich kombinieren, z. B.") + " " + b.slice(0, 3).map(x => q[0] + x + q[1]).join(", ") + ".";
+  $("#hilfeVersion").textContent = `${konfig.name || "Immich Showcase"} ${konfig.version || ""}`;
+  $("#hilfeDialog").classList.remove("versteckt");
+});
+$("#sprache").addEventListener("change", e => { location.href = location.pathname + "?lang=" + e.target.value; });
+$("#hilfeZu").addEventListener("click", () => $("#hilfeDialog").classList.add("versteckt"));
+$("#diagnoseBtn").addEventListener("click", async () => {
+  try {
+    const r = await fetch("/api/diagnose", { credentials: "same-origin" }); if (!r.ok) throw new Error("Support-Paket nicht verfügbar");
+    const blob = new Blob([JSON.stringify(await r.json(), null, 2)], { type: "application/json" }), a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = `showcase-support-${new Date().toISOString().slice(0, 10)}.json`; document.body.appendChild(a); a.click(); a.remove();
+    toast("Support-Paket gespeichert.");
+  } catch (e) { fehler(e); }
+});
+$("#abmelden").addEventListener("click", async () => {
+  try { await api("logout", { method: "POST", body: "{}" }); } catch (e) {}
+  location.reload();
+});
+async function start() {
+  $("#loginAnsicht").classList.add("versteckt"); $("#appAnsicht").classList.remove("versteckt");
+  if (!start.fertig) { start.fertig = true; konfigLaden(); laden(); try { await facettenLaden(); } catch (e) {} }
+  aktualisiere(); statusLaden(); wechsle(tab); benutzerZeigen();
+}
+// ---------------------------------------------------------------- Selbst-Aktualisierung
+let appVersion = null;
+async function versionPruefen() {
+  try {
+    const d = await (await fetch("/api/version", { cache: "no-store" })).json();
+    if (appVersion === null) appVersion = d.v;
+    else if (d.v !== appVersion) $("#updateBanner").classList.remove("versteckt");
+  } catch (e) {}
+}
+$("#updateBanner").addEventListener("click", () => location.reload());
+versionPruefen(); setInterval(versionPruefen, 120000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") versionPruefen(); });
+if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));
+(async () => {
+  try {
+    const c = await (await fetch("/api/config", { cache: "no-store" })).json();
+    if (c.konfiguriert === false) { location.replace("/setup/"); return; }              // noch nicht eingerichtet: Einrichtungsassistent
+  } catch (e) {}
+  try { const m = await (await fetch("/api/me")).json(); m.angemeldet ? start() : zeigeLogin(); } catch (e) { zeigeLogin(); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,640 @@
+{
+ "texte": {
+  "Dein Blick in die Fotos": "Jouw venster op je foto’s",
+  "Bitte PIN eingeben": "Voer je pincode in",
+  "PIN, 6 Ziffern": "Pincode, 6 cijfers",
+  "Neueste": "Nieuwste",
+  "Suchen": "Zoeken",
+  "Meine Shows": "Mijn shows",
+  "Normal": "Normaal",
+  "Immich Showcase – zur Startseite": "Immich Showcase – terug naar het begin",
+  "Rückgängig": "Ongedaan maken",
+  "↶ Rückgängig": "↶ Ongedaan",
+  "Letzte Änderung an der Auswahl rückgängig machen": "Laatste wijziging van de selectie ongedaan maken",
+  "Der Rahmen zeigt wieder das normale Programm": "De lijst gaat terug naar het normale programma",
+  "Reihenfolge auf dem Rahmen": "Volgorde op de lijst",
+  "Zeitlich: ältestes zuerst": "Op datum: oudste eerst",
+  "Zeitlich: neuestes zuerst": "Op datum: nieuwste eerst",
+  "Zufällig": "Willekeurig",
+  "Zufall": "Willekeurig",
+  "Reihenfolge": "Volgorde",
+  "Alle Personen": "Alle personen",
+  "Alle Jahre": "Alle jaren",
+  "Alle Länder": "Alle landen",
+  "Nur Fotos": "Alleen foto’s",
+  "Nur Videos": "Alleen video’s",
+  "Fotos & Videos": "Foto’s en video’s",
+  "Fotos &amp; Videos": "Foto’s en video’s",
+  "Person": "Persoon",
+  "Jahr": "Jaar",
+  "Land": "Land",
+  "Medien": "Media",
+  "✕ Filter zurücksetzen": "✕ Filters wissen",
+  "Alle Filter zurücksetzen": "Alle filters wissen",
+  "✓ Alle auswählen": "✓ Alles selecteren",
+  "✕ Alle abwählen": "✕ Alles deselecteren",
+  "✓ Alle Treffer auswählen": "✓ Alle resultaten selecteren",
+  "✕ Alle Treffer abwählen": "✕ Alle resultaten deselecteren",
+  "Alle Fotos abwählen (es werden keine Fotos gelöscht)": "Alle foto’s deselecteren (er worden geen foto’s verwijderd)",
+  "▶ Diashow": "▶ Diavoorstelling",
+  "Diashow": "Diavoorstelling",
+  "Die Fotos dieser Ansicht als Diashow abspielen": "De foto’s in deze weergave als diavoorstelling afspelen",
+  "Die Treffer als Diashow abspielen": "De resultaten als diavoorstelling afspelen",
+  "Tag wählen": "Dag kiezen",
+  "Ohne Datum": "Geen datum",
+  "Lade …": "Laden …",
+  "Lade alle …": "Alles laden …",
+  "Das waren alle Fotos.": "Dat waren ze allemaal.",
+  "Keine Fotos gefunden.": "Geen foto’s gevonden.",
+  "Großansicht": "Vergrote weergave",
+  "Foto groß ansehen": "Foto groter bekijken",
+  "Foto": "Foto",
+  "Video": "Video",
+  "Suchtext": "Zoektekst",
+  "Suche läuft …": "Zoeken …",
+  "🎤 Tipp: Auf der Tastatur das Mikrofon antippen und einfach sprechen, z. B.": "🎤 Tip: tik op de microfoon van het toetsenbord en spreek, bijv.",
+  "Dauer-Diashow, keine Wunsch-Show aktiv": "Doorlopende diavoorstelling, geen gevraagde show actief",
+  "Bilderrahmen": "Fotolijst",
+  "Rahmen": "Lijst",
+  "● Läuft gerade auf dem Rahmen": "● Nu op de lijst",
+  "Normales Programm": "Normaal programma",
+  "Neueste Fotos": "Nieuwste foto’s",
+  "Zurück zu": "Terug naar",
+  "⭐ Gemerkt": "⭐ Bewaard",
+  "🕘 Zuletzt gezeigt": "🕘 Onlangs getoond",
+  "läuft": "bezig",
+  "Noch nichts dauerhaft gemerkt. Tippe bei einer Show auf „⭐ Merken“.": "Nog niets permanent bewaard. Tik bij een show op ‘⭐ Bewaren’.",
+  "Alles, was du auf den Rahmen schickst, erscheint hier automatisch.": "Alles wat je naar de lijst stuurt, verschijnt hier automatisch.",
+  "▶ Auf den Rahmen": "▶ Op de lijst",
+  "📺 Auf TV": "📺 Op tv",
+  "🖥 Diashow hier": "🖥 Diavoorstelling hier",
+  "Bearbeiten": "Bewerken",
+  "☆ Nicht mehr merken": "☆ Niet meer bewaren",
+  "⭐ Merken": "⭐ Bewaren",
+  "⭐ merken": "⭐ bewaren",
+  "Löschen": "Verwijderen",
+  "Dauerhaft unter „Gemerkt“ speichern – sonst steht die Show nur unter „Zuletzt gezeigt“": "Permanent bewaren onder ‘Bewaard’ – anders staat de show alleen onder ‘Onlangs getoond’",
+  "Name der Show": "Naam van de show",
+  "Noch nichts ausgewählt.": "Nog niets geselecteerd.",
+  "Ausgewählte Fotos": "Geselecteerde foto’s",
+  "✕ Leeren": "✕ Leegmaken",
+  "Leeren": "Leegmaken",
+  "Auf den Rahmen": "Op de lijst",
+  "Sende …": "Verzenden …",
+  "Schließen": "Sluiten",
+  "Abbrechen": "Annuleren",
+  "Auswählen": "Selecteren",
+  "✓ Ausgewählt – abwählen": "✓ Geselecteerd – deselecteren",
+  "Bitte gib der Show einen Namen.": "Geef de show een naam.",
+  "Es sind keine Fotos ausgewählt.": "Er zijn geen foto’s geselecteerd.",
+  "Auf den Rahmen gehen nur Fotos – diese Auswahl enthält nur Videos. Nutze „📺 Auf den TV“.": "Alleen foto’s kunnen naar de lijst – deze selectie bevat alleen video’s. Gebruik ‘📺 Op tv’.",
+  "Auswahl geleert – mit „↶ Rückgängig“ holst du sie zurück.": "Selectie leeggemaakt – met ‘↶ Ongedaan’ haal je haar terug.",
+  "Rückgängig gemacht.": "Ongedaan gemaakt.",
+  "Der Rahmen soll wieder das normale Programm zeigen?": "Moet de lijst terug naar het normale programma?",
+  "Es sind höchstens 1000 Fotos pro Show möglich.": "Een show kan maximaal 1000 foto’s bevatten.",
+  "Höchstens 1000 Fotos pro Show.": "Maximaal 1000 foto’s per show.",
+  "Die Diashow hier zeigt nur Fotos – Videos laufen über „📺 Auf den TV“.": "De diavoorstelling hier toont alleen foto’s – video’s spelen via ‘📺 Op tv’.",
+  "Die Fotos lassen sich gerade nicht laden.": "De foto’s kunnen nu niet worden geladen.",
+  "Die Auswahl hier als Diashow abspielen – der Bilderrahmen bleibt unverändert": "De selectie hier als diavoorstelling afspelen – de fotolijst blijft ongewijzigd",
+  "Die Auswahl per AirPlay auf LG TV oder Shield abspielen": "De selectie via AirPlay op LG TV of Shield afspelen",
+  "Diashow beenden": "Diavoorstelling beëindigen",
+  "Vollbild": "Volledig scherm",
+  "Pause": "Pauze",
+  "Tempo": "Snelheid",
+  "Fertig": "Klaar",
+  "3 s": "3 s",
+  "5 s": "5 s",
+  "8 s": "8 s",
+  "15 s": "15 s",
+  "30 s": "30 s",
+  "60 s": "60 s",
+  "📺 Auf den Fernseher": "📺 Op de tv",
+  "📺 Auf den TV": "📺 Op tv",
+  "Fernseher": "Tv",
+  "Fernseher stoppen": "Tv stoppen",
+  "Fernbedienung für den Fernseher öffnen": "Afstandsbediening van de tv openen",
+  "Fernbedienung": "Afstandsbediening",
+  "Zeit pro Foto": "Tijd per foto",
+  "3 Sekunden": "3 seconden",
+  "5 Sekunden": "5 seconden",
+  "8 Sekunden": "8 seconden",
+  "12 Sekunden": "12 seconden",
+  "20 Sekunden": "20 seconden",
+  "30 Sekunden": "30 seconden",
+  "60 Sekunden": "60 seconden",
+  "3 Minuten": "3 minuten",
+  "🎬 Videos höchstens": "🎬 Video’s maximaal",
+  "🎵 Hintergrundmusik": "🎵 Achtergrondmuziek",
+  "Hintergrundmusik": "Achtergrondmuziek",
+  "Keine": "Geen",
+  "Aus": "Uit",
+  "Frei lizenzierte Musik (gemeinfrei oder CC BY, Titel und Urheber erscheinen am Fernseher) – leise im Hintergrund, Reihenfolge zufällig.": "Vrij gelicentieerde muziek (publiek domein of CC BY; titel en artiest worden op de tv getoond) – zachtjes op de achtergrond, in willekeurige volgorde.",
+  "Lautstärke der Musik": "Muziekvolume",
+  "Sehr leise": "Heel zacht",
+  "Leise": "Zacht",
+  "Mittel": "Middel",
+  "▶ Starten": "▶ Starten",
+  "⏹ Stopp": "⏹ Stoppen",
+  "Am Fernseher einmal die Fernseher-Seite dieser App (…/tv/) im Browser öffnen": "Open op de tv één keer de tv-pagina van deze app (…/tv/) in de browser",
+  "und offen lassen.": "en laat hem open.",
+  "und offen lassen. ·": "en laat hem open. ·",
+  "Stattdessen als AirPlay-Video senden (nur Safari)": "In plaats daarvan als AirPlay-video verzenden (alleen Safari)",
+  "Die Auswahl hier als Diashow": "De selectie als diavoorstelling",
+  "Musik lauter": "Muziek luider",
+  "Musik leiser": "Muziek zachter",
+  "Nächster Musiktitel": "Volgend nummer",
+  "Nächster Titel": "Volgend nummer",
+  "Nächstes Foto": "Volgende foto",
+  "Vorheriges Foto": "Vorige foto",
+  "🎵 Titel": "🎵 Nummer",
+  "– zufällig weiter –": "– willekeurig doorgaan –",
+  "Musik aus.": "Muziek uit.",
+  "Fernseher gestoppt.": "Tv gestopt.",
+  "Bitte einen Fernseher wählen.": "Kies een tv.",
+  "Video vorbereiten": "Video voorbereiden",
+  "Video wird vorbereitet …": "Video voorbereiden …",
+  "📺 Fernseher wählen (AirPlay)": "📺 Tv kiezen (AirPlay)",
+  "AirPlay lässt sich hier nicht öffnen.": "AirPlay kan hier niet worden geopend.",
+  "Das Video wird auf dem Server gebaut – das dauert je nach Anzahl etwa 10 bis 90 Sekunden. Danach wählst du den Fernseher im AirPlay-Fenster (nur Safari).": "De video wordt op de server gemaakt – dat duurt ongeveer 10 tot 90 seconden, afhankelijk van het aantal foto’s. Kies daarna de tv in het AirPlay-venster (alleen Safari).",
+  "AirPlay-Auswahl gibt es nur in Safari (iPhone, iPad, Mac). Hier kannst du das Video nur auf diesem Gerät ansehen.": "De AirPlay-keuze bestaat alleen in Safari (iPhone, iPad, Mac). Hier kun je de video alleen op dit apparaat bekijken.",
+  "Im AirPlay-Fenster LG TV oder SHIELDAndroidTV auswählen – die Fotos laufen dann auf dem Fernseher. Falls beide fehlen: Fernseher an und im selben WLAN?": "Kies in het AirPlay-venster LG TV of SHIELDAndroidTV – de foto’s spelen dan op de tv. Ontbreken beide: staat de tv aan en op dezelfde wifi?",
+  "Fehler beim Vorbereiten": "Fout bij het voorbereiden",
+  "Suche Fernseher …": "Tv’s zoeken …",
+  "Für ein AirPlay-Video höchstens 150 Fotos – bitte weniger auswählen oder den Fernseher-Weg nutzen.": "Maximaal 150 foto’s voor een AirPlay-video – selecteer er minder of gebruik de tv-pagina.",
+  "Der Fernseher hat die Seite /tv noch nicht geöffnet – es startet, sobald sie offen ist.": "De tv heeft de pagina /tv nog niet geopend – het begint zodra die open is.",
+  "● bereit": "● klaar",
+  "○ nicht geöffnet": "○ niet geopend",
+  "Update": "Bijwerken",
+  "↻ Neue Version verfügbar – tippen zum Aktualisieren": "↻ Nieuwe versie beschikbaar – tik om bij te werken",
+  "Neue Version verfügbar – tippen zum Aktualisieren": "Nieuwe versie beschikbaar – tik om bij te werken",
+  "PIN erforderlich": "Pincode vereist",
+  "PIN falsch": "Onjuiste pincode",
+  "Anfrage nicht zugelassen": "Verzoek niet toegestaan",
+  "Es ist ein Fehler aufgetreten. Bitte nochmal versuchen.": "Er is een fout opgetreden. Probeer het opnieuw.",
+  "Video nicht verfuegbar": "Video niet beschikbaar",
+  "Show nicht gefunden": "Show niet gevonden",
+  "Datei nicht gefunden": "Bestand niet gevonden",
+  "nicht gefunden": "niet gevonden",
+  "Unbekannte Aktion": "Onbekende actie",
+  "Unbekannter Titel": "Onbekend nummer",
+  "Unbekanntes Ziel": "Onbekend doel",
+  "Unbekannte Musikauswahl": "Onbekende muziekkeuze",
+  "Musikauswahl unbekannt": "Muziekkeuze onbekend",
+  "Unbekannter Medientyp": "Onbekend mediatype",
+  "Ungueltige Filter": "Ongeldige filters",
+  "Ungueltige Foto-ID": "Ongeldige foto-ID",
+  "Person unbekannt": "Persoon onbekend",
+  "Ort unbekannt": "Plaats onbekend",
+  "Album ungueltig": "Ongeldig album",
+  "ungueltig": "ongeldig",
+  "Suchtext fehlt oder ist zu lang": "Zoektekst ontbreekt of is te lang",
+  "Auftrag nicht gefunden": "Taak niet gevonden",
+  "Die vorherige Show gibt es nicht mehr.": "De vorige show bestaat niet meer.",
+  "Es gibt noch nichts, wohin ich zurückgehen könnte.": "Er is nog niets om naar terug te gaan.",
+  "Es wird gerade schon ein Video vorbereitet. Bitte kurz warten.": "Er wordt al een video voorbereid. Wacht even.",
+  "Dazu habe ich keine Fotos gefunden.": "Ik heb daarvoor geen foto’s gevonden.",
+  "Dazu habe ich keine Fotos gefunden. Der Bilderrahmen bleibt wie er ist.": "Ik heb daarvoor geen foto’s gevonden. De fotolijst blijft zoals hij is.",
+  "Der Bilderrahmen zeigt das normale Programm.": "De fotolijst toont het normale programma.",
+  "Der Bilderrahmen zeigt wieder das normale Programm.": "De fotolijst toont weer het normale programma.",
+  "Es läuft gerade kein Wunsch, den ich merken könnte.": "Er loopt geen gevraagde show die ik kan bewaren.",
+  "Der Rahmen zeigt jetzt zeitlich: ältestes zuerst.": "De lijst toont nu op datum: oudste eerst.",
+  "Der Rahmen zeigt jetzt zeitlich: neuestes zuerst.": "De lijst toont nu op datum: nieuwste eerst.",
+  "Der Rahmen zeigt jetzt in zufälliger Reihenfolge.": "De lijst toont nu in willekeurige volgorde.",
+  "(keine Favoriten markiert – ich zeige alle passenden)": "(geen favorieten gemarkeerd – ik toon alle treffers)",
+  "Synchronisation angestossen": "Synchronisatie gestart",
+  "nicht berechtigt": "niet toegestaan",
+  "Bitte einen Namen (1-60 Zeichen)": "Voer een naam in (1-60 tekens)",
+  "Immich Showcase TV": "Immich Showcase TV",
+  "Verbinde …": "Verbinden …",
+  "Keine Verbindung zum Server – ich versuche es weiter …": "Geen verbinding met de server – opnieuw proberen …",
+  "PIN eingeben": "Pincode invoeren",
+  "6 Ziffern mit der Fernbedienung": "6 cijfers met de afstandsbediening",
+  "PIN falsch – nochmal versuchen": "Onjuiste pincode – probeer opnieuw",
+  "Zu viele Versuche – bitte später erneut.": "Te veel pogingen – probeer het later opnieuw.",
+  "Die Videos lassen sich gerade nicht laden.": "De video’s kunnen nu niet worden geladen.",
+  "🎵 Für Musik einmal die OK-Taste drücken": "🎵 Druk één keer op OK voor muziek",
+  "🔇 Für Video-Ton einmal die OK-Taste drücken": "🔇 Druk één keer op OK voor videogeluid",
+  "Alle abwählen": "Alles deselecteren",
+  "Alle auswählen": "Alles selecteren",
+  "Alle Treffer auswählen": "Alle resultaten selecteren",
+  "Alle Treffer abwählen": "Alle resultaten deselecteren",
+  "Am Fernseher einmal im Browser": "Open op de tv in de browser",
+  "öffnen (Shield:": "eenmalig (Shield:",
+  "Auswahl": "Selectie",
+  "läuft auf": "speelt op",
+  "· Auswahl": "· Selectie",
+  "🎲 Alles bunt gemischt": "🎲 Alles door elkaar",
+  "Test (nur Entwicklung)": "Test (alleen ontwikkeling)",
+  "E-Mail-Adresse (Immich)": "E-mailadres (Immich)",
+  "E-Mail-Adresse": "E-mailadres",
+  "Passwort": "Wachtwoord",
+  "Anmelden": "Inloggen",
+  "oder mit der PIN": "of met de pincode",
+  "Abmelden": "Uitloggen",
+  "Anmeldung erforderlich": "Inloggen vereist",
+  "E-Mail oder Passwort falsch": "Onjuist e-mailadres of wachtwoord",
+  "Bitte mit dem Immich-Konto anmelden": "Log in met je Immich-account",
+  "Immich ist gerade nicht erreichbar": "Immich is nu niet bereikbaar",
+  "Immich hat die Anfrage abgelehnt oder ist nicht erreichbar.": "Immich heeft het verzoek geweigerd of is niet bereikbaar.",
+  "Eigene Musik: Titel und Künstler erscheinen am Fernseher, die Reihenfolge ist zufällig.": "Je eigen muziek: titel en artiest worden op de tv getoond, de volgorde is willekeurig.",
+  "Noch keine Musik eingerichtet. Füge eigene Titel hinzu.": "Nog geen muziek ingesteld. Voeg je eigen nummers toe.",
+  "Noch keine Musik eingerichtet. Lege Musikdateien in den Musikordner des Servers (siehe Anleitung).": "Nog geen muziek ingesteld. Zet muziekbestanden in de muziekmap van de server (zie de handleiding).",
+  "🎵 Eigene Musik hinzufügen …": "🎵 Eigen muziek toevoegen …",
+  "🎵 Eigene Musik": "🎵 Je eigen muziek",
+  "Nur eigene oder frei lizenzierte Musik (mp3, ogg, m4a). Du bist für die Rechte verantwortlich.": "Alleen eigen of vrij gelicentieerde muziek (mp3, ogg, m4a). Je bent zelf verantwoordelijk voor de rechten.",
+  "Sammlung": "Verzameling",
+  "Name der neuen Sammlung": "Naam van de nieuwe verzameling",
+  "z. B. Urlaub 2024": "bijv. Vakantie 2024",
+  "Dateien": "Bestanden",
+  "⬆ Hinzufügen": "⬆ Toevoegen",
+  "➕ Neue Sammlung …": "➕ Nieuwe verzameling …",
+  "Titel entfernen": "Nummer verwijderen",
+  "Bitte Dateien auswählen.": "Kies bestanden.",
+  "Bitte einen Namen für die neue Sammlung eingeben.": "Voer een naam in voor de nieuwe verzameling.",
+  "Hochladen fehlgeschlagen": "Uploaden mislukt",
+  "Hochladen ist nicht aktiviert": "Uploaden is niet ingeschakeld",
+  "Verwalten ist nicht aktiviert": "Beheren is niet ingeschakeld",
+  "Nur mp3-, ogg- und m4a-Dateien": "Alleen mp3-, ogg- en m4a-bestanden",
+  "Das ist keine abspielbare Audiodatei": "Dit is geen afspeelbaar audiobestand",
+  "Die Musiksammlung ist voll": "De muziekverzameling is vol",
+  "Eigene Musik": "Je eigen muziek",
+  "Immich Showcase – Einrichtung": "Immich Showcase – Installatie",
+  "Einrichtung": "Installatie",
+  "Willkommen! In drei Schritten verbindest du Immich Showcase mit deinem Immich.": "Welkom! In drie stappen verbind je Immich Showcase met je Immich.",
+  "Einrichtungs-Code": "Installatiecode",
+  "6 Ziffern": "6 cijfers",
+  "Weiter": "Volgende",
+  "Zurück": "Terug",
+  "Adresse von Immich": "Adres van Immich",
+  "Mit Immich-Konto": "Met Immich-account",
+  "Mit API-Schlüssel": "Met API-sleutel",
+  "API-Schlüssel": "API-sleutel",
+  "Immich Showcase legt damit einmalig einen eigenen Schlüssel „Immich Showcase (Dienst)“ ohne Lösch-Rechte an. Das Passwort wird nicht gespeichert.": "Immich Showcase gebruikt het eenmalig om een eigen sleutel ‘Immich Showcase (dienst)’ zonder verwijderrechten aan te maken. Het wachtwoord wordt niet opgeslagen.",
+  "PIN für die App (6 Ziffern, optional)": "Pincode voor de app (6 cijfers, optioneel)",
+  "leer lassen = zufällige PIN": "leeg laten = willekeurige pincode",
+  "Name der App (optional)": "Naam van de app (optioneel)",
+  "Einrichtung abschließen": "Installatie afronden",
+  "Geschafft. Immich Showcase startet jetzt neu …": "Klaar. Immich Showcase start nu opnieuw …",
+  "Geschafft.": "Klaar.",
+  "Deine PIN (bitte merken, sie wird nur jetzt angezeigt):": "Je pincode (onthoud hem, hij wordt alleen nu getoond):",
+  "Einen Moment, die Seite öffnet sich gleich von selbst.": "Een moment, de pagina opent vanzelf.",
+  "Fertig – du kannst jetzt starten.": "Klaar – je kunt nu beginnen.",
+  "Immich Showcase öffnen": "Immich Showcase openen",
+  "Bitte E-Mail und Passwort eingeben.": "Voer e-mailadres en wachtwoord in.",
+  "Bitte den API-Schlüssel eingeben.": "Voer de API-sleutel in.",
+  "Stattdessen mit API-Schlüssel anmelden": "In plaats daarvan inloggen met een API-sleutel",
+  "Stattdessen mit E-Mail und Passwort anmelden": "In plaats daarvan inloggen met e-mailadres en wachtwoord",
+  "Immich-API-Schlüssel": "Immich-API-sleutel",
+  "Der Einrichtungs-Code stimmt nicht (er steht im Protokoll: docker compose logs)": "De installatiecode klopt niet (hij staat in het logboek: docker compose logs)",
+  "Bitte eine Adresse wie http://192.168.1.10:2283 eingeben": "Voer een adres in zoals http://192.168.1.10:2283",
+  "Unter dieser Adresse antwortet kein Immich": "Op dit adres antwoordt geen Immich",
+  "Immich ist unter dieser Adresse nicht erreichbar": "Immich is op dit adres niet bereikbaar",
+  "Der Schluessel wird von Immich nicht akzeptiert": "Immich accepteert de sleutel niet",
+  "Die PIN muss genau 6 Ziffern haben": "De pincode moet precies 6 cijfers hebben",
+  "Zu viele Versuche. Bitte spaeter erneut versuchen.": "Te veel pogingen. Probeer het later opnieuw.",
+  "Einrichtung erforderlich": "Installatie vereist",
+  "öffnen": "eenmalig",
+  "Die Bildsuche (Immich Machine Learning) ist gerade nicht verfuegbar. Suchen nach Person, Zeit oder Ort geht weiter.": "Zoeken op beeld (Immich Machine Learning) is nu niet beschikbaar. Zoeken op persoon, tijd of plaats werkt nog.",
+  "❓ Hilfe": "❓ Help",
+  "Hilfe": "Help",
+  "So geht es": "Zo werkt het",
+  "Suchtipps": "Zoektips",
+  "Fernseher und Rahmen": "Tv en fotolijst",
+  "Etwas funktioniert nicht?": "Werkt er iets niet?",
+  "Fotos durchblättern (Neueste) oder suchen – auch in ganzen Sätzen.": "Blader door foto’s (Nieuwste) of zoek – ook in hele zinnen.",
+  "Fotos antippen, um sie auszuwählen. „Alle auswählen“ und „Tag wählen“ sparen Zeit.": "Tik op foto’s om ze te selecteren. ‘Alles selecteren’ en ‘Dag kiezen’ besparen tijd.",
+  "Der Auswahl einen Namen geben und auf den Rahmen oder den Fernseher schicken. Gespeichert wird sie unter „Meine Shows“.": "Geef de selectie een naam en stuur haar naar de lijst of de tv. Ze wordt bewaard onder ‘Mijn shows’.",
+  "Personen, Zeit, Orte und Motive lassen sich kombinieren, z. B. „Sommer 2022 am Strand“.": "Personen, tijd, plaatsen en onderwerpen zijn te combineren, bijv. ‘Zomer 2022 aan het strand’.",
+  "Am Fernseher oder Tablet einmal die Seite /tv/ im Browser öffnen und offen lassen. Den Namen des Geräts wählst du beim Senden.": "Open op de tv of tablet één keer de pagina /tv/ in de browser en laat hem open. Het apparaat kies je bij het verzenden.",
+  "Das Support-Paket enthält Version, Einstellungen und das Protokoll – ohne Passwörter, PIN oder Schlüssel. Es hilft bei einem Fehlerbericht.": "Het ondersteuningspakket bevat de versie, instellingen en het logboek – zonder wachtwoorden, pincode of sleutels. Het helpt bij een foutmelding.",
+  "⬇ Support-Paket herunterladen": "⬇ Ondersteuningspakket downloaden",
+  "Support-Paket gespeichert.": "Ondersteuningspakket opgeslagen.",
+  "Support-Paket nicht verfügbar": "Ondersteuningspakket niet beschikbaar",
+  "Personen, Zeit, Orte und Motive lassen sich kombinieren, z. B.": "Personen, tijd, plaatsen en onderwerpen zijn te combineren, bijv.",
+  "z. B.": "bijv.",
+  "Sprache / Language": "Taal / Language"
+ },
+ "muster": [
+  [
+   "^1 Foto ausgewählt ›$",
+   "1 foto geselecteerd ›"
+  ],
+  [
+   "^1 Fotos$",
+   "1 foto"
+  ],
+  [
+   "^1 Foto werden zu einem Video für den Fernseher\\.$",
+   "Van 1 foto wordt een video voor de tv gemaakt."
+  ],
+  [
+   "^1 Fotos – (.*)$",
+   "1 foto – $1",
+   "beschreibung"
+  ],
+  [
+   "^(.*) · bereit\\. Wähle am Handy Fotos und tippe auf „Auf TV“\\. \\(Für Musik einmal die OK-Taste drücken\\.\\)$",
+   "$1 · klaar. Kies foto’s op je telefoon en tik op ‘Op tv’. (Druk één keer op OK voor muziek.)"
+  ],
+  [
+   "^🔊 Musik-Lautstärke (\\d+) %$",
+   "🔊 Muziekvolume $1 %"
+  ],
+  [
+   "^(\\d+) Fotos ausgewählt ›$",
+   "$1 foto’s geselecteerd ›"
+  ],
+  [
+   "^· sehr viele$",
+   "· heel veel"
+  ],
+  [
+   "^Foto vom (.*)$",
+   "Foto van $1"
+  ],
+  [
+   "^Zurück zu: (.*)$",
+   "Terug naar: $1"
+  ],
+  [
+   "^↩ Zurück zu „(.*)“$",
+   "↩ Terug naar ‘$1’"
+  ],
+  [
+   "^↩ Zurück zu „(.*)“ jederzeit oben möglich\\.$",
+   "↩ Terug naar ‘$1’ kan altijd bovenaan."
+  ],
+  [
+   "^(\\d+) Fotos · seit (.*) Uhr$",
+   "$1 foto’s · sinds $2"
+  ],
+  [
+   "^(\\d+) Fotos$",
+   "$1 foto’s"
+  ],
+  [
+   "^(\\d+) Fotos · (.*)$",
+   "$1 foto’s · $2"
+  ],
+  [
+   "^· seit (.*) Uhr$",
+   "· sinds $1"
+  ],
+  [
+   "^([\\d.,]+) Fotos in dieser Ansicht$",
+   "$1 foto’s in deze weergave"
+  ],
+  [
+   "^([\\d.,]+) Medien in dieser Ansicht$",
+   "$1 media in deze weergave"
+  ],
+  [
+   "^([\\d.,+]+) in dieser Ansicht$",
+   "$1 in deze weergave"
+  ],
+  [
+   "^Alle (\\d+) ausgewählten Fotos wieder abwählen\\? Dabei wird kein Foto gelöscht – nur die Auswahl wird geleert\\.$",
+   "Alle $1 geselecteerde foto’s weer deselecteren? Er wordt geen foto verwijderd – alleen de selectie wordt leeggemaakt."
+  ],
+  [
+   "^Die aktuelle Auswahl \\((\\d+) Fotos\\) wird durch die Treffer ersetzt\\. Weiter\\?$",
+   "De huidige selectie ($1 foto’s) wordt vervangen door de resultaten. Doorgaan?"
+  ],
+  [
+   "^Die aktuelle Auswahl \\((\\d+) Fotos\\) wird durch „(.*)“ ersetzt\\. Weiter\\?$",
+   "De huidige selectie ($1 foto’s) wordt vervangen door ‘$2’. Doorgaan?"
+  ],
+  [
+   "^„(.*)“ aus der Liste löschen\\? Dabei wird kein Foto gelöscht\\.$",
+   "‘$1’ uit de lijst verwijderen? Er wordt geen foto verwijderd."
+  ],
+  [
+   "^Es sind höchstens (\\d+) Fotos pro Show möglich – die ersten wurden ausgewählt\\.$",
+   "Maximaal $1 foto’s per show mogelijk – de eerste zijn geselecteerd."
+  ],
+  [
+   "^Höchstens (\\d+) Fotos pro Show\\.$",
+   "Maximaal $1 foto’s per show."
+  ],
+  [
+   "^(\\d+) Video\\(s\\) wurden nicht auf den Rahmen geschickt \\(er zeigt nur Fotos\\)\\.$",
+   "$1 video(’s) zijn niet naar de lijst gestuurd (hij toont alleen foto’s)."
+  ],
+  [
+   "^(\\d+) gefunden, (\\d+) davon sinnvoll verteilt$",
+   "$1 gevonden, $2 daarvan verstandig gespreid"
+  ],
+  [
+   "^· (\\d+) gefunden, (\\d+) davon sinnvoll verteilt$",
+   "· $1 gevonden, $2 daarvan verstandig gespreid"
+  ],
+  [
+   "^Alle Treffer sind schon ausgewählt – tippe ein Foto an, um es abzuwählen\\.$",
+   "Alle resultaten zijn al geselecteerd – tik op een foto om te deselecteren."
+  ],
+  [
+   "^Musik: (.*)$",
+   "Muziek: $1"
+  ],
+  [
+   "^Spielt: (.*)$",
+   "Speelt: $1"
+  ],
+  [
+   "^Fertig: (\\d+) Fotos, (.*) Laufzeit\\.$",
+   "Klaar: $1 foto’s, speelduur $2."
+  ],
+  [
+   "^(\\d+) Fotos werden zu einem Video für den Fernseher\\.$",
+   "Van $1 foto’s wordt een video voor de tv gemaakt."
+  ],
+  [
+   "^Video wird vorbereitet … (\\d+) %$",
+   "Video voorbereiden … $1 %"
+  ],
+  [
+   "^(.*) läuft auf (.*)\\.$",
+   "$1 speelt op $2."
+  ],
+  [
+   "^(\\d+) Videos? wird?e?n? ?vorbereitet.*$",
+   "$1 video(’s) worden voorbereid"
+  ],
+  [
+   "^📺 (.*) · (.*)$",
+   "📺 $1 · $2"
+  ],
+  [
+   "^● bereit · zeigt (.*)$",
+   "● klaar · toont $1"
+  ],
+  [
+   "^Am Fernseher einmal im Browser (.*) öffnen$",
+   "Open op de tv $1 eenmalig in de browser"
+  ],
+  [
+   "^\\((.*): (.*)\\)$",
+   "($1: $2)"
+  ],
+  [
+   "^„(.*)“ mit (\\d+) Fotos läuft gleich auf dem Bilderrahmen\\.$",
+   "‘$1’ met $2 foto’s speelt zo meteen op de fotolijst."
+  ],
+  [
+   "^\\(Test\\) (\\d+) Fotos als „?\\\"?(.*?)\\\"?“? wuerden auf den Rahmen gehen\\.$",
+   "(Test) $1 foto’s als ‘$2’ zouden naar de lijst gaan."
+  ],
+  [
+   "^\\\"(.*)\\\" mit (\\d+) Fotos läuft gleich auf dem Bilderrahmen\\.$",
+   "‘$1’ met $2 foto’s speelt zo meteen op de fotolijst."
+  ],
+  [
+   "^\\\"(.*)\\\" \\((\\d+) Medien\\) wurde an (.*) geschickt\\.(.*)$",
+   "‘$1’ ($2 items) is naar $3 gestuurd.$4"
+  ],
+  [
+   "^ ?(.*) ist gerade nicht bereit – es startet, sobald die Seite (.*) dort geöffnet ist\\.$",
+   "$1 is nu niet klaar – het begint zodra de pagina $2 daar is geopend."
+  ],
+  [
+   "^(\\d+) Video\\(s\\) werden für den Fernseher vorbereitet – \\\"(.*)\\\" startet gleich auf (.*)\\.$",
+   "$1 video(’s) worden voor de tv voorbereid – ‘$2’ begint zo meteen op $3."
+  ],
+  [
+   "^Zu viele Versuche\\. Bitte in (\\d+) Minuten? erneut\\.?$",
+   "Te veel pogingen. Probeer het over $1 minuut/minuten opnieuw."
+  ],
+  [
+   "^Zu viele Versuche\\. Bitte in (\\d+) Minuten? erneut versuchen\\.$",
+   "Te veel pogingen. Probeer het over $1 minuut/minuten opnieuw."
+  ],
+  [
+   "^Bitte 1 bis (\\d+) Fotos auswaehlen$",
+   "Selecteer 1 tot $1 foto’s"
+  ],
+  [
+   "^Für den Fernseher höchstens (\\d+) Fotos pro Video\\.$",
+   "Maximaal $1 foto’s per video voor de tv."
+  ],
+  [
+   "^Gemerkt: „(.*)“ – steht jetzt unter „Meine Diashows“\\.$",
+   "Bewaard: ‘$1’ – staat nu onder ‘Mijn diavoorstellingen’."
+  ],
+  [
+   "^„(.*)“ entfernt\\.$",
+   "‘$1’ verwijderd."
+  ],
+  [
+   "^„(.*)“ war nicht gemerkt \\(aus dem Verlauf entfernt\\)\\.$",
+   "‘$1’ was niet bewaard (uit de geschiedenis verwijderd)."
+  ],
+  [
+   "^Läuft gerade: \\\"(.*)\\\" \\((.*) Fotos, seit (.*)\\)$",
+   "Speelt nu: ‘$1’ ($2 foto’s, sinds $3)"
+  ],
+  [
+   "^(.*) – läuft gleich auf dem Bilderrahmen\\.$",
+   "$1 – speelt zo meteen op de fotolijst."
+  ],
+  [
+   "^\\(Test\\) (.*)$",
+   "(Test) $1"
+  ],
+  [
+   "^Das habe ich nicht verstanden\\. Beispiel: (.*)\\.$",
+   "Dat heb ik niet begrepen. Voorbeeld: $1."
+  ],
+  [
+   "^Es gibt mehrere Personen namens (.*)\\. Bitte in Immich eindeutig benennen\\.$",
+   "Er zijn meerdere personen met de naam $1. Geef ze in Immich een unieke naam."
+  ],
+  [
+   "^Welche Person meinst du mit \\\"(.*)\\\"\\? (.*)$",
+   "Welke persoon bedoel je met ‘$1’? $2"
+  ],
+  [
+   "^(\\d+) Fotos – (.*)$",
+   "$1 foto’s – $2",
+   "beschreibung"
+  ],
+  [
+   "^(.*) oder (.*)$",
+   "$1 of $2"
+  ],
+  [
+   "^z\\. B\\. (.*)$",
+   "bijv. $1"
+  ],
+  [
+   "^„(.*)“$",
+   "‘$1’"
+  ],
+  [
+   "^· (\\d+) Fotos$",
+   "· $1 foto’s"
+  ],
+  [
+   "^· 1 Foto$",
+   "· 1 foto"
+  ],
+  [
+   "^(\\d+) Titel hinzugefügt\\.$",
+   "$1 nummer(s) toegevoegd."
+  ],
+  [
+   "^Lade (\\d+) von (\\d+): (.*) …$",
+   "Uploaden $1 van $2: $3 …"
+  ],
+  [
+   "^„(.*)“ von diesem Server entfernen\\?$",
+   "‘$1’ van deze server verwijderen?"
+  ],
+  [
+   "^Die Datei ist groesser als (\\d+) MB$",
+   "Het bestand is groter dan $1 MB"
+  ],
+  [
+   "^Immich (\\d+\\.\\d+\\.\\d+) gefunden\\.$",
+   "Immich $1 gevonden."
+  ],
+  [
+   "^Fehler (\\d+)$",
+   "Fout $1"
+  ],
+  [
+   "^(.*) \\(Die Motivsuche nach \\\"(.*)\\\" ist gerade nicht verfuegbar – ohne Motiv gesucht\\)$",
+   "$1 (Zoeken naar ‘$2’ is nu niet beschikbaar – zonder gezocht)"
+  ],
+  [
+   "^(\\d+) Fotos – (.*) \\(Die Motivsuche nach \\\"(.*)\\\" ist gerade nicht verfuegbar – ohne Motiv gesucht\\)$",
+   "$1 foto’s – $2 (Zoeken naar ‘$3’ is nu niet beschikbaar – zonder gezocht)",
+   "beschreibung"
+  ],
+  [
+   "^Immich Showcase(?: \\(.*\\))? ([\\w.\\-]+)$",
+   "Immich Showcase $1"
+  ]
+ ],
+ "beschreibung": [
+  [
+   " und ",
+   " en "
+  ],
+  [
+   "(^| |, )aus (\\d{4})",
+   "$1uit $2"
+  ],
+  [
+   "vom (\\S+) bis (\\S+)",
+   "van $1 tot $2"
+  ],
+  [
+   "\\((\\d+) Zeitraeume\\)",
+   "($1 periodes)"
+  ],
+  [
+   "nur Favoriten",
+   "alleen favorieten"
+  ]
+ ]
+}

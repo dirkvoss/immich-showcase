@@ -1,0 +1,640 @@
+{
+ "texte": {
+  "Dein Blick in die Fotos": "Votre fenêtre sur vos photos",
+  "Bitte PIN eingeben": "Saisissez votre code PIN",
+  "PIN, 6 Ziffern": "PIN, 6 chiffres",
+  "Neueste": "Récentes",
+  "Suchen": "Rechercher",
+  "Meine Shows": "Mes diaporamas",
+  "Normal": "Normal",
+  "Immich Showcase – zur Startseite": "Immich Showcase – retour à l’accueil",
+  "Rückgängig": "Annuler",
+  "↶ Rückgängig": "↶ Annuler",
+  "Letzte Änderung an der Auswahl rückgängig machen": "Annuler la dernière modification de la sélection",
+  "Der Rahmen zeigt wieder das normale Programm": "Le cadre reprend son programme normal",
+  "Reihenfolge auf dem Rahmen": "Ordre sur le cadre",
+  "Zeitlich: ältestes zuerst": "Par date : les plus anciennes d’abord",
+  "Zeitlich: neuestes zuerst": "Par date : les plus récentes d’abord",
+  "Zufällig": "Aléatoire",
+  "Zufall": "Aléatoire",
+  "Reihenfolge": "Ordre",
+  "Alle Personen": "Toutes les personnes",
+  "Alle Jahre": "Toutes les années",
+  "Alle Länder": "Tous les pays",
+  "Nur Fotos": "Photos uniquement",
+  "Nur Videos": "Vidéos uniquement",
+  "Fotos & Videos": "Photos et vidéos",
+  "Fotos &amp; Videos": "Photos et vidéos",
+  "Person": "Personne",
+  "Jahr": "Année",
+  "Land": "Pays",
+  "Medien": "Médias",
+  "✕ Filter zurücksetzen": "✕ Réinitialiser les filtres",
+  "Alle Filter zurücksetzen": "Réinitialiser tous les filtres",
+  "✓ Alle auswählen": "✓ Tout sélectionner",
+  "✕ Alle abwählen": "✕ Tout désélectionner",
+  "✓ Alle Treffer auswählen": "✓ Sélectionner tous les résultats",
+  "✕ Alle Treffer abwählen": "✕ Désélectionner tous les résultats",
+  "Alle Fotos abwählen (es werden keine Fotos gelöscht)": "Désélectionner toutes les photos (aucune photo n’est supprimée)",
+  "▶ Diashow": "▶ Diaporama",
+  "Diashow": "Diaporama",
+  "Die Fotos dieser Ansicht als Diashow abspielen": "Lire les photos de cette vue en diaporama",
+  "Die Treffer als Diashow abspielen": "Lire les résultats en diaporama",
+  "Tag wählen": "Choisir le jour",
+  "Ohne Datum": "Sans date",
+  "Lade …": "Chargement …",
+  "Lade alle …": "Chargement de tout …",
+  "Das waren alle Fotos.": "C’était toutes.",
+  "Keine Fotos gefunden.": "Aucune photo trouvée.",
+  "Großansicht": "Vue agrandie",
+  "Foto groß ansehen": "Agrandir la photo",
+  "Foto": "Photo",
+  "Video": "Vidéo",
+  "Suchtext": "Texte de recherche",
+  "Suche läuft …": "Recherche …",
+  "🎤 Tipp: Auf der Tastatur das Mikrofon antippen und einfach sprechen, z. B.": "🎤 Astuce : touchez le micro du clavier et parlez, par ex.",
+  "Dauer-Diashow, keine Wunsch-Show aktiv": "Diaporama continu, aucun diaporama demandé en cours",
+  "Bilderrahmen": "Cadre photo",
+  "Rahmen": "Cadre",
+  "● Läuft gerade auf dem Rahmen": "● En cours sur le cadre",
+  "Normales Programm": "Programme normal",
+  "Neueste Fotos": "Dernières photos",
+  "Zurück zu": "Retour à",
+  "⭐ Gemerkt": "⭐ Enregistrés",
+  "🕘 Zuletzt gezeigt": "🕘 Montrés récemment",
+  "läuft": "en cours",
+  "Noch nichts dauerhaft gemerkt. Tippe bei einer Show auf „⭐ Merken“.": "Rien n’est encore enregistré. Touchez « ⭐ Enregistrer » sur un diaporama.",
+  "Alles, was du auf den Rahmen schickst, erscheint hier automatisch.": "Tout ce que vous envoyez au cadre apparaît ici automatiquement.",
+  "▶ Auf den Rahmen": "▶ Sur le cadre",
+  "📺 Auf TV": "📺 Sur la télé",
+  "🖥 Diashow hier": "🖥 Diaporama ici",
+  "Bearbeiten": "Modifier",
+  "☆ Nicht mehr merken": "☆ Retirer des enregistrés",
+  "⭐ Merken": "⭐ Enregistrer",
+  "⭐ merken": "⭐ enregistrer",
+  "Löschen": "Supprimer",
+  "Dauerhaft unter „Gemerkt“ speichern – sonst steht die Show nur unter „Zuletzt gezeigt“": "Enregistrer durablement dans « Enregistrés » – sinon le diaporama n’apparaît que dans « Montrés récemment »",
+  "Name der Show": "Nom du diaporama",
+  "Noch nichts ausgewählt.": "Rien n’est encore sélectionné.",
+  "Ausgewählte Fotos": "Photos sélectionnées",
+  "✕ Leeren": "✕ Vider",
+  "Leeren": "Vider",
+  "Auf den Rahmen": "Sur le cadre",
+  "Sende …": "Envoi …",
+  "Schließen": "Fermer",
+  "Abbrechen": "Annuler",
+  "Auswählen": "Sélectionner",
+  "✓ Ausgewählt – abwählen": "✓ Sélectionnée – désélectionner",
+  "Bitte gib der Show einen Namen.": "Donnez un nom au diaporama.",
+  "Es sind keine Fotos ausgewählt.": "Aucune photo n’est sélectionnée.",
+  "Auf den Rahmen gehen nur Fotos – diese Auswahl enthält nur Videos. Nutze „📺 Auf den TV“.": "Seules les photos peuvent aller sur le cadre – cette sélection ne contient que des vidéos. Utilisez « 📺 Sur la télé ».",
+  "Auswahl geleert – mit „↶ Rückgängig“ holst du sie zurück.": "Sélection vidée – « ↶ Annuler » la restaure.",
+  "Rückgängig gemacht.": "Annulé.",
+  "Der Rahmen soll wieder das normale Programm zeigen?": "Le cadre doit-il reprendre son programme normal ?",
+  "Es sind höchstens 1000 Fotos pro Show möglich.": "Un diaporama peut contenir 1000 photos au maximum.",
+  "Höchstens 1000 Fotos pro Show.": "1000 photos au maximum par diaporama.",
+  "Die Diashow hier zeigt nur Fotos – Videos laufen über „📺 Auf den TV“.": "Le diaporama ici n’affiche que des photos – les vidéos passent par « 📺 Sur la télé ».",
+  "Die Fotos lassen sich gerade nicht laden.": "Les photos ne peuvent pas être chargées pour le moment.",
+  "Die Auswahl hier als Diashow abspielen – der Bilderrahmen bleibt unverändert": "Lire la sélection ici en diaporama – le cadre photo reste inchangé",
+  "Die Auswahl per AirPlay auf LG TV oder Shield abspielen": "Lire la sélection via AirPlay sur LG TV ou Shield",
+  "Diashow beenden": "Terminer le diaporama",
+  "Vollbild": "Plein écran",
+  "Pause": "Pause",
+  "Tempo": "Vitesse",
+  "Fertig": "Terminé",
+  "3 s": "3 s",
+  "5 s": "5 s",
+  "8 s": "8 s",
+  "15 s": "15 s",
+  "30 s": "30 s",
+  "60 s": "60 s",
+  "📺 Auf den Fernseher": "📺 Sur la télé",
+  "📺 Auf den TV": "📺 Sur la télé",
+  "Fernseher": "Télé",
+  "Fernseher stoppen": "Arrêter la télé",
+  "Fernbedienung für den Fernseher öffnen": "Ouvrir la télécommande de la télé",
+  "Fernbedienung": "Télécommande",
+  "Zeit pro Foto": "Durée par photo",
+  "3 Sekunden": "3 secondes",
+  "5 Sekunden": "5 secondes",
+  "8 Sekunden": "8 secondes",
+  "12 Sekunden": "12 secondes",
+  "20 Sekunden": "20 secondes",
+  "30 Sekunden": "30 secondes",
+  "60 Sekunden": "60 secondes",
+  "3 Minuten": "3 minutes",
+  "🎬 Videos höchstens": "🎬 Vidéos au maximum",
+  "🎵 Hintergrundmusik": "🎵 Musique de fond",
+  "Hintergrundmusik": "Musique de fond",
+  "Keine": "Aucune",
+  "Aus": "Désactivée",
+  "Frei lizenzierte Musik (gemeinfrei oder CC BY, Titel und Urheber erscheinen am Fernseher) – leise im Hintergrund, Reihenfolge zufällig.": "Musique sous licence libre (domaine public ou CC BY ; titre et artiste s’affichent sur la télé) – discrètement en fond, dans un ordre aléatoire.",
+  "Lautstärke der Musik": "Volume de la musique",
+  "Sehr leise": "Très bas",
+  "Leise": "Bas",
+  "Mittel": "Moyen",
+  "▶ Starten": "▶ Démarrer",
+  "⏹ Stopp": "⏹ Arrêter",
+  "Am Fernseher einmal die Fernseher-Seite dieser App (…/tv/) im Browser öffnen": "Sur la télé, ouvrez une fois dans le navigateur la page télé de cette application (…/tv/)",
+  "und offen lassen.": "et laissez-la ouverte.",
+  "und offen lassen. ·": "et laissez-la ouverte. ·",
+  "Stattdessen als AirPlay-Video senden (nur Safari)": "Envoyer plutôt en vidéo AirPlay (Safari uniquement)",
+  "Die Auswahl hier als Diashow": "La sélection en diaporama",
+  "Musik lauter": "Musique plus fort",
+  "Musik leiser": "Musique moins fort",
+  "Nächster Musiktitel": "Morceau suivant",
+  "Nächster Titel": "Titre suivant",
+  "Nächstes Foto": "Photo suivante",
+  "Vorheriges Foto": "Photo précédente",
+  "🎵 Titel": "🎵 Titre",
+  "– zufällig weiter –": "– continuer au hasard –",
+  "Musik aus.": "Musique coupée.",
+  "Fernseher gestoppt.": "Télé arrêtée.",
+  "Bitte einen Fernseher wählen.": "Choisissez une télé.",
+  "Video vorbereiten": "Préparer la vidéo",
+  "Video wird vorbereitet …": "Préparation de la vidéo …",
+  "📺 Fernseher wählen (AirPlay)": "📺 Choisir la télé (AirPlay)",
+  "AirPlay lässt sich hier nicht öffnen.": "AirPlay ne peut pas être ouvert ici.",
+  "Das Video wird auf dem Server gebaut – das dauert je nach Anzahl etwa 10 bis 90 Sekunden. Danach wählst du den Fernseher im AirPlay-Fenster (nur Safari).": "La vidéo est créée sur le serveur – comptez de 10 à 90 secondes selon le nombre de photos. Choisissez ensuite la télé dans la fenêtre AirPlay (Safari uniquement).",
+  "AirPlay-Auswahl gibt es nur in Safari (iPhone, iPad, Mac). Hier kannst du das Video nur auf diesem Gerät ansehen.": "Le sélecteur AirPlay n’existe que dans Safari (iPhone, iPad, Mac). Ici, vous ne pouvez regarder la vidéo que sur cet appareil.",
+  "Im AirPlay-Fenster LG TV oder SHIELDAndroidTV auswählen – die Fotos laufen dann auf dem Fernseher. Falls beide fehlen: Fernseher an und im selben WLAN?": "Dans la fenêtre AirPlay, choisissez LG TV ou SHIELDAndroidTV – les photos s’affichent alors sur la télé. Si les deux manquent : la télé est-elle allumée et sur le même Wi-Fi ?",
+  "Fehler beim Vorbereiten": "Erreur lors de la préparation",
+  "Suche Fernseher …": "Recherche de télés …",
+  "Für ein AirPlay-Video höchstens 150 Fotos – bitte weniger auswählen oder den Fernseher-Weg nutzen.": "150 photos au maximum pour une vidéo AirPlay – sélectionnez-en moins ou utilisez la page télé.",
+  "Der Fernseher hat die Seite /tv noch nicht geöffnet – es startet, sobald sie offen ist.": "La télé n’a pas encore ouvert la page /tv – cela démarrera dès qu’elle sera ouverte.",
+  "● bereit": "● prête",
+  "○ nicht geöffnet": "○ non ouverte",
+  "Update": "Mettre à jour",
+  "↻ Neue Version verfügbar – tippen zum Aktualisieren": "↻ Nouvelle version disponible – touchez pour mettre à jour",
+  "Neue Version verfügbar – tippen zum Aktualisieren": "Nouvelle version disponible – touchez pour mettre à jour",
+  "PIN erforderlich": "PIN requis",
+  "PIN falsch": "PIN incorrect",
+  "Anfrage nicht zugelassen": "Requête non autorisée",
+  "Es ist ein Fehler aufgetreten. Bitte nochmal versuchen.": "Une erreur s’est produite. Veuillez réessayer.",
+  "Video nicht verfuegbar": "Vidéo indisponible",
+  "Show nicht gefunden": "Diaporama introuvable",
+  "Datei nicht gefunden": "Fichier introuvable",
+  "nicht gefunden": "introuvable",
+  "Unbekannte Aktion": "Action inconnue",
+  "Unbekannter Titel": "Titre inconnu",
+  "Unbekanntes Ziel": "Cible inconnue",
+  "Unbekannte Musikauswahl": "Sélection musicale inconnue",
+  "Musikauswahl unbekannt": "Sélection musicale inconnue",
+  "Unbekannter Medientyp": "Type de média inconnu",
+  "Ungueltige Filter": "Filtres non valides",
+  "Ungueltige Foto-ID": "ID de photo non valide",
+  "Person unbekannt": "Personne inconnue",
+  "Ort unbekannt": "Lieu inconnu",
+  "Album ungueltig": "Album non valide",
+  "ungueltig": "non valide",
+  "Suchtext fehlt oder ist zu lang": "Texte de recherche manquant ou trop long",
+  "Auftrag nicht gefunden": "Tâche introuvable",
+  "Die vorherige Show gibt es nicht mehr.": "Le diaporama précédent n’existe plus.",
+  "Es gibt noch nichts, wohin ich zurückgehen könnte.": "Il n’y a encore rien à restaurer.",
+  "Es wird gerade schon ein Video vorbereitet. Bitte kurz warten.": "Une vidéo est déjà en préparation. Patientez un instant.",
+  "Dazu habe ich keine Fotos gefunden.": "Je n’ai trouvé aucune photo pour cela.",
+  "Dazu habe ich keine Fotos gefunden. Der Bilderrahmen bleibt wie er ist.": "Je n’ai trouvé aucune photo pour cela. Le cadre reste tel quel.",
+  "Der Bilderrahmen zeigt das normale Programm.": "Le cadre affiche son programme normal.",
+  "Der Bilderrahmen zeigt wieder das normale Programm.": "Le cadre affiche de nouveau son programme normal.",
+  "Es läuft gerade kein Wunsch, den ich merken könnte.": "Aucun diaporama demandé n’est en cours, que je pourrais enregistrer.",
+  "Der Rahmen zeigt jetzt zeitlich: ältestes zuerst.": "Le cadre affiche maintenant par date : les plus anciennes d’abord.",
+  "Der Rahmen zeigt jetzt zeitlich: neuestes zuerst.": "Le cadre affiche maintenant par date : les plus récentes d’abord.",
+  "Der Rahmen zeigt jetzt in zufälliger Reihenfolge.": "Le cadre affiche maintenant dans un ordre aléatoire.",
+  "(keine Favoriten markiert – ich zeige alle passenden)": "(aucun favori marqué – j’affiche toutes les correspondances)",
+  "Synchronisation angestossen": "Synchronisation déclenchée",
+  "nicht berechtigt": "non autorisé",
+  "Bitte einen Namen (1-60 Zeichen)": "Saisissez un nom (1 à 60 caractères)",
+  "Immich Showcase TV": "Immich Showcase TV",
+  "Verbinde …": "Connexion …",
+  "Keine Verbindung zum Server – ich versuche es weiter …": "Pas de connexion au serveur – nouvelle tentative …",
+  "PIN eingeben": "Saisissez le PIN",
+  "6 Ziffern mit der Fernbedienung": "6 chiffres avec la télécommande",
+  "PIN falsch – nochmal versuchen": "PIN incorrect – réessayez",
+  "Zu viele Versuche – bitte später erneut.": "Trop de tentatives – réessayez plus tard.",
+  "Die Videos lassen sich gerade nicht laden.": "Les vidéos ne peuvent pas être chargées pour le moment.",
+  "🎵 Für Musik einmal die OK-Taste drücken": "🎵 Appuyez une fois sur OK pour la musique",
+  "🔇 Für Video-Ton einmal die OK-Taste drücken": "🔇 Appuyez une fois sur OK pour le son de la vidéo",
+  "Alle abwählen": "Tout désélectionner",
+  "Alle auswählen": "Tout sélectionner",
+  "Alle Treffer auswählen": "Sélectionner tous les résultats",
+  "Alle Treffer abwählen": "Désélectionner tous les résultats",
+  "Am Fernseher einmal im Browser": "Sur la télé, dans le navigateur, ouvrez",
+  "öffnen (Shield:": "une fois (Shield :",
+  "Auswahl": "Sélection",
+  "läuft auf": "est lu sur",
+  "· Auswahl": "· Sélection",
+  "🎲 Alles bunt gemischt": "🎲 Tout mélangé",
+  "Test (nur Entwicklung)": "Test (développement uniquement)",
+  "E-Mail-Adresse (Immich)": "Adresse e-mail (Immich)",
+  "E-Mail-Adresse": "Adresse e-mail",
+  "Passwort": "Mot de passe",
+  "Anmelden": "Se connecter",
+  "oder mit der PIN": "ou avec le PIN",
+  "Abmelden": "Se déconnecter",
+  "Anmeldung erforderlich": "Connexion requise",
+  "E-Mail oder Passwort falsch": "E-mail ou mot de passe incorrect",
+  "Bitte mit dem Immich-Konto anmelden": "Connectez-vous avec votre compte Immich",
+  "Immich ist gerade nicht erreichbar": "Immich n’est pas joignable pour le moment",
+  "Immich hat die Anfrage abgelehnt oder ist nicht erreichbar.": "Immich a refusé la requête ou n’est pas joignable.",
+  "Eigene Musik: Titel und Künstler erscheinen am Fernseher, die Reihenfolge ist zufällig.": "Votre propre musique : titre et artiste s’affichent sur la télé, l’ordre est aléatoire.",
+  "Noch keine Musik eingerichtet. Füge eigene Titel hinzu.": "Aucune musique configurée. Ajoutez vos propres titres.",
+  "Noch keine Musik eingerichtet. Lege Musikdateien in den Musikordner des Servers (siehe Anleitung).": "Aucune musique configurée. Placez des fichiers musicaux dans le dossier de musique du serveur (voir le guide).",
+  "🎵 Eigene Musik hinzufügen …": "🎵 Ajouter votre musique …",
+  "🎵 Eigene Musik": "🎵 Votre musique",
+  "Nur eigene oder frei lizenzierte Musik (mp3, ogg, m4a). Du bist für die Rechte verantwortlich.": "Uniquement de la musique personnelle ou sous licence libre (mp3, ogg, m4a). Vous êtes responsable des droits.",
+  "Sammlung": "Collection",
+  "Name der neuen Sammlung": "Nom de la nouvelle collection",
+  "z. B. Urlaub 2024": "par ex. Vacances 2024",
+  "Dateien": "Fichiers",
+  "⬆ Hinzufügen": "⬆ Ajouter",
+  "➕ Neue Sammlung …": "➕ Nouvelle collection …",
+  "Titel entfernen": "Retirer le titre",
+  "Bitte Dateien auswählen.": "Choisissez des fichiers.",
+  "Bitte einen Namen für die neue Sammlung eingeben.": "Saisissez un nom pour la nouvelle collection.",
+  "Hochladen fehlgeschlagen": "Échec de l’envoi",
+  "Hochladen ist nicht aktiviert": "L’envoi n’est pas activé",
+  "Verwalten ist nicht aktiviert": "La gestion n’est pas activée",
+  "Nur mp3-, ogg- und m4a-Dateien": "Fichiers mp3, ogg et m4a uniquement",
+  "Das ist keine abspielbare Audiodatei": "Ce n’est pas un fichier audio lisible",
+  "Die Musiksammlung ist voll": "La collection de musique est pleine",
+  "Eigene Musik": "Votre musique",
+  "Immich Showcase – Einrichtung": "Immich Showcase – Configuration",
+  "Einrichtung": "Configuration",
+  "Willkommen! In drei Schritten verbindest du Immich Showcase mit deinem Immich.": "Bienvenue ! En trois étapes, vous connectez Immich Showcase à votre Immich.",
+  "Einrichtungs-Code": "Code de configuration",
+  "6 Ziffern": "6 chiffres",
+  "Weiter": "Suivant",
+  "Zurück": "Retour",
+  "Adresse von Immich": "Adresse d’Immich",
+  "Mit Immich-Konto": "Avec un compte Immich",
+  "Mit API-Schlüssel": "Avec une clé d’API",
+  "API-Schlüssel": "Clé d’API",
+  "Immich Showcase legt damit einmalig einen eigenen Schlüssel „Immich Showcase (Dienst)“ ohne Lösch-Rechte an. Das Passwort wird nicht gespeichert.": "Immich Showcase l’utilise une seule fois pour créer sa propre clé « Immich Showcase (service) » sans droit de suppression. Le mot de passe n’est pas enregistré.",
+  "PIN für die App (6 Ziffern, optional)": "PIN pour l’application (6 chiffres, facultatif)",
+  "leer lassen = zufällige PIN": "vide = PIN aléatoire",
+  "Name der App (optional)": "Nom de l’application (facultatif)",
+  "Einrichtung abschließen": "Terminer la configuration",
+  "Geschafft. Immich Showcase startet jetzt neu …": "Terminé. Immich Showcase redémarre …",
+  "Geschafft.": "Terminé.",
+  "Deine PIN (bitte merken, sie wird nur jetzt angezeigt):": "Votre PIN (retenez-le, il n’est affiché que maintenant) :",
+  "Einen Moment, die Seite öffnet sich gleich von selbst.": "Un instant, la page s’ouvre toute seule.",
+  "Fertig – du kannst jetzt starten.": "Terminé – vous pouvez commencer.",
+  "Immich Showcase öffnen": "Ouvrir Immich Showcase",
+  "Bitte E-Mail und Passwort eingeben.": "Saisissez l’e-mail et le mot de passe.",
+  "Bitte den API-Schlüssel eingeben.": "Saisissez la clé d’API.",
+  "Stattdessen mit API-Schlüssel anmelden": "Se connecter plutôt avec une clé d’API",
+  "Stattdessen mit E-Mail und Passwort anmelden": "Se connecter plutôt avec e-mail et mot de passe",
+  "Immich-API-Schlüssel": "Clé d’API Immich",
+  "Der Einrichtungs-Code stimmt nicht (er steht im Protokoll: docker compose logs)": "Le code de configuration est incorrect (il figure dans le journal : docker compose logs)",
+  "Bitte eine Adresse wie http://192.168.1.10:2283 eingeben": "Saisissez une adresse comme http://192.168.1.10:2283",
+  "Unter dieser Adresse antwortet kein Immich": "Aucun Immich ne répond à cette adresse",
+  "Immich ist unter dieser Adresse nicht erreichbar": "Immich n’est pas joignable à cette adresse",
+  "Der Schluessel wird von Immich nicht akzeptiert": "Immich n’accepte pas la clé",
+  "Die PIN muss genau 6 Ziffern haben": "Le PIN doit comporter exactement 6 chiffres",
+  "Zu viele Versuche. Bitte spaeter erneut versuchen.": "Trop de tentatives. Réessayez plus tard.",
+  "Einrichtung erforderlich": "Configuration requise",
+  "öffnen": "une fois",
+  "Die Bildsuche (Immich Machine Learning) ist gerade nicht verfuegbar. Suchen nach Person, Zeit oder Ort geht weiter.": "La recherche par image (Immich Machine Learning) n’est pas disponible pour le moment. La recherche par personne, date ou lieu fonctionne toujours.",
+  "❓ Hilfe": "❓ Aide",
+  "Hilfe": "Aide",
+  "So geht es": "Comment ça marche",
+  "Suchtipps": "Conseils de recherche",
+  "Fernseher und Rahmen": "Télé et cadre photo",
+  "Etwas funktioniert nicht?": "Quelque chose ne fonctionne pas ?",
+  "Fotos durchblättern (Neueste) oder suchen – auch in ganzen Sätzen.": "Parcourez les photos (Récentes) ou recherchez – même avec des phrases entières.",
+  "Fotos antippen, um sie auszuwählen. „Alle auswählen“ und „Tag wählen“ sparen Zeit.": "Touchez les photos pour les sélectionner. « Tout sélectionner » et « Choisir le jour » font gagner du temps.",
+  "Der Auswahl einen Namen geben und auf den Rahmen oder den Fernseher schicken. Gespeichert wird sie unter „Meine Shows“.": "Donnez un nom à la sélection et envoyez-la au cadre ou à la télé. Elle est enregistrée dans « Mes diaporamas ».",
+  "Personen, Zeit, Orte und Motive lassen sich kombinieren, z. B. „Sommer 2022 am Strand“.": "Personnes, dates, lieux et sujets peuvent être combinés, par ex. « Été 2022 à la plage ».",
+  "Am Fernseher oder Tablet einmal die Seite /tv/ im Browser öffnen und offen lassen. Den Namen des Geräts wählst du beim Senden.": "Sur la télé ou la tablette, ouvrez une fois la page /tv/ dans le navigateur et laissez-la ouverte. Vous choisissez l’appareil à l’envoi.",
+  "Das Support-Paket enthält Version, Einstellungen und das Protokoll – ohne Passwörter, PIN oder Schlüssel. Es hilft bei einem Fehlerbericht.": "Le paquet de support contient la version, les réglages et le journal – sans mots de passe, PIN ni clés. Il aide à signaler un problème.",
+  "⬇ Support-Paket herunterladen": "⬇ Télécharger le paquet de support",
+  "Support-Paket gespeichert.": "Paquet de support enregistré.",
+  "Support-Paket nicht verfügbar": "Paquet de support indisponible",
+  "Personen, Zeit, Orte und Motive lassen sich kombinieren, z. B.": "Personnes, dates, lieux et sujets peuvent être combinés, par ex.",
+  "z. B.": "par ex.",
+  "Sprache / Language": "Langue / Language"
+ },
+ "muster": [
+  [
+   "^1 Foto ausgewählt ›$",
+   "1 photo sélectionnée ›"
+  ],
+  [
+   "^1 Fotos$",
+   "1 photo"
+  ],
+  [
+   "^1 Foto werden zu einem Video für den Fernseher\\.$",
+   "1 photo sera transformée en vidéo pour la télé."
+  ],
+  [
+   "^1 Fotos – (.*)$",
+   "1 photo – $1",
+   "beschreibung"
+  ],
+  [
+   "^(.*) · bereit\\. Wähle am Handy Fotos und tippe auf „Auf TV“\\. \\(Für Musik einmal die OK-Taste drücken\\.\\)$",
+   "$1 · prête. Choisissez des photos sur votre téléphone et touchez « Sur la télé ». (Appuyez une fois sur OK pour la musique.)"
+  ],
+  [
+   "^🔊 Musik-Lautstärke (\\d+) %$",
+   "🔊 Volume de la musique $1 %"
+  ],
+  [
+   "^(\\d+) Fotos ausgewählt ›$",
+   "$1 photos sélectionnées ›"
+  ],
+  [
+   "^· sehr viele$",
+   "· très nombreuses"
+  ],
+  [
+   "^Foto vom (.*)$",
+   "Photo du $1"
+  ],
+  [
+   "^Zurück zu: (.*)$",
+   "Retour à : $1"
+  ],
+  [
+   "^↩ Zurück zu „(.*)“$",
+   "↩ Retour à « $1 »"
+  ],
+  [
+   "^↩ Zurück zu „(.*)“ jederzeit oben möglich\\.$",
+   "↩ Le retour à « $1 » est possible à tout moment en haut."
+  ],
+  [
+   "^(\\d+) Fotos · seit (.*) Uhr$",
+   "$1 photos · depuis $2"
+  ],
+  [
+   "^(\\d+) Fotos$",
+   "$1 photos"
+  ],
+  [
+   "^(\\d+) Fotos · (.*)$",
+   "$1 photos · $2"
+  ],
+  [
+   "^· seit (.*) Uhr$",
+   "· depuis $1"
+  ],
+  [
+   "^([\\d.,]+) Fotos in dieser Ansicht$",
+   "$1 photos dans cette vue"
+  ],
+  [
+   "^([\\d.,]+) Medien in dieser Ansicht$",
+   "$1 médias dans cette vue"
+  ],
+  [
+   "^([\\d.,+]+) in dieser Ansicht$",
+   "$1 dans cette vue"
+  ],
+  [
+   "^Alle (\\d+) ausgewählten Fotos wieder abwählen\\? Dabei wird kein Foto gelöscht – nur die Auswahl wird geleert\\.$",
+   "Désélectionner de nouveau les $1 photos sélectionnées ? Aucune photo n’est supprimée – seule la sélection est vidée."
+  ],
+  [
+   "^Die aktuelle Auswahl \\((\\d+) Fotos\\) wird durch die Treffer ersetzt\\. Weiter\\?$",
+   "La sélection actuelle ($1 photos) sera remplacée par les résultats. Continuer ?"
+  ],
+  [
+   "^Die aktuelle Auswahl \\((\\d+) Fotos\\) wird durch „(.*)“ ersetzt\\. Weiter\\?$",
+   "La sélection actuelle ($1 photos) sera remplacée par « $2 ». Continuer ?"
+  ],
+  [
+   "^„(.*)“ aus der Liste löschen\\? Dabei wird kein Foto gelöscht\\.$",
+   "Retirer « $1 » de la liste ? Aucune photo n’est supprimée."
+  ],
+  [
+   "^Es sind höchstens (\\d+) Fotos pro Show möglich – die ersten wurden ausgewählt\\.$",
+   "$1 photos au maximum par diaporama – les premières ont été sélectionnées."
+  ],
+  [
+   "^Höchstens (\\d+) Fotos pro Show\\.$",
+   "$1 photos au maximum par diaporama."
+  ],
+  [
+   "^(\\d+) Video\\(s\\) wurden nicht auf den Rahmen geschickt \\(er zeigt nur Fotos\\)\\.$",
+   "$1 vidéo(s) n’ont pas été envoyées au cadre (il n’affiche que des photos)."
+  ],
+  [
+   "^(\\d+) gefunden, (\\d+) davon sinnvoll verteilt$",
+   "$1 trouvées, $2 réparties judicieusement"
+  ],
+  [
+   "^· (\\d+) gefunden, (\\d+) davon sinnvoll verteilt$",
+   "· $1 trouvées, $2 réparties judicieusement"
+  ],
+  [
+   "^Alle Treffer sind schon ausgewählt – tippe ein Foto an, um es abzuwählen\\.$",
+   "Tous les résultats sont déjà sélectionnés – touchez une photo pour la désélectionner."
+  ],
+  [
+   "^Musik: (.*)$",
+   "Musique : $1"
+  ],
+  [
+   "^Spielt: (.*)$",
+   "Lecture : $1"
+  ],
+  [
+   "^Fertig: (\\d+) Fotos, (.*) Laufzeit\\.$",
+   "Terminé : $1 photos, durée $2."
+  ],
+  [
+   "^(\\d+) Fotos werden zu einem Video für den Fernseher\\.$",
+   "$1 photos seront transformées en vidéo pour la télé."
+  ],
+  [
+   "^Video wird vorbereitet … (\\d+) %$",
+   "Préparation de la vidéo … $1 %"
+  ],
+  [
+   "^(.*) läuft auf (.*)\\.$",
+   "$1 est lu sur $2."
+  ],
+  [
+   "^(\\d+) Videos? wird?e?n? ?vorbereitet.*$",
+   "$1 vidéo(s) en préparation"
+  ],
+  [
+   "^📺 (.*) · (.*)$",
+   "📺 $1 · $2"
+  ],
+  [
+   "^● bereit · zeigt (.*)$",
+   "● prête · affiche $1"
+  ],
+  [
+   "^Am Fernseher einmal im Browser (.*) öffnen$",
+   "Sur la télé, ouvrez $1 une fois dans le navigateur"
+  ],
+  [
+   "^\\((.*): (.*)\\)$",
+   "($1 : $2)"
+  ],
+  [
+   "^„(.*)“ mit (\\d+) Fotos läuft gleich auf dem Bilderrahmen\\.$",
+   "« $1 » avec $2 photos sera bientôt lu sur le cadre photo."
+  ],
+  [
+   "^\\(Test\\) (\\d+) Fotos als „?\\\"?(.*?)\\\"?“? wuerden auf den Rahmen gehen\\.$",
+   "(Test) $1 photos en tant que « $2 » iraient sur le cadre."
+  ],
+  [
+   "^\\\"(.*)\\\" mit (\\d+) Fotos läuft gleich auf dem Bilderrahmen\\.$",
+   "« $1 » avec $2 photos sera bientôt lu sur le cadre photo."
+  ],
+  [
+   "^\\\"(.*)\\\" \\((\\d+) Medien\\) wurde an (.*) geschickt\\.(.*)$",
+   "« $1 » ($2 médias) a été envoyé à $3.$4"
+  ],
+  [
+   "^ ?(.*) ist gerade nicht bereit – es startet, sobald die Seite (.*) dort geöffnet ist\\.$",
+   "$1 n’est pas prête pour le moment – cela démarrera dès que la page $2 y sera ouverte."
+  ],
+  [
+   "^(\\d+) Video\\(s\\) werden für den Fernseher vorbereitet – \\\"(.*)\\\" startet gleich auf (.*)\\.$",
+   "$1 vidéo(s) sont en préparation pour la télé – « $2 » démarrera bientôt sur $3."
+  ],
+  [
+   "^Zu viele Versuche\\. Bitte in (\\d+) Minuten? erneut\\.?$",
+   "Trop de tentatives. Réessayez dans $1 minute(s)."
+  ],
+  [
+   "^Zu viele Versuche\\. Bitte in (\\d+) Minuten? erneut versuchen\\.$",
+   "Trop de tentatives. Réessayez dans $1 minute(s)."
+  ],
+  [
+   "^Bitte 1 bis (\\d+) Fotos auswaehlen$",
+   "Sélectionnez de 1 à $1 photos"
+  ],
+  [
+   "^Für den Fernseher höchstens (\\d+) Fotos pro Video\\.$",
+   "$1 photos au maximum par vidéo pour la télé."
+  ],
+  [
+   "^Gemerkt: „(.*)“ – steht jetzt unter „Meine Diashows“\\.$",
+   "Enregistré : « $1 » – figure maintenant dans « Mes diaporamas »."
+  ],
+  [
+   "^„(.*)“ entfernt\\.$",
+   "« $1 » retiré."
+  ],
+  [
+   "^„(.*)“ war nicht gemerkt \\(aus dem Verlauf entfernt\\)\\.$",
+   "« $1 » n’était pas enregistré (retiré de l’historique)."
+  ],
+  [
+   "^Läuft gerade: \\\"(.*)\\\" \\((.*) Fotos, seit (.*)\\)$",
+   "En cours : « $1 » ($2 photos, depuis $3)"
+  ],
+  [
+   "^(.*) – läuft gleich auf dem Bilderrahmen\\.$",
+   "$1 – sera bientôt lu sur le cadre photo."
+  ],
+  [
+   "^\\(Test\\) (.*)$",
+   "(Test) $1"
+  ],
+  [
+   "^Das habe ich nicht verstanden\\. Beispiel: (.*)\\.$",
+   "Je n’ai pas compris. Exemple : $1."
+  ],
+  [
+   "^Es gibt mehrere Personen namens (.*)\\. Bitte in Immich eindeutig benennen\\.$",
+   "Plusieurs personnes s’appellent $1. Nommez-les de façon unique dans Immich."
+  ],
+  [
+   "^Welche Person meinst du mit \\\"(.*)\\\"\\? (.*)$",
+   "Quelle personne voulez-vous dire par « $1 » ? $2"
+  ],
+  [
+   "^(\\d+) Fotos – (.*)$",
+   "$1 photos – $2",
+   "beschreibung"
+  ],
+  [
+   "^(.*) oder (.*)$",
+   "$1 ou $2"
+  ],
+  [
+   "^z\\. B\\. (.*)$",
+   "par ex. $1"
+  ],
+  [
+   "^„(.*)“$",
+   "« $1 »"
+  ],
+  [
+   "^· (\\d+) Fotos$",
+   "· $1 photos"
+  ],
+  [
+   "^· 1 Foto$",
+   "· 1 photo"
+  ],
+  [
+   "^(\\d+) Titel hinzugefügt\\.$",
+   "$1 titre(s) ajouté(s)."
+  ],
+  [
+   "^Lade (\\d+) von (\\d+): (.*) …$",
+   "Envoi $1 sur $2 : $3 …"
+  ],
+  [
+   "^„(.*)“ von diesem Server entfernen\\?$",
+   "Retirer « $1 » de ce serveur ?"
+  ],
+  [
+   "^Die Datei ist groesser als (\\d+) MB$",
+   "Le fichier dépasse $1 Mo"
+  ],
+  [
+   "^Immich (\\d+\\.\\d+\\.\\d+) gefunden\\.$",
+   "Immich $1 trouvé."
+  ],
+  [
+   "^Fehler (\\d+)$",
+   "Erreur $1"
+  ],
+  [
+   "^(.*) \\(Die Motivsuche nach \\\"(.*)\\\" ist gerade nicht verfuegbar – ohne Motiv gesucht\\)$",
+   "$1 (La recherche de « $2 » n’est pas disponible pour le moment – recherché sans)"
+  ],
+  [
+   "^(\\d+) Fotos – (.*) \\(Die Motivsuche nach \\\"(.*)\\\" ist gerade nicht verfuegbar – ohne Motiv gesucht\\)$",
+   "$1 photos – $2 (La recherche de « $3 » n’est pas disponible pour le moment – recherché sans)",
+   "beschreibung"
+  ],
+  [
+   "^Immich Showcase(?: \\(.*\\))? ([\\w.\\-]+)$",
+   "Immich Showcase $1"
+  ]
+ ],
+ "beschreibung": [
+  [
+   " und ",
+   " et "
+  ],
+  [
+   "(^| |, )aus (\\d{4})",
+   "$1de $2"
+  ],
+  [
+   "vom (\\S+) bis (\\S+)",
+   "du $1 au $2"
+  ],
+  [
+   "\\((\\d+) Zeitraeume\\)",
+   "($1 périodes)"
+  ],
+  [
+   "nur Favoriten",
+   "favoris uniquement"
+  ]
+ ]
+}

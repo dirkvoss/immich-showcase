@@ -1,0 +1,13 @@
+.git
+.github
+.env
+.env.*
+container.env
+db.env
+data
+state
+tests
+dev
+deploy
+__pycache__
+*.md

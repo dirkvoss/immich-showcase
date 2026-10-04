@@ -1,0 +1,34 @@
+# Wegwerf-Immich fuer Tests (Entwicklungsinstanz und CI-Integrationstest): Server, Datenbank, Redis - ohne Machine Learning, mit Speichergrenzen.
+# Ablauf siehe tests/integration_immich.sh. Variablen: IMMICH_VERSION, IMMICH_PORT, UPLOAD_LOCATION, DB_DATA_LOCATION, DB_PASSWORD
+services:
+  immich-server:
+    container_name: ${IMMICH_PREFIX:-immich}_server
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-v3.2.4}
+    environment:
+      DB_HOSTNAME: database
+      DB_USERNAME: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_DATABASE_NAME: immich
+      REDIS_HOSTNAME: redis
+    volumes:
+      - ${UPLOAD_LOCATION:-./upload}:/data
+    ports: ["127.0.0.1:${IMMICH_PORT:-2283}:2283"]
+    depends_on: [redis, database]
+    mem_limit: ${IMMICH_MEM:-1536m}
+    memswap_limit: ${IMMICH_MEM:-1536m}
+    restart: unless-stopped
+  redis:
+    image: docker.io/valkey/valkey:9@sha256:8e8d64b405ce18f41b8e5ee20aa4687a8ed0022d1298f2ce31cdcf3a76e09411
+    mem_limit: 96m
+    restart: unless-stopped
+  database:
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_USER: postgres
+      POSTGRES_DB: immich
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    volumes: ["${DB_DATA_LOCATION:-./postgres}:/var/lib/postgresql/data"]
+    shm_size: 128mb
+    restart: unless-stopped
+    mem_limit: 640m

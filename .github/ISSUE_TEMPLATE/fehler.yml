@@ -1,0 +1,20 @@
+name: Fehler melden
+description: Etwas funktioniert nicht wie erwartet
+labels: [bug]
+body:
+  - type: textarea
+    id: was
+    attributes: {label: Was ist passiert?, description: "Was hast du erwartet, was ist stattdessen geschehen?"}
+    validations: {required: true}
+  - type: input
+    id: version
+    attributes: {label: Immich-Showcase-Version, description: "Steht unter /api/config (\"version\")"}
+  - type: input
+    id: immich
+    attributes: {label: Immich-Version}
+  - type: textarea
+    id: protokoll
+    attributes: {label: Protokoll, description: "docker compose logs showcase (bitte ohne Schlüssel/PIN)", render: shell}
+  - type: textarea
+    id: schritte
+    attributes: {label: Schritte zum Nachstellen}

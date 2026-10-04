@@ -1,0 +1,640 @@
+{
+ "texte": {
+  "Dein Blick in die Fotos": "Tu ventana a tus fotos",
+  "Bitte PIN eingeben": "Introduce tu PIN",
+  "PIN, 6 Ziffern": "PIN, 6 dígitos",
+  "Neueste": "Recientes",
+  "Suchen": "Buscar",
+  "Meine Shows": "Mis pases",
+  "Normal": "Normal",
+  "Immich Showcase – zur Startseite": "Immich Showcase – volver al inicio",
+  "Rückgängig": "Deshacer",
+  "↶ Rückgängig": "↶ Deshacer",
+  "Letzte Änderung an der Auswahl rückgängig machen": "Deshacer el último cambio de la selección",
+  "Der Rahmen zeigt wieder das normale Programm": "El marco vuelve a su programa normal",
+  "Reihenfolge auf dem Rahmen": "Orden en el marco",
+  "Zeitlich: ältestes zuerst": "Por fecha: primero las más antiguas",
+  "Zeitlich: neuestes zuerst": "Por fecha: primero las más recientes",
+  "Zufällig": "Aleatorio",
+  "Zufall": "Aleatorio",
+  "Reihenfolge": "Orden",
+  "Alle Personen": "Todas las personas",
+  "Alle Jahre": "Todos los años",
+  "Alle Länder": "Todos los países",
+  "Nur Fotos": "Solo fotos",
+  "Nur Videos": "Solo vídeos",
+  "Fotos & Videos": "Fotos y vídeos",
+  "Fotos &amp; Videos": "Fotos y vídeos",
+  "Person": "Persona",
+  "Jahr": "Año",
+  "Land": "País",
+  "Medien": "Archivos",
+  "✕ Filter zurücksetzen": "✕ Restablecer filtros",
+  "Alle Filter zurücksetzen": "Restablecer todos los filtros",
+  "✓ Alle auswählen": "✓ Seleccionar todo",
+  "✕ Alle abwählen": "✕ Deseleccionar todo",
+  "✓ Alle Treffer auswählen": "✓ Seleccionar todos los resultados",
+  "✕ Alle Treffer abwählen": "✕ Deseleccionar todos los resultados",
+  "Alle Fotos abwählen (es werden keine Fotos gelöscht)": "Deseleccionar todas las fotos (no se borra ninguna)",
+  "▶ Diashow": "▶ Presentación",
+  "Diashow": "Presentación",
+  "Die Fotos dieser Ansicht als Diashow abspielen": "Reproducir las fotos de esta vista como presentación",
+  "Die Treffer als Diashow abspielen": "Reproducir los resultados como presentación",
+  "Tag wählen": "Elegir día",
+  "Ohne Datum": "Sin fecha",
+  "Lade …": "Cargando …",
+  "Lade alle …": "Cargando todo …",
+  "Das waren alle Fotos.": "Esas eran todas.",
+  "Keine Fotos gefunden.": "No se encontraron fotos.",
+  "Großansicht": "Vista ampliada",
+  "Foto groß ansehen": "Ver foto más grande",
+  "Foto": "Foto",
+  "Video": "Vídeo",
+  "Suchtext": "Texto de búsqueda",
+  "Suche läuft …": "Buscando …",
+  "🎤 Tipp: Auf der Tastatur das Mikrofon antippen und einfach sprechen, z. B.": "🎤 Consejo: toca el micrófono del teclado y habla, p. ej.",
+  "Dauer-Diashow, keine Wunsch-Show aktiv": "Presentación continua, ningún pase solicitado activo",
+  "Bilderrahmen": "Marco de fotos",
+  "Rahmen": "Marco",
+  "● Läuft gerade auf dem Rahmen": "● Reproduciéndose en el marco",
+  "Normales Programm": "Programa normal",
+  "Neueste Fotos": "Últimas fotos",
+  "Zurück zu": "Volver a",
+  "⭐ Gemerkt": "⭐ Guardados",
+  "🕘 Zuletzt gezeigt": "🕘 Mostrados hace poco",
+  "läuft": "en curso",
+  "Noch nichts dauerhaft gemerkt. Tippe bei einer Show auf „⭐ Merken“.": "Aún no hay nada guardado. Toca «⭐ Guardar» en un pase.",
+  "Alles, was du auf den Rahmen schickst, erscheint hier automatisch.": "Todo lo que envíes al marco aparece aquí automáticamente.",
+  "▶ Auf den Rahmen": "▶ En el marco",
+  "📺 Auf TV": "📺 En la tele",
+  "🖥 Diashow hier": "🖥 Presentación aquí",
+  "Bearbeiten": "Editar",
+  "☆ Nicht mehr merken": "☆ Quitar de guardados",
+  "⭐ Merken": "⭐ Guardar",
+  "⭐ merken": "⭐ guardar",
+  "Löschen": "Eliminar",
+  "Dauerhaft unter „Gemerkt“ speichern – sonst steht die Show nur unter „Zuletzt gezeigt“": "Guardar de forma permanente en «Guardados»; si no, el pase solo aparece en «Mostrados hace poco»",
+  "Name der Show": "Nombre del pase",
+  "Noch nichts ausgewählt.": "Aún no hay nada seleccionado.",
+  "Ausgewählte Fotos": "Fotos seleccionadas",
+  "✕ Leeren": "✕ Vaciar",
+  "Leeren": "Vaciar",
+  "Auf den Rahmen": "En el marco",
+  "Sende …": "Enviando …",
+  "Schließen": "Cerrar",
+  "Abbrechen": "Cancelar",
+  "Auswählen": "Seleccionar",
+  "✓ Ausgewählt – abwählen": "✓ Seleccionada – deseleccionar",
+  "Bitte gib der Show einen Namen.": "Ponle un nombre al pase.",
+  "Es sind keine Fotos ausgewählt.": "No hay fotos seleccionadas.",
+  "Auf den Rahmen gehen nur Fotos – diese Auswahl enthält nur Videos. Nutze „📺 Auf den TV“.": "Al marco solo pueden ir fotos; esta selección contiene solo vídeos. Usa «📺 En la tele».",
+  "Auswahl geleert – mit „↶ Rückgängig“ holst du sie zurück.": "Selección vaciada: con «↶ Deshacer» la recuperas.",
+  "Rückgängig gemacht.": "Deshecho.",
+  "Der Rahmen soll wieder das normale Programm zeigen?": "¿Debe el marco volver a su programa normal?",
+  "Es sind höchstens 1000 Fotos pro Show möglich.": "Un pase puede tener como máximo 1000 fotos.",
+  "Höchstens 1000 Fotos pro Show.": "Máximo 1000 fotos por pase.",
+  "Die Diashow hier zeigt nur Fotos – Videos laufen über „📺 Auf den TV“.": "La presentación de aquí solo muestra fotos; los vídeos se reproducen con «📺 En la tele».",
+  "Die Fotos lassen sich gerade nicht laden.": "Ahora mismo no se pueden cargar las fotos.",
+  "Die Auswahl hier als Diashow abspielen – der Bilderrahmen bleibt unverändert": "Reproducir la selección aquí como presentación; el marco no cambia",
+  "Die Auswahl per AirPlay auf LG TV oder Shield abspielen": "Reproducir la selección por AirPlay en LG TV o Shield",
+  "Diashow beenden": "Terminar presentación",
+  "Vollbild": "Pantalla completa",
+  "Pause": "Pausa",
+  "Tempo": "Velocidad",
+  "Fertig": "Listo",
+  "3 s": "3 s",
+  "5 s": "5 s",
+  "8 s": "8 s",
+  "15 s": "15 s",
+  "30 s": "30 s",
+  "60 s": "60 s",
+  "📺 Auf den Fernseher": "📺 En la tele",
+  "📺 Auf den TV": "📺 En la tele",
+  "Fernseher": "Tele",
+  "Fernseher stoppen": "Detener la tele",
+  "Fernbedienung für den Fernseher öffnen": "Abrir el mando de la tele",
+  "Fernbedienung": "Mando",
+  "Zeit pro Foto": "Tiempo por foto",
+  "3 Sekunden": "3 segundos",
+  "5 Sekunden": "5 segundos",
+  "8 Sekunden": "8 segundos",
+  "12 Sekunden": "12 segundos",
+  "20 Sekunden": "20 segundos",
+  "30 Sekunden": "30 segundos",
+  "60 Sekunden": "60 segundos",
+  "3 Minuten": "3 minutos",
+  "🎬 Videos höchstens": "🎬 Vídeos como máximo",
+  "🎵 Hintergrundmusik": "🎵 Música de fondo",
+  "Hintergrundmusik": "Música de fondo",
+  "Keine": "Ninguna",
+  "Aus": "Apagada",
+  "Frei lizenzierte Musik (gemeinfrei oder CC BY, Titel und Urheber erscheinen am Fernseher) – leise im Hintergrund, Reihenfolge zufällig.": "Música de licencia libre (dominio público o CC BY; el título y el artista se muestran en la tele), en segundo plano y en orden aleatorio.",
+  "Lautstärke der Musik": "Volumen de la música",
+  "Sehr leise": "Muy bajo",
+  "Leise": "Bajo",
+  "Mittel": "Medio",
+  "▶ Starten": "▶ Iniciar",
+  "⏹ Stopp": "⏹ Detener",
+  "Am Fernseher einmal die Fernseher-Seite dieser App (…/tv/) im Browser öffnen": "En la tele, abre una vez en el navegador la página de la tele de esta app (…/tv/)",
+  "und offen lassen.": "y déjala abierta.",
+  "und offen lassen. ·": "y déjala abierta. ·",
+  "Stattdessen als AirPlay-Video senden (nur Safari)": "Enviar como vídeo AirPlay (solo Safari)",
+  "Die Auswahl hier als Diashow": "La selección como presentación",
+  "Musik lauter": "Música más alta",
+  "Musik leiser": "Música más baja",
+  "Nächster Musiktitel": "Siguiente canción",
+  "Nächster Titel": "Siguiente tema",
+  "Nächstes Foto": "Siguiente foto",
+  "Vorheriges Foto": "Foto anterior",
+  "🎵 Titel": "🎵 Tema",
+  "– zufällig weiter –": "– seguir al azar –",
+  "Musik aus.": "Música apagada.",
+  "Fernseher gestoppt.": "Tele detenida.",
+  "Bitte einen Fernseher wählen.": "Elige una tele.",
+  "Video vorbereiten": "Preparar vídeo",
+  "Video wird vorbereitet …": "Preparando vídeo …",
+  "📺 Fernseher wählen (AirPlay)": "📺 Elegir tele (AirPlay)",
+  "AirPlay lässt sich hier nicht öffnen.": "AirPlay no se puede abrir aquí.",
+  "Das Video wird auf dem Server gebaut – das dauert je nach Anzahl etwa 10 bis 90 Sekunden. Danach wählst du den Fernseher im AirPlay-Fenster (nur Safari).": "El vídeo se genera en el servidor; tarda entre 10 y 90 segundos según el número de fotos. Después elige la tele en la ventana de AirPlay (solo Safari).",
+  "AirPlay-Auswahl gibt es nur in Safari (iPhone, iPad, Mac). Hier kannst du das Video nur auf diesem Gerät ansehen.": "El selector de AirPlay solo existe en Safari (iPhone, iPad, Mac). Aquí solo puedes ver el vídeo en este dispositivo.",
+  "Im AirPlay-Fenster LG TV oder SHIELDAndroidTV auswählen – die Fotos laufen dann auf dem Fernseher. Falls beide fehlen: Fernseher an und im selben WLAN?": "En la ventana de AirPlay elige LG TV o SHIELDAndroidTV; las fotos se reproducen entonces en la tele. Si faltan ambas: ¿está la tele encendida y en la misma wifi?",
+  "Fehler beim Vorbereiten": "Error al preparar",
+  "Suche Fernseher …": "Buscando teles …",
+  "Für ein AirPlay-Video höchstens 150 Fotos – bitte weniger auswählen oder den Fernseher-Weg nutzen.": "Máximo 150 fotos para un vídeo AirPlay; selecciona menos o usa la página de la tele.",
+  "Der Fernseher hat die Seite /tv noch nicht geöffnet – es startet, sobald sie offen ist.": "La tele aún no ha abierto la página /tv; empezará en cuanto esté abierta.",
+  "● bereit": "● lista",
+  "○ nicht geöffnet": "○ no abierta",
+  "Update": "Actualizar",
+  "↻ Neue Version verfügbar – tippen zum Aktualisieren": "↻ Nueva versión disponible: toca para actualizar",
+  "Neue Version verfügbar – tippen zum Aktualisieren": "Nueva versión disponible: toca para actualizar",
+  "PIN erforderlich": "Se necesita el PIN",
+  "PIN falsch": "PIN incorrecto",
+  "Anfrage nicht zugelassen": "Solicitud no permitida",
+  "Es ist ein Fehler aufgetreten. Bitte nochmal versuchen.": "Se ha producido un error. Inténtalo de nuevo.",
+  "Video nicht verfuegbar": "Vídeo no disponible",
+  "Show nicht gefunden": "Pase no encontrado",
+  "Datei nicht gefunden": "Archivo no encontrado",
+  "nicht gefunden": "no encontrado",
+  "Unbekannte Aktion": "Acción desconocida",
+  "Unbekannter Titel": "Tema desconocido",
+  "Unbekanntes Ziel": "Destino desconocido",
+  "Unbekannte Musikauswahl": "Selección de música desconocida",
+  "Musikauswahl unbekannt": "Selección de música desconocida",
+  "Unbekannter Medientyp": "Tipo de archivo desconocido",
+  "Ungueltige Filter": "Filtros no válidos",
+  "Ungueltige Foto-ID": "ID de foto no válido",
+  "Person unbekannt": "Persona desconocida",
+  "Ort unbekannt": "Lugar desconocido",
+  "Album ungueltig": "Álbum no válido",
+  "ungueltig": "no válido",
+  "Suchtext fehlt oder ist zu lang": "Falta el texto de búsqueda o es demasiado largo",
+  "Auftrag nicht gefunden": "Tarea no encontrada",
+  "Die vorherige Show gibt es nicht mehr.": "El pase anterior ya no existe.",
+  "Es gibt noch nichts, wohin ich zurückgehen könnte.": "Todavía no hay nada a lo que volver.",
+  "Es wird gerade schon ein Video vorbereitet. Bitte kurz warten.": "Ya se está preparando un vídeo. Espera un momento.",
+  "Dazu habe ich keine Fotos gefunden.": "No he encontrado fotos para eso.",
+  "Dazu habe ich keine Fotos gefunden. Der Bilderrahmen bleibt wie er ist.": "No he encontrado fotos para eso. El marco queda como está.",
+  "Der Bilderrahmen zeigt das normale Programm.": "El marco muestra su programa normal.",
+  "Der Bilderrahmen zeigt wieder das normale Programm.": "El marco vuelve a mostrar su programa normal.",
+  "Es läuft gerade kein Wunsch, den ich merken könnte.": "No hay ningún pase solicitado en curso que pueda guardar.",
+  "Der Rahmen zeigt jetzt zeitlich: ältestes zuerst.": "El marco muestra ahora por fecha: primero las más antiguas.",
+  "Der Rahmen zeigt jetzt zeitlich: neuestes zuerst.": "El marco muestra ahora por fecha: primero las más recientes.",
+  "Der Rahmen zeigt jetzt in zufälliger Reihenfolge.": "El marco muestra ahora en orden aleatorio.",
+  "(keine Favoriten markiert – ich zeige alle passenden)": "(no hay favoritas marcadas; muestro todas las coincidencias)",
+  "Synchronisation angestossen": "Sincronización iniciada",
+  "nicht berechtigt": "no autorizado",
+  "Bitte einen Namen (1-60 Zeichen)": "Introduce un nombre (1-60 caracteres)",
+  "Immich Showcase TV": "Immich Showcase TV",
+  "Verbinde …": "Conectando …",
+  "Keine Verbindung zum Server – ich versuche es weiter …": "Sin conexión con el servidor; reintentando …",
+  "PIN eingeben": "Introduce el PIN",
+  "6 Ziffern mit der Fernbedienung": "6 dígitos con el mando",
+  "PIN falsch – nochmal versuchen": "PIN incorrecto; inténtalo de nuevo",
+  "Zu viele Versuche – bitte später erneut.": "Demasiados intentos; inténtalo más tarde.",
+  "Die Videos lassen sich gerade nicht laden.": "Ahora mismo no se pueden cargar los vídeos.",
+  "🎵 Für Musik einmal die OK-Taste drücken": "🎵 Pulsa OK una vez para la música",
+  "🔇 Für Video-Ton einmal die OK-Taste drücken": "🔇 Pulsa OK una vez para el sonido del vídeo",
+  "Alle abwählen": "Deseleccionar todo",
+  "Alle auswählen": "Seleccionar todo",
+  "Alle Treffer auswählen": "Seleccionar todos los resultados",
+  "Alle Treffer abwählen": "Deseleccionar todos los resultados",
+  "Am Fernseher einmal im Browser": "En la tele, en el navegador, abre",
+  "öffnen (Shield:": "una vez (Shield:",
+  "Auswahl": "Selección",
+  "läuft auf": "se reproduce en",
+  "· Auswahl": "· Selección",
+  "🎲 Alles bunt gemischt": "🎲 Todo mezclado",
+  "Test (nur Entwicklung)": "Prueba (solo desarrollo)",
+  "E-Mail-Adresse (Immich)": "Correo electrónico (Immich)",
+  "E-Mail-Adresse": "Correo electrónico",
+  "Passwort": "Contraseña",
+  "Anmelden": "Iniciar sesión",
+  "oder mit der PIN": "o con el PIN",
+  "Abmelden": "Cerrar sesión",
+  "Anmeldung erforderlich": "Se necesita iniciar sesión",
+  "E-Mail oder Passwort falsch": "Correo o contraseña incorrectos",
+  "Bitte mit dem Immich-Konto anmelden": "Inicia sesión con tu cuenta de Immich",
+  "Immich ist gerade nicht erreichbar": "Immich no está accesible ahora mismo",
+  "Immich hat die Anfrage abgelehnt oder ist nicht erreichbar.": "Immich ha rechazado la solicitud o no está accesible.",
+  "Eigene Musik: Titel und Künstler erscheinen am Fernseher, die Reihenfolge ist zufällig.": "Tu propia música: el título y el artista se muestran en la tele; el orden es aleatorio.",
+  "Noch keine Musik eingerichtet. Füge eigene Titel hinzu.": "Aún no hay música configurada. Añade tus propios temas.",
+  "Noch keine Musik eingerichtet. Lege Musikdateien in den Musikordner des Servers (siehe Anleitung).": "Aún no hay música configurada. Coloca archivos de música en la carpeta de música del servidor (ver la guía).",
+  "🎵 Eigene Musik hinzufügen …": "🎵 Añadir tu propia música …",
+  "🎵 Eigene Musik": "🎵 Tu propia música",
+  "Nur eigene oder frei lizenzierte Musik (mp3, ogg, m4a). Du bist für die Rechte verantwortlich.": "Solo música propia o de licencia libre (mp3, ogg, m4a). Eres responsable de los derechos.",
+  "Sammlung": "Colección",
+  "Name der neuen Sammlung": "Nombre de la nueva colección",
+  "z. B. Urlaub 2024": "p. ej. Vacaciones 2024",
+  "Dateien": "Archivos",
+  "⬆ Hinzufügen": "⬆ Añadir",
+  "➕ Neue Sammlung …": "➕ Nueva colección …",
+  "Titel entfernen": "Quitar tema",
+  "Bitte Dateien auswählen.": "Elige archivos.",
+  "Bitte einen Namen für die neue Sammlung eingeben.": "Introduce un nombre para la nueva colección.",
+  "Hochladen fehlgeschlagen": "Error al subir",
+  "Hochladen ist nicht aktiviert": "La subida no está activada",
+  "Verwalten ist nicht aktiviert": "La gestión no está activada",
+  "Nur mp3-, ogg- und m4a-Dateien": "Solo archivos mp3, ogg y m4a",
+  "Das ist keine abspielbare Audiodatei": "Este no es un archivo de audio reproducible",
+  "Die Musiksammlung ist voll": "La colección de música está llena",
+  "Eigene Musik": "Tu propia música",
+  "Immich Showcase – Einrichtung": "Immich Showcase – Configuración",
+  "Einrichtung": "Configuración",
+  "Willkommen! In drei Schritten verbindest du Immich Showcase mit deinem Immich.": "¡Bienvenido! En tres pasos conectas Immich Showcase con tu Immich.",
+  "Einrichtungs-Code": "Código de configuración",
+  "6 Ziffern": "6 dígitos",
+  "Weiter": "Siguiente",
+  "Zurück": "Atrás",
+  "Adresse von Immich": "Dirección de Immich",
+  "Mit Immich-Konto": "Con cuenta de Immich",
+  "Mit API-Schlüssel": "Con clave de API",
+  "API-Schlüssel": "Clave de API",
+  "Immich Showcase legt damit einmalig einen eigenen Schlüssel „Immich Showcase (Dienst)“ ohne Lösch-Rechte an. Das Passwort wird nicht gespeichert.": "Immich Showcase la usa una sola vez para crear su propia clave «Immich Showcase (servicio)» sin permisos de borrado. La contraseña no se guarda.",
+  "PIN für die App (6 Ziffern, optional)": "PIN para la app (6 dígitos, opcional)",
+  "leer lassen = zufällige PIN": "vacío = PIN aleatorio",
+  "Name der App (optional)": "Nombre de la app (opcional)",
+  "Einrichtung abschließen": "Terminar la configuración",
+  "Geschafft. Immich Showcase startet jetzt neu …": "Listo. Immich Showcase se reinicia ahora …",
+  "Geschafft.": "Listo.",
+  "Deine PIN (bitte merken, sie wird nur jetzt angezeigt):": "Tu PIN (recuérdalo, solo se muestra ahora):",
+  "Einen Moment, die Seite öffnet sich gleich von selbst.": "Un momento, la página se abre sola.",
+  "Fertig – du kannst jetzt starten.": "Listo: ya puedes empezar.",
+  "Immich Showcase öffnen": "Abrir Immich Showcase",
+  "Bitte E-Mail und Passwort eingeben.": "Introduce correo y contraseña.",
+  "Bitte den API-Schlüssel eingeben.": "Introduce la clave de API.",
+  "Stattdessen mit API-Schlüssel anmelden": "Iniciar sesión con una clave de API",
+  "Stattdessen mit E-Mail und Passwort anmelden": "Iniciar sesión con correo y contraseña",
+  "Immich-API-Schlüssel": "Clave de API de Immich",
+  "Der Einrichtungs-Code stimmt nicht (er steht im Protokoll: docker compose logs)": "El código de configuración no es correcto (está en el registro: docker compose logs)",
+  "Bitte eine Adresse wie http://192.168.1.10:2283 eingeben": "Introduce una dirección como http://192.168.1.10:2283",
+  "Unter dieser Adresse antwortet kein Immich": "En esta dirección no responde ningún Immich",
+  "Immich ist unter dieser Adresse nicht erreichbar": "Immich no está accesible en esta dirección",
+  "Der Schluessel wird von Immich nicht akzeptiert": "Immich no acepta la clave",
+  "Die PIN muss genau 6 Ziffern haben": "El PIN debe tener exactamente 6 dígitos",
+  "Zu viele Versuche. Bitte spaeter erneut versuchen.": "Demasiados intentos. Inténtalo más tarde.",
+  "Einrichtung erforderlich": "Configuración necesaria",
+  "öffnen": "una vez",
+  "Die Bildsuche (Immich Machine Learning) ist gerade nicht verfuegbar. Suchen nach Person, Zeit oder Ort geht weiter.": "La búsqueda por imagen (Immich Machine Learning) no está disponible ahora. La búsqueda por persona, fecha o lugar sigue funcionando.",
+  "❓ Hilfe": "❓ Ayuda",
+  "Hilfe": "Ayuda",
+  "So geht es": "Cómo funciona",
+  "Suchtipps": "Consejos de búsqueda",
+  "Fernseher und Rahmen": "Tele y marco de fotos",
+  "Etwas funktioniert nicht?": "¿Algo no funciona?",
+  "Fotos durchblättern (Neueste) oder suchen – auch in ganzen Sätzen.": "Hojea las fotos (Recientes) o busca, también con frases completas.",
+  "Fotos antippen, um sie auszuwählen. „Alle auswählen“ und „Tag wählen“ sparen Zeit.": "Toca las fotos para seleccionarlas. «Seleccionar todo» y «Elegir día» ahorran tiempo.",
+  "Der Auswahl einen Namen geben und auf den Rahmen oder den Fernseher schicken. Gespeichert wird sie unter „Meine Shows“.": "Ponle un nombre a la selección y envíala al marco o a la tele. Se guarda en «Mis pases».",
+  "Personen, Zeit, Orte und Motive lassen sich kombinieren, z. B. „Sommer 2022 am Strand“.": "Personas, fechas, lugares y motivos se pueden combinar, p. ej. «Verano 2022 en la playa».",
+  "Am Fernseher oder Tablet einmal die Seite /tv/ im Browser öffnen und offen lassen. Den Namen des Geräts wählst du beim Senden.": "En la tele o la tableta, abre una vez la página /tv/ en el navegador y déjala abierta. El dispositivo lo eliges al enviar.",
+  "Das Support-Paket enthält Version, Einstellungen und das Protokoll – ohne Passwörter, PIN oder Schlüssel. Es hilft bei einem Fehlerbericht.": "El paquete de soporte contiene la versión, los ajustes y el registro, sin contraseñas, PIN ni claves. Ayuda al informar de un error.",
+  "⬇ Support-Paket herunterladen": "⬇ Descargar paquete de soporte",
+  "Support-Paket gespeichert.": "Paquete de soporte guardado.",
+  "Support-Paket nicht verfügbar": "Paquete de soporte no disponible",
+  "Personen, Zeit, Orte und Motive lassen sich kombinieren, z. B.": "Personas, fechas, lugares y motivos se pueden combinar, p. ej.",
+  "z. B.": "p. ej.",
+  "Sprache / Language": "Idioma / Language"
+ },
+ "muster": [
+  [
+   "^1 Foto ausgewählt ›$",
+   "1 foto seleccionada ›"
+  ],
+  [
+   "^1 Fotos$",
+   "1 foto"
+  ],
+  [
+   "^1 Foto werden zu einem Video für den Fernseher\\.$",
+   "De 1 foto se hará un vídeo para la tele."
+  ],
+  [
+   "^1 Fotos – (.*)$",
+   "1 foto – $1",
+   "beschreibung"
+  ],
+  [
+   "^(.*) · bereit\\. Wähle am Handy Fotos und tippe auf „Auf TV“\\. \\(Für Musik einmal die OK-Taste drücken\\.\\)$",
+   "$1 · lista. Elige fotos en el móvil y toca «En la tele». (Pulsa OK una vez para la música.)"
+  ],
+  [
+   "^🔊 Musik-Lautstärke (\\d+) %$",
+   "🔊 Volumen de la música $1 %"
+  ],
+  [
+   "^(\\d+) Fotos ausgewählt ›$",
+   "$1 fotos seleccionadas ›"
+  ],
+  [
+   "^· sehr viele$",
+   "· muchas"
+  ],
+  [
+   "^Foto vom (.*)$",
+   "Foto del $1"
+  ],
+  [
+   "^Zurück zu: (.*)$",
+   "Volver a: $1"
+  ],
+  [
+   "^↩ Zurück zu „(.*)“$",
+   "↩ Volver a «$1»"
+  ],
+  [
+   "^↩ Zurück zu „(.*)“ jederzeit oben möglich\\.$",
+   "↩ Volver a «$1» es posible en cualquier momento arriba."
+  ],
+  [
+   "^(\\d+) Fotos · seit (.*) Uhr$",
+   "$1 fotos · desde $2"
+  ],
+  [
+   "^(\\d+) Fotos$",
+   "$1 fotos"
+  ],
+  [
+   "^(\\d+) Fotos · (.*)$",
+   "$1 fotos · $2"
+  ],
+  [
+   "^· seit (.*) Uhr$",
+   "· desde $1"
+  ],
+  [
+   "^([\\d.,]+) Fotos in dieser Ansicht$",
+   "$1 fotos en esta vista"
+  ],
+  [
+   "^([\\d.,]+) Medien in dieser Ansicht$",
+   "$1 archivos en esta vista"
+  ],
+  [
+   "^([\\d.,+]+) in dieser Ansicht$",
+   "$1 en esta vista"
+  ],
+  [
+   "^Alle (\\d+) ausgewählten Fotos wieder abwählen\\? Dabei wird kein Foto gelöscht – nur die Auswahl wird geleert\\.$",
+   "¿Deseleccionar de nuevo las $1 fotos seleccionadas? No se borra ninguna foto, solo se vacía la selección."
+  ],
+  [
+   "^Die aktuelle Auswahl \\((\\d+) Fotos\\) wird durch die Treffer ersetzt\\. Weiter\\?$",
+   "La selección actual ($1 fotos) se sustituirá por los resultados. ¿Continuar?"
+  ],
+  [
+   "^Die aktuelle Auswahl \\((\\d+) Fotos\\) wird durch „(.*)“ ersetzt\\. Weiter\\?$",
+   "La selección actual ($1 fotos) se sustituirá por «$2». ¿Continuar?"
+  ],
+  [
+   "^„(.*)“ aus der Liste löschen\\? Dabei wird kein Foto gelöscht\\.$",
+   "¿Quitar «$1» de la lista? No se borra ninguna foto."
+  ],
+  [
+   "^Es sind höchstens (\\d+) Fotos pro Show möglich – die ersten wurden ausgewählt\\.$",
+   "Como máximo caben $1 fotos por pase; se han seleccionado las primeras."
+  ],
+  [
+   "^Höchstens (\\d+) Fotos pro Show\\.$",
+   "Máximo $1 fotos por pase."
+  ],
+  [
+   "^(\\d+) Video\\(s\\) wurden nicht auf den Rahmen geschickt \\(er zeigt nur Fotos\\)\\.$",
+   "$1 vídeo(s) no se enviaron al marco (solo muestra fotos)."
+  ],
+  [
+   "^(\\d+) gefunden, (\\d+) davon sinnvoll verteilt$",
+   "$1 encontradas, $2 repartidas con criterio"
+  ],
+  [
+   "^· (\\d+) gefunden, (\\d+) davon sinnvoll verteilt$",
+   "· $1 encontradas, $2 repartidas con criterio"
+  ],
+  [
+   "^Alle Treffer sind schon ausgewählt – tippe ein Foto an, um es abzuwählen\\.$",
+   "Todos los resultados ya están seleccionados; toca una foto para deseleccionarla."
+  ],
+  [
+   "^Musik: (.*)$",
+   "Música: $1"
+  ],
+  [
+   "^Spielt: (.*)$",
+   "Sonando: $1"
+  ],
+  [
+   "^Fertig: (\\d+) Fotos, (.*) Laufzeit\\.$",
+   "Listo: $1 fotos, $2 de duración."
+  ],
+  [
+   "^(\\d+) Fotos werden zu einem Video für den Fernseher\\.$",
+   "De $1 fotos se hará un vídeo para la tele."
+  ],
+  [
+   "^Video wird vorbereitet … (\\d+) %$",
+   "Preparando vídeo … $1 %"
+  ],
+  [
+   "^(.*) läuft auf (.*)\\.$",
+   "$1 se reproduce en $2."
+  ],
+  [
+   "^(\\d+) Videos? wird?e?n? ?vorbereitet.*$",
+   "$1 vídeo(s) en preparación"
+  ],
+  [
+   "^📺 (.*) · (.*)$",
+   "📺 $1 · $2"
+  ],
+  [
+   "^● bereit · zeigt (.*)$",
+   "● lista · mostrando $1"
+  ],
+  [
+   "^Am Fernseher einmal im Browser (.*) öffnen$",
+   "En la tele, abre $1 en el navegador una vez"
+  ],
+  [
+   "^\\((.*): (.*)\\)$",
+   "($1: $2)"
+  ],
+  [
+   "^„(.*)“ mit (\\d+) Fotos läuft gleich auf dem Bilderrahmen\\.$",
+   "«$1» con $2 fotos se reproducirá en breve en el marco."
+  ],
+  [
+   "^\\(Test\\) (\\d+) Fotos als „?\\\"?(.*?)\\\"?“? wuerden auf den Rahmen gehen\\.$",
+   "(Prueba) $1 fotos como «$2» irían al marco."
+  ],
+  [
+   "^\\\"(.*)\\\" mit (\\d+) Fotos läuft gleich auf dem Bilderrahmen\\.$",
+   "«$1» con $2 fotos se reproducirá en breve en el marco."
+  ],
+  [
+   "^\\\"(.*)\\\" \\((\\d+) Medien\\) wurde an (.*) geschickt\\.(.*)$",
+   "«$1» ($2 archivos) se envió a $3.$4"
+  ],
+  [
+   "^ ?(.*) ist gerade nicht bereit – es startet, sobald die Seite (.*) dort geöffnet ist\\.$",
+   "$1 no está lista ahora; empezará en cuanto la página $2 esté abierta allí."
+  ],
+  [
+   "^(\\d+) Video\\(s\\) werden für den Fernseher vorbereitet – \\\"(.*)\\\" startet gleich auf (.*)\\.$",
+   "Se están preparando $1 vídeo(s) para la tele; «$2» empezará en breve en $3."
+  ],
+  [
+   "^Zu viele Versuche\\. Bitte in (\\d+) Minuten? erneut\\.?$",
+   "Demasiados intentos. Inténtalo de nuevo en $1 minuto(s)."
+  ],
+  [
+   "^Zu viele Versuche\\. Bitte in (\\d+) Minuten? erneut versuchen\\.$",
+   "Demasiados intentos. Inténtalo de nuevo en $1 minuto(s)."
+  ],
+  [
+   "^Bitte 1 bis (\\d+) Fotos auswaehlen$",
+   "Selecciona de 1 a $1 fotos"
+  ],
+  [
+   "^Für den Fernseher höchstens (\\d+) Fotos pro Video\\.$",
+   "Máximo $1 fotos por vídeo para la tele."
+  ],
+  [
+   "^Gemerkt: „(.*)“ – steht jetzt unter „Meine Diashows“\\.$",
+   "Guardado: «$1»; ahora está en «Mis presentaciones»."
+  ],
+  [
+   "^„(.*)“ entfernt\\.$",
+   "«$1» eliminado."
+  ],
+  [
+   "^„(.*)“ war nicht gemerkt \\(aus dem Verlauf entfernt\\)\\.$",
+   "«$1» no estaba guardado (quitado del historial)."
+  ],
+  [
+   "^Läuft gerade: \\\"(.*)\\\" \\((.*) Fotos, seit (.*)\\)$",
+   "En curso: «$1» ($2 fotos, desde $3)"
+  ],
+  [
+   "^(.*) – läuft gleich auf dem Bilderrahmen\\.$",
+   "$1 – se reproducirá en breve en el marco."
+  ],
+  [
+   "^\\(Test\\) (.*)$",
+   "(Prueba) $1"
+  ],
+  [
+   "^Das habe ich nicht verstanden\\. Beispiel: (.*)\\.$",
+   "No he entendido eso. Ejemplo: $1."
+  ],
+  [
+   "^Es gibt mehrere Personen namens (.*)\\. Bitte in Immich eindeutig benennen\\.$",
+   "Hay varias personas llamadas $1. Nómbralas de forma única en Immich."
+  ],
+  [
+   "^Welche Person meinst du mit \\\"(.*)\\\"\\? (.*)$",
+   "¿Qué persona quieres decir con «$1»? $2"
+  ],
+  [
+   "^(\\d+) Fotos – (.*)$",
+   "$1 fotos – $2",
+   "beschreibung"
+  ],
+  [
+   "^(.*) oder (.*)$",
+   "$1 o $2"
+  ],
+  [
+   "^z\\. B\\. (.*)$",
+   "p. ej. $1"
+  ],
+  [
+   "^„(.*)“$",
+   "«$1»"
+  ],
+  [
+   "^· (\\d+) Fotos$",
+   "· $1 fotos"
+  ],
+  [
+   "^· 1 Foto$",
+   "· 1 foto"
+  ],
+  [
+   "^(\\d+) Titel hinzugefügt\\.$",
+   "$1 tema(s) añadido(s)."
+  ],
+  [
+   "^Lade (\\d+) von (\\d+): (.*) …$",
+   "Subiendo $1 de $2: $3 …"
+  ],
+  [
+   "^„(.*)“ von diesem Server entfernen\\?$",
+   "¿Quitar «$1» de este servidor?"
+  ],
+  [
+   "^Die Datei ist groesser als (\\d+) MB$",
+   "El archivo es mayor de $1 MB"
+  ],
+  [
+   "^Immich (\\d+\\.\\d+\\.\\d+) gefunden\\.$",
+   "Immich $1 encontrado."
+  ],
+  [
+   "^Fehler (\\d+)$",
+   "Error $1"
+  ],
+  [
+   "^(.*) \\(Die Motivsuche nach \\\"(.*)\\\" ist gerade nicht verfuegbar – ohne Motiv gesucht\\)$",
+   "$1 (La búsqueda de «$2» no está disponible ahora; se buscó sin ella)"
+  ],
+  [
+   "^(\\d+) Fotos – (.*) \\(Die Motivsuche nach \\\"(.*)\\\" ist gerade nicht verfuegbar – ohne Motiv gesucht\\)$",
+   "$1 fotos – $2 (La búsqueda de «$3» no está disponible ahora; se buscó sin ella)",
+   "beschreibung"
+  ],
+  [
+   "^Immich Showcase(?: \\(.*\\))? ([\\w.\\-]+)$",
+   "Immich Showcase $1"
+  ]
+ ],
+ "beschreibung": [
+  [
+   " und ",
+   " y "
+  ],
+  [
+   "(^| |, )aus (\\d{4})",
+   "$1de $2"
+  ],
+  [
+   "vom (\\S+) bis (\\S+)",
+   "del $1 al $2"
+  ],
+  [
+   "\\((\\d+) Zeitraeume\\)",
+   "($1 períodos)"
+  ],
+  [
+   "nur Favoriten",
+   "solo favoritas"
+  ]
+ ]
+}

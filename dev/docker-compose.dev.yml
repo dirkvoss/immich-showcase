@@ -1,0 +1,31 @@
+# Entwicklungsinstanz: baut Immich Showcase direkt aus dem Arbeitsverzeichnis und haengt sich an das Test-Immich (Netzwerk immich_default).
+name: showcase-dev
+services:
+  showcase:
+    build: ..
+    image: showcase:dev
+    container_name: showcase_dev
+    restart: unless-stopped
+    user: "10001:10001"
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 768m
+    ports: ["8090:8090"]
+    env_file: [./container.env]
+    environment:
+      RAHMEN_WEB_PIN_FILE: /data/pin
+      RAHMEN_WEB_SECRET_FILE: /data/secret
+      RAHMEN_WEB_AUTH_STATE: /data/auth.json
+      RAHMEN_WEB_SHOWS_FILE: /data/shows.json
+      SHOWCASE_VERSION: dev
+      RAHMEN_STATE_DIR: /var/lib/bilderrahmen
+      TZ: Europe/Berlin
+    volumes:
+      - ./data:/data
+      - ./state:/var/lib/bilderrahmen
+    networks: [immich_default]
+networks:
+  immich_default:
+    external: true

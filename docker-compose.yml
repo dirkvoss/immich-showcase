@@ -1,0 +1,74 @@
+# Immich Showcase – komplette Installation per Docker Compose.
+#
+#   1.  cp .env.example .env      und mindestens RAHMEN_IMMICH_URL + RAHMEN_IMMICH_KEY eintragen
+#   2.  docker compose up -d
+#   3.  docker compose logs showcase      (beim ersten Start steht dort die erzeugte PIN, falls SHOWCASE_PIN nicht gesetzt ist)
+#   4.  http://<server>:8090 oeffnen
+#
+# Alle Einstellungen stehen in der Datei .env (siehe .env.example mit Erklaerungen). Dort nicht gesetzte Werte haben sichere Vorgaben.
+# Immich in einem anderen Docker-Netzwerk?  COMPOSE_FILE=docker-compose.yml:docker-compose.immich-network.yml in .env setzen
+# (oder RAHMEN_IMMICH_URL auf http://<immich-host>:2283/api zeigen lassen). Selbst bauen: COMPOSE_FILE=docker-compose.yml:docker-compose.build.yml.
+name: showcase
+
+services:
+  showcase:
+    image: ghcr.io/dirkvoss/immich-showcase:${SHOWCASE_VERSION:-latest}
+    container_name: ${SHOWCASE_CONTAINER:-showcase}
+    restart: unless-stopped
+    # Laeuft ohne Root, mit schreibgeschuetztem Dateisystem und ohne Zusatzrechte. Bei einem Ordner statt Volume als Datenverzeichnis
+    # SHOWCASE_UID/SHOWCASE_GID auf den Besitzer des Ordners setzen.
+    user: "${SHOWCASE_UID:-10001}:${SHOWCASE_GID:-10001}"
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: ${SHOWCASE_MEMORY:-768m}
+    pids_limit: 256
+    ports:
+      - "${SHOWCASE_BIND:-0.0.0.0}:${SHOWCASE_PORT:-8090}:8090"
+    environment:
+      TZ: ${TZ:-Europe/Berlin}
+      SHOWCASE_PIN: ${SHOWCASE_PIN:-}
+      # --- Immich ---
+      RAHMEN_IMMICH_URL: ${RAHMEN_IMMICH_URL:-}
+      RAHMEN_IMMICH_KEY: ${RAHMEN_IMMICH_KEY:-}
+      RAHMEN_ML_URL: ${RAHMEN_ML_URL:-}
+      RAHMEN_DB_DSN: ${RAHMEN_DB_DSN:-}
+      RAHMEN_FACETTEN: ${RAHMEN_FACETTEN:-}
+      RAHMEN_MOTIV_OHNE_DB: ${RAHMEN_MOTIV_OHNE_DB:-60}
+      # --- Zugang ---
+      RAHMEN_WEB_AUTH: ${RAHMEN_WEB_AUTH:-pin}
+      RAHMEN_WEB_LAN: ${RAHMEN_WEB_LAN:-}
+      RAHMEN_WEB_PROXIES: ${RAHMEN_WEB_PROXIES:-}
+      # --- Darstellung / Einsatzzweck ---
+      RAHMEN_WEB_NAME: ${RAHMEN_WEB_NAME:-Immich Showcase}
+      RAHMEN_WEB_MODUS: ${RAHMEN_WEB_MODUS:-beides}
+      RAHMEN_WEB_BEISPIELE: ${RAHMEN_WEB_BEISPIELE:-Sommer 2022; Geburtstag; Strand}
+      RAHMEN_WEB_BEISPIELE_EN: ${RAHMEN_WEB_BEISPIELE_EN:-Summer 2022; Birthday; Beach}
+      RAHMEN_WEB_ALIASE: ${RAHMEN_WEB_ALIASE:-}
+      # --- Fernseher ---
+      RAHMEN_WEB_TV_URL: ${RAHMEN_WEB_TV_URL:-}
+      RAHMEN_WEB_TV_ZIELE: ${RAHMEN_WEB_TV_ZIELE:-lg=LG TV,shield=Shield}
+      RAHMEN_WEB_VIDEO_CACHE_MB: ${RAHMEN_WEB_VIDEO_CACHE_MB:-3000}
+      RAHMEN_WEB_MUSIK_UPLOAD: ${RAHMEN_WEB_MUSIK_UPLOAD:-0}
+      RAHMEN_WEB_MUSIK_MAX_MB: ${RAHMEN_WEB_MUSIK_MAX_MB:-100}
+      RAHMEN_WEB_MUSIK_GESAMT_MB: ${RAHMEN_WEB_MUSIK_GESAMT_MB:-2000}
+      # --- Bilderrahmen (eingebauter Player) ---
+      RAHMEN_WEB_RAHMEN_ZIELE: ${RAHMEN_WEB_RAHMEN_ZIELE:-}
+      RAHMEN_WEB_RAHMEN_SEK: ${RAHMEN_WEB_RAHMEN_SEK:-8}
+      RAHMEN_WEB_RAHMEN_QUELLEN: ${RAHMEN_WEB_RAHMEN_QUELLEN:-}
+      RAHMEN_WEB_RAHMEN_ALBEN: ${RAHMEN_WEB_RAHMEN_ALBEN:-}
+      RAHMEN_WEB_RAHMEN_MARKER: ${RAHMEN_WEB_RAHMEN_MARKER:-}
+      RAHMEN_WEB_RAHMEN_ALARM_MIN: ${RAHMEN_WEB_RAHMEN_ALARM_MIN:-15}
+      # --- Benachrichtigung (Pushover, optional) ---
+      RAHMEN_WEB_PUSHOVER_API_KEY: ${RAHMEN_WEB_PUSHOVER_API_KEY:-}
+      RAHMEN_WEB_PUSHOVER_USER_KEY: ${RAHMEN_WEB_PUSHOVER_USER_KEY:-}
+      RAHMEN_WEB_PUSHOVER_DEVICE: ${RAHMEN_WEB_PUSHOVER_DEVICE:-}
+    volumes:
+      # Benanntes Volume: Docker legt es mit den richtigen Rechten an. Statt dessen z. B. ./data:/data (dann SHOWCASE_UID/GID anpassen).
+      - ${SHOWCASE_DATA:-showcase_data}:/data
+      # Eigene Musik als Ordner einbinden: je Unterordner eine Sammlung mit mp3/ogg/m4a-Dateien (siehe README)
+      # - ./musik:/data/musik:ro
+
+volumes:
+  showcase_data:

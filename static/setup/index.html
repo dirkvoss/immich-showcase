@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<script src="/i18n.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<title>Immich Showcase – Einrichtung</title>
+<style>
+@font-face { font-family: "Cormorant Garamond"; font-weight: 600; font-style: normal; font-display: swap; src: url(/fonts/cormorant-600.woff2) format("woff2"); }
+:root { --bg: #f6f4ef; --card: #fff; --text: #1e2430; --muted: #6b7280; --line: #e3dfd6; --accent: #b4532a; --accent-text: #fff; --ok: #2f7d4f; --danger: #b42318; }
+@media (prefers-color-scheme: dark) { :root { --bg: #14181f; --card: #1e242e; --text: #eceff4; --muted: #9aa4b2; --line: #2e3643; --accent: #e0834f; --accent-text: #1a1208; --ok: #5cc28a; --danger: #ff8a7a; } }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+main { max-width: 460px; margin: 0 auto; padding: 6vh 16px 40px; }
+.logo { display: block; width: 96px; height: 96px; margin: 0 auto 10px; border-radius: 22px; box-shadow: 0 8px 22px rgba(0,0,0,.25); }
+h1 { font: 600 44px/1 "Cormorant Garamond", Georgia, serif; text-align: center; margin: 0 0 4px; }
+.sub { text-align: center; color: var(--muted); margin: 0 0 22px; }
+.karte { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
+.schritte { display: flex; gap: 6px; justify-content: center; margin-bottom: 16px; }
+.schritte i { width: 28px; height: 5px; border-radius: 3px; background: var(--line); }
+.schritte i.an { background: var(--accent); }
+label { display: block; margin: 12px 0 4px; font-weight: 600; font-size: 14px; }
+input { width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); color: inherit; font: inherit; }
+.tipp { color: var(--muted); font-size: 13px; margin: 6px 0 0; }
+.knoepfe { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+button { min-height: 48px; padding: 0 20px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: inherit; font: inherit; font-weight: 600; cursor: pointer; }
+button.primaer { background: var(--accent); color: var(--accent-text); border-color: transparent; }
+button:disabled { opacity: .5; }
+.meldung { min-height: 1.4em; margin-top: 12px; font-size: 14px; }
+.meldung.fehler { color: var(--danger); } .meldung.gut { color: var(--ok); }
+.versteckt { display: none !important; }
+.pin { font: 600 40px/1 "Cormorant Garamond", Georgia, serif; letter-spacing: .25em; text-align: center; margin: 12px 0; }
+.wahl { display: flex; gap: 8px; margin: 4px 0 8px; }
+.wahl button { flex: 1; min-height: 40px; font-size: 14px; }
+.wahl button.an { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <img class="logo" src="/icon-512.png" alt="">
+  <h1>Immich Showcase</h1>
+  <p class="sub">Einrichtung</p>
+  <div class="karte">
+    <div class="schritte"><i id="p1" class="an"></i><i id="p2"></i><i id="p3"></i></div>
+
+    <section id="s1">
+      <p>Willkommen! In drei Schritten verbindest du Immich Showcase mit deinem Immich.</p>
+      <label for="code">Einrichtungs-Code</label>
+      <input id="code" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="6 Ziffern">
+      <p class="tipp">Den Code zeigt Immich Showcase beim Start im Protokoll: <code>docker compose logs showcase</code></p>
+      <label for="url">Adresse von Immich</label>
+      <input id="url" type="url" autocapitalize="none" placeholder="http://192.168.1.10:2283" value="">
+      <p class="tipp">So, wie du Immich im Browser öffnest. Im selben Docker-Netzwerk: <code>http://immich_server:2283</code></p>
+      <div class="meldung" id="m1" role="alert"></div>
+      <div class="knoepfe"><button class="primaer" id="w1">Weiter</button></div>
+    </section>
+
+    <section id="s2" class="versteckt">
+      <p id="verb" class="tipp"></p>
+      <div class="wahl"><button id="wahlKonto" class="an" type="button">Mit Immich-Konto</button><button id="wahlKey" type="button">Mit API-Schlüssel</button></div>
+      <div id="kontoBlock">
+        <label for="mail">E-Mail-Adresse (Immich)</label>
+        <input id="mail" type="email" autocomplete="username" autocapitalize="none">
+        <label for="pw">Passwort</label>
+        <input id="pw" type="password" autocomplete="current-password">
+        <p class="tipp">Immich Showcase legt damit einmalig einen eigenen Schlüssel „Immich Showcase (Dienst)“ ohne Lösch-Rechte an. Das Passwort wird nicht gespeichert.</p>
+      </div>
+      <div id="keyBlock" class="versteckt">
+        <label for="key">API-Schlüssel</label>
+        <input id="key" type="password" autocomplete="off" autocapitalize="none">
+        <p class="tipp">Immich → Kontoeinstellungen → API-Schlüssel. Rechte siehe Anleitung; keine Lösch-Rechte für Fotos vergeben.</p>
+      </div>
+      <div class="meldung" id="m2" role="alert"></div>
+      <div class="knoepfe"><button id="z2">Zurück</button><button class="primaer" id="w2">Weiter</button></div>
+    </section>
+
+    <section id="s3" class="versteckt">
+      <label for="pin">PIN für die App (6 Ziffern, optional)</label>
+      <input id="pin" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="leer lassen = zufällige PIN">
+      <label for="name">Name der App (optional)</label>
+      <input id="name" maxlength="40" placeholder="Immich Showcase">
+      <div class="meldung" id="m3" role="alert"></div>
+      <div class="knoepfe"><button id="z3">Zurück</button><button class="primaer" id="w3">Einrichtung abschließen</button></div>
+    </section>
+
+    <section id="s4" class="versteckt">
+      <p><b>Geschafft.</b> Immich Showcase startet jetzt neu …</p>
+      <div id="pinBox" class="versteckt"><p>Deine PIN (bitte merken, sie wird nur jetzt angezeigt):</p><div class="pin" id="pinAnzeige"></div></div>
+      <p class="tipp" id="warte">Einen Moment, die Seite öffnet sich gleich von selbst.</p>
+    </section>
+  </div>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+let basis = "", modus = "konto";
+async function api(pfad, daten) {
+  const r = await fetch("/api/setup/" + pfad, { method: "POST", headers: { "Content-Type": "application/json", "X-Rahmen": "1" }, body: JSON.stringify(daten) });
+  let d = {}; try { d = await r.json(); } catch (e) {}
+  if (!r.ok) throw new Error(d.nachricht || "Fehler " + r.status);
+  return d;
+}
+function schritt(n) { for (let i = 1; i <= 4; i++) $("#s" + i).classList.toggle("versteckt", i !== n); for (let i = 1; i <= 3; i++) $("#p" + i).classList.toggle("an", i <= n); }
+function meld(id, text, gut) { const m = $(id); m.textContent = text || ""; m.className = "meldung" + (text ? (gut ? " gut" : " fehler") : ""); }
+$("#w1").addEventListener("click", async () => {
+  meld("#m1", ""); $("#w1").disabled = true;
+  try { const d = await api("pruefen", { code: $("#code").value.trim(), url: $("#url").value }); basis = d.url; $("#verb").textContent = "Immich " + d.immich_version + " gefunden."; schritt(2); }
+  catch (e) { meld("#m1", e.message); }
+  $("#w1").disabled = false;
+});
+$("#wahlKonto").addEventListener("click", () => { modus = "konto"; $("#kontoBlock").classList.remove("versteckt"); $("#keyBlock").classList.add("versteckt"); $("#wahlKonto").classList.add("an"); $("#wahlKey").classList.remove("an"); });
+$("#wahlKey").addEventListener("click", () => { modus = "key"; $("#keyBlock").classList.remove("versteckt"); $("#kontoBlock").classList.add("versteckt"); $("#wahlKey").classList.add("an"); $("#wahlKonto").classList.remove("an"); });
+$("#z2").addEventListener("click", () => schritt(1));
+$("#w2").addEventListener("click", () => {
+  if (modus === "konto" && (!$("#mail").value.trim() || !$("#pw").value)) return meld("#m2", "Bitte E-Mail und Passwort eingeben.");
+  if (modus === "key" && !$("#key").value.trim()) return meld("#m2", "Bitte den API-Schlüssel eingeben.");
+  meld("#m2", ""); schritt(3);
+});
+$("#z3").addEventListener("click", () => schritt(2));
+$("#w3").addEventListener("click", async () => {
+  meld("#m3", ""); $("#w3").disabled = true;
+  const d = { code: $("#code").value.trim(), url: basis, pin: $("#pin").value.trim(), name: $("#name").value.trim() };
+  if (modus === "konto") { d.email = $("#mail").value.trim(); d.passwort = $("#pw").value; } else d.schluessel = $("#key").value.trim();
+  try {
+    const r = await api("speichern", d); schritt(4);
+    if (r.pin) { $("#pinAnzeige").textContent = r.pin; $("#pinBox").classList.remove("versteckt"); }
+    for (let i = 0; i < 60; i++) {
+      await new Promise(f => setTimeout(f, 1500));
+      try { const c = await (await fetch("/api/config", { cache: "no-store" })).json(); if (c.konfiguriert) { $("#warte").textContent = "Fertig – du kannst jetzt starten."; const a = document.createElement("button"); a.className = "primaer"; a.textContent = "Immich Showcase öffnen"; a.onclick = () => location.href = "/"; $("#s4").appendChild(a); if (!r.pin) location.href = "/"; return; } } catch (e) {}
+    }
+  } catch (e) { meld("#m3", e.message); $("#w3").disabled = false; }
+});
+</script>
+</body>
+</html>
