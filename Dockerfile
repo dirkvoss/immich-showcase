@@ -14,6 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
  && mkdir -p /data/state && chown -R 10001:10001 /data
 COPY rahmen_helfer.py rahmen_web.py postdeploy.py docker-entrypoint.sh ./
 COPY static ./static
+RUN python -W error::SyntaxWarning -c "import ast,sys; [ast.parse(open(f, encoding='utf-8').read(), f) for f in sys.argv[1:]]" rahmen_helfer.py rahmen_web.py postdeploy.py
 RUN chmod 755 /app/docker-entrypoint.sh
 ARG SHOWCASE_VERSION=dev
 ENV SHOWCASE_VERSION=$SHOWCASE_VERSION

@@ -10,6 +10,7 @@ trap 'docker rm -f "$N" >/dev/null 2>&1; docker volume rm "$V" >/dev/null 2>&1' 
 ok() { echo "OK   $*"; }; fail() { echo "FEHL $*"; docker logs "$N" 2>&1 | tail -20 || true; exit 1; }
 start() { docker run -d --name "$N" -p "$PORT:8090" -v "$V:/data" --read-only --tmpfs /tmp --cap-drop ALL \
   -e RAHMEN_IMMICH_URL=http://127.0.0.1:1/api -e RAHMEN_IMMICH_KEY=test "$@" "$IMG" >/dev/null; }
+log_hat() { for _ in $(seq 1 20); do docker logs "$N" 2>&1 | grep -q -- "$1" && return 0; sleep 0.5; done; return 1; }     # das Protokoll kann dem Start etwas hinterherhinken
 warte() { for _ in $(seq 1 40); do curl -fsS "http://127.0.0.1:$PORT/api/config" >/dev/null 2>&1 && return 0; sleep 1; done; return 1; }
 
 # 1. Ohne Pflichtangaben: Einrichtungsmodus mit Code im Protokoll, App-Daten gesperrt (503), Assistent erreichbar
@@ -17,8 +18,7 @@ start2() { docker run -d --name "$N" -p "$PORT:8090" -v "$V:/data" --read-only -
 start2
 warte || fail "Dienst startet im Einrichtungsmodus nicht"
 curl -fsS "http://127.0.0.1:$PORT/api/config" | grep -q '"konfiguriert":false' && ok "Einrichtungsmodus ohne Pflichtangaben" || fail "kein Einrichtungsmodus"
-gefunden=0; for _ in $(seq 1 20); do docker logs "$N" 2>&1 | grep -q "Einrichtungs-Code" && { gefunden=1; break; }; sleep 0.5; done     # das Protokoll kann dem Start etwas hinterherhinken
-[[ $gefunden == 1 ]] && ok "Einrichtungs-Code im Protokoll" || fail "kein Einrichtungs-Code im Protokoll"
+log_hat "Einrichtungs-Code" && ok "Einrichtungs-Code im Protokoll" || fail "kein Einrichtungs-Code im Protokoll"
 code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/api/neueste")"; [[ "$code" == 503 ]] && ok "App-Daten im Einrichtungsmodus gesperrt (503)" || fail "erwartet 503, war $code"
 code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/setup/")"; [[ "$code" == 200 ]] && ok "Einrichtungsseite erreichbar" || fail "Einrichtungsseite $code"
 code="$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'X-Rahmen: 1' -H 'Content-Type: application/json' -d '{"code":"000000","url":"http://x:1"}' "http://127.0.0.1:$PORT/api/setup/pruefen")"; [[ "$code" == 403 ]] && ok "falscher Einrichtungs-Code abgelehnt" || fail "falscher Code: $code"
@@ -28,6 +28,7 @@ docker rm -f "$N" >/dev/null; docker volume rm "$V" >/dev/null
 start
 warte || fail "Dienst startet nicht"
 ok "Dienst laeuft nur mit URL und Schluessel"
+log_hat "Erste PIN" || fail "keine PIN im Protokoll"
 PIN="$(docker logs "$N" 2>&1 | sed -n 's/.*Erste PIN[^:]*: \([0-9]\{6\}\).*/\1/p' | head -1)"
 [[ -n "$PIN" ]] && ok "erste PIN im Protokoll" || fail "keine PIN im Protokoll"
 curl -fsS "http://127.0.0.1:$PORT/api/config" | grep -q '"auth":"pin"' && ok "Vorgabe: PIN-Anmeldung"
@@ -40,7 +41,7 @@ rm -f /tmp/postdeploy-$$.txt
 
 # 3. Neustart: PIN bleibt, wird nicht neu erzeugt
 docker restart "$N" >/dev/null; warte || fail "Dienst startet nach Neustart nicht"
-[[ "$(docker logs "$N" 2>&1 | grep -c 'Erste PIN')" == 1 ]] && ok "PIN bleibt nach Neustart (Volume)" || fail "PIN wurde neu erzeugt"
+sleep 2; [[ "$(docker logs "$N" 2>&1 | grep -c 'Erste PIN')" == 1 ]] && ok "PIN bleibt nach Neustart (Volume)" || fail "PIN wurde neu erzeugt"
 curl -fsS -X POST -H 'X-Rahmen: 1' -H 'Content-Type: application/json' -d "{\"pin\":\"$PIN\"}" "http://127.0.0.1:$PORT/api/login" | grep -q '"ok":true' && ok "alte PIN gilt weiter" || fail "alte PIN gilt nicht mehr"
 
 # 4. Vorgegebene PIN

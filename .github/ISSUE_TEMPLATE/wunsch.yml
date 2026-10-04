@@ -1,11 +1,20 @@
-name: Wunsch / Idee
-description: Eine neue Funktion oder Verbesserung vorschlagen
+name: Wish or idea / Wunsch oder Idee
+description: Suggest a new feature or an improvement / Eine neue Funktion oder Verbesserung vorschlagen
 labels: [enhancement]
 body:
   - type: textarea
     id: idee
-    attributes: {label: Was wünschst du dir?, description: "Und wofür brauchst du es?"}
-    validations: {required: true}
+    attributes:
+      label: "What would you like? / Was wünschst du dir?"
+      description: "And what do you need it for? / Und wofür brauchst du es?"
+    validations:
+      required: true
   - type: dropdown
     id: einsatz
-    attributes: {label: Einsatzzweck, options: [Bilderrahmen, Fernseher, Beides, Anderes]}
+    attributes:
+      label: "Use / Einsatzzweck"
+      options:
+        - Picture frame / Bilderrahmen
+        - TV / Fernseher
+        - Both / Beides
+        - Other / Anderes
