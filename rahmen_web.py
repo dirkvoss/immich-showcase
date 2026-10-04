@@ -1016,6 +1016,7 @@ def player_ereignis(z, felder):
         ev = {"seq": t["seq"], "typ": "start", "seit": datetime.datetime.now().isoformat(timespec="seconds"), **felder}
         t["events"] = (t["events"] + [ev])[-30:]
         t["aktiv"] = ev
+    aktiv_speichern()
 
 
 def player_zeigen(name, ids, reihe="alt"):
@@ -1037,6 +1038,7 @@ def rahmen_normal():
             t["events"] = (t["events"] + [{"seq": t["seq"], "typ": "steuer", "aktion": "stopp", "wert": ""}])[-30:]
             t["aktiv"] = None
         AKTIV_BESITZER.pop(PLAYER, None)
+        aktiv_speichern()
         return {"ok": True, "nachricht": "Der Bilderrahmen zeigt wieder das normale Programm."}
     return H.normal()
 
@@ -1422,6 +1424,38 @@ TV_ZIELE.update(RAHMEN_ZIELE)
 TV_ZIELE["test"] = "Test (nur Entwicklung)"
 TV_VERSTECKT = {"test"}          # Ziele, die in der App nicht erscheinen (Automatiktests laufen auf /tv/?ziel=test statt auf dem echten Fernseher)
 TV = {z: {"hb": 0.0, "seq": 0, "events": [], "aktiv": None, "tv_laeuft": False, "tv_name": "", "tv_musik": ""} for z in TV_ZIELE}
+AKTIV_FILE = os.environ.get("RAHMEN_WEB_AKTIV_FILE", os.path.join(os.path.dirname(SHOWS_FILE), "rahmen_web_aktiv.json"))
+
+
+def aktiv_speichern():
+    """Welche Show laeuft auf welchem Geraet - damit ein Neustart/Update des Servers sie nicht vergisst (die Seite am Geraet spielt sie ja weiter)."""
+    try:
+        daten = {z: {"ev": t["aktiv"], "uid": (AKTIV_BESITZER.get(z) or (None, None))[1]} for z, t in TV.items() if t.get("aktiv")}
+        os.makedirs(os.path.dirname(AKTIV_FILE), exist_ok=True)
+        tmp = AKTIV_FILE + ".tmp"
+        with open(tmp, "w") as f:
+            json.dump(daten, f)
+        os.replace(tmp, AKTIV_FILE)
+    except (OSError, TypeError, ValueError) as e:
+        H.log.warning("Laufende Show konnte nicht gespeichert werden: %s", e)
+
+
+def aktiv_laden():
+    try:
+        with open(AKTIV_FILE) as f:
+            daten = json.load(f)
+    except (OSError, ValueError):
+        return
+    for z, eintrag in (daten or {}).items():
+        ev = (eintrag or {}).get("ev")
+        if z in TV and isinstance(ev, dict) and ev.get("typ") == "start":
+            TV[z]["aktiv"] = ev
+            TV[z]["seq"] = max(TV[z]["seq"], int(ev.get("seq", 0)))
+            AKTIV_BESITZER[z] = (set(ev.get("ids") or []), eintrag.get("uid"))
+            H.log.info("Laufende Show '%s' auf %s nach dem Start wiederhergestellt", ev.get("name"), z)
+
+
+aktiv_laden()
 # Hintergrundmusik: KEINE Musik im Lieferumfang. Eigene Dateien (mp3, ogg, m4a) in MUSIK_DIR/<sammlung>/ legen (oder bei aktiviertem
 # Hochladen in der App hinzufuegen). Titel/Kuenstler kommen aus den Dateimarken (ID3), sonst aus dem Dateinamen; eine optionale
 # info.json je Ordner ("name", "stuecke": [{"datei","titel","urheber","lizenz"}]) ueberschreibt das. Wird als Wiedergabeliste abgespielt.
@@ -2365,6 +2399,8 @@ def steuer_senden(daten):
         t["events"] = (t["events"] + [{"seq": t["seq"], "typ": "steuer", "aktion": aktion, "wert": wert}])[-30:]
         if aktion == "stopp":
             t["aktiv"] = None
+    if aktion == "stopp":
+        aktiv_speichern()
     return {"ok": True}
 
 

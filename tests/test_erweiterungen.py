@@ -198,3 +198,27 @@ def test_ha_startet_gespeicherte_show(app_laden):
     r = ha.post("/api/ha/show", json={"ziel": "wz", "show": "sardinien"}, headers=H).json()
     assert r["ok"] and "Sardinien" in r["nachricht"]
     assert ha.post("/api/ha/show", json={"ziel": "wz", "show": "gibtsnicht"}, headers=H).status_code == 404
+
+
+# ---------------------------------------------------------------- Laufende Show ueberlebt einen Neustart des Servers
+def test_laufende_show_ueberlebt_neustart_und_stopp_wird_gemerkt(app_laden):
+    import conftest
+    ids = [a["id"] for a in conftest.ASSETS[:3]]
+    w, client, _ = app_laden(**LAN)
+    c = client()
+    assert c.post("/api/tv/senden", json={"ziel": "rahmen", "ids": ids, "name": "Sardinien"}, headers=H).json()["ok"]
+    w2, client2, _ = app_laden(**LAN)                                       # Neustart: frische Module, gleiche Dateien
+    ev = w2.TV["rahmen"]["aktiv"]
+    assert ev["name"] == "Sardinien" and set(ev["ids"]) == set(ids) and w2.TV["rahmen"]["seq"] >= ev["seq"]
+    assert client2().get("/api/tv/abfrage?ziel=rahmen&seq=-1").json()["events"][0]["name"] == "Sardinien"     # Seite laedt neu: Show laeuft weiter
+    assert client2().get("/api/rahmen/status").json()["rahmen"][0]["id"] == "rahmen"
+    client2().post("/api/tv/steuer", json={"ziel": "rahmen", "aktion": "stopp"}, headers=H)
+    w3, _, _ = app_laden(**LAN)
+    assert w3.TV["rahmen"]["aktiv"] is None
+
+
+def test_kaputte_aktiv_datei_stoert_den_start_nicht(app_laden, tmp_path):
+    (tmp_path / "data").mkdir(exist_ok=True)
+    (tmp_path / "data" / "rahmen_web_aktiv.json").write_text("{kaputt")
+    w, client, _ = app_laden(**LAN)
+    assert w.TV["rahmen"]["aktiv"] is None
