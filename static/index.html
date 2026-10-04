@@ -96,6 +96,8 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
 .alle { display: flex; align-items: center; gap: 10px; margin: 2px 0 4px; flex-wrap: wrap; }
 .alle .tipp { margin: 0; }
 .tipp { margin: 0 0 10px; font-size: 13px; color: var(--muted); }
+.versionszeile { text-align: center; font-size: 12px; color: var(--muted); margin: 18px 0 90px; opacity: .8; }
+.login .versionszeile { margin: 28px 0 0; }
 .hinweis { margin: 4px 0 12px; padding: 10px 12px; border-radius: 12px; background: var(--accent-soft); font-size: 14px; }
 .leer { text-align: center; color: var(--muted); padding: 40px 12px; }
 
@@ -232,6 +234,7 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
     <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" aria-label="PIN, 6 Ziffern">
   </div>
   <div id="loginFehler" class="fehler" role="alert"></div>
+  <p class="versionszeile" data-version></p>
 </div>
 
 <div id="appAnsicht" class="versteckt">
@@ -293,6 +296,7 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
       <div id="auswahlListe"></div>
     </section>
   </main>
+  <p class="versionszeile" data-version></p>
 
   <div class="leiste versteckt" id="leiste">
     <div class="innen">
@@ -468,7 +472,10 @@ function toast(text, schlecht = false) {
 // ---------------------------------------------------------------- Anmeldung
 async function zeigeLogin() {
   $("#appAnsicht").classList.add("versteckt"); $("#loginAnsicht").classList.remove("versteckt"); $("#pin").value = "";
-  let art = "pin"; try { art = (await (await fetch("/api/config", { cache: "no-store" })).json()).auth || "pin"; } catch (e) {}
+  let art = "pin"; try {
+    const c = await (await fetch("/api/config", { cache: "no-store" })).json(); art = c.auth || "pin";
+    document.querySelectorAll("[data-version]").forEach(e => { e.textContent = `${c.name || "Immich Showcase"} · ${RW_T("Version")} ${c.version || ""}`; });
+  } catch (e) {}
   const mitImmich = art !== "pin", mitPin = art !== "immich";
   $("#immichForm").classList.toggle("versteckt", !mitImmich); $("#pinBlock").classList.toggle("versteckt", !mitPin);
   $("#pinOder").classList.toggle("versteckt", !(mitImmich && mitPin));
@@ -1111,6 +1118,7 @@ async function konfigLaden() {
   try {
     konfig = await (await fetch("/api/config", { cache: "no-store" })).json();
     document.body.classList.remove("modus-laden"); document.body.classList.add("modus-" + (konfig.modus || "beides"));
+    document.querySelectorAll("[data-version]").forEach(e => { e.textContent = `${konfig.name || "Immich Showcase"} · ${RW_T("Version")} ${konfig.version || ""}`; });
     const bsp = beispielListe(), q = RW_LANG === "de" ? ["„", "“"] : (RW_LANG === "es" || RW_LANG === "fr") ? ["«", "»"] : ["“", "”"];
     if (bsp.length) {
       $("#sucheText").placeholder = RW_T("z. B.") + " " + bsp.slice(0, 2).join(", ");
