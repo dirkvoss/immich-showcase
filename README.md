@@ -21,6 +21,12 @@ The picture frame (continuous programme with blurred background, date, place and
 
 ![Frame](docs/screenshots/rahmen.png)
 
+With weather and appointments at the top right, device pairing by code/QR on the TV, and the Devices view in the app:
+
+| Frame with weather and appointments | Pair a device (TV/tablet) | Devices view |
+|---|---|---|
+| ![Weather](docs/screenshots/rahmen-zusatz.png) | ![Pairing](docs/screenshots/koppeln.png) | ![Devices](docs/screenshots/geraete.png) |
+
 *(All screenshots use invented sample photos.)*
 
 ## What it does

@@ -21,6 +21,12 @@ Der Bilderrahmen (Dauerprogramm mit unscharfem Hintergrund, Datum, Ort und Uhr):
 
 ![Rahmen](docs/screenshots/rahmen.png)
 
+Mit Wetter und Terminen oben rechts, Gerätekopplung per Code/QR am Fernseher und die Geräte-Ansicht in der App:
+
+| Rahmen mit Wetter und Terminen | Gerät koppeln (TV/Tablet) | Geräte-Ansicht |
+|---|---|---|
+| ![Wetter](docs/screenshots/rahmen-zusatz.png) | ![Kopplung](docs/screenshots/koppeln.png) | ![Geräte](docs/screenshots/geraete.png) |
+
 *(Alle Bilder zeigen erfundene Beispielfotos und die englische Oberfläche.)*
 
 ## Was es kann
