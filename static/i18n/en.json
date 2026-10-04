@@ -340,7 +340,11 @@
   "Oder scanne den Code mit der Handykamera.": "Or scan the code with your phone camera.",
   "morgen": "tomorrow",
   "Bildschirm aus": "Screen off",
-  "Bildschirm an": "Screen on"
+  "Bildschirm an": "Screen on",
+  "Tastatur (Rechner)": "Keyboard (computer)",
+  "Mit „/“ springst du zur Suche, mit „Esc“ schließt du Fenster.": "Press “/” to jump to search and “Esc” to close windows.",
+  "Konto": "Account",
+  "Geräte": "Devices"
  },
  "muster": [
   [

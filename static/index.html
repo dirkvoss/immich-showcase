@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <script src="/i18n.js"></script>
+<script src="/ikonen.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f4ef">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#14181f">
@@ -20,15 +21,18 @@
 @font-face { font-family: "Cormorant Garamond"; font-weight: 600; font-style: normal; font-display: swap; src: url(/fonts/cormorant-600.woff2) format("woff2"); }
 :root {
   --schrift-logo: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
-  --bg: #f6f4ef; --card: #ffffff; --text: #1e2430; --muted: #6b7280; --line: #e3dfd6;
-  --accent: #b4532a; --accent-text: #ffffff; --accent-soft: #f6e4da; --ok: #2f7d4f; --danger: #b42318;
-  --shadow: 0 1px 2px rgba(20,24,32,.08), 0 6px 18px rgba(20,24,32,.08);
+  --serif: var(--schrift-logo);
+  --bg: #f3eee4; --card: #fbf8f1; --text: #1d1b17; --muted: #5f594e; --line: #ddd4c4;
+  --accent: #8a6420; --accent-text: #fbf8f1; --accent-soft: #ecdfc3; --ok: #2f7d4f; --danger: #a8321f;
+  --shadow: 0 1px 2px rgba(40,30,10,.07), 0 8px 24px rgba(40,30,10,.09);
+  --ease: cubic-bezier(.16, 1, .3, 1); --r: 10px;
+  color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #14181f; --card: #1e242e; --text: #eceff4; --muted: #9aa4b2; --line: #2e3643;
-    --accent: #e0834f; --accent-text: #1a1208; --accent-soft: #3a2a20; --ok: #5cc28a; --danger: #ff8a7a;
-    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.35);
+    --bg: #0f1218; --card: #171b23; --text: #ece7db; --muted: #a29b8d; --line: #2a303b;
+    --accent: #dcae5c; --accent-text: #1a1408; --accent-soft: #2c2619; --ok: #5cc28a; --danger: #ff8a7a;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.4);
   }
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -111,6 +115,7 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
   border: 2px solid #fff; background: rgba(0,0,0,.28); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; font-weight: 700; }
 .foto.an img { transform: scale(.86); border-radius: 8px; }
 .foto.an { background: var(--accent-soft); box-shadow: inset 0 0 0 3px var(--accent); }
+.foto:not(.an) .haken .ic { opacity: 0; }
 .foto.an .haken { background: var(--accent); border-color: var(--accent); }
 .foto .gross { position: absolute; left: 4px; top: 4px; width: 30px; height: 30px; border-radius: 50%; border: 0;
   background: rgba(0,0,0,.45); color: #fff; font-size: 14px; display: flex; align-items: center; justify-content: center; }
@@ -222,9 +227,188 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
   border: 0; background: rgba(255,255,255,.18); color: #fff; font-size: 22px; }
 .lightbox .waehlen { position: absolute; bottom: calc(env(safe-area-inset-bottom) + 24px); left: 50%; transform: translateX(-50%); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* ===================================================================================================================
+   Galerie-Look: Papier (hell) und Nachtgalerie (dunkel), Messing-Akzent, Serifen-Beschriftungen, Fotos im Mittelpunkt
+   =================================================================================================================== */
+::selection { background: color-mix(in srgb, var(--accent) 32%, transparent); color: inherit; }
+* { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--muted) 45%, transparent) transparent; }
+input, select, textarea { caret-color: var(--accent); }
+a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+input[type=checkbox], input[type=radio] { accent-color: var(--accent); }
+.ic { width: 1.15em; height: 1.15em; vertical-align: -.2em; margin-right: .4em; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ic-stern, .ic-punkt { fill: currentColor; }
+.btn:focus-visible, select:focus-visible, input:focus-visible, .foto:focus-visible, summary:focus-visible, .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Kopf: eine Zeile, Symbole statt Textleiste */
+header { background: var(--bg); padding: calc(env(safe-area-inset-top) + 8px) 16px 0; }
+.kopf, .tabs { max-width: 1500px; margin-left: auto; margin-right: auto; }
+.kopf { gap: 6px 10px; align-items: center; }
+.kopf h1 { font: 600 24px/1 var(--serif); letter-spacing: .005em; }
+.kopf-name { white-space: nowrap; }
+.kopf-home { min-height: 44px; }
+.logo { width: 38px; height: 38px; border-radius: 10px; box-shadow: none; border: 1px solid var(--line); }
+.benutzer { order: 2; flex-basis: auto; margin: 0; gap: 0; justify-content: flex-end; }
+.benutzer .ik, .konto summary { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0; border-radius: var(--r); color: var(--muted); font-size: 0; background: none; border: 0; cursor: pointer; }
+.benutzer .ik .ic, .konto summary .ic { width: 22px; height: 22px; margin: 0; }
+.benutzer .ik:hover, .konto summary:hover, .konto[open] summary { background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text); }
+.konto { position: relative; }
+.konto summary { list-style: none; }
+.konto summary::-webkit-details-marker { display: none; }
+.konto-menu { position: absolute; right: 0; top: 46px; z-index: 40; min-width: 200px; padding: 12px 14px; display: grid; gap: 4px; font-size: 14px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+.konto-menu #benutzerName { font-weight: 600; color: var(--text); }
+.konto-menu #abmelden { text-align: left; color: var(--text); font-weight: 600; padding: 10px 0 4px; margin-top: 4px; border-top: 1px solid var(--line); }
+.konto-menu .versionskurz { margin: 4px 0 0; }
+#normalBtn { display: none !important; }
+@media (min-width: 700px) {
+  .benutzer .ik { font-size: 14px; font-weight: 600; width: auto; padding: 0 12px; gap: 6px; }
+  .benutzer .ik .ic { width: 18px; height: 18px; }
+}
+
+/* Rahmen-Status: schmale Leiste, kein Kleingedrucktes ueber der Ueberschrift */
+.laeuft { padding: 6px 12px; min-height: 42px; border-radius: var(--r); background: transparent; border: 1px solid var(--line); gap: 6px 10px; flex-wrap: wrap; }
+.laeuft.aktiv { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }
+.laeuft-text { flex: 1 1 220px; flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
+.laeuft-label { font-size: 13px; letter-spacing: 0; text-transform: none; font-weight: 500; color: var(--muted); }
+.laeuft.aktiv .laeuft-label { color: var(--accent); }
+.laeuft-name { font: 600 20px/1.15 var(--serif); }
+.laeuft-meta { flex-basis: 100%; }
+.reihe-sel { min-height: 36px; border-radius: 999px; background: var(--card); }
+.btn.zurueck { flex: 1 1 100%; max-width: none; white-space: normal; text-overflow: clip; }
+@media (min-width: 700px) { .btn.zurueck { flex: 0 1 auto; } .laeuft-meta { flex-basis: auto; } }
+
+/* Reiter */
+.tabs { margin-top: 2px; gap: 6px; }
+.tab { padding: 11px 4px; border-bottom-width: 2px; font-size: 15px; letter-spacing: .01em; transition: color .15s; }
+.tab:hover { color: var(--text); }
+@media (min-width: 700px) { .tabs { gap: 26px; } .tab { flex: none; } }
+
+main { padding: 14px 16px 24px; max-width: 1500px; }
+
+/* Schaltflaechen: ruhig, eine Hauptaktion in Messing */
+.btn { border-radius: var(--r); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; letter-spacing: .005em;
+  transition: background-color .15s, border-color .15s, transform .14s var(--ease); }
+.btn:hover { border-color: color-mix(in srgb, var(--text) 32%, var(--line)); }
+.btn:active { transform: scale(.98); }
+.btn.primaer:hover { background: color-mix(in srgb, var(--accent) 86%, var(--text)); border-color: transparent; }
+
+/* Filter: eine Chip-Zeile statt vier grosser Auswahlfelder */
+.filter { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px 8px; padding: 2px 16px 4px; scrollbar-width: none; }
+.filter::-webkit-scrollbar { display: none; }
+.filter select { flex: 0 0 auto; appearance: none; -webkit-appearance: none; min-height: 38px; padding: 0 32px 0 14px; border-radius: 999px; font-size: 14px;
+  background: var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b8578' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center / 12px; }
+.filter select:not(:has(option:first-child:checked)) { border-color: var(--accent); background-color: var(--accent-soft); font-weight: 600; }
+.filter .btn.klein { flex: none; border-radius: 999px; }
+.alle { margin: 2px 0; gap: 6px; }
+.alle .btn.klein { min-height: 34px; border-radius: 999px; font-size: 13px; background: transparent; }
+.alle .btn.klein.primaer { background: var(--accent); }
+.alle .tipp { margin-left: auto; font-variant-numeric: tabular-nums; }
+
+/* Tage und Fotos */
+.tag { margin: 22px 0 8px; padding-bottom: 6px; align-items: baseline; border-bottom: 1px solid var(--line); }
+.tag h2 { font: 600 25px/1.1 var(--serif); letter-spacing: .005em; min-width: 0; }
+@media (max-width: 420px) { .tag h2 { font-size: 22px; } }
+.tag .btn.klein { min-height: 32px; padding: 0 4px; border: 0; background: none; color: var(--accent); font-size: 13px; white-space: nowrap; flex: none; }
+.raster { grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 4px; }
+@media (min-width: 700px) { .raster { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; } }
+@media (min-width: 1100px) { .raster { grid-template-columns: repeat(auto-fill, minmax(178px, 1fr)); } }
+.foto { border-radius: 4px; }
+.foto img { transition: transform .4s var(--ease); }
+@media (hover: hover) { .foto:hover img { transform: scale(1.035); } }
+.foto.an img { transform: none; border-radius: 0; }
+.foto.an { background: var(--accent); box-shadow: none; }
+.foto.an::after { content: ""; position: absolute; inset: 0; border: 3px solid var(--accent); border-radius: 4px; pointer-events: none; }
+.foto .haken { width: 26px; height: 26px; font-size: 0; border-color: rgba(255,255,255,.92); background: rgba(0,0,0,.34); }
+.foto .haken .ic, .foto .gross .ic { width: 14px; height: 14px; margin: 0; stroke-width: 2.4; }
+.foto.an .haken { background: var(--accent); border-color: var(--accent); color: var(--accent-text); animation: pop .24s var(--ease); }
+.foto .gross { font-size: 0; }
+@keyframes pop { from { transform: scale(.4); opacity: .3; } to { transform: scale(1); opacity: 1; } }
+
+/* Shows */
+.karte { border-radius: 12px; box-shadow: none; padding: 14px; }
+.karte h3 { font: 600 23px/1.15 var(--serif); }
+
+/* Auswahlleiste: Zaehler und kleine Werkzeuge oben, Name, dann die zwei Senden-Knoepfe */
+.leiste { border-radius: 18px 18px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,.2); padding: 12px 16px calc(env(safe-area-inset-bottom) + 12px); }
+body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
+.leiste .innen { gap: 10px; }
+.leiste .zaehler { font: 600 21px/1.1 var(--serif); }
+.leiste .zaehler small { font: 400 13px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+.leiste .werkzeuge { display: flex; gap: 2px; }
+.leiste .werkzeuge .btn { font-size: 0; min-width: 40px; min-height: 40px; padding: 0; border-color: transparent; background: transparent; color: var(--muted); }
+.leiste .werkzeuge .btn .ic { width: 20px; height: 20px; margin: 0; }
+.leiste .werkzeuge .btn:hover { color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.leiste .werkzeuge .btn.gefahr:hover { color: var(--danger); }
+.leiste .zeile2 { display: flex; align-items: center; gap: 10px; }
+.leiste input[type=text] { min-height: 46px; border-radius: var(--r); background: var(--bg); }
+.leiste .merken { padding: 0 2px; }
+.leiste .zeile3 { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
+.leiste .zeile3 .btn { min-height: 50px; font-size: 16px; }
+
+/* Fenster: Serifen-Titel, weiche Bewegung, am Rechner mittig */
+.tvkarte { border-radius: 20px 20px 0 0; }
+.tvkarte h2 { font: 600 30px/1.1 var(--serif); }
+#hilfeDialog h3, .tvkarte h3 { font: 600 21px/1.2 var(--serif); }
+.tvdialog:not(.versteckt) .tvkarte { animation: hoch .28s var(--ease) both; }
+@keyframes hoch { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (min-width: 700px) { .tvdialog { align-items: center; } .tvkarte { border-radius: 18px; max-height: 88vh; } }
+.geraet { border-radius: var(--r); }
+.geraet .art .ic { width: 22px; height: 22px; margin: 0; color: var(--muted); }
+.tvziel { border-radius: 12px; }
+
+/* Anmeldung */
+.login h1 { font-size: 64px; }
+.login .untertitel { color: var(--accent); }
+
+/* Rechner: Fotos links, Auswahl als feste Seitenleiste rechts */
+@media (min-width: 1000px) {
+  body.mit-leiste main { padding-right: 372px; }
+  body.mit-leiste { padding-bottom: 40px; }
+  .leiste { left: auto; right: max(16px, calc((100vw - 1500px) / 2 + 16px)); top: 138px; bottom: auto; width: 340px; border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 18px; max-height: calc(100vh - 160px); overflow: auto; animation: hoch .3s var(--ease) both; }
+  .leiste .innen { max-width: none; gap: 14px; }
+  .leiste .zeile1 { flex-wrap: wrap; gap: 8px; }
+  .leiste .werkzeuge { flex-basis: 100%; gap: 6px; }
+  .leiste .werkzeuge .btn { font-size: 13px; min-height: 34px; padding: 0 12px; border-color: var(--line); color: var(--text); }
+  .leiste .werkzeuge .btn .ic { width: 16px; height: 16px; margin-right: 6px; }
+  .leiste .zeile3 { grid-auto-flow: row; }
+  .toast { bottom: 28px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 </style>
 </head>
 <body class="modus-laden">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></symbol>
+<symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></symbol>
+<symbol id="i-tv" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+<symbol id="i-geraete" viewBox="0 0 24 24"><path d="M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/><path d="M2 12a9 9 0 0 1 8 8"/><path d="M2 16a5 5 0 0 1 4 4"/><path d="M2 20h.01"/></symbol>
+<symbol id="i-hilfe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1.1.9-1.1 1.7"/><path d="M12 17h.01"/></symbol>
+<symbol id="i-konto" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+<symbol id="i-stern" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.9z"/></symbol>
+<symbol id="i-stern-leer" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.9z"/></symbol>
+<symbol id="i-musik" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
+<symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></symbol>
+<symbol id="i-leiser" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 9.5a3.5 3.5 0 0 1 0 5"/></symbol>
+<symbol id="i-lauter" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 9.5a3.5 3.5 0 0 1 0 5M19 7a7 7 0 0 1 0 10"/></symbol>
+<symbol id="i-stumm" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9.5l4 5M21 9.5l-4 5"/></symbol>
+<symbol id="i-welt" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></symbol>
+<symbol id="i-laden" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></symbol>
+<symbol id="i-fehler" viewBox="0 0 24 24"><rect x="8" y="8" width="8" height="11" rx="4"/><path d="M12 8V5M5 12h3M16 12h3M6 18l3-2M18 18l-3-2M8 6l2 2M16 6l-2 2"/></symbol>
+<symbol id="i-idee" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-bild" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></symbol>
+<symbol id="i-akku" viewBox="0 0 24 24"><rect x="3" y="8" width="16" height="8" rx="2"/><path d="M21 11v2M6 11v2"/></symbol>
+<symbol id="i-blitz" viewBox="0 0 24 24"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></symbol>
+<symbol id="i-uhr" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-zufall" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></symbol>
+<symbol id="i-gross" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+<symbol id="i-punkt" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/></symbol>
+</defs></svg>
 
 <div id="loginAnsicht" class="login versteckt">
   <img class="login-logo" src="/icon-512.png" alt="">
@@ -251,7 +435,7 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
     <div class="kopf">
       <h1><button type="button" class="kopf-home" id="kopfHome" aria-label="Immich Showcase – zur Startseite"><span class="logo" id="logo" aria-hidden="true"><img alt="" src="/icon-192.png"></span><span class="kopf-name">Immich Showcase</span></button></h1>
       <button class="btn klein versteckt" id="undoKopf" title="Letzte Änderung an der Auswahl rückgängig machen" aria-label="Rückgängig"><span aria-hidden="true">↶</span><span class="undo-text"> Rückgängig</span></button>
-      <div class="benutzer" id="benutzer"><span class="versionskurz" data-version-kurz></span><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><button type="button" id="geraeteBtn" aria-label="Geräte">📡 Geräte</button><button type="button" id="hilfeBtn" aria-label="Hilfe">❓ Hilfe</button></div>
+      <div class="benutzer" id="benutzer"><button type="button" id="geraeteBtn" class="ik" aria-label="Geräte" title="Geräte">📡 Geräte</button><button type="button" id="hilfeBtn" class="ik" aria-label="Hilfe" title="Hilfe">❓ Hilfe</button><details class="konto" id="konto"><summary aria-label="Konto" title="Konto"><svg class="ic" aria-hidden="true"><use href="#i-konto"/></svg></summary><div class="konto-menu"><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><span class="versionskurz" data-version-kurz></span></div></details></div>
       <button class="btn klein nur-rahmen" id="normalBtn" title="Der Rahmen zeigt wieder das normale Programm">Normal</button>
       <div class="laeuft nur-rahmen" id="laeuft" aria-live="polite">
         <div class="laeuft-text">
@@ -311,17 +495,19 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
     <div class="innen">
       <div class="zeile1">
         <button class="zaehler" id="zaehler"></button>
-        <label class="merken" title="Dauerhaft unter „Gemerkt“ speichern – sonst steht die Show nur unter „Zuletzt gezeigt“"><input type="checkbox" id="merken"> ⭐ merken</label>
-      </div>
-      <div class="zeile1b">
-        <button class="btn klein primaer" id="diashowBtn" title="Die Auswahl hier als Diashow abspielen – der Bilderrahmen bleibt unverändert">▶ Diashow</button>
-        <button class="btn klein primaer nur-tv" id="tvBtn" title="Die Auswahl per AirPlay auf LG TV oder Shield abspielen">📺 Auf den TV</button>
-        <button class="btn klein" id="undo" title="Letzte Änderung an der Auswahl rückgängig machen">↶ Rückgängig</button>
-        <button class="btn klein gefahr" id="leeren" title="Alle Fotos abwählen (es werden keine Fotos gelöscht)">✕ Leeren</button>
+        <div class="werkzeuge">
+          <button class="btn klein" id="diashowBtn" title="Die Auswahl hier als Diashow abspielen – der Bilderrahmen bleibt unverändert">▶ Diashow</button>
+          <button class="btn klein" id="undo" title="Letzte Änderung an der Auswahl rückgängig machen">↶ Rückgängig</button>
+          <button class="btn klein gefahr" id="leeren" title="Alle Fotos abwählen (es werden keine Fotos gelöscht)">✕ Leeren</button>
+        </div>
       </div>
       <div class="zeile2">
         <input type="text" id="showName" maxlength="60" placeholder="Name der Show" aria-label="Name der Show" enterkeyhint="send">
+        <label class="merken" title="Dauerhaft unter „Gemerkt“ speichern – sonst steht die Show nur unter „Zuletzt gezeigt“"><input type="checkbox" id="merken"> ⭐ merken</label>
+      </div>
+      <div class="zeile3">
         <button class="btn primaer nur-rahmen" id="senden">Auf den Rahmen</button>
+        <button class="btn nur-tv" id="tvBtn" title="Die Auswahl per AirPlay auf LG TV oder Shield abspielen">📺 Auf den TV</button>
       </div>
     </div>
   </div>
@@ -357,6 +543,8 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
     <p class="tipp" id="hilfeBeispiele">Personen, Zeit, Orte und Motive lassen sich kombinieren, z. B. „Sommer 2022 am Strand“.</p>
     <h3>Fernseher und Rahmen</h3>
     <p class="tipp">Am Fernseher oder Tablet einmal die Seite /tv/ im Browser öffnen und offen lassen. Den Namen des Geräts wählst du beim Senden.</p>
+    <h3>Tastatur (Rechner)</h3>
+    <p class="tipp">Mit „/“ springst du zur Suche, mit „Esc“ schließt du Fenster.</p>
     <h3>Sprache / Language</h3>
     <label class="tvfeld"><span>🌐</span> <select id="sprache" aria-label="Sprache / Language"><option value="de">Deutsch</option><option value="en">English</option><option value="es">Español</option><option value="fr">Français</option><option value="nl">Nederlands</option></select></label>
     <h3>Etwas funktioniert nicht?</h3>
@@ -1107,8 +1295,9 @@ $("#kopfHome").addEventListener("click", () => {
 });
 
 function zurueckZeigen(name) {
-  const b = $("#zurueckBtn"); b.classList.toggle("versteckt", !name);
-  if (name) { b.textContent = `↩ Zurück zu „${name}“`; b.title = `Zurück zu: ${name}`; }
+  const b = $("#zurueckBtn"), aktiv = $("#laeuft").classList.contains("aktiv");           // nur sinnvoll, solange eine Show laeuft
+  b.classList.toggle("versteckt", !name || !aktiv);
+  if (name) { const n = RW_T(name); b.textContent = `↩ Zurück zu „${n}“`; b.title = `Zurück zu: ${n}`; }
 }
 $("#rahmenReihe").addEventListener("change", async e => {
   try { const r = await api("reihenfolge", { method: "POST", body: JSON.stringify({ reihenfolge: e.target.value }) }); toast(r.nachricht); } catch (err) { fehler(err); }
@@ -1220,6 +1409,17 @@ $("#koppelBtn").addEventListener("click", async () => {
   if (code.length !== 6) { toast(RW_T("Bitte den 6-stelligen Code eingeben."), true); return; }
   try { const r = await api("koppeln", { method: "POST", body: JSON.stringify({ code, ziel }) }); toast(RW_T("Gekoppelt mit") + " " + r.name + "."); $("#koppelCode").value = ""; geraeteLaden(); }
   catch (e) { toast(e.message === "Code unbekannt oder abgelaufen" ? RW_T("Code unbekannt oder abgelaufen.") : e.message, true); }
+});
+// ---------------------------------------------------------------- Bedienung am Rechner: Konto-Menue, Tastenkuerzel
+document.addEventListener("click", e => { const k = $("#konto"); if (k && k.open && !k.contains(e.target)) k.open = false; });
+document.addEventListener("keydown", e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) { if (e.key === "Escape") e.target.blur(); return; }
+  if (e.key === "/" && !$("#appAnsicht").classList.contains("versteckt")) { e.preventDefault(); wechsle("suchen"); $("#sucheText").focus(); }
+  else if (e.key === "Escape") {
+    const k = $("#konto"); if (k) k.open = false;
+    document.querySelectorAll(".tvdialog:not(.versteckt)").forEach(d => { const zu = d.querySelector("[id$='Zu'], [id$='Abbruch'], [id$='Abbrechen']"); if (zu) zu.click(); else d.classList.add("versteckt"); });
+  }
 });
 $("#abmelden").addEventListener("click", async () => {
   try { await api("logout", { method: "POST", body: "{}" }); } catch (e) {}
