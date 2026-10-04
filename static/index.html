@@ -55,7 +55,8 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bo
 #undoKopf .undo-text { display: none; font-size: 14px; }
 @media (min-width: 520px) { #undoKopf .undo-text { display: inline; } }
 .kopf h1 { min-width: 0; }
-.kopf-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kopf-name { overflow: hidden; overflow-wrap: anywhere; line-height: 1.02; }          /* langer Name (Immich Showcase) bricht um statt abgeschnitten zu werden */
+@media (max-width: 520px) { .kopf h1 { font-size: 28px; } }
 .kopf-home { display: flex; align-items: center; gap: 10px; padding: 0; margin: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; min-height: 60px; border-radius: 12px; }
 .kopf-home:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .kopf-home:active { opacity: .75; }

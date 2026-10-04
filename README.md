@@ -1,84 +1,136 @@
 # Immich Showcase
 
-Eine kleine Web-App (PWA) für **Immich**: Fotos suchen und auswählen, der Auswahl einen Namen geben und sie auf dem **Bilderrahmen**, dem **Fernseher** (mit Hintergrundmusik und Videos) oder als **Diashow im Browser** zeigen. Gedacht für Familien, bei denen nicht jeder Immich bedienen möchte.
+<p align="center"><img src="static/icon-192.png" width="96" alt="Immich Showcase icon"></p>
 
-> Immich Showcase ist ein unabhängiges Community-Projekt und steht in keiner Verbindung zum Immich-Projekt oder dessen Betreibern. „Immich“ ist der Name der Software, mit der es zusammenarbeitet.
+**Show your [Immich](https://immich.app) photos on the TV and on a picture frame – and let the whole family do it from their phone.**
+Search in plain sentences ("Grandma and Anna, Christmas 2019, on the beach"), tap the photos you like, give the show a name and send it to the living-room TV or the picture frame in the hallway. Optional background music, videos, and a continuous slideshow when nobody has asked for anything.
 
-> Status: läuft produktiv im Homelab des Autors und wird gerade für andere Installationen verallgemeinert (siehe [Fahrplan](#fahrplan)). Bis dahin: **nur für Leute, die Docker und Immich selbst betreiben.**
+🇩🇪 [Deutsche Anleitung](README.de.md)
 
-## Was es kann
-- Suche in ganzen Sätzen: Personen, Zeit, Ort, Motiv („Oma und Anna Weihnachten 2019 am Strand“)
-- Verknüpfte Filter (Person, Jahr, Land, Fotos/Videos), alle Fotos eines Tages oder alles auswählen, Rückgängig
-- Shows speichern, benennen, merken, wieder starten
-- Fernseher: Seite im TV-Browser (LG webOS, Android TV, Shield …), Steuerung vom Handy (Pause, vor/zurück, Musik), Reihenfolge zeitlich auf- oder absteigend oder zufällig, Videos werden vorab für den Fernseher umgewandelt
-- Hintergrundmusik aus eigenen Ordnern (Zufall, Titelwahl)
-- Bilderrahmen: eigener Player (Tablet-Browser oder Fully Kiosk öffnet `…/tv/?ziel=rahmen`): im Leerlauf Zufallsfotos mit Uhr, Shows aus der App laufen dort wie auf einem Fernseher; „Stopp“ bringt das Dauerprogramm zurück.
+> Immich Showcase is an independent community project. It is not affiliated with, endorsed by, or part of the Immich project. "Immich" is the name of the software it works with.
 
-## Voraussetzungen
-- Immich (getestet mit 3.2.x); ein API-Schlüssel mit den in `.env.example` genannten Rechten. Zugriff auf Immichs Datenbank ist **optional**.
-- Docker / Compose, ein Reverse-Proxy mit HTTPS, wenn die App von außen erreichbar sein soll
-- Optional: immich-kiosk für den festen Bilderrahmen
+| Sign in | Latest photos | Selection | Send to TV |
+|---|---|---|---|
+| ![Sign in](docs/screenshots/login.png) | ![Latest](docs/screenshots/neueste.png) | ![Selection](docs/screenshots/auswahl.png) | ![TV](docs/screenshots/fernseher.png) |
 
-## Installation (Docker Compose)
-Voraussetzung: Docker mit Compose und eine laufende Immich-Installation. Es wird **kein Quelltext gebaut**, das fertige Image kommt von `ghcr.io`.
+| Remote control | Search in sentences |
+|---|---|
+| ![Remote](docs/screenshots/fernbedienung.png) | ![Search](docs/screenshots/suche.png) |
+
+The picture frame (continuous programme with blurred background, date, place and clock):
+
+![Frame](docs/screenshots/rahmen.png)
+
+*(All screenshots use invented sample photos.)*
+
+## What it does
+- **Search in whole sentences** in five languages: people, time, place, motif.
+- **Linked filters** (person, year, country, photos/videos), "select the whole day", undo.
+- **Shows:** save, name and restart them later.
+- **TV:** a web page you open once in the TV browser (LG webOS, Android TV, Shield, Chromecast with browser …). Control it from the phone: pause, next/previous, music, stop. Videos are converted in advance so the TV can play them.
+- **Picture frame:** an own player for any tablet (browser or [Fully Kiosk](https://www.fully-kiosk.com)). Without a request it shows a continuous programme with a clock; a show from the app interrupts it, "Stop" brings the programme back.
+- **Background music** from your own folders (none is included).
+- **Safe by design:** the app can never delete a photo, runs as non-root in a read-only container, and every person can use their own Immich account.
+
+## What you need
+- A running **Immich** (tested with 3.2.x) and a user account on it.
+- A machine with **Docker + Docker Compose** (NAS, mini PC, Raspberry Pi – images for amd64 and arm64).
+- For the picture frame: a **tablet** (or any device with a browser). For the TV: a TV with a web browser.
+
+## Installation (about 5 minutes)
 
 ```bash
-git clone https://github.com/dirkvoss/immich-showcase.git && cd immich-showcase     # oder nur docker-compose.yml und .env.example herunterladen
+git clone https://github.com/dirkvoss/immich-showcase.git
+cd immich-showcase
 cp .env.example .env
 docker compose up -d
-docker compose logs showcase      # zeigt den Einrichtungs-Code
+docker compose logs showcase       # shows a one-time setup code
 ```
-Dann `http://<server>:8090` öffnen: Der **Einrichtungsassistent** fragt nach dem Code aus dem Protokoll, der Adresse von Immich und deinem Immich-Konto (E-Mail + Passwort), legt den nötigen Schlüssel **selbst** an (ohne Lösch-Rechte; das Passwort wird nicht gespeichert) und lässt dich die PIN wählen. Danach startet Immich Showcase von selbst neu (iPhone: Teilen → „Zum Home-Bildschirm“). Wer lieber ohne Assistent arbeitet, trägt `RAHMEN_IMMICH_URL` und `RAHMEN_IMMICH_KEY` in die `.env` ein; die Einstellungen aus der `.env` haben immer Vorrang vor denen des Assistenten (gespeichert in `/data/einstellungen.json`). Alles Weitere steht in der `.env`, jede Einstellung ist dort erklärt.
 
-**Immich im selben Docker-Rechner?** Entweder `RAHMEN_IMMICH_URL=http://<ip-des-rechners>:2283/api` eintragen, oder Immich Showcase ins Immich-Netzwerk hängen: in `.env` `COMPOSE_FILE=docker-compose.yml:docker-compose.immich-network.yml` und `SHOWCASE_IMMICH_NETWORK=immich_default` (Name per `docker network ls`) setzen, dann `RAHMEN_IMMICH_URL=http://immich_server:2283/api`.
+Open `http://<server>:8090` in a browser. The **setup wizard** guides you:
 
-**Selbst bauen** statt das Image zu laden: `COMPOSE_FILE=docker-compose.yml:docker-compose.build.yml` in `.env`, dann `docker compose up -d --build`.
+1. enter the **setup code** from the log (so nobody else on your network can take over the setup),
+2. enter the **address of your Immich** (for example `http://192.168.1.10:2283`),
+3. sign in with your **Immich account** (email + password). Immich Showcase creates its own API key *without delete permissions* – your password is not stored,
+4. choose a **PIN**.
 
-**Was liegt wo?** Alle Daten (PIN-Hash, Sitzungen, Shows, Zwischenspeicher, eigene Musik) liegen im Volume `showcase_data` (Pfad `/data`). Soll es ein Ordner sein: `SHOWCASE_DATA=./data`, `SHOWCASE_UID`/`SHOWCASE_GID` auf den Besitzer des Ordners setzen (`id -u`, `id -g`). Der Container läuft ohne Root, mit schreibgeschütztem Dateisystem und ohne Linux-Capabilities.
+The app restarts by itself. On an iPhone: Share → "Add to Home Screen".
 
-**Von außen erreichbar machen:** immer hinter einen Reverse-Proxy mit HTTPS (Nginx, Caddy, Traefik, Nginx Proxy Manager …) und `SHOWCASE_BIND=127.0.0.1` setzen, wenn der Proxy auf demselben Rechner läuft. Trägt der Proxy die Verbindung, die Adresse in `RAHMEN_WEB_PROXIES` eintragen. WebSocket-Unterstützung ist nicht nötig. Ein vertrautes Netz (`RAHMEN_WEB_LAN`) nur setzen, wenn Internetverkehr nicht mit einer internen Adresse ankommt.
+**Immich runs in Docker on the same machine?** Either use the machine's IP address as above, or join Immich's Docker network: put `COMPOSE_FILE=docker-compose.yml:docker-compose.immich-network.yml` and `SHOWCASE_IMMICH_NETWORK=immich_default` (see `docker network ls`) in `.env`, and use `http://immich_server:2283` as the address.
 
-**Fernseher einrichten:** in `.env` `RAHMEN_WEB_TV_ZIELE=wohnzimmer=Wohnzimmer`, am Fernseher im Browser `http://<server>:8090/tv/?ziel=wohnzimmer` öffnen und als Lesezeichen speichern (Smart-TV-Browser, Android TV, Shield, Chromecast mit Browser …).
-**Bilderrahmen einrichten:** `RAHMEN_WEB_RAHMEN_ZIELE=rahmen=Bilderrahmen`; am Tablet (Browser im Vollbild oder Fully Kiosk) `http://<server>:8090/tv/?ziel=rahmen` als Startseite. Quellen und Gewichte des Dauerprogramms: `RAHMEN_WEB_RAHMEN_QUELLEN`.
-**Eigene Musik (keine im Lieferumfang):** zwei Wege, beide mit eigener oder frei lizenzierter Musik (mp3, ogg, m4a):
-1. *Ordner:* Dateien in Unterordner von `/data/musik` legen, jeder Ordner ist eine Sammlung (`/data/musik/Urlaub/01 Lied.mp3`), z. B. mit `- ./musik:/data/musik:ro` in der Compose-Datei. Titel und Künstler kommen aus den Dateimarken, sonst aus dem Dateinamen. Optional beschreibt eine `info.json` im Ordner (`name`, `stuecke` mit `datei`, `titel`, `urheber`, `lizenz`) die Titel genauer.
-2. *In der App:* `RAHMEN_WEB_MUSIK_UPLOAD=1` setzen, dann erscheint im „Auf den Fernseher“-Fenster „Eigene Musik hinzufügen …“ (hinzufügen und entfernen, mit Größengrenzen).
-Ausgewählt wird die Musik im selben Fenster („Hintergrundmusik“), auch „Alles bunt gemischt“ oder ein einzelner Titel über die Fernbedienung.
+**Prefer no wizard?** Put `RAHMEN_IMMICH_URL` and `RAHMEN_IMMICH_KEY` into `.env`. Values in `.env` always win over the wizard.
 
-**Aktualisieren:** `docker compose pull && docker compose up -d` (oder mit `deploy/deploy.sh` samt Sicherung und automatischem Rückweg, siehe RELEASING.md).
-**Störungen:** `docker compose logs showcase`. Zeigt die App „Einrichtung erforderlich“, ist Immich Showcase noch nicht mit Immich verbunden (Assistent unter `/setup/`). 401 in der App heißt: PIN oder Konto fehlt.
+## Set up a TV
+1. In `.env`: `RAHMEN_WEB_TV_ZIELE=livingroom=Living room` (`id=Display name`, comma-separated for several TVs).
+2. `docker compose up -d`
+3. On the TV, open the browser at `http://<server>:8090/tv/?ziel=livingroom` and bookmark it. Leave the page open – it shows "ready" and waits.
+4. On your phone: select photos → **On TV** → choose the TV, time per photo, order, music → **Start**.
 
-## Entwicklung und Auslieferung
-Tests: `pip install -r requirements-dev.txt && python -m pytest`. Versionen werden per Tag (`v1.2.3`) von GitHub Actions gebaut und mit `deploy/deploy.sh` samt Sicherung und automatischem Rückweg ausgeliefert, siehe [RELEASING.md](RELEASING.md).
+## Set up a picture frame
+1. In `.env`: `RAHMEN_WEB_RAHMEN_ZIELE=frame=Picture frame`
+2. Choose what the frame shows when nobody asks for anything (`RAHMEN_WEB_RAHMEN_*`, all optional):
+   - **Albums:** `RAHMEN_WEB_RAHMEN_ALBEN=<album-id>,<album-id>` (ids from the Immich album URL)
+   - **Marker albums:** `RAHMEN_WEB_RAHMEN_MARKER=1` – any album whose **description contains a tag with `frame`** (e.g. `#frame`, `#picture-frame`; German: `#rahmen`) joins the programme automatically. A tag like `#onlyframe` (German: `#nurrahmen`) shows **only** that album, in the order chosen in the app. Remove the tag to go back to normal.
+   - **Weighted sources:** `RAHMEN_WEB_RAHMEN_QUELLEN=<album-id>:70, neu14:20, *:10` (an album, "uploaded in the last 14 days", the whole library – with weights)
+   - Seconds per photo `RAHMEN_WEB_RAHMEN_SEK`, background `RAHMEN_WEB_RAHMEN_FUELLUNG` (`unscharf` = blurred, `zuschnitt` = crop, `balken` = black bars), caption `RAHMEN_WEB_RAHMEN_ANZEIGE=datum,ort`, night rest `RAHMEN_WEB_RAHMEN_NACHT=22:00-06:30`
+3. `docker compose up -d`
+4. On the tablet, open `http://<server>:8090/tv/?ziel=frame` in full screen – or set it as the start page of Fully Kiosk.
+   *Tip (Fully Kiosk):* if you use it as the **screensaver**, enter the address as the screensaver playlist item and restart the app once – Fully Kiosk only reads changes to the playlist after a restart.
 
-## Konfiguration
-Alles Installationsspezifische steht in der `.env` (Vorlage mit Erklärung jeder Einstellung: [.env.example](.env.example)); eigene Einstellungen gehören nie ins Repository (`.env` ist ausgeschlossen). Wichtig: Ohne `RAHMEN_WEB_LAN` und `RAHMEN_WEB_PROXIES` verlangt jede Anfrage die PIN. Das ist die sichere Vorgabe.
+## Daily use
+1. Open the app on your phone and sign in (PIN, or your Immich account if you set `RAHMEN_WEB_AUTH=immich`).
+2. **Latest** shows recent photos with filters; **Search** understands sentences; **My shows** keeps saved shows.
+3. Tap photos to select them. **Slideshow** plays in the phone's browser, **On TV** and **On the frame** send them to a device.
+4. The phone is a remote control while a show runs. **Stop** brings the continuous programme back on the frame.
 
-## Sicherheit
-- Die App kann Fotos **nie löschen**; der Schlüssel braucht keine Löschrechte.
-- Anmeldung per PIN oder Immich-Konto, jeweils mit Sperre nach Fehlversuchen (je IP und je E-Mail), Pro Person ein eigener, in Immich widerrufbarer Schlüssel ohne Löschrechte, Sitzung 90 Tage, schreibende Aufrufe nur mit eigenem Header.
-- Container: nicht-root, Dateisystem schreibgeschützt, ohne Linux-Capabilities, Speicher begrenzt.
-- Die Fernseher-Seite zeigt Fotos ohne Anmeldung, wenn sie aus einem vertrauten Netz aufgerufen wird. Netze deshalb eng wählen.
+## Sign-in options
+`RAHMEN_WEB_AUTH=pin` (default: one shared 6-digit PIN), `immich` (each person signs in with their Immich account and sees **only their own** photos and shows) or `beide` (both). Without `RAHMEN_WEB_LAN` and `RAHMEN_WEB_PROXIES` every request needs the PIN/account – that is the safe default. Change the PIN later:
+`docker compose exec showcase python /app/rahmen_web.py --set-pin 123456`
 
-## Einschränkungen (ehrlich)
-- Ohne Datenbankzugang prüft die Motivsuche („am Strand“) die Ähnlichkeit nicht exakt, sondern nimmt die besten 60 Treffer der Rangliste (Immich liefert über die API keine Ähnlichkeitswerte). Filter und Sortierung sind über die API etwas langsamer, aber gleichwertig.
-- Ohne `RAHMEN_WEB_RAHMEN_ZIELE` erwartet der „Bilderrahmen“-Weg einen immich-kiosk samt Hilfsskript auf dem Immich-Host (Legacy, hier nicht enthalten). Empfohlen ist der eingebaute Rahmen-Player.
-- Die Oberfläche gibt es auf **Deutsch, Englisch, Spanisch, Französisch und Niederländisch** (automatisch nach Browsersprache, oder `?lang=xx`; Umschalter im Hilfe-Fenster). Die **Suche in ganzen Sätzen** versteht dieselben fünf Sprachen (Monate, Jahreszeiten, „letzte Wochen“, Weihnachten …). Die Übersetzungen ES/FR/NL sind maschinell erstellt – Korrekturen sind willkommen. Weitere Sprachen: `static/i18n/<sprache>.json` (Schlüssel wie in `en.json`) und ein Eintrag in `SPRACHEN` (`rahmen_helfer.py`).
-- Anmeldung: Vorgabe ist eine gemeinsame PIN. Mit `RAHMEN_WEB_AUTH=immich` (oder `beide`) melden sich Personen mit ihrem **Immich-Konto** an und sehen nur ihre eigenen Fotos und Shows; Immich Showcase führt keine eigene Benutzerverwaltung. Dafür muss der Rahmen der eingebaute Player sein.
-- Musik wird nicht mitgeliefert (Lizenzen): eigene MP3-Dateien in `data/musik/<sammlung>/` mit einer `info.json` (Titel, Urheber, Lizenz) ablegen.
+## Use it from outside your home
+Always behind a **reverse proxy with HTTPS** (Nginx Proxy Manager, Caddy, Traefik …). Set `SHOWCASE_BIND=127.0.0.1` if the proxy runs on the same machine and add the proxy's IP to `RAHMEN_WEB_PROXIES`. WebSocket support is not needed. Only list networks in `RAHMEN_WEB_LAN` if internet traffic can never arrive with an internal address.
 
-## Fahrplan
-1. Konfiguration entkoppeln (erledigt: Name, Netze, Proxys, Fernseher, Beispiele über Umgebungsvariablen; sichere Vorgaben)
-2. Immich-API statt Datenbank (erledigt, Datenbank optional); Oberfläche und Suche in fünf Sprachen (erledigt)
-3. Anmeldung mit dem Immich-Konto (erledigt, `RAHMEN_WEB_AUTH`); offen: Einrichtungsassistent, SSO/OIDC
-4. Eigener Rahmen-Player statt immich-kiosk (erledigt: Dauerprogramm + Shows; offen: Albumquellen mit Gewichtung, Überwachung/Neustart)
-5. Geräte-Kopplung per Code/QR, Lizenz festlegen, Veröffentlichung
+## Your own music
+None is included (licences). Two ways:
+- **Folder:** put mp3/ogg/m4a files into sub-folders of `/data/musik` (each folder = one collection), e.g. mount `./musik:/data/musik:ro`. Title/artist come from the file tags or the file name. An optional `info.json` can describe titles (`name`, `stuecke` with `datei`, `titel`, `urheber`, `lizenz`).
+- **In the app:** set `RAHMEN_WEB_MUSIK_UPLOAD=1`; then "Add your own music …" appears in the "On TV" window.
 
-## Lizenzen von Bestandteilen
-Schrift *Cormorant Garamond* (SIL OFL 1.1). Das Logo ist eigens erzeugt. Keine Musik im Repository.
+## Update
+`docker compose pull && docker compose up -d` – or `deploy/deploy.sh <version>` (backup, health checks, automatic rollback; see [RELEASING.md](RELEASING.md)).
 
-## Lizenz
-[GNU Affero General Public License v3.0 oder neuer](LICENSE) (AGPL-3.0-or-later), wie Immich selbst. Wer die App als Dienst für andere betreibt, muss geänderten Quelltext ebenfalls bereitstellen. Schrift: siehe `static/fonts/OFL.txt`.
+## Troubleshooting
+| Symptom | What to do |
+|---|---|
+| "Setup required" in the app | Not connected to Immich yet – open `/setup/` |
+| HTTP 401 in the app | PIN or account missing / expired |
+| TV shows "not open" in the app | Open the TV address in the TV browser and leave it open |
+| Frame stays on the old picture / screensaver address ignored | Fully Kiosk: restart the app after changing the playlist |
+| Containers can't reach Immich | Use the machine's IP instead of `localhost`, or join Immich's Docker network (see above) |
+| Anything else | `docker compose logs showcase`; the **Help** window in the app can create a *support package* (diagnostics without secrets) for a bug report |
 
-## Hinweis
-Immich Showcase ist ein unabhängiges Projekt und steht in keiner Verbindung zum Immich-Team. Immich ist eine Marke seiner Urheber.
+## Settings
+Everything installation-specific lives in `.env` – every setting is explained in [.env.example](.env.example). Your own `.env` is never part of the repository.
+
+## Languages
+The interface and the sentence search work in **German, English, Spanish, French and Dutch** (automatic by browser language, or `?lang=xx`; switcher in the Help window). The Spanish, French and Dutch translations are machine-made – corrections are very welcome (`static/i18n/<language>.json`).
+
+## Security
+- The app can **never delete photos**; its API key has no delete rights.
+- Sign-in with PIN or Immich account, locked after failed attempts (per IP and per email). Every person gets an own, revocable key. Sessions last 90 days; writing requests need an own header.
+- The container runs as non-root with a read-only file system, no Linux capabilities and a memory limit.
+- The TV/frame pages show photos **without sign-in** to devices in a trusted network (`RAHMEN_WEB_LAN`) – keep that network small.
+- Found a vulnerability? See [SECURITY.md](SECURITY.md).
+
+## Limitations
+- Without database access, the motif search ("on the beach") takes the best 60 ranked hits instead of checking similarity exactly. Filters are slightly slower but equivalent. Database access is optional (`RAHMEN_DB_DSN`).
+- No pairing by QR code yet: the address has to be entered on each device once.
+- No music is bundled.
+
+## Development
+`pip install -r requirements-dev.txt && python -m pytest`. Releases are built by GitHub Actions from version tags; see [RELEASING.md](RELEASING.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Third-party parts
+Font *Cormorant Garamond* (SIL OFL 1.1). The logo is original. No music in the repository.
+
+## License
+[GNU Affero General Public License v3.0 or later](LICENSE) (AGPL-3.0-or-later), like Immich itself. If you run a modified version as a service for others, you must make your changes available. Font: see `static/fonts/OFL.txt`.

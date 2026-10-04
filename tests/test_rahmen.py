@@ -165,3 +165,12 @@ def test_ohne_marker_schalter_bleibt_alles_beim_alten(app_laden):
     w, client, schrein = app_laden(RAHMEN_WEB_RAHMEN_ALBEN=A, **LAN)
     schrein.albumliste = [{"id": B, "description": "#nurrahmen", "assetCount": 5}]
     assert w.rahmen_alben() == ([A], False)
+
+
+def test_marker_funktionieren_auch_englisch(app_laden):
+    w, client, schrein = app_laden(RAHMEN_WEB_RAHMEN_ALBEN=A, RAHMEN_WEB_RAHMEN_MARKER="1", **LAN)
+    schrein.albumliste = [{"id": B, "description": "show on the #picture-frame", "assetCount": 3}]
+    assert w.rahmen_alben() == ([A, B], False)
+    w.MARKER_CACHE["t"] = 0
+    schrein.albumliste[0]["description"] = "#onlyframe"
+    assert w.rahmen_alben() == ([B], True)

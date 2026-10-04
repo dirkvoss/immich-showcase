@@ -90,8 +90,8 @@ RAHMEN_ZIELE = {k.strip(): v.strip() for k, _, v in (z.partition("=") for z in _
 RAHMEN_ALBEN = [a for a in _liste("RAHMEN_WEB_RAHMEN_ALBEN") if re.match(r"^[0-9a-f-]{36}$", a)]    # leer = ganze Bibliothek
 # Marker-Alben: Alben, deren Beschreibung "#...rahmen..." enthaelt, kommen zum Dauerprogramm dazu; "#...nurrahmen..." zeigt NUR diese (exklusiv)
 RAHMEN_MARKER = os.environ.get("RAHMEN_WEB_RAHMEN_MARKER", "").strip().lower() in ("1", "ja", "true", "an", "yes")
-MARKER_RE = re.compile(r"#\S*rahmen\S*", re.IGNORECASE)
-MARKER_NUR_RE = re.compile(r"#\S*nur\S*rahmen\S*", re.IGNORECASE)
+MARKER_RE = re.compile(r"#\S*(?:rahmen|frame)\S*", re.IGNORECASE)
+MARKER_NUR_RE = re.compile(r"#\S*(?:nur|only)\S*(?:rahmen|frame)\S*", re.IGNORECASE)
 RAHMEN_SEK = max(3, min(int(os.environ.get("RAHMEN_WEB_RAHMEN_SEK", "8")), 120))
 # Quellen des Dauerprogramms mit Gewicht: "<album-id>:70, neu14:20, *:10"  (*=ganze Bibliothek, neuN=in den letzten N Tagen hochgeladen).
 # Ohne Angabe: RAHMEN_WEB_RAHMEN_ALBEN gemeinsam bzw. die ganze Bibliothek.
