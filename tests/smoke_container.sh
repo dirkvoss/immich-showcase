@@ -17,7 +17,8 @@ start2() { docker run -d --name "$N" -p "$PORT:8090" -v "$V:/data" --read-only -
 start2
 warte || fail "Dienst startet im Einrichtungsmodus nicht"
 curl -fsS "http://127.0.0.1:$PORT/api/config" | grep -q '"konfiguriert":false' && ok "Einrichtungsmodus ohne Pflichtangaben" || fail "kein Einrichtungsmodus"
-docker logs "$N" 2>&1 | grep -q "Einrichtungs-Code" && ok "Einrichtungs-Code im Protokoll" || fail "kein Einrichtungs-Code im Protokoll"
+gefunden=0; for _ in $(seq 1 20); do docker logs "$N" 2>&1 | grep -q "Einrichtungs-Code" && { gefunden=1; break; }; sleep 0.5; done     # das Protokoll kann dem Start etwas hinterherhinken
+[[ $gefunden == 1 ]] && ok "Einrichtungs-Code im Protokoll" || fail "kein Einrichtungs-Code im Protokoll"
 code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/api/neueste")"; [[ "$code" == 503 ]] && ok "App-Daten im Einrichtungsmodus gesperrt (503)" || fail "erwartet 503, war $code"
 code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/setup/")"; [[ "$code" == 200 ]] && ok "Einrichtungsseite erreichbar" || fail "Einrichtungsseite $code"
 code="$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'X-Rahmen: 1' -H 'Content-Type: application/json' -d '{"code":"000000","url":"http://x:1"}' "http://127.0.0.1:$PORT/api/setup/pruefen")"; [[ "$code" == 403 ]] && ok "falscher Einrichtungs-Code abgelehnt" || fail "falscher Code: $code"

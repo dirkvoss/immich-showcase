@@ -26,7 +26,7 @@ echo
 
 IP="$( (hostname -I 2>/dev/null | awk '{print $1}') || true)"
 [[ -n "$IP" ]] || IP="$( (ipconfig getifaddr en0 2>/dev/null) || true)"; IP="${IP:-<server>}"
-CODE="$(docker compose logs showcase 2>&1 | grep -o 'Einrichtungs-Code eingeben: [0-9]*' | tail -1 | grep -o '[0-9]*$' || true)"
+CODE="$(docker compose logs showcase 2>&1 | grep -o 'Einrichtungs-Code ein: [0-9]*' | tail -1 | grep -o '[0-9]*$' || true)"
 echo
 echo "Fertig. Weiter im Browser:"
 [[ $MIT_IMMICH == 1 ]] && echo "  1. Immich einrichten:            http://$IP:2283   (erstes Konto = Administrator)"

@@ -2001,7 +2001,7 @@ def ics_termine(text, heute, tage=2, maximum=4):
                             bis = _ics_zeit(ende, {})
                             treffer = not bis or tag <= bis[0]
                         if treffer:
-                            titel = (ereignis.get("SUMMARY", ("", ""))[1]).replace("\\,", ",").replace("\;", ";").replace("\\n", " ").strip()
+                            titel = (ereignis.get("SUMMARY", ("", ""))[1]).replace("\\,", ",").replace("\\;", ";").replace("\\n", " ").strip()
                             ergebnis.append({"tag": "heute" if tag == heute else "morgen" if tag == heute + datetime.timedelta(days=1) else tag.isoformat(),
                                              "zeit": uhr.strftime("%H:%M") if uhr else "", "titel": titel[:60], "_k": (tag, uhr or datetime.time.min)})
             ereignis = None
