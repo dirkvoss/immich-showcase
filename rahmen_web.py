@@ -1606,6 +1606,15 @@ def rahmen_quellen(ziel=None, jetzt=None):
         roh = [x.strip() for x in eigene.split(",") if x.strip()] if eigene.strip() else RAHMEN_QUELLEN_ROH
     quellen = []
     for e in roh:
+        if e.lower().startswith("person="):                              # person=Anna Muster  |  person=oma:60  |  person=Anna+Ben (beide zusammen)
+            rest = e[7:]
+            teil, sep, gw = rest.rpartition(":")
+            if not sep or not re.fullmatch(r"\d+(\.\d+)?", gw):
+                teil, gw = rest, ""
+            namen = [n.strip() for n in teil.split("+") if n.strip()]
+            if namen:
+                quellen.append({"typ": "person", "namen": namen, "gewicht": float(gw) if gw else 1.0})
+            continue
         name, _, gw = e.partition(":")
         try:
             gewicht = max(0.0, float(gw)) if gw else 1.0
@@ -1623,6 +1632,28 @@ def rahmen_quellen(ziel=None, jetzt=None):
     if not quellen:
         quellen = [{"typ": "alben", "gewicht": 1.0}] if (RAHMEN_ALBEN or RAHMEN_MARKER) else [{"typ": "alle", "gewicht": 1.0}]
     return quellen
+
+
+PERSONEN_CACHE = {"t": 0.0, "named": [], "alias": {}}
+
+
+def person_ids(namen):
+    """Immich-Personen-IDs zu Namen oder Spitznamen (RAHMEN_WEB_ALIASE); unbekannte Namen -> None."""
+    if time.time() - PERSONEN_CACHE["t"] > 600:
+        try:
+            PERSONEN_CACHE["named"], PERSONEN_CACHE["alias"] = H.lade_personen()
+            PERSONEN_CACHE["t"] = time.time()
+        except Exception as e:  # noqa: BLE001 - mit dem letzten Stand weiterarbeiten
+            H.log.warning("Personen laden: %s", e)
+    ids = []
+    for name in namen:
+        ziel = H.norm(PERSONEN_CACHE["alias"].get(H.norm(name), name))
+        treffer = [i for n, i in PERSONEN_CACHE["named"] if H.norm(n) == ziel] or [i for n, i in PERSONEN_CACHE["named"] if H.norm(n).startswith(ziel)]
+        if not treffer:
+            H.log.warning("Rahmen-Quelle person=%s: unbekannt in Immich", name)
+            return None
+        ids.append(treffer[0])
+    return ids
 
 
 HEUTE_CACHE = {"key": None, "ids": []}
@@ -1753,6 +1784,11 @@ def rahmen_auswahl(n, ziel=None):
             body["albumIds"] = [q["id"]]
         elif q["typ"] == "alben":
             body["albumIds"] = alben_ids or RAHMEN_ALBEN
+        elif q["typ"] == "person":
+            pids = person_ids(q["namen"])
+            if not pids:
+                continue
+            body["personIds"] = pids
         elif q["typ"] == "neu":
             body["createdAfter"] = (datetime.datetime.utcnow() - datetime.timedelta(days=q["tage"])).strftime("%Y-%m-%dT%H:%M:%S.000Z")
         try:
@@ -1963,9 +1999,88 @@ def rahmen_zusatz(_=Depends(geraet)):
 
 
 # --------------------------------------------------------------------------- Geraete: Uebersicht und Kopplung per Code
-@app.get("/api/geraete")
-def geraete_uebersicht(_=Depends(anmeldung)):
-    """Alle Fernseher und Rahmen mit Zustand (fuer die Geraete-Ansicht in der App)."""
+# Fully Kiosk (Android-Tablet) fernsteuern: Bildschirm zur Nachtruhe aus/an, Akku melden. RAHMEN_WEB_FULLY_<KENNUNG>=<Adresse[:Port]> und
+# RAHMEN_WEB_FULLY_PASSWORT[_<KENNUNG>] (Fully: Einstellungen -> Remote Admin -> aktivieren, Passwort setzen)
+FULLY = {}
+for _z in TV_ZIELE:
+    _h = os.environ.get(f"RAHMEN_WEB_FULLY_{_z.upper()}", "").strip()
+    if re.fullmatch(r"[A-Za-z0-9.-]+(:\d{1,5})?", _h):
+        FULLY[_z] = {"host": _h if ":" in _h else _h + ":2323",
+                     "pw": os.environ.get(f"RAHMEN_WEB_FULLY_PASSWORT_{_z.upper()}") or os.environ.get("RAHMEN_WEB_FULLY_PASSWORT", "")}
+FULLY_HELLIGKEIT = int(os.environ["RAHMEN_WEB_FULLY_HELLIGKEIT"]) if re.fullmatch(r"\d{1,3}", os.environ.get("RAHMEN_WEB_FULLY_HELLIGKEIT", "")) and int(os.environ["RAHMEN_WEB_FULLY_HELLIGKEIT"]) <= 255 else None
+FULLY_AKKU_MIN = int(os.environ.get("RAHMEN_WEB_FULLY_AKKU_MIN", "20") or 20)
+FULLY_STATE = {}
+
+
+def fully_get(url, timeout=6):
+    return http_text(url, timeout)
+
+
+def fully_befehl(z, cmd, **params):
+    f = FULLY[z]
+    return fully_get(f"http://{f['host']}/?" + urllib.parse.urlencode({"cmd": cmd, "password": f["pw"], "type": "json", **params}))
+
+
+def in_nacht(jetzt=None):
+    m = re.fullmatch(r"(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})", RAHMEN_NACHT or "")
+    if not m:
+        return False
+    von, bis = int(m[1]) * 60 + int(m[2]), int(m[3]) * 60 + int(m[4])
+    jetzt = jetzt or datetime.datetime.now()
+    minute = jetzt.hour * 60 + jetzt.minute
+    return von <= minute < bis if von <= bis else (minute >= von or minute < bis)
+
+
+def fully_bildschirm(z, an):
+    fully_befehl(z, "screenOn" if an else "screenOff")
+    if an and FULLY_HELLIGKEIT is not None:
+        fully_befehl(z, "setStringSetting", key="screenBrightness", value=str(FULLY_HELLIGKEIT))
+    FULLY_STATE.setdefault(z, {})["bildschirm"] = "an" if an else "aus"
+
+
+def fully_wache_pruefen(jetzt=None):
+    """Einmal pro Minute: Nachtruhe (Bildschirm aus/an nur beim Wechsel, damit Handeingriffe nicht ueberstimmt werden) und Akku (alle 5 Minuten)."""
+    for z in FULLY:
+        st = FULLY_STATE.setdefault(z, {})
+        if RAHMEN_NACHT:
+            soll = "aus" if in_nacht(jetzt) else "an"
+            if st.get("soll") != soll:
+                try:
+                    fully_bildschirm(z, soll == "an")
+                    st["soll"] = soll
+                except Exception as e:  # noqa: BLE001 - naechste Minute noch einmal
+                    H.log.warning("Fully %s: %s", z, e)
+        if time.time() - st.get("info_t", 0) > 300:
+            st["info_t"] = time.time()
+            try:
+                info = json.loads(fully_befehl(z, "deviceInfo"))
+                st["akku"], st["laedt"] = int(info.get("batteryLevel")), bool(info.get("isPlugged"))
+            except Exception as e:  # noqa: BLE001
+                H.log.warning("Fully %s Akku: %s", z, e)
+                continue
+            if st["akku"] <= FULLY_AKKU_MIN and not st["laedt"] and not st.get("akku_gemeldet"):
+                st["akku_gemeldet"] = True
+                pushover(f"{TV_ZIELE[z]}: Akku niedrig", f"Akku {st['akku']} % und das Tablet laedt nicht.", 1)
+            elif st["laedt"] or st["akku"] >= FULLY_AKKU_MIN + 10:
+                st["akku_gemeldet"] = False
+
+
+def fully_wache_schleife():
+    while True:
+        try:
+            fully_wache_pruefen()
+        except Exception as e:  # noqa: BLE001
+            H.log.warning("Fully-Wache: %s", e)
+        time.sleep(60)
+
+
+@app.on_event("startup")
+def fully_wache_starten():
+    if FULLY:
+        threading.Thread(target=fully_wache_schleife, daemon=True).start()
+
+
+def geraete_liste():
     jetzt = time.time()
     liste = []
     for z, n in TV_ZIELE.items():
@@ -1973,12 +2088,70 @@ def geraete_uebersicht(_=Depends(anmeldung)):
             continue
         d = TV[z]
         online = jetzt - d["hb"] < 10
+        spielt = (d["tv_name"] or "Wiedergabe") if (online and d["tv_laeuft"] and not d.get("ambient")) else None
+        dauer = bool(online and d.get("ambient"))
+        st = FULLY_STATE.get(z, {})
         liste.append({"id": z, "name": n, "art": "rahmen" if z in RAHMEN_ZIELE else "tv", "online": online,
-                      "zuletzt_vor_s": int(jetzt - d["hb"]) if d["hb"] else None,
-                      "spielt": (d["tv_name"] or "Wiedergabe") if (online and d["tv_laeuft"] and not d.get("ambient")) else None,
-                      "dauerprogramm": bool(online and d.get("ambient")),
-                      "bild_alter_s": d.get("bild_alter") if online else None})
-    return {"geraete": liste}
+                      "zustand": "offline" if not online else "spielt" if spielt else "dauerprogramm" if dauer else "bereit",
+                      "zuletzt_vor_s": int(jetzt - d["hb"]) if d["hb"] else None, "spielt": spielt, "dauerprogramm": dauer,
+                      "bild_alter_s": d.get("bild_alter") if online else None,
+                      "fully": z in FULLY, "bildschirm": st.get("bildschirm"), "akku": st.get("akku"), "laedt": st.get("laedt")})
+    return liste
+
+
+@app.get("/api/geraete")
+def geraete_uebersicht(_=Depends(anmeldung)):
+    """Alle Fernseher und Rahmen mit Zustand (fuer die Geraete-Ansicht in der App)."""
+    return {"geraete": geraete_liste()}
+
+
+@app.post("/api/geraete/bildschirm")
+def geraete_bildschirm(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
+    return bildschirm_schalten(daten)
+
+
+def bildschirm_schalten(daten):
+    z = str(daten.get("ziel", ""))
+    if z not in FULLY:
+        raise HTTPException(400, "Dieses Geraet ist nicht fuer Fully Kiosk eingerichtet")
+    try:
+        fully_bildschirm(z, bool(daten.get("an")))
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(502, f"Fully Kiosk antwortet nicht: {e}")
+    return {"ok": True, "bildschirm": FULLY_STATE[z]["bildschirm"]}
+
+
+# --------------------------------------------------------------------------- Home Assistant (und andere Automationen): Zustand lesen, steuern
+# Zugriff wie bei den Geraeteseiten: aus dem vertrauten Netz (RAHMEN_WEB_LAN muss die Adresse von Home Assistant enthalten) oder mit Sitzung.
+@app.get("/api/ha/status")
+def ha_status(_=Depends(geraet)):
+    return {"version": VERSION, "geraete": geraete_liste(), "shows": [x["name"] for x in daten_lesen()["shows"]]}
+
+
+@app.post("/api/ha/steuer")
+def ha_steuer(daten: dict, _=Depends(geraet), __=Depends(csrf)):
+    if str(daten.get("aktion", "")) not in ("pause", "weiter", "vor", "zurueck", "stopp", "lauter", "leiser", "naechster"):
+        raise HTTPException(400, "Unbekannte Aktion")
+    return steuer_senden({"ziel": daten.get("ziel"), "aktion": daten.get("aktion")})
+
+
+@app.post("/api/ha/show")
+def ha_show(daten: dict, _=Depends(geraet), __=Depends(csrf)):
+    """Eine gespeicherte Show (nach Name) auf einem Fernseher/Rahmen starten."""
+    name = H.norm(str(daten.get("show", "")))
+    show = next((x for x in daten_lesen()["shows"] if H.norm(x["name"]) == name), None)
+    if not show:
+        raise HTTPException(404, "Show nicht gefunden")
+    senden = {"ziel": daten.get("ziel"), "ids": show["ids"], "name": show["name"]}
+    for k in ("sekunden", "musik", "laut", "reihenfolge"):
+        if k in daten:
+            senden[k] = daten[k]
+    return tv_senden(senden, None, None)
+
+
+@app.post("/api/ha/bildschirm")
+def ha_bildschirm(daten: dict, _=Depends(geraet), __=Depends(csrf)):
+    return bildschirm_schalten(daten)
 
 
 KOPPEL = {}                       # code -> {"t": Zeit, "ziel": None|Kennung, "ip": ...}
@@ -2173,6 +2346,10 @@ def tv_senden(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
 
 @app.post("/api/tv/steuer")
 def tv_steuer(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
+    return steuer_senden(daten)
+
+
+def steuer_senden(daten):
     z = str(daten.get("ziel", ""))
     t = tv_ziel(z)
     aktion = str(daten.get("aktion", ""))

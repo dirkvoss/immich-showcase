@@ -92,6 +92,15 @@ Danach startet die App von selbst neu. Auf dem iPhone: Teilen → „Zum Home-Bi
 - **Heute vor Jahren:** die Quelle `heute` (oder `heute5` = ±5 Tage) zeigt Fotos von diesem Tag aus früheren Jahren.
 - **Wetter und Termine** oben rechts am Rahmen: `RAHMEN_WEB_WETTER_ORT=52.52,13.40` (open-meteo.com, kostenlos, ohne Konto – dein **Server** fragt ab, nur die Koordinaten werden übertragen) und `RAHMEN_WEB_KALENDER_URL=<iCalendar-Link>` (Google/Nextcloud/Apple „geheime iCal-Adresse“; einfache tägliche/wöchentliche/jährliche Wiederholungen werden verstanden). Es erscheint nur, was du einrichtest.
 
+## Rahmenprogramm nach Person
+`person=<name>` bei den Quellen: `RAHMEN_WEB_RAHMEN_QUELLEN=person=Anna Muster:60, person=oma:20, *:20` zeigt Fotos dieser Person (Name wie in Immich oder ein Spitzname aus `RAHMEN_WEB_ALIASE`; `Anna+Ben` = beide zusammen). Ein unbekannter Name wird übersprungen, die anderen Quellen laufen weiter.
+
+## Tablet-Bildschirm nachts ausschalten (Fully Kiosk)
+Mit `RAHMEN_WEB_RAHMEN_NACHT=22:00-06:30` wird der Rahmen schwarz. Fully Kiosk kann den **Bildschirm wirklich ausschalten** (spart Strom, schont das Display): In Fully *Remote Administration* aktivieren und ein Passwort setzen, dann `RAHMEN_WEB_FULLY_RAHMEN=<Adresse des Tablets>` und `RAHMEN_WEB_FULLY_PASSWORT=…` eintragen. Geschaltet wird nur beim **Wechsel** (ein Aufwecken von Hand wird nicht überstimmt). Unter **📡 Geräte** kannst du den Bildschirm von Hand schalten, siehst den **Akkustand** und bekommst eine Pushover-Meldung, wenn das Tablet fast leer ist und nicht lädt.
+
+## Home Assistant
+Fertige Sensoren, Knöpfe und Beispiele stehen in [`examples/home-assistant/immich_showcase.yaml`](examples/home-assistant/immich_showcase.yaml): Zustand jedes Fernsehers/Rahmens (offline / bereit / spielt / Dauerprogramm), ein Online-Sensor und Befehle (Pause, weiter, Stopp, gespeicherte Show starten, Bildschirm an/aus) als `rest_command`. Die Adresse von Home Assistant muss in `RAHMEN_WEB_LAN` stehen. API: `GET /api/ha/status`, `POST /api/ha/steuer|show|bildschirm` (Header `X-Rahmen: 1`).
+
 ## Installationshilfe
 `./install.sh` startet Immich Showcase und zeigt Adresse und Einrichtungs-Code. **Noch kein Immich?** `./install.sh --with-immich` startet **Immich und Immich Showcase zusammen** (siehe `examples/immich-stack/`).
 

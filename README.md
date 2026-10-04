@@ -92,6 +92,15 @@ The app restarts by itself. On an iPhone: Share → "Add to Home Screen".
 - **On this day:** the source `heute` (or `heute5` = ±5 days) shows photos taken on this day in earlier years.
 - **Weather and appointments** at the top right of the frame: `RAHMEN_WEB_WETTER_ORT=52.52,13.40` (open-meteo.com, free, no account – your **server** asks, only the coordinates are sent) and `RAHMEN_WEB_KALENDER_URL=<iCalendar link>` (Google/Nextcloud/Apple "secret iCal address"; simple daily/weekly/yearly repeats are understood). Only what you configure appears.
 
+## Frame programme by person
+Add `person=<name>` to the sources: `RAHMEN_WEB_RAHMEN_QUELLEN=person=Anna Muster:60, person=grandma:20, *:20` shows photos of that person (name as in Immich, or a nickname from `RAHMEN_WEB_ALIASE`; `Anna+Ben` = both together). An unknown name is skipped, the other sources continue.
+
+## Switch the tablet screen off at night (Fully Kiosk)
+With `RAHMEN_WEB_RAHMEN_NACHT=22:00-06:30` the frame goes black. Fully Kiosk can really switch the **screen off** (saves power, protects the display): in Fully enable *Remote Administration* and set a password, then set `RAHMEN_WEB_FULLY_RAHMEN=<tablet address>` and `RAHMEN_WEB_FULLY_PASSWORT=…`. The screen is switched only at the **change** (so a manual wake-up is not overruled). In **📡 Devices** you can switch it by hand, see the **battery level**, and you get a Pushover alert when the tablet is almost empty and not charging.
+
+## Home Assistant
+Ready-made sensors, buttons and examples are in [`examples/home-assistant/immich_showcase.yaml`](examples/home-assistant/immich_showcase.yaml): state of every TV/frame (offline / ready / playing / continuous), an online sensor, and commands (pause, next, stop, start a saved show, screen on/off) as `rest_command`s. Home Assistant's address must be in `RAHMEN_WEB_LAN`. API: `GET /api/ha/status`, `POST /api/ha/steuer|show|bildschirm` (header `X-Rahmen: 1`).
+
 ## Quick install helper
 `./install.sh` starts Immich Showcase and prints the address and setup code. **No Immich yet?** `./install.sh --with-immich` starts **Immich and Immich Showcase together** (see `examples/immich-stack/`).
 

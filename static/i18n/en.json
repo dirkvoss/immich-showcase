@@ -338,7 +338,9 @@
   "Code unbekannt oder abgelaufen.": "Code unknown or expired.",
   "Öffne am Handy Immich Showcase, tippe auf „Geräte“ und gib diesen Code ein:": "On your phone open Immich Showcase, tap “Devices” and enter this code:",
   "Oder scanne den Code mit der Handykamera.": "Or scan the code with your phone camera.",
-  "morgen": "tomorrow"
+  "morgen": "tomorrow",
+  "Bildschirm aus": "Screen off",
+  "Bildschirm an": "Screen on"
  },
  "muster": [
   [

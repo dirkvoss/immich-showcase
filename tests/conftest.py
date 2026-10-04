@@ -26,6 +26,8 @@ def _asset(n, jahr, monat, typ="IMAGE", land="Italy"):
 # 30 Fotos: 10 je Jahr 2019/2020/2021, 2 Videos
 ASSETS = [_asset(i, 2019 + i % 3, 1 + i % 12, land=LAENDER[i % 3]) for i in range(1, 29)]
 ASSETS += [_asset(100, 2020, 5, "VIDEO"), _asset(101, 2021, 6, "VIDEO")]
+for _a in ASSETS:                                      # Anna Muster ist auf allen Fotos mit gerader Nummer
+    _a["_p"] = [PERSONEN[0][1]] if int(_a["id"][:8], 16) % 2 == 0 else []
 
 
 def H_schluessel():
@@ -74,6 +76,8 @@ class SchreinImmich:
     @staticmethod
     def _passt(a, b):
         if b.get("type") and a["type"] != b["type"]:
+            return False
+        if b.get("personIds") and not set(b["personIds"]) <= set(a.get("_p", ())):
             return False
         if b.get("country") and a["exifInfo"]["country"] != b["country"]:
             return False

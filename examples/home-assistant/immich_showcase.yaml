@@ -1,0 +1,58 @@
+# Immich Showcase in Home Assistant: Zustand der Fernseher/Rahmen lesen und steuern.
+# Als Package ablegen (config/packages/immich_showcase.yaml; in configuration.yaml: homeassistant: packages: !include_dir_named packages)
+# ODER die Abschnitte in die eigene Konfiguration uebernehmen. Ersetze SHOWCASE durch Adresse und Port, z. B. 192.168.1.20:8090.
+#
+# Voraussetzung: Die Adresse von Home Assistant muss bei Immich Showcase zum vertrauten Netz gehoeren (.env: RAHMEN_WEB_LAN=192.168.1.0/24).
+
+rest:
+  - resource: http://SHOWCASE/api/ha/status
+    scan_interval: 30
+    headers:
+      X-Rahmen: "1"
+    sensor:
+      # Zustand je Geraet: offline | bereit | spielt | dauerprogramm   (Kennung "rahmen" durch deine Kennung ersetzen, so oft wie noetig kopieren)
+      - name: "Showcase Rahmen"
+        unique_id: showcase_rahmen
+        value_template: "{{ (value_json.geraete | selectattr('id', 'eq', 'rahmen') | first).zustand }}"
+        json_attributes_path: "$.geraete[?(@.id=='rahmen')]"
+        json_attributes: [name, online, spielt, bild_alter_s, zuletzt_vor_s, bildschirm, akku, laedt]
+      - name: "Showcase Version"
+        unique_id: showcase_version
+        value_template: "{{ value_json.version }}"
+    binary_sensor:
+      - name: "Showcase Rahmen online"
+        unique_id: showcase_rahmen_online
+        device_class: connectivity
+        value_template: "{{ (value_json.geraete | selectattr('id', 'eq', 'rahmen') | first).online }}"
+
+rest_command:
+  showcase_steuer:                      # aktion: pause | weiter | vor | zurueck | stopp | lauter | leiser | naechster
+    url: http://SHOWCASE/api/ha/steuer
+    method: POST
+    headers: {X-Rahmen: "1"}
+    content_type: application/json
+    payload: '{"ziel": "{{ ziel }}", "aktion": "{{ aktion }}"}'
+  showcase_show:                        # eine gespeicherte Show (Name wie in der App) auf einem Geraet starten
+    url: http://SHOWCASE/api/ha/show
+    method: POST
+    headers: {X-Rahmen: "1"}
+    content_type: application/json
+    payload: '{"ziel": "{{ ziel }}", "show": "{{ show }}"}'
+  showcase_bildschirm:                  # nur mit Fully Kiosk (RAHMEN_WEB_FULLY_<KENNUNG>): Bildschirm an/aus
+    url: http://SHOWCASE/api/ha/bildschirm
+    method: POST
+    headers: {X-Rahmen: "1"}
+    content_type: application/json
+    payload: '{"ziel": "{{ ziel }}", "an": {{ an | lower }}}'
+
+# Beispiele fuer Automationen und Skripte
+# automation:
+#   - alias: "Rahmen offline melden"
+#     trigger: {platform: state, entity_id: binary_sensor.showcase_rahmen_online, to: "off", for: "00:10:00"}
+#     action: {service: notify.notify, data: {message: "Der Bilderrahmen ist seit 10 Minuten nicht erreichbar."}}
+#   - alias: "Rahmen zeigt Urlaubsshow, wenn Besuch kommt"
+#     trigger: {platform: state, entity_id: input_boolean.besuch, to: "on"}
+#     action: {service: rest_command.showcase_show, data: {ziel: rahmen, show: "Sardinien 2026"}}
+# script:
+#   rahmen_normal:
+#     sequence: [{service: rest_command.showcase_steuer, data: {ziel: rahmen, aktion: stopp}}]

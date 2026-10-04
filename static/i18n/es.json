@@ -338,7 +338,9 @@
   "Code unbekannt oder abgelaufen.": "Código desconocido o caducado.",
   "Öffne am Handy Immich Showcase, tippe auf „Geräte“ und gib diesen Code ein:": "En el móvil abre Immich Showcase, toca «Dispositivos» e introduce este código:",
   "Oder scanne den Code mit der Handykamera.": "O escanea el código con la cámara del móvil.",
-  "morgen": "mañana"
+  "morgen": "mañana",
+  "Bildschirm aus": "Pantalla apagada",
+  "Bildschirm an": "Pantalla encendida"
  },
  "muster": [
   [

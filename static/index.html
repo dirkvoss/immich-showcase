@@ -1193,8 +1193,16 @@ async function geraeteLaden() {
       const z = document.createElement("div"); z.className = "zustand";
       z.textContent = !g.online ? RW_T("offline") + (g.zuletzt_vor_s != null ? " · " + RW_T("zuletzt") + " " + vorZeit(g.zuletzt_vor_s) : "")
         : g.spielt ? "▶ " + g.spielt : g.dauerprogramm ? RW_T("Dauerprogramm") + (g.bild_alter_s != null ? " · " + RW_T("Bild seit") + " " + g.bild_alter_s + " s" : "") : RW_T("bereit");
+      if (g.akku != null) z.textContent += " · 🔋 " + g.akku + " %" + (g.laedt ? " ⚡" : "");
       mitte.append(n, z); const punkt = document.createElement("span"); punkt.className = "punkt";
-      zeile.append(punkt, ik, mitte); box.append(zeile);
+      zeile.append(punkt, ik, mitte);
+      if (g.fully) {
+        const an = g.bildschirm !== "aus", b = document.createElement("button"); b.type = "button"; b.className = "btn klein";
+        b.textContent = an ? RW_T("Bildschirm aus") : RW_T("Bildschirm an");
+        b.addEventListener("click", async () => { try { await api("geraete/bildschirm", { method: "POST", body: JSON.stringify({ ziel: g.id, an: !an }) }); geraeteLaden(); } catch (e) { fehler(e); } });
+        zeile.append(b);
+      }
+      box.append(zeile);
     }
     if (!d.geraete.length) box.textContent = RW_T("Noch keine Geräte eingerichtet.");
   } catch (e) {}
