@@ -44,7 +44,7 @@ def test_ics_termine_heute_morgen_und_wiederholungen(app_laden):
 
 def test_zusatz_nur_wenn_eingerichtet(app_laden):
     w, client, _ = app_laden(**LAN)
-    assert w.ZUSATZ == []
+    assert w.zusatz_liste() == []
     assert client().get("/api/rahmen/zusatz").json() == {}
     assert client().get("/api/config").json()["rahmen_zusatz"] == []
 
@@ -59,7 +59,7 @@ def test_zusatz_wetter_und_kalender_gecacht(app_laden, monkeypatch):
             return '{"current": {"temperature_2m": 12.6, "weather_code": 3}}'
         return ICS.replace("20261005", datetime.date.today().strftime("%Y%m%d"))
     monkeypatch.setattr(w, "http_text", falsch)
-    assert w.ZUSATZ == ["wetter", "kalender"]
+    assert w.zusatz_liste() == ["wetter", "kalender"]
     d = client().get("/api/rahmen/zusatz").json()
     assert d["wetter"] == {"temp": 13, "symbol": "☁️"} and any(e["titel"] == "Muelltonne" for e in d["termine"])
     client().get("/api/rahmen/zusatz")

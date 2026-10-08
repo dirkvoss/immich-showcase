@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <script src="/i18n.js"></script>
 <script src="/ikonen.js"></script>
+<script src="/qrcode.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f4ef">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#14181f">
@@ -213,6 +214,14 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
 .verteil .tvfeld > span:first-child { flex: none; max-width: 40%; }
 .verteil .tvfeld select { flex: 1; min-width: 0; text-align: right; }
 .verteil small { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
+.assi-adr { display: flex; justify-content: center; margin: 8px 0; }
+.assi-adr code { word-break: break-all; text-align: center; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); font-size: 14px; }
+#assiQr { width: 200px; max-width: 60%; margin: 6px auto; background: #fff; padding: 10px; border-radius: 12px; }
+#assiQr svg { display: block; width: 100%; height: auto; }
+.assi-status { text-align: center; font-weight: 600; margin: 10px 0; color: var(--muted); }
+.assi-status.ok { color: var(--ok, #3ecf8e); }
+.gfdetails { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--bg); }
+.gfdetails > summary { cursor: pointer; font: 600 18px/1.2 var(--serif); }
 .qzeile { display: flex; gap: 6px; align-items: center; min-width: 0; }
 .qzeile select { max-width: 46%; }
 .qzeile select, .qzeile input { min-height: 38px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: inherit; font: inherit; padding: 0 8px; min-width: 0; }
@@ -471,7 +480,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
     <div class="kopf">
       <h1><button type="button" class="kopf-home" id="kopfHome" aria-label="Immich Showcase – zur Startseite"><span class="logo" id="logo" aria-hidden="true"><img alt="" src="/icon-192.png"></span><span class="kopf-name">Immich Showcase</span></button></h1>
       <button class="btn klein versteckt" id="undoKopf" title="Letzte Änderung an der Auswahl rückgängig machen" aria-label="Rückgängig"><span aria-hidden="true">↶</span><span class="undo-text"> Rückgängig</span></button>
-      <div class="benutzer" id="benutzer"><button type="button" id="geraeteBtn" class="ik" aria-label="Geräte" title="Geräte">📡 Geräte</button><button type="button" id="hilfeBtn" class="ik" aria-label="Hilfe" title="Hilfe">❓ Hilfe</button><details class="konto" id="konto"><summary aria-label="Konto" title="Konto"><svg class="ic" aria-hidden="true"><use href="#i-konto"/></svg></summary><div class="konto-menu"><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><span class="versionskurz" data-version-kurz></span></div></details></div>
+      <div class="benutzer" id="benutzer"><button type="button" id="geraeteBtn" class="ik" aria-label="Geräte" title="Geräte">📡 Geräte</button><button type="button" id="hilfeBtn" class="ik" aria-label="Hilfe" title="Hilfe">❓ Hilfe</button><details class="konto" id="konto"><summary aria-label="Konto" title="Konto"><svg class="ic" aria-hidden="true"><use href="#i-konto"/></svg></summary><div class="konto-menu"><button type="button" id="einstBtn">⚙ Einstellungen</button><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><span class="versionskurz" data-version-kurz></span></div></details></div>
       <button class="btn klein nur-rahmen" id="normalBtn" title="Der Rahmen zeigt wieder das normale Programm">Normal</button>
       <div class="laeuft nur-rahmen" id="laeuft" aria-live="polite">
         <select id="rahmenWahl" class="reihe-sel versteckt" aria-label="Rahmen wählen"></select>
@@ -569,19 +578,73 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
     <div class="tvknoepfe"><button class="btn" id="geraeteZu" type="button">Schließen</button></div>
   </div>
 </div>
+<div id="einstDialog" class="tvdialog versteckt" role="dialog" aria-modal="true" aria-labelledby="einstTitel">
+  <div class="tvkarte">
+    <h2 id="einstTitel">Einstellungen</h2>
+    <div class="gf">
+      <h3>Vorgaben für alle Rahmen</h3>
+      <p class="tipp">Gelten, wenn bei einem Rahmen (⚙ unter „Geräte“) nichts anderes eingestellt ist.</p>
+      <label class="tvfeld"><span>Sekunden pro Foto</span> <input id="eSek" type="number" min="3" max="120" inputmode="numeric" aria-label="Sekunden pro Foto"></label>
+      <label class="tvfeld"><span>Hintergrund (Rahmen)</span> <select id="eFuellungR" aria-label="Hintergrund (Rahmen)"><option value="">Standard</option><option value="unscharf">Unscharf</option><option value="zuschnitt">Zuschnitt</option><option value="balken">Schwarze Balken</option></select></label>
+      <label class="tvfeld"><span>Hintergrund (Fernseher)</span> <select id="eFuellungT" aria-label="Hintergrund (Fernseher)"><option value="">Standard</option><option value="unscharf">Unscharf</option><option value="zuschnitt">Zuschnitt</option><option value="balken">Schwarze Balken</option></select></label>
+      <div class="tvfeld"><span>Bildunterschrift</span><span class="reihe"><label><input type="checkbox" id="eDatum"> Datum</label><label><input type="checkbox" id="eZeit"> Uhrzeit</label><label><input type="checkbox" id="eOrt"> Ort</label></span></div>
+      <h3>Wetter und Termine</h3>
+      <p class="tipp">Erscheinen oben rechts am Rahmen. Für das Wetter wird nur der Ortsname an open-meteo.com geschickt.</p>
+      <div class="tvfeld"><span>Ort</span> <span id="eOrtName" style="flex:1;text-align:right"></span> <button class="btn klein versteckt" id="eOrtWeg" type="button">Entfernen</button></div>
+      <label class="tvfeld"><span>Ort suchen</span> <input id="eOrtSuche" type="text" autocomplete="off" aria-label="Ort suchen" placeholder="Berlin"></label>
+      <div id="eOrtTreffer"></div>
+      <label class="tvfeld stapel"><span>Kalender-Link (iCal)</span> <input id="eKal" type="text" autocomplete="off" aria-label="Kalender-Link" placeholder="https://…"></label>
+      <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="eWetterTest" type="button">Wetter testen</button><button class="btn klein" id="eKalTest" type="button">Kalender testen</button><button class="btn klein gefahr versteckt" id="eKalWeg" type="button">Kalender-Link entfernen</button></div>
+      <h3>Benachrichtigungen aufs Handy (Pushover)</h3>
+      <p class="tipp">Warnt zum Beispiel, wenn ein Rahmen offline ist oder der Akku fast leer ist. Den Zugang gibt es unter pushover.net.</p>
+      <label class="tvfeld"><span>User-Key</span> <input id="ePoUser" type="password" autocomplete="off" aria-label="User-Key"></label>
+      <label class="tvfeld"><span>App-Token</span> <input id="ePoToken" type="password" autocomplete="off" aria-label="App-Token"></label>
+      <label class="tvfeld"><span>Alarm, wenn ein Rahmen so viele Minuten offline ist (0 = aus)</span> <input id="eAlarm" type="number" min="0" max="1440" inputmode="numeric" aria-label="Minuten bis zum Alarm"></label>
+      <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="ePoTest" type="button">Test-Nachricht senden</button><button class="btn klein gefahr versteckt" id="ePoWeg" type="button">Zugang entfernen</button></div>
+      <h3>Spitznamen für Personen</h3>
+      <p class="tipp">Damit die Suche „Oma“ versteht, obwohl die Person in Immich anders heißt.</p>
+      <div id="eAliase"></div>
+      <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="eAliasNeu" type="button">＋ Spitzname</button></div>
+      <h3>Adresse der Fernseher-Seite</h3>
+      <label class="tvfeld"><span>Adresse</span> <input id="eTvUrl" type="text" autocomplete="off" aria-label="Adresse der Fernseher-Seite" placeholder="tv.example.com"></label>
+      <p class="tipp">Wird für die Anleitungen und QR-Codes beim Verbinden von Geräten genutzt.</p>
+    </div>
+    <div class="tvknoepfe"><button class="btn" id="einstAbbrechen" type="button">Schließen</button><button class="btn primaer" id="einstSpeichern" type="button">Speichern</button></div>
+  </div>
+</div>
+<div id="assiDialog" class="tvdialog versteckt" role="dialog" aria-modal="true" aria-labelledby="assiTitel">
+  <div class="tvkarte">
+    <h2 id="assiTitel">Gerät hinzufügen</h2>
+    <div id="assiSchritt1" class="gf">
+      <div class="tvfeld"><span>Art</span>
+        <select id="assiArt" aria-label="Art"><option value="rahmen">Bilderrahmen</option><option value="tv">Fernseher</option></select></div>
+      <label class="tvfeld"><span>Name</span> <input id="assiName" type="text" maxlength="60" autocomplete="off" aria-label="Name" placeholder="Flur"></label>
+      <div class="tvknoepfe"><button class="btn" id="assiAbbrechen" type="button">Abbrechen</button><button class="btn primaer" id="assiWeiter" type="button">Weiter</button></div>
+    </div>
+    <div id="assiSchritt2" class="versteckt">
+      <p class="tipp">Öffne am Tablet oder Fernseher diese Adresse im Browser – oder scanne den QR-Code mit der Kamera des Tablets.</p>
+      <div id="assiQr"></div>
+      <div class="assi-adr"><code id="assiAdresse"></code></div>
+      <p class="assi-status" id="assiStatus">Warte auf das Gerät …</p>
+      <p class="tipp">Alternativ: Am Gerät die Seite /tv/ öffnen und den Code unter „Gerät koppeln“ eingeben.</p>
+      <div class="tvknoepfe"><button class="btn" id="assiEinst" type="button">Einstellungen</button><button class="btn primaer" id="assiZu" type="button">Fertig</button></div>
+    </div>
+  </div>
+</div>
 <div id="geraetDialog" class="tvdialog versteckt" role="dialog" aria-modal="true" aria-labelledby="geraetTitel">
   <div class="tvkarte">
     <h2 id="geraetTitel">Gerät einstellen</h2>
     <div class="gf">
       <div class="tvfeld versteckt" id="gfArtZeile"><span>Art</span>
         <select id="gfArt" aria-label="Art"><option value="rahmen">Bilderrahmen</option><option value="tv">Fernseher</option></select></div>
+      <div class="tvknoepfe versteckt" id="gfVerbindenZeile" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfVerbinden" type="button">Verbindungs-Link und QR-Code anzeigen</button></div>
       <div class="tvfeld versteckt" id="gfKennungZeile"><span>Kennung (z. B. für Home Assistant)</span><code id="gfKennung"></code></div>
       <label class="tvfeld"><span>Name</span> <input id="gfName" type="text" maxlength="60" autocomplete="off" aria-label="Name"></label>
       <label class="tvfeld"><span>Hintergrund</span> <select id="gfFuellung" aria-label="Hintergrund"><option value="">Standard</option><option value="unscharf">Unscharf</option><option value="zuschnitt">Zuschnitt</option><option value="balken">Schwarze Balken</option></select></label>
       <div class="nur-gf-rahmen">
         <div class="gf">
           <label class="tvfeld"><span>Sekunden pro Foto</span> <input id="gfSek" type="number" min="3" max="120" inputmode="numeric" aria-label="Sekunden pro Foto"></label>
-          <div class="tvfeld"><span>Bildunterschrift</span><span class="reihe"><label><input type="checkbox" id="gfDatum"> Datum</label><label><input type="checkbox" id="gfOrt"> Ort</label></span></div>
+          <div class="tvfeld"><span>Bildunterschrift</span><span class="reihe"><label><input type="checkbox" id="gfDatum"> Datum</label><label><input type="checkbox" id="gfZeit"> Uhrzeit</label><label><input type="checkbox" id="gfOrt"> Ort</label></span></div>
           <div class="tvfeld"><span>Nachtruhe (Bildschirm aus)</span><span class="reihe"><input id="gfNachtVon" type="time" aria-label="von"> – <input id="gfNachtBis" type="time" aria-label="bis"></span></div>
           <h3>Dauerprogramm</h3>
           <p class="tipp">Was der Rahmen zeigt, wenn niemand etwas schickt. Ohne Eintrag gilt die allgemeine Einstellung der Installation.</p>
@@ -591,10 +654,23 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
           <p class="tipp">Zu bestimmten Tagen und Uhrzeiten zeigt der Rahmen andere Quellen als das Dauerprogramm oben.</p>
           <div id="gfPlan"></div>
           <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfPlanNeu" type="button">＋ Zeitfenster</button></div>
-          <h3>Fully Kiosk (Tablet)</h3>
-          <label class="tvfeld"><span>Adresse des Tablets</span> <input id="gfFullyHost" type="text" autocomplete="off" aria-label="Adresse des Tablets" placeholder="192.168.1.50"></label>
-          <label class="tvfeld"><span>Passwort</span> <input id="gfFullyPw" type="password" autocomplete="new-password" aria-label="Passwort"></label>
-          <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfFullyTest" type="button">Verbindung testen</button></div>
+          <details id="gfTablet" class="gfdetails">
+            <summary>Tablet-Steuerung (optional)</summary>
+            <p class="tipp">Ohne diese Steuerung läuft der Rahmen einfach rund um die Uhr; die Fotos kommen auch so an.</p>
+            <p class="tipp" id="gfTabletInfo"></p>
+            <div id="gfTabletWege">
+              <p class="tipp">Damit sich der Bildschirm nachts wirklich ausschaltet und der Akkustand gemeldet wird, gibt es zwei Wege:</p>
+              <p class="tipp">1. In Fully Kiosk unter „Erweiterte Web-Einstellungen“ die „JavaScript-Schnittstelle“ aktivieren (benötigt Fully Plus). Danach steuert sich das Tablet selbst – hier ist nichts weiter einzustellen.</p>
+              <p class="tipp">2. Oder in Fully „Remote Admin“ einschalten und hier Adresse und Passwort eintragen:</p>
+            </div>
+            <div class="tvknoepfe versteckt" id="gfFullyAnzeigen" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfFullyAn" type="button">Adresse und Passwort trotzdem einrichten</button></div>
+            <div class="gf" id="gfFullyFelder">
+              <label class="tvfeld"><span>Adresse des Tablets</span> <input id="gfFullyHost" type="text" autocomplete="off" aria-label="Adresse des Tablets" placeholder="192.168.1.50"></label>
+              <div class="tvknoepfe versteckt" id="gfIpZeile" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfIpNehmen" type="button"></button></div>
+              <label class="tvfeld"><span>Passwort</span> <input id="gfFullyPw" type="password" autocomplete="new-password" aria-label="Passwort"></label>
+              <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfFullyTest" type="button">Verbindung testen</button></div>
+            </div>
+          </details>
         </div>
       </div>
     </div>
@@ -1425,7 +1501,8 @@ async function statusLaden() {
     const d = await api("status" + (rahmenIds().length > 1 ? "?ziel=" + encodeURIComponent(rahmenAktuell()) : "")), box = $("#laeuft");
     rahmenWahlBauen(d.rahmen);
     box.classList.toggle("aktiv", !!d.laeuft);
-    $("#laeuftLabel").textContent = d.laeuft ? "● Läuft gerade auf dem Rahmen" : "Bilderrahmen";
+    const einer = rahmenIds().length === 1 ? rahmenName(rahmenIds()[0]) : "";            // bei genau einem Rahmen steht sein Name im Banner (sonst die Auswahl links)
+    $("#laeuftLabel").textContent = d.laeuft ? (einer ? "● Läuft gerade auf " + einer : "● Läuft gerade auf dem Rahmen") : (einer || "Bilderrahmen");
     $("#laeuftName").textContent = d.laeuft ? d.laeuft : "Normales Programm";
     $("#laeuftMeta").textContent = d.laeuft ? `${d.anzahl} Fotos${d.seit ? " · seit " + new Date(d.seit).toLocaleTimeString(RW_LOCALE, { hour: "2-digit", minute: "2-digit" }) + " Uhr" : ""}` : "Dauer-Diashow, keine Wunsch-Show aktiv";
     const rr = $("#rahmenReihe"); rr.classList.toggle("versteckt", !d.laeuft); if (d.reihenfolge && document.activeElement !== rr) rr.value = d.reihenfolge;
@@ -1457,7 +1534,7 @@ async function konfigLaden() {
       $("#sucheText").placeholder = RW_T("z. B.") + " " + bsp.slice(0, 2).join(", ");
       $("#sucheBsp").textContent = q[0] + bsp[0] + q[1];
     }
-    rahmenAuswahlBauen(); rahmenWahlBauen(); if (rahmenIds().length > 1) statusLaden();
+    rahmenAuswahlBauen(); rahmenWahlBauen(); if (rahmenIds().length) statusLaden();
     if (konfig.tv_url) $("#tvTippAdr").innerHTML = `Am Fernseher einmal im Browser <b>${esc(konfig.tv_url)}</b> öffnen` + (konfig.ziele.shield ? ` (${esc(konfig.ziele.shield)}: <b>${esc(konfig.tv_url)}/s</b>)` : "");
   } catch (e) { document.body.classList.remove("modus-laden"); }
 }
@@ -1629,6 +1706,19 @@ function planSchreiben() {
   return eintraege.join("; ");
 }
 $("#gfPlanNeu").addEventListener("click", () => $("#gfPlan").append(planKarte()));
+function tabletBereich(g) {                                // zwei Wege zur Tablet-Steuerung: Das Tablet meldet sich selbst (Fully-JavaScript) oder der Server steuert es per Adresse und Passwort
+  const selbst = !!g.selbst, hat = !!g.fully_host;
+  $("#gfTabletInfo").textContent = selbst ? RW_T("✓ Fully-Schnittstelle erkannt – das Tablet steuert sich selbst (Nachtruhe, Akku).") + (g.akku != null ? " " + RW_T("Akku") + " " + g.akku + " %." : "") : "";
+  $("#gfTabletInfo").classList.toggle("versteckt", !selbst);
+  $("#gfTabletWege").classList.toggle("versteckt", selbst);
+  $("#gfFullyFelder").classList.toggle("versteckt", selbst && !hat);
+  $("#gfFullyAnzeigen").classList.toggle("versteckt", !(selbst && !hat));
+  const ip = g.ip && !g.fully_host ? g.ip : "", b = $("#gfIpNehmen");
+  $("#gfIpZeile").classList.toggle("versteckt", !ip); b.dataset.ip = ip; b.textContent = ip ? RW_T("Erkannte Adresse übernehmen") + ": " + ip : "";
+  $("#gfTablet").open = selbst || hat;
+}
+$("#gfFullyAn").addEventListener("click", () => { $("#gfFullyFelder").classList.remove("versteckt"); $("#gfFullyAnzeigen").classList.add("versteckt"); });
+$("#gfIpNehmen").addEventListener("click", e => { $("#gfFullyHost").value = e.currentTarget.dataset.ip; $("#gfIpZeile").classList.add("versteckt"); });
 async function geraetDialogOeffnen(id) {
   gfId = id || null;
   let g = { art: "rahmen", name: "", sek: "", fuellung: "", anzeige: [], nacht: "", quellen: "", zeitplan: "", fully_host: "", fully_pw_gesetzt: false };
@@ -1640,18 +1730,129 @@ async function geraetDialogOeffnen(id) {
   $("#geraetTitel").textContent = RW_T(id ? "Gerät einstellen" : "Gerät hinzufügen");
   $("#gfArtZeile").classList.toggle("versteckt", !!id); $("#gfArt").value = g.art; gfArtAnpassen();
   $("#gfName").value = g.name; $("#gfFuellung").value = g.fuellung || "";
-  $("#gfSek").value = g.sek || ""; $("#gfDatum").checked = (g.anzeige || []).includes("datum"); $("#gfOrt").checked = (g.anzeige || []).includes("ort");
+  $("#gfSek").value = g.sek || ""; $("#gfDatum").checked = (g.anzeige || []).includes("datum"); $("#gfOrt").checked = (g.anzeige || []).includes("ort"); $("#gfZeit").checked = (g.anzeige || []).includes("zeit");
   const [von, bis] = (g.nacht || "-").split("-"); $("#gfNachtVon").value = (von || "").padStart(5, "0"); $("#gfNachtBis").value = (bis || "").padStart(5, "0");
   if (!g.nacht) { $("#gfNachtVon").value = ""; $("#gfNachtBis").value = ""; }
   $("#gfQuellen").innerHTML = ""; for (const q of quellenLesen(g.quellen)) $("#gfQuellen").append(quelleZeile(q));
   $("#gfPlan").innerHTML = ""; for (const f of planLesen(g.zeitplan)) $("#gfPlan").append(planKarte(f));
-  $("#gfKennungZeile").classList.toggle("versteckt", !id); $("#gfKennung").textContent = id || "";
+  $("#gfKennungZeile").classList.toggle("versteckt", !id); $("#gfVerbindenZeile").classList.toggle("versteckt", !id); $("#gfKennung").textContent = id || "";
   $("#gfFullyHost").value = g.fully_host || ""; $("#gfFullyPw").value = "";
+  tabletBereich(g);
   $("#gfFullyPw").placeholder = g.fully_pw_gesetzt ? RW_T("gesetzt – leer lassen zum Behalten") : "";
   $("#gfLoeschen").classList.toggle("versteckt", !id);
   $("#geraetDialog").classList.remove("versteckt"); $("#gfName").focus();
 }
-$("#geraetNeu").addEventListener("click", () => geraetDialogOeffnen(null));
+// ---------------------------------------------------------------- Einstellungen (statt .env)
+let einstWetter = null, einstDaten = null;
+function aliasZeile(a) {
+  a = a || { name: "", person: "" };
+  const z = document.createElement("div"); z.className = "qzeile";
+  const n = document.createElement("input"); n.type = "text"; n.className = "qwert"; n.value = a.name; n.placeholder = "Oma"; n.maxLength = 40; n.setAttribute("aria-label", RW_T("Spitzname"));
+  const pe = document.createElement("input"); pe.type = "text"; pe.className = "qwert"; pe.value = a.person; pe.placeholder = "Anna Muster"; pe.setAttribute("list", "ePersonenListe"); pe.setAttribute("aria-label", RW_T("Person"));
+  const weg = document.createElement("button"); weg.type = "button"; weg.className = "btn klein"; weg.textContent = "✕"; weg.setAttribute("aria-label", RW_T("Entfernen")); weg.addEventListener("click", () => z.remove());
+  z.append(n, document.createTextNode("="), pe, weg); return z;
+}
+function einstFuellen(d) {
+  einstDaten = d; einstWetter = d.wetter;
+  $("#eSek").value = d.sek || ""; $("#eSek").placeholder = String(d.standard.sek);
+  $("#eFuellungR").value = d.fuellung_rahmen || ""; $("#eFuellungT").value = d.fuellung_tv || "";
+  const an = d.anzeige.length ? d.anzeige : d.standard.anzeige;
+  $("#eDatum").checked = an.includes("datum"); $("#eZeit").checked = an.includes("zeit"); $("#eOrt").checked = an.includes("ort");
+  $("#eOrtName").textContent = d.wetter ? d.wetter.name || (d.wetter.lat + ", " + d.wetter.lon) : (d.wetter_env ? RW_T("über die Installation eingestellt") : RW_T("nicht eingestellt"));
+  $("#eOrtWeg").classList.toggle("versteckt", !d.wetter); $("#eOrtSuche").value = ""; $("#eOrtTreffer").innerHTML = "";
+  $("#eKal").value = ""; $("#eKal").placeholder = d.kalender_gesetzt ? RW_T("gesetzt – zum Ändern neuen Link einfügen") : d.kalender_env ? RW_T("über die Installation eingestellt") : "https://…";
+  $("#eKalWeg").classList.toggle("versteckt", !d.kalender_gesetzt);
+  $("#ePoUser").value = ""; $("#ePoToken").value = ""; $("#ePoUser").placeholder = $("#ePoToken").placeholder = d.pushover_gesetzt ? RW_T("gesetzt – leer lassen zum Behalten") : "";
+  $("#ePoWeg").classList.toggle("versteckt", !d.pushover_gesetzt);
+  $("#eAlarm").value = d.alarm_min != null ? d.alarm_min : ""; $("#eAlarm").placeholder = String(d.standard.alarm_min);
+  $("#eTvUrl").value = d.tv_url || ""; $("#eTvUrl").placeholder = d.standard.tv_url || "tv.example.com";
+  $("#eAliase").innerHTML = ""; for (const a of d.aliase) $("#eAliase").append(aliasZeile(a));
+  let dl = $("#ePersonenListe"); if (!dl) { dl = document.createElement("datalist"); dl.id = "ePersonenListe"; document.body.append(dl); }
+  dl.innerHTML = ""; for (const n of d.personen) { const o = document.createElement("option"); o.value = n; dl.append(o); }
+}
+async function einstOeffnen() {
+  $("#konto").open = false;
+  try { einstFuellen(await api("einstellungen")); } catch (e) { fehler(e); return; }
+  $("#einstDialog").classList.remove("versteckt");
+}
+function einstSammeln() {
+  const k = { sek: $("#eSek").value, fuellung_rahmen: $("#eFuellungR").value, fuellung_tv: $("#eFuellungT").value, tv_url: $("#eTvUrl").value.trim(), alarm_min: $("#eAlarm").value,
+    anzeige: [$("#eDatum").checked && "datum", $("#eZeit").checked && "zeit", $("#eOrt").checked && "ort"].filter(Boolean), wetter: einstWetter,
+    aliase: [...$$("#eAliase .qzeile")].map(z => { const i = z.querySelectorAll("input"); return { name: i[0].value.trim(), person: i[1].value.trim() }; }) };
+  if ($("#eKal").value.trim()) k.kalender_url = $("#eKal").value.trim();
+  if ($("#ePoUser").value.trim() || $("#ePoToken").value.trim()) k.pushover = { user: $("#ePoUser").value.trim(), token: $("#ePoToken").value.trim() };
+  return k;
+}
+async function einstSpeichern(still) {
+  const r = await api("einstellungen", { method: "PUT", body: JSON.stringify(einstSammeln()) });
+  einstFuellen(r.einstellungen); if (!still) toast(RW_T("Gespeichert.")); return r;
+}
+$("#einstBtn").addEventListener("click", einstOeffnen);
+$("#einstAbbrechen").addEventListener("click", () => $("#einstDialog").classList.add("versteckt"));
+$("#einstSpeichern").addEventListener("click", async () => { try { await einstSpeichern(); await konfigLaden(); statusLaden(); } catch (e) { fehler(e); } });
+$("#eAliasNeu").addEventListener("click", () => $("#eAliase").append(aliasZeile()));
+$("#eOrtWeg").addEventListener("click", () => { einstWetter = null; $("#eOrtName").textContent = RW_T("nicht eingestellt"); $("#eOrtWeg").classList.add("versteckt"); });
+let eOrtTimer = 0;
+$("#eOrtSuche").addEventListener("input", () => {
+  clearTimeout(eOrtTimer); const q = $("#eOrtSuche").value.trim(), box = $("#eOrtTreffer"); box.innerHTML = ""; if (q.length < 2) return;
+  eOrtTimer = setTimeout(async () => {
+    try {
+      const d = await api("einstellungen/ort-suche?q=" + encodeURIComponent(q));
+      for (const o of d.orte) {
+        const b = document.createElement("button"); b.type = "button"; b.className = "btn klein"; b.style.margin = "2px 6px 2px 0";
+        b.textContent = [o.name, o.region, o.land].filter((x, i, a) => x && a.indexOf(x) === i).join(", ");
+        b.addEventListener("click", () => { einstWetter = { lat: o.lat, lon: o.lon, name: o.name + (o.land ? ", " + o.land : "") }; $("#eOrtName").textContent = einstWetter.name; $("#eOrtWeg").classList.remove("versteckt"); box.innerHTML = ""; $("#eOrtSuche").value = ""; });
+        box.append(b);
+      }
+      if (!d.orte.length) box.textContent = RW_T("Nichts gefunden.");
+    } catch (e) {}
+  }, 350);
+});
+async function einstTest(was) {
+  try { await einstSpeichern(true); const r = await api("einstellungen/test", { method: "POST", body: JSON.stringify({ was }) }); toast(r.nachricht); } catch (e) { fehler(e); }
+}
+$("#eWetterTest").addEventListener("click", () => einstTest("wetter"));
+$("#eKalTest").addEventListener("click", () => einstTest("kalender"));
+$("#ePoTest").addEventListener("click", () => einstTest("pushover"));
+$("#eKalWeg").addEventListener("click", async () => { try { const r = await api("einstellungen", { method: "PUT", body: JSON.stringify({ kalender_url: null }) }); einstFuellen(r.einstellungen); } catch (e) { fehler(e); } });
+$("#ePoWeg").addEventListener("click", async () => { try { const r = await api("einstellungen", { method: "PUT", body: JSON.stringify({ pushover: null }) }); einstFuellen(r.einstellungen); } catch (e) { fehler(e); } });
+
+let assiTimer = 0, assiId = null;
+function tvBasis() {
+  const u = (konfig.tv_url || "").trim(); if (!u) return location.origin;
+  return /^https?:\/\//.test(u) ? u : (/^[\d.]+(:\d+)?(\/|$)/.test(u) ? "http://" : "https://") + u;
+}
+function assiVerbinden(id) {
+  assiId = id; const adr = tvBasis() + "/tv/?ziel=" + encodeURIComponent(id);
+  $("#assiTitel").textContent = RW_T("Gerät verbinden"); $("#assiSchritt1").classList.add("versteckt"); $("#assiSchritt2").classList.remove("versteckt");
+  $("#assiAdresse").textContent = adr; $("#assiQr").innerHTML = "";
+  try { const qr = qrcode(0, "M"); qr.addData(adr); qr.make(); $("#assiQr").innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true }); $("#assiQr").style.display = ""; } catch (e) { $("#assiQr").style.display = "none"; }
+  const st = $("#assiStatus"); st.textContent = RW_T("Warte auf das Gerät …"); st.classList.remove("ok");
+  $("#assiDialog").classList.remove("versteckt"); clearInterval(assiTimer);
+  const pruefen = async () => {
+    try { const d = await api("geraete"), g = d.geraete.find(x => x.id === id); if (g && g.online) { st.textContent = RW_T("✓ Verbunden"); st.classList.add("ok"); clearInterval(assiTimer); } } catch (e) {}
+  };
+  assiTimer = setInterval(pruefen, 2500); pruefen();
+}
+function assiOeffnen() {
+  $("#assiTitel").textContent = RW_T("Gerät hinzufügen"); $("#assiSchritt1").classList.remove("versteckt"); $("#assiSchritt2").classList.add("versteckt");
+  $("#assiName").value = ""; $("#assiArt").value = "rahmen"; $("#assiDialog").classList.remove("versteckt"); $("#assiName").focus();
+}
+function assiSchliessen() { clearInterval(assiTimer); $("#assiDialog").classList.add("versteckt"); geraeteNeuLesen(); }
+$("#geraetNeu").addEventListener("click", assiOeffnen);
+$("#assiAbbrechen").addEventListener("click", () => { $("#assiDialog").classList.add("versteckt"); });
+$("#assiZu").addEventListener("click", assiSchliessen);
+$("#assiEinst").addEventListener("click", () => { const id = assiId; assiSchliessen(); geraetDialogOeffnen(id); });
+$("#assiName").addEventListener("keydown", e => { if (e.key === "Enter") $("#assiWeiter").click(); });
+$("#assiWeiter").addEventListener("click", async () => {
+  const name = $("#assiName").value.trim(); if (!name) { toast(RW_T("Bitte einen Namen eingeben."), true); $("#assiName").focus(); return; }
+  const b = $("#assiWeiter"); b.disabled = true;
+  try { const r = await api("verwaltung/geraete", { method: "POST", body: JSON.stringify({ art: $("#assiArt").value, name }) }); await konfigLaden(); assiVerbinden(r.id); }
+  catch (e) { fehler(e); }
+  b.disabled = false;
+});
+// Verbindungs-Link eines vorhandenen Geraets (z. B. wenn das Tablet neu eingerichtet wird)
+$("#gfVerbinden").addEventListener("click", () => { const id = gfId; $("#geraetDialog").classList.add("versteckt"); if (id) assiVerbinden(id); });
 
 async function verteilenOeffnen(shows) {
   let st; try { st = await api("status?ziel=" + encodeURIComponent(rahmenAktuell())); } catch (e) { fehler(e); return; }
@@ -1692,7 +1893,7 @@ $("#gfSpeichern").addEventListener("click", async () => {
   const daten = { name, fuellung: $("#gfFuellung").value };
   if (!gfId) daten.art = $("#gfArt").value;
   if (istRahmen) {
-    Object.assign(daten, { sek: $("#gfSek").value, anzeige: [$("#gfDatum").checked && "datum", $("#gfOrt").checked && "ort"].filter(Boolean), nacht: von && bis ? von + "-" + bis : "",
+    Object.assign(daten, { sek: $("#gfSek").value, anzeige: [$("#gfDatum").checked && "datum", $("#gfZeit").checked && "zeit", $("#gfOrt").checked && "ort"].filter(Boolean), nacht: von && bis ? von + "-" + bis : "",
       quellen: quellenSchreiben(), zeitplan: planSchreiben(), fully_host: $("#gfFullyHost").value.trim() });
     if ($("#gfFullyPw").value) daten.fully_pw = $("#gfFullyPw").value;
   }

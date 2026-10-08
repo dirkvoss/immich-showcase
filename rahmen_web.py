@@ -105,7 +105,7 @@ def _wahl(name, erlaubt, default):
 
 RAHMEN_FUELLUNG = _wahl("RAHMEN_WEB_RAHMEN_FUELLUNG", ("balken", "unscharf", "zuschnitt"), "unscharf")
 TV_FUELLUNG = _wahl("RAHMEN_WEB_TV_FUELLUNG", ("balken", "unscharf", "zuschnitt"), "balken")
-RAHMEN_ANZEIGE = [x for x in _liste("RAHMEN_WEB_RAHMEN_ANZEIGE") if x in ("datum", "ort")]
+RAHMEN_ANZEIGE = [x for x in _liste("RAHMEN_WEB_RAHMEN_ANZEIGE") if x in ("datum", "zeit", "ort")]
 RAHMEN_NACHT = os.environ.get("RAHMEN_WEB_RAHMEN_NACHT", "").strip() if re.fullmatch(r"\d{1,2}:\d{2}-\d{1,2}:\d{2}", os.environ.get("RAHMEN_WEB_RAHMEN_NACHT", "").strip()) else ""
 # Meldung (Pushover), wenn ein Rahmen laenger als so viele Minuten nicht erreichbar ist bzw. dasselbe Bild zeigt (0 = aus)
 RAHMEN_ALARM_MIN = max(0, int(os.environ.get("RAHMEN_WEB_RAHMEN_ALARM_MIN", "15")))
@@ -170,19 +170,26 @@ def zwischenspeicher(schluessel, sekunden, holen):
     return wert
 
 
+def pushover_senden(titel, text, prio=0):
+    """Schickt eine Pushover-Nachricht; wirft bei Fehlern. Zugang: App-Einstellungen, sonst Umgebung, sonst Datei."""
+    pe = EINST.get("pushover") if "EINST" in globals() else None
+    if isinstance(pe, dict) and pe.get("user") and pe.get("token"):
+        cred = {"PUSHOVER_API_KEY": pe["token"], "PUSHOVER_USER_KEY": pe["user"], "PUSHOVER_DEVICE": pe.get("device", "")}
+    elif os.environ.get("RAHMEN_WEB_PUSHOVER_API_KEY") and os.environ.get("RAHMEN_WEB_PUSHOVER_USER_KEY"):      # bequem ueber die Umgebung
+        cred = {"PUSHOVER_API_KEY": os.environ["RAHMEN_WEB_PUSHOVER_API_KEY"], "PUSHOVER_USER_KEY": os.environ["RAHMEN_WEB_PUSHOVER_USER_KEY"],
+                "PUSHOVER_DEVICE": os.environ.get("RAHMEN_WEB_PUSHOVER_DEVICE", "")}
+    else:
+        cred = dict(z.strip().split("=", 1) for z in open(PUSHOVER_FILE) if "=" in z and not z.startswith("#"))
+    daten = {"token": cred["PUSHOVER_API_KEY"].strip('"'), "user": cred["PUSHOVER_USER_KEY"].strip('"'),
+             "title": titel, "message": text, "priority": prio}
+    if cred.get("PUSHOVER_DEVICE"):
+        daten["device"] = cred["PUSHOVER_DEVICE"].strip('"')
+    urllib.request.urlopen("https://api.pushover.net/1/messages.json", urllib.parse.urlencode(daten).encode(), timeout=10).read()
+
+
 def pushover(titel, text, prio=0):
     try:
-        if os.environ.get("RAHMEN_WEB_PUSHOVER_API_KEY") and os.environ.get("RAHMEN_WEB_PUSHOVER_USER_KEY"):      # bequem ueber die Umgebung
-            cred = {"PUSHOVER_API_KEY": os.environ["RAHMEN_WEB_PUSHOVER_API_KEY"], "PUSHOVER_USER_KEY": os.environ["RAHMEN_WEB_PUSHOVER_USER_KEY"],
-                    "PUSHOVER_DEVICE": os.environ.get("RAHMEN_WEB_PUSHOVER_DEVICE", "")}
-        else:
-            cred = dict(z.strip().split("=", 1) for z in open(PUSHOVER_FILE) if "=" in z and not z.startswith("#"))
-        daten = {"token": cred["PUSHOVER_API_KEY"].strip('"'), "user": cred["PUSHOVER_USER_KEY"].strip('"'),
-                 "title": titel, "message": text, "priority": prio}
-        if cred.get("PUSHOVER_DEVICE"):
-            daten["device"] = cred["PUSHOVER_DEVICE"].strip('"')
-        urllib.request.urlopen("https://api.pushover.net/1/messages.json",
-                               urllib.parse.urlencode(daten).encode(), timeout=10).read()
+        pushover_senden(titel, text, prio)
     except Exception as e:  # noqa: BLE001 - Alarm darf nie den Login stoeren
         H.log.warning("Pushover fehlgeschlagen: %s", e)
 
@@ -540,10 +547,10 @@ def logout(response: Response, _=Depends(csrf)):
 def konfig(ziel: str = ""):
     """Oeffentliche Darstellung der Installation (kein Geheimnis): Name, Beispiele fuer die Suche, Adresse der Fernseher-Seite. Mit ?ziel= gelten die Einstellungen dieses Geraets."""
     z = ziel if ziel in GERAETE else None
-    return {"name": APP_NAME, "version": VERSION, "modus": MODUS, "auth": AUTH, "musik_upload": MUSIK_UPLOAD, "konfiguriert": konfiguriert(), "tv_url": TV_URL, "beispiele": BEISPIELE, "beispiele_en": BEISPIELE_EN,
+    return {"name": APP_NAME, "version": VERSION, "modus": MODUS, "auth": AUTH, "musik_upload": MUSIK_UPLOAD, "konfiguriert": konfiguriert(), "tv_url": tv_url(), "beispiele": BEISPIELE, "beispiele_en": BEISPIELE_EN,
             "ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT and k not in RAHMEN_ZIELE},
-            "rahmen": list(RAHMEN_ZIELE), "rahmen_namen": dict(RAHMEN_ZIELE), "rahmen_sek": gwert(z, "sek", RAHMEN_SEK), "rahmen_fuellung": gwert(z, "fuellung", RAHMEN_FUELLUNG), "tv_fuellung": gwert(z, "fuellung", TV_FUELLUNG),
-            "rahmen_anzeige": gwert(z, "anzeige", RAHMEN_ANZEIGE), "rahmen_nacht": rahmen_nacht(z), "rahmen_zusatz": ZUSATZ, "koppeln": True,
+            "rahmen": list(RAHMEN_ZIELE), "rahmen_namen": dict(RAHMEN_ZIELE), "rahmen_sek": gwert(z, "sek", std_sek()), "rahmen_fuellung": gwert(z, "fuellung", std_fuellung_rahmen()), "tv_fuellung": gwert(z, "fuellung", std_fuellung_tv()),
+            "rahmen_anzeige": gwert(z, "anzeige", std_anzeige()), "rahmen_nacht": rahmen_nacht(z), "rahmen_zusatz": zusatz_liste(), "koppeln": True,
             "alle_ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT}}
 
 
@@ -728,7 +735,7 @@ def diagnose(_=Depends(anmeldung)):
         "immich": immich,
         "einstellungen": {"auth": AUTH, "modus": MODUS, "name": APP_NAME, "datenbank_aktiv": DB_AKTIV, "musik_upload": MUSIK_UPLOAD, "tv_ziele": list(TV_ZIELE), "rahmen_ziele": list(RAHMEN_ZIELE),
                           "vertraute_netze": [str(n) for n in LAN_NETS], "proxys": sorted(TRUSTED_PROXIES), "rahmen_quellen": len(RAHMEN_QUELLEN_ROH), "rahmen_fuellung": RAHMEN_FUELLUNG,
-                          "rahmen_anzeige": RAHMEN_ANZEIGE, "rahmen_nacht": RAHMEN_NACHT, "alarm_minuten": RAHMEN_ALARM_MIN, "konfiguriert": konfiguriert()},
+                          "rahmen_anzeige": RAHMEN_ANZEIGE, "rahmen_nacht": RAHMEN_NACHT, "alarm_minuten": std_alarm_min(), "konfiguriert": konfiguriert()},
         "musik_sammlungen": bib,
         "geraete": [{"id": z, "name": n, "zuletzt_gesehen_vor_s": int(jetzt - TV[z]["hb"]) if TV[z]["hb"] else None, "spielt": TV[z]["tv_name"] if TV[z]["tv_laeuft"] else None} for z, n in TV_ZIELE.items() if z not in TV_VERSTECKT],
         "protokoll": [schwaerzen(z) for z in LOGRING],
@@ -1549,6 +1556,44 @@ REGISTER["aktiv"] = _aktiv
 geraete_anwenden(_g)
 
 
+# --------------------------------------------------------------------------- Einstellungen der Installation (in der App statt in der .env)
+# Werte aus der App liegen in EINST_FILE und haben Vorrang vor den Umgebungsvariablen (die dann nur Startwerte sind). Sicherheitsrelevantes
+# (Anmeldeart, vertrautes Netz, Proxys, Immich-Schluessel) bleibt bewusst in der Umgebung.
+EINST_FILE = os.environ.get("RAHMEN_WEB_EINSTELLUNGEN_FILE", os.path.join(os.path.dirname(SHOWS_FILE), "rahmen_web_einstellungen.json"))
+EINST = lies_json(EINST_FILE, {})
+if not isinstance(EINST, dict):
+    EINST = {}
+
+
+def einst(key, default=None):
+    v = EINST.get(key)
+    return default if v in (None, "", [], {}) else v
+
+
+def std_sek():
+    return einst("sek", RAHMEN_SEK)
+
+
+def std_fuellung_rahmen():
+    return einst("fuellung_rahmen", RAHMEN_FUELLUNG)
+
+
+def std_fuellung_tv():
+    return einst("fuellung_tv", TV_FUELLUNG)
+
+
+def std_anzeige():
+    return einst("anzeige", RAHMEN_ANZEIGE)
+
+
+def std_alarm_min():
+    return einst("alarm_min", RAHMEN_ALARM_MIN) if "alarm_min" in EINST else RAHMEN_ALARM_MIN
+
+
+def tv_url():
+    return einst("tv_url", TV_URL)
+
+
 def gwert(z, feld, standard=None):
     """Einstellung eines Geraets; leer/fehlend = allgemeiner Wert."""
     v = (GERAETE.get(z) or {}).get(feld)
@@ -1556,7 +1601,7 @@ def gwert(z, feld, standard=None):
 
 
 def rahmen_sek(z=None):
-    return gwert(z or PLAYER, "sek", RAHMEN_SEK)
+    return gwert(z or PLAYER, "sek", std_sek())
 
 
 def rahmen_nacht(z=None):
@@ -2006,7 +2051,7 @@ BILDINFO = {}
 
 @app.get("/api/bildinfo/{asset_id}")
 def bildinfo(asset_id: str, lang: str = "de", _=Depends(geraet)):
-    """Datum und Ort eines Fotos fuer die Bildunterschrift am Rahmen."""
+    """Datum, Uhrzeit und Ort eines Fotos fuer die Bildunterschrift am Rahmen."""
     if not ID_RE.match(asset_id):
         raise HTTPException(400, "ungueltig")
     if asset_id in BILDINFO:
@@ -2029,7 +2074,8 @@ def bildinfo(asset_id: str, lang: str = "de", _=Depends(geraet)):
     if lang == "de":
         land = LAND_DE.get(land, land)
     ort = ", ".join(x for x in (exif.get("city"), land) if x)
-    return {"datum": (a.get("localDateTime") or a.get("fileCreatedAt") or "")[:10], "ort": ort}
+    wann = a.get("localDateTime") or a.get("fileCreatedAt") or ""
+    return {"datum": wann[:10], "zeit": wann[11:16] if re.fullmatch(r"\d\d:\d\d", wann[11:16]) else "", "ort": ort}
 
 
 @app.get("/api/rahmen/status")
@@ -2050,7 +2096,17 @@ if _m:
 KALENDER_URL = os.environ.get("RAHMEN_WEB_KALENDER_URL", "").strip()
 if not re.match(r"^https?://", KALENDER_URL):
     KALENDER_URL = ""
-ZUSATZ = [k for k in _liste("RAHMEN_WEB_RAHMEN_ZUSATZ", "wetter,kalender") if (k == "wetter" and WETTER_ORT) or (k == "kalender" and KALENDER_URL)]
+def wetter_ort():
+    w = EINST.get("wetter")
+    return (float(w["lat"]), float(w["lon"])) if isinstance(w, dict) and "lat" in w and "lon" in w else WETTER_ORT
+
+
+def kalender_url():
+    return einst("kalender_url", KALENDER_URL)
+
+
+def zusatz_liste():
+    return [k for k in _liste("RAHMEN_WEB_RAHMEN_ZUSATZ", "wetter,kalender") if (k == "wetter" and wetter_ort()) or (k == "kalender" and kalender_url())]
 ZUSATZ_CACHE = {}
 
 
@@ -2082,7 +2138,7 @@ def zusatz_gecacht(name, sekunden, holen):
 
 
 def wetter_holen():
-    lat, lon = WETTER_ORT
+    lat, lon = wetter_ort()
     d = json.loads(http_text(f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,weather_code&timezone=auto"))
     cur = d["current"]
     return {"temp": round(float(cur["temperature_2m"])), "symbol": wetter_symbol(int(cur["weather_code"]))}
@@ -2160,18 +2216,19 @@ def ics_termine(text, heute, tage=2, maximum=4):
 
 
 def kalender_holen():
-    return ics_termine(http_text(KALENDER_URL), datetime.date.today())
+    return ics_termine(http_text(kalender_url()), datetime.date.today())
 
 
 @app.get("/api/rahmen/zusatz")
 def rahmen_zusatz(_=Depends(geraet)):
     """Wetter und Termine fuer die Zusatzanzeige am Rahmen (nur was eingerichtet ist)."""
     out = {}
-    if "wetter" in ZUSATZ:
+    zusatz = zusatz_liste()
+    if "wetter" in zusatz:
         w = zusatz_gecacht("wetter", 900, wetter_holen)
         if w:
             out["wetter"] = w
-    if "kalender" in ZUSATZ:
+    if "kalender" in zusatz:
         t = zusatz_gecacht("kalender", 600, kalender_holen)
         if t is not None:
             out["termine"] = t
@@ -2212,11 +2269,28 @@ def fully_bildschirm(z, an):
     FULLY_STATE.setdefault(z, {})["bildschirm"] = "an" if an else "aus"
 
 
+def akku_melden(z, akku, laedt):
+    """Merkt den Akkustand eines Tablets und warnt einmal, wenn er niedrig ist und das Tablet nicht laedt (egal ob es ihn selbst meldet oder ueber Fully abgefragt wurde)."""
+    st = FULLY_STATE.setdefault(z, {})
+    st["akku"], st["laedt"] = akku, laedt
+    if akku <= FULLY_AKKU_MIN and not laedt and not st.get("akku_gemeldet"):
+        st["akku_gemeldet"] = True
+        threading.Thread(target=pushover, args=(f"{TV_ZIELE.get(z, z)}: Akku niedrig", f"Akku {akku} % und das Tablet laedt nicht.", 1), daemon=True).start()
+    elif laedt or akku >= FULLY_AKKU_MIN + 10:
+        st["akku_gemeldet"] = False
+
+
+def meldet_selbst(z):
+    """Das Tablet steuert sich selbst (Fully-JavaScript-Schnittstelle), solange es sich so meldet."""
+    t = TV.get(z) or {}
+    return bool(t.get("fully_js") and time.time() - t.get("hb", 0) < 60)
+
+
 def fully_wache_pruefen(jetzt=None):
     """Einmal pro Minute: Nachtruhe (Bildschirm aus/an nur beim Wechsel, damit Handeingriffe nicht ueberstimmt werden) und Akku (alle 5 Minuten)."""
     for z in FULLY:
         st = FULLY_STATE.setdefault(z, {})
-        if rahmen_nacht(z):
+        if rahmen_nacht(z) and not meldet_selbst(z):               # meldet sich das Tablet selbst, schaltet es den Bildschirm selbst
             soll = "aus" if in_nacht(jetzt, z) else "an"
             if st.get("soll") != soll:
                 try:
@@ -2232,11 +2306,7 @@ def fully_wache_pruefen(jetzt=None):
             except Exception as e:  # noqa: BLE001
                 H.log.warning("Fully %s Akku: %s", z, e)
                 continue
-            if st["akku"] <= FULLY_AKKU_MIN and not st["laedt"] and not st.get("akku_gemeldet"):
-                st["akku_gemeldet"] = True
-                pushover(f"{TV_ZIELE[z]}: Akku niedrig", f"Akku {st['akku']} % und das Tablet laedt nicht.", 1)
-            elif st["laedt"] or st["akku"] >= FULLY_AKKU_MIN + 10:
-                st["akku_gemeldet"] = False
+            akku_melden(z, st["akku"], st["laedt"])
 
 
 def fully_wache_schleife():
@@ -2268,7 +2338,7 @@ def geraete_liste():
                       "zustand": "offline" if not online else "spielt" if spielt else "dauerprogramm" if dauer else "bereit",
                       "zuletzt_vor_s": int(jetzt - d["hb"]) if d["hb"] else None, "spielt": spielt, "dauerprogramm": dauer,
                       "bild_alter_s": d.get("bild_alter") if online else None,
-                      "fully": z in FULLY, "bildschirm": st.get("bildschirm"), "akku": st.get("akku"), "laedt": st.get("laedt")})
+                      "fully": z in FULLY, "selbst": meldet_selbst(z), "bildschirm": st.get("bildschirm"), "akku": st.get("akku"), "laedt": st.get("laedt")})
     return liste
 
 
@@ -2284,7 +2354,8 @@ NACHT_RE = re.compile(r"(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})")
 
 
 def geraet_ansicht(z, e):
-    return {"id": z, "art": e["art"], "name": e["name"], "sek": e.get("sek"), "fuellung": e.get("fuellung") or "", "anzeige": e.get("anzeige") or [],
+    t = TV.get(z) or {}
+    return {"selbst": meldet_selbst(z), "ip": t.get("ip") or "", "akku": (FULLY_STATE.get(z) or {}).get("akku"), "id": z, "art": e["art"], "name": e["name"], "sek": e.get("sek"), "fuellung": e.get("fuellung") or "", "anzeige": e.get("anzeige") or [],
             "nacht": e.get("nacht") or "", "quellen": e.get("quellen") or "", "zeitplan": e.get("zeitplan") or "",
             "fully_host": e.get("fully_host") or "", "fully_pw_gesetzt": bool(e.get("fully_pw"))}
 
@@ -2319,9 +2390,9 @@ def geraet_felder(daten, art):
                     raise HTTPException(400, "Sekunden pro Foto: bitte eine Zahl zwischen 3 und 120")
         if "anzeige" in daten:
             a = daten["anzeige"] if isinstance(daten["anzeige"], list) else []
-            if any(x not in ("datum", "ort") for x in a):
+            if any(x not in ("datum", "zeit", "ort") for x in a):
                 raise HTTPException(400, "Unbekannte Bildunterschrift")
-            (setzen.__setitem__("anzeige", [x for x in ("datum", "ort") if x in a]) if a else weg.append("anzeige"))
+            (setzen.__setitem__("anzeige", [x for x in ("datum", "zeit", "ort") if x in a]) if a else weg.append("anzeige"))
         if "nacht" in daten:
             v = str(daten["nacht"] or "").strip()
             m = NACHT_RE.fullmatch(v)
@@ -2375,7 +2446,7 @@ def geraet_aufraeumen(z):
 @app.get("/api/verwaltung")
 def verwaltung(_=Depends(anmeldung)):
     return {"geraete": [geraet_ansicht(z, e) for z, e in GERAETE.items()], "register_aktiv": REGISTER["aktiv"],
-            "standard": {"sek": RAHMEN_SEK, "fuellung_rahmen": RAHMEN_FUELLUNG, "fuellung_tv": TV_FUELLUNG, "anzeige": RAHMEN_ANZEIGE, "nacht": RAHMEN_NACHT}}
+            "standard": {"sek": std_sek(), "fuellung_rahmen": std_fuellung_rahmen(), "fuellung_tv": std_fuellung_tv(), "anzeige": std_anzeige(), "nacht": RAHMEN_NACHT}}
 
 
 @app.post("/api/verwaltung/geraete")
@@ -2433,6 +2504,171 @@ def fully_test(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
     except Exception as e:  # noqa: BLE001
         raise HTTPException(502, f"Fully Kiosk antwortet nicht: {e}")
     return {"ok": True, "akku": info.get("batteryLevel"), "laedt": bool(info.get("isPlugged")), "nachricht": f"Verbunden – Akku {info.get('batteryLevel')} %"}
+
+
+# --------------------------------------------------------------------------- Einstellungen in der App
+_lade_personen_orig = H.lade_personen
+
+
+def _lade_personen_mit_app():
+    named, alias = _lade_personen_orig()
+    for e in EINST.get("aliase") or []:                                   # Spitznamen aus der App ("oma" -> "Erika Muster")
+        if e.get("name") and e.get("person"):
+            alias[H.norm(e["name"])] = e["person"]
+    return named, alias
+
+
+H.lade_personen = _lade_personen_mit_app
+
+
+def einst_speichern():
+    try:
+        schreibe_json(EINST_FILE, EINST)
+    except OSError as e:
+        H.log.error("Einstellungen nicht speicherbar: %s", e)
+        raise HTTPException(500, "Die Einstellungen konnten nicht gespeichert werden.")
+    ZUSATZ_CACHE.clear()
+    PERSONEN_CACHE["t"] = 0.0
+
+
+def einst_ansicht():
+    pe = EINST.get("pushover") or {}
+    namen = []
+    try:
+        namen = sorted({n for n, _i in H.lade_personen()[0]})
+    except Exception:  # noqa: BLE001 - ohne Immich keine Personenliste
+        pass
+    return {"sek": EINST.get("sek"), "fuellung_rahmen": EINST.get("fuellung_rahmen") or "", "fuellung_tv": EINST.get("fuellung_tv") or "",
+            "anzeige": EINST.get("anzeige") or [], "alarm_min": EINST.get("alarm_min"), "tv_url": EINST.get("tv_url") or "",
+            "wetter": EINST.get("wetter") or None, "wetter_env": bool(WETTER_ORT) and not EINST.get("wetter"),
+            "kalender_gesetzt": bool(EINST.get("kalender_url")), "kalender_env": bool(KALENDER_URL) and not EINST.get("kalender_url"),
+            "pushover_gesetzt": bool(pe.get("user") and pe.get("token")), "pushover_geraet": pe.get("device") or "",
+            "aliase": EINST.get("aliase") or [], "personen": namen,
+            "standard": {"sek": RAHMEN_SEK, "fuellung_rahmen": RAHMEN_FUELLUNG, "fuellung_tv": TV_FUELLUNG, "anzeige": RAHMEN_ANZEIGE, "alarm_min": RAHMEN_ALARM_MIN, "tv_url": TV_URL}}
+
+
+@app.get("/api/einstellungen")
+def einstellungen_lesen(_=Depends(anmeldung)):
+    return einst_ansicht()
+
+
+@app.put("/api/einstellungen")
+def einstellungen_aendern(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
+    neu = dict(EINST)
+
+    def setzen(key, wert):
+        if wert in (None, "", [], {}):
+            neu.pop(key, None)
+        else:
+            neu[key] = wert
+    if "sek" in daten:
+        try:
+            setzen("sek", None if daten["sek"] in (None, "") else max(3, min(int(daten["sek"]), 120)))
+        except (TypeError, ValueError):
+            raise HTTPException(400, "Sekunden pro Foto: bitte eine Zahl zwischen 3 und 120")
+    for k in ("fuellung_rahmen", "fuellung_tv"):
+        if k in daten:
+            v = str(daten[k] or "")
+            if v and v not in FUELLUNGEN:
+                raise HTTPException(400, "Unbekannte Hintergrund-Füllung")
+            setzen(k, v)
+    if "anzeige" in daten:
+        a = daten["anzeige"] if isinstance(daten["anzeige"], list) else []
+        if any(x not in ("datum", "zeit", "ort") for x in a):
+            raise HTTPException(400, "Unbekannte Bildunterschrift")
+        setzen("anzeige", [x for x in ("datum", "zeit", "ort") if x in a])
+    if "alarm_min" in daten:
+        if daten["alarm_min"] in (None, ""):
+            neu.pop("alarm_min", None)
+        else:
+            try:
+                neu["alarm_min"] = max(0, min(int(daten["alarm_min"]), 1440))
+            except (TypeError, ValueError):
+                raise HTTPException(400, "Minuten bis zum Alarm: bitte eine Zahl (0 = aus)")
+    if "tv_url" in daten:
+        v = str(daten["tv_url"] or "").strip().rstrip("/")
+        if v and not re.fullmatch(r"[A-Za-z0-9.:/_-]{1,200}", v):
+            raise HTTPException(400, "Adresse der Fernseher-Seite ungültig")
+        setzen("tv_url", v)
+    if "wetter" in daten:
+        w = daten["wetter"]
+        if w:
+            try:
+                lat, lon = float(w["lat"]), float(w["lon"])
+                assert -90 <= lat <= 90 and -180 <= lon <= 180
+            except (KeyError, TypeError, ValueError, AssertionError):
+                raise HTTPException(400, "Wetter-Ort ungültig")
+            setzen("wetter", {"lat": lat, "lon": lon, "name": str(w.get("name") or "")[:80]})
+        else:
+            setzen("wetter", None)
+    if "kalender_url" in daten:
+        v = daten["kalender_url"]
+        if v is None:
+            neu.pop("kalender_url", None)
+        elif str(v).strip():
+            v = str(v).strip()
+            if not re.match(r"^https?://\S{4,1000}$", v):
+                raise HTTPException(400, "Kalender-Link bitte als https://… eintragen")
+            neu["kalender_url"] = v
+    if "pushover" in daten:
+        pz = daten["pushover"]
+        if pz is None:
+            neu.pop("pushover", None)
+        elif isinstance(pz, dict):
+            alt = neu.get("pushover") or {}
+            user, token = str(pz.get("user") or alt.get("user") or "").strip(), str(pz.get("token") or alt.get("token") or "").strip()
+            if (user or token) and not (re.fullmatch(r"[A-Za-z0-9]{20,40}", user) and re.fullmatch(r"[A-Za-z0-9]{20,40}", token)):
+                raise HTTPException(400, "Pushover: User-Key und App-Token bitte vollständig eintragen (je 30 Zeichen)")
+            if user and token:
+                neu["pushover"] = {"user": user, "token": token, "device": str(pz.get("device") or "").strip()[:25]}
+    if "aliase" in daten:
+        liste = daten["aliase"] if isinstance(daten["aliase"], list) else []
+        sauber = []
+        for e in liste[:50]:
+            n, pn = re.sub(r"[;=]", "", str((e or {}).get("name") or "")).strip()[:40], str((e or {}).get("person") or "").strip()[:80]
+            if n and pn:
+                sauber.append({"name": n, "person": pn})
+        setzen("aliase", sauber)
+    with GERAETE_LOCK:
+        EINST.clear()
+        EINST.update(neu)
+        einst_speichern()
+    return {"ok": True, "einstellungen": einst_ansicht()}
+
+
+@app.get("/api/einstellungen/ort-suche")
+def ort_suche(q: str, _=Depends(anmeldung)):
+    """Sucht einen Ort fuer das Wetter (Open-Meteo, ohne Konto). Es wird nur der Suchbegriff uebertragen."""
+    q = q.strip()[:80]
+    if len(q) < 2:
+        return {"orte": []}
+    try:
+        d = json.loads(http_text("https://geocoding-api.open-meteo.com/v1/search?count=6&language=de&name=" + urllib.parse.quote(q)))
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(502, f"Ortssuche nicht erreichbar: {e}")
+    return {"orte": [{"name": o.get("name", ""), "land": o.get("country", ""), "region": o.get("admin1", ""), "lat": o["latitude"], "lon": o["longitude"]}
+                     for o in (d.get("results") or [])]}
+
+
+@app.post("/api/einstellungen/test")
+def einstellungen_testen(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
+    was = str(daten.get("was", ""))
+    try:
+        if was == "wetter":
+            if not wetter_ort():
+                raise ValueError("Kein Ort eingestellt")
+            w = wetter_holen()
+            return {"ok": True, "nachricht": f"Wetter gelesen: {w['symbol']} {w['temp']} °C"}
+        if was == "kalender":
+            if not kalender_url():
+                raise ValueError("Kein Kalender-Link eingestellt")
+            return {"ok": True, "nachricht": f"Kalender gelesen: {len(kalender_holen())} Termin(e) in den nächsten Tagen"}
+        if was == "pushover":
+            pushover_senden("Immich Showcase", "Test: Benachrichtigungen funktionieren.", 0)
+            return {"ok": True, "nachricht": "Test-Nachricht gesendet"}
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(502, f"Test fehlgeschlagen: {e}")
+    raise HTTPException(400, "Unbekannter Test")
 
 
 @app.post("/api/geraete/bildschirm")
@@ -2545,9 +2781,9 @@ def rahmen_wache_pruefen(jetzt=None):
         zuletzt = max(t["hb"], WACHE["start"])
         offline_min = (jetzt - zuletzt) / 60
         alter = t.get("bild_alter")
-        haengt = (jetzt - t["hb"] < 20 and t.get("ambient") and alter is not None and alter > max(RAHMEN_SEK * 6, 180) + RAHMEN_ALARM_MIN * 60)
+        haengt = (jetzt - t["hb"] < 20 and t.get("ambient") and alter is not None and alter > max(std_sek() * 6, 180) + std_alarm_min() * 60)
         gemeldet = WACHE["gemeldet"].get(z)
-        if offline_min >= RAHMEN_ALARM_MIN and gemeldet != "offline":
+        if std_alarm_min() and offline_min >= std_alarm_min() and gemeldet != "offline":
             WACHE["gemeldet"][z] = "offline"
             meldungen.append((f"{name} nicht erreichbar", f"Der Rahmen meldet sich seit {int(offline_min)} Minuten nicht mehr (Tablet aus, WLAN oder Browser beendet?)."))
         elif haengt and gemeldet != "haengt":
@@ -2573,8 +2809,7 @@ def rahmen_wache_schleife():
 
 @app.on_event("startup")
 def rahmen_wache_starten():
-    if RAHMEN_ALARM_MIN:
-        threading.Thread(target=rahmen_wache_schleife, daemon=True).start()
+    threading.Thread(target=rahmen_wache_schleife, daemon=True).start()
 
 
 @app.get("/api/tv/ziele")
@@ -2671,7 +2906,7 @@ def tv_senden(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
                 "nachricht": f"{len(fehlen)} Video(s) werden für den Fernseher vorbereitet – \"{name}\" startet gleich auf {TV_ZIELE[z]}."}
     veroeffentlichen()
     return {"ok": True, "online": online, "nachricht": f"\"{name}\" ({len(ids)} Medien) wurde an {TV_ZIELE[z]} geschickt."
-            + ("" if online else f" {TV_ZIELE[z]} ist gerade nicht bereit – es startet, sobald die Seite {TV_URL or 'des Fernsehers (…/tv/)'} dort geöffnet ist.")}
+            + ("" if online else f" {TV_ZIELE[z]} ist gerade nicht bereit – es startet, sobald die Seite {tv_url() or 'des Fernsehers (…/tv/)'} dort geöffnet ist.")}
 
 
 @app.post("/api/tv/steuer")
@@ -2701,12 +2936,20 @@ def steuer_senden(daten):
 
 
 @app.get("/api/tv/abfrage")
-def tv_abfrage(ziel: str, seq: int = -1, s: int = 0, n: str = "", m: str = "", ra: int = -1, a: int = 0, _=Depends(geraet)):
+def tv_abfrage(request: Request, ziel: str, seq: int = -1, s: int = 0, n: str = "", m: str = "", ra: int = -1, a: int = 0, fj: int = 0, ak: int = -1, pl: int = -1, _=Depends(geraet)):
     """Vom Fernseher alle 2 s aufgerufen (zaehlt zugleich als 'online'). s/n/m = was der Fernseher gerade wirklich tut."""
     t = tv_ziel(ziel)
     t["hb"] = time.time()
     t["tv_laeuft"], t["tv_name"], t["tv_musik"] = bool(s), n[:60], (m if KAT_RE.match(m or "") else "")
     t["ambient"], t["bild_alter"] = bool(a), (ra if ra >= 0 else None)       # Dauerprogramm aktiv / Sekunden seit dem letzten Bildwechsel
+    t["fully_js"] = bool(fj)                                                  # die Seite laeuft in Fully Kiosk mit aktiver JavaScript-Schnittstelle
+    ip = client_ip(request)
+    try:
+        t["ip"] = ip if ipaddress.ip_address(ip).is_private else ""
+    except ValueError:
+        t["ip"] = ""
+    if fj and 0 <= ak <= 100:
+        akku_melden(ziel, ak, pl == 1)
     if seq < 0:                                   # Seite neu geladen: laufende Show fortsetzen
         return {"seq": t["seq"], "events": [t["aktiv"]] if t["aktiv"] else []}
     if seq > t["seq"]:                            # Server wurde neu gestartet

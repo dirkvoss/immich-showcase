@@ -1,6 +1,14 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.10.0]
+### Neu
+- **Assistent „Gerät hinzufügen“:** Name und Art eingeben, dann zeigt die App Adresse und QR-Code zum Verbinden und wartet live, bis sich das Tablet/der Fernseher meldet („✓ Verbunden“). Den Verbindungs-Link gibt es auch später im ⚙ des Geräts. Der Kopplungs-Code bleibt als Alternative.
+- **Einstellungen in der App** (Konto-Menü → ⚙ Einstellungen) statt in der `.env`: Vorgaben für alle Rahmen (Sekunden, Hintergrund, Bildunterschrift, Offline-Alarm), Wetter-Ort (Ortssuche) und Kalender-Link mit Test, Pushover-Zugang mit Test-Nachricht, Spitznamen für Personen, Adresse der Fernseher-Seite. Die Datei `rahmen_web_einstellungen.json` hat Vorrang vor den Umgebungsvariablen; Geheimnisse (Kalender-Link, Pushover) werden nie ausgeliefert. Anmeldeart, vertrautes Netz, Proxys und Immich-Schlüssel bleiben bewusst in der Umgebung.
+- **Tablet-Steuerung ohne Adresse und Passwort:** Läuft die Rahmen-Seite in Fully Kiosk mit aktiver JavaScript-Schnittstelle, schaltet das Tablet den Bildschirm zur Nachtruhe selbst aus und meldet Akku und Ladezustand (inkl. Warnung bei niedrigem Akku). Wer das nicht nutzen kann, trägt wie bisher Adresse und Passwort der Fully-Fernbedienung ein – die App schlägt die erkannte Adresse des Tablets vor. Der ganze Bereich ist „optional“ und eingeklappt; ohne ihn läuft alles wie gehabt.
+- **Bildunterschrift mit Uhrzeit** (Datum · Uhrzeit · Ort).
+- Der Banner nennt bei genau einem Rahmen dessen Namen („Läuft gerade auf Bilderrahmen“); die Hilfe erklärt die Geräte-Verwaltung.
+
 ## [2.9.0]
 ### Neu
 - **Zeitplan mit Eingabemaske:** Zeitfenster mit Wochentagen, Uhrzeit von–bis und eigenen Quellen (statt Textfeld); bestehende Zeitpläne werden gelesen und wieder geschrieben.

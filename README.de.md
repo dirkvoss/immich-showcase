@@ -98,6 +98,8 @@ Die Adresse `http://<server>:8090/tv/` **ohne** `?ziel=…` öffnen, um das Ger�
 4. Am Handy: Fotos auswählen → **Auf den Fernseher** → Fernseher, Zeit pro Foto, Reihenfolge und Musik wählen → **Start**.
 
 ## Bilderrahmen einrichten
+**Einstellungen in der App:** Konto-Menü → **⚙ Einstellungen** enthält Vorgaben für alle Rahmen, Wetter-Ort und Kalender-Link (mit Test), Pushover-Benachrichtigungen, Spitznamen für Personen und die Adresse der Fernseher-Seite. Dort gespeicherte Werte haben Vorrang vor den Umgebungsvariablen; Sicherheitsrelevantes (Anmeldeart, vertrautes Netz, Proxys, Immich-Schlüssel) bleibt in der `.env`. **Tablet-Steuerung:** Läuft die Rahmen-Seite in Fully Kiosk mit aktivierter *JavaScript-Schnittstelle* (Fully Plus), schaltet das Tablet seinen Bildschirm nachts selbst aus und meldet den Akku – ohne Adresse und Passwort. Sonst trägst du in den Geräte-Einstellungen Adresse und Passwort der Fully-Fernbedienung ein. Beides ist optional.
+
 **Am einfachsten in der App:** **📡 Geräte** → **＋ Gerät hinzufügen** → Art „Bilderrahmen“, Name vergeben, mit ⚙ später Sekunden pro Foto, Hintergrund, Bildunterschrift, Nachtruhe, Dauerprogramm (Quellen mit Gewicht), Zeitplan und Fully Kiosk einstellen. Die Geräteliste liegt dann in `rahmen_web_geraete.json` im Datenordner und hat Vorrang vor den Variablen unten (die gelten nur als Startwerte, bis du in der App etwas änderst). Am Tablet öffnest du `http://<server>:8090/tv/` und koppelst es mit dem Code.
 
 Der Weg über die `.env`:
@@ -106,7 +108,7 @@ Der Weg über die `.env`:
    - **Alben:** `RAHMEN_WEB_RAHMEN_ALBEN=<album-id>,<album-id>` (die IDs stehen in der Immich-Adresse des Albums)
    - **Marker-Alben:** `RAHMEN_WEB_RAHMEN_MARKER=1` – jedes Album, dessen **Beschreibung einen Marker mit „rahmen“ enthält** (z. B. `#rahmen`, `#bilderrahmen`; englisch `#frame`), kommt automatisch ins Programm. Ein Marker wie `#nurrahmen` (englisch `#onlyframe`) zeigt **nur** dieses Album, in der in der App gewählten Reihenfolge. Marker entfernen = zurück zum Normalbetrieb.
    - **Gewichtete Quellen:** `RAHMEN_WEB_RAHMEN_QUELLEN=<album-id>:70, neu14:20, *:10` (ein Album, „in den letzten 14 Tagen hochgeladen“, die ganze Bibliothek – mit Gewichten)
-   - Sekunden pro Foto `RAHMEN_WEB_RAHMEN_SEK`, Hintergrund `RAHMEN_WEB_RAHMEN_FUELLUNG` (`unscharf`, `zuschnitt` oder `balken`), Bildunterschrift `RAHMEN_WEB_RAHMEN_ANZEIGE=datum,ort`, Nachtruhe `RAHMEN_WEB_RAHMEN_NACHT=22:00-06:30`
+   - Sekunden pro Foto `RAHMEN_WEB_RAHMEN_SEK`, Hintergrund `RAHMEN_WEB_RAHMEN_FUELLUNG` (`unscharf`, `zuschnitt` oder `balken`), Bildunterschrift `RAHMEN_WEB_RAHMEN_ANZEIGE=datum,zeit,ort`, Nachtruhe `RAHMEN_WEB_RAHMEN_NACHT=22:00-06:30`
 3. `docker compose up -d`
 4. Am Tablet `http://<server>:8090/tv/?ziel=rahmen` im Vollbild öffnen – oder als Startseite in Fully Kiosk eintragen.
    *Tipp (Fully Kiosk):* Nutzt du die Adresse als **Bildschirmschoner**, trage sie in der Bildschirmschoner-Playlist ein und starte die App einmal neu – Fully Kiosk liest Änderungen an der Playlist erst nach einem Neustart.

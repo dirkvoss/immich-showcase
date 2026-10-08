@@ -103,12 +103,14 @@ Use `http://<server>:8090/tv/` **without** `?ziel=…` to pair the device by cod
    - **Albums:** `RAHMEN_WEB_RAHMEN_ALBEN=<album-id>,<album-id>` (ids from the Immich album URL)
    - **Marker albums:** `RAHMEN_WEB_RAHMEN_MARKER=1` – any album whose **description contains a tag with `frame`** (e.g. `#frame`, `#picture-frame`; German: `#rahmen`) joins the programme automatically. A tag like `#onlyframe` (German: `#nurrahmen`) shows **only** that album, in the order chosen in the app. Remove the tag to go back to normal.
    - **Weighted sources:** `RAHMEN_WEB_RAHMEN_QUELLEN=<album-id>:70, neu14:20, *:10` (an album, "uploaded in the last 14 days", the whole library – with weights)
-   - Seconds per photo `RAHMEN_WEB_RAHMEN_SEK`, background `RAHMEN_WEB_RAHMEN_FUELLUNG` (`unscharf` = blurred, `zuschnitt` = crop, `balken` = black bars), caption `RAHMEN_WEB_RAHMEN_ANZEIGE=datum,ort`, night rest `RAHMEN_WEB_RAHMEN_NACHT=22:00-06:30`
+   - Seconds per photo `RAHMEN_WEB_RAHMEN_SEK`, background `RAHMEN_WEB_RAHMEN_FUELLUNG` (`unscharf` = blurred, `zuschnitt` = crop, `balken` = black bars), caption `RAHMEN_WEB_RAHMEN_ANZEIGE=datum,zeit,ort`, night rest `RAHMEN_WEB_RAHMEN_NACHT=22:00-06:30`
 3. `docker compose up -d`
 4. On the tablet, open `http://<server>:8090/tv/?ziel=frame` in full screen – or set it as the start page of Fully Kiosk.
    *Tip (Fully Kiosk):* if you use it as the **screensaver**, enter the address as the screensaver playlist item and restart the app once – Fully Kiosk only reads changes to the playlist after a restart.
 
 **In the app instead of `.env`:** open **Devices** (📡) → **＋ Add device** to create frames and TVs and set them up (seconds per photo, background, caption, night rest, continuous programme sources, schedule, Fully Kiosk). The list is then stored in `rahmen_web_geraete.json` in the data folder and takes precedence over the variables above (they only serve as the starting point until the first change in the app).
+
+**Settings in the app:** Account menu → **⚙ Settings** covers defaults for all frames, weather location and calendar link (with test), Pushover notifications, nicknames for people and the TV page address. Values saved there take precedence over the environment variables; anything security-related (sign-in mode, trusted network, proxies, Immich key) stays in `.env`. **Tablet control:** if the player page runs in Fully Kiosk with the *JavaScript interface* enabled (Fully Plus), the tablet switches its own screen off at night and reports its battery – no address or password needed; otherwise enter the address and password of Fully's remote admin in the device settings. Both are optional.
 
 **Several frames:** list them separated by commas (`RAHMEN_WEB_RAHMEN_ZIELE=hall=Hallway,kitchen=Kitchen`). In the selection bar you then tick the frames to send to – the same show to several frames, or a different show to each (send one after the other). Each frame keeps its own running show, "Back" and order; the banner at the top switches between them. Per-frame sources and schedules: `RAHMEN_WEB_RAHMEN_QUELLEN_<ID>` / `RAHMEN_WEB_RAHMEN_ZEITPLAN_<ID>`.
 

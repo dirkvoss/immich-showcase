@@ -130,3 +130,47 @@ def test_zeitplan_im_format_der_app(app_laden):
     assert [q["typ"] for q in w.rahmen_quellen("flur", dt(2026, 10, 5, 19, 0))] == ["neu", "alle"]          # Montag Abend
     assert w.rahmen_quellen("flur", dt(2026, 10, 10, 9, 0))[0]["id"] == A                                  # Samstag Vormittag
     assert w.rahmen_quellen("flur", dt(2026, 10, 7, 3, 0))[0]["typ"] == "person"                           # taeglich nachts
+
+
+def test_bildunterschrift_mit_uhrzeit(app_laden):
+    w, client, _ = app_laden(**LAN)
+    c = client()
+    r = c.post("/api/verwaltung/geraete", json={"art": "rahmen", "name": "Flur", "anzeige": ["ort", "zeit", "datum"]}, headers=H).json()
+    assert r["geraet"]["anzeige"] == ["datum", "zeit", "ort"]                                   # feste Reihenfolge
+    assert c.get("/api/config?ziel=flur").json()["rahmen_anzeige"] == ["datum", "zeit", "ort"]
+    a = conftest.ASSETS[0]
+    w.BILDINFO[a["id"]] = a
+    info = c.get(f"/api/bildinfo/{a['id']}").json()
+    assert info["zeit"] == "12:00" and info["datum"] == a["localDateTime"][:10]
+    assert c.post("/api/verwaltung/geraete", json={"art": "rahmen", "name": "X", "anzeige": ["wetter"]}, headers=H).status_code == 400
+
+
+def test_tablet_meldet_sich_selbst_ueber_fully(app_laden, monkeypatch):
+    w, client, _ = app_laden(**LAN)
+    gesendet = []
+    monkeypatch.setattr(w, "pushover", lambda *a, **k: gesendet.append(a))
+    c = client()
+    assert c.get("/api/verwaltung").json()["geraete"][1]["selbst"] is False
+    c.get("/api/tv/abfrage?ziel=rahmen&seq=-1&fj=1&ak=15&pl=0")
+    g = [x for x in c.get("/api/geraete").json()["geraete"] if x["id"] == "rahmen"][0]
+    assert g["selbst"] is True and g["akku"] == 15 and g["laedt"] is False
+    assert [x for x in c.get("/api/verwaltung").json()["geraete"] if x["id"] == "rahmen"][0]["selbst"] is True
+    import time
+    for _ in range(50):
+        if gesendet:
+            break
+        time.sleep(0.05)
+    assert gesendet and "Akku niedrig" in gesendet[0][0]
+    n = len(gesendet)
+    c.get("/api/tv/abfrage?ziel=rahmen&seq=-1&fj=1&ak=14&pl=0")                 # nicht noch einmal melden
+    time.sleep(0.2)
+    assert len(gesendet) == n
+    c.get("/api/tv/abfrage?ziel=rahmen&seq=-1&fj=1&ak=60&pl=1")
+    assert w.FULLY_STATE["rahmen"]["akku_gemeldet"] is False
+
+
+def test_ohne_fully_meldet_das_geraet_nichts_selbst(app_laden):
+    w, client, _ = app_laden(**LAN)
+    c = client()
+    c.get("/api/tv/abfrage?ziel=rahmen&seq=-1")
+    assert [x for x in c.get("/api/verwaltung").json()["geraete"] if x["id"] == "rahmen"][0]["selbst"] is False

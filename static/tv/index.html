@@ -244,6 +244,7 @@ body.zuschnitt .bild { object-fit: cover; }
       var teile = [], dt = d.datum ? new Date(d.datum + "T12:00:00") : null, i;
       for (i = 0; i < anzeige.length; i++) {
         if (anzeige[i] === "datum" && dt && !isNaN(dt.getTime())) { try { teile.push(dt.toLocaleDateString(window.RW_LOCALE || "de-DE", { day: "numeric", month: "long", year: "numeric" })); } catch (e) { teile.push(d.datum); } }
+        if (anzeige[i] === "zeit" && d.zeit) teile.push(d.zeit);
         if (anzeige[i] === "ort" && d.ort) teile.push(d.ort);
       }
       bildtextEl.textContent = teile.join(" · "); bildtextEl.className = teile.length ? "an" : "";
@@ -256,6 +257,10 @@ body.zuschnitt .bild { object-fit: cover; }
       if (m) { h1 = +m[1]; m1 = +m[2]; h2 = +m[3]; m2 = +m[4]; var d = new Date(); jetzt = d.getHours() * 60 + d.getMinutes(); a = h1 * 60 + m1; b = h2 * 60 + m2; an = a <= b ? (jetzt >= a && jetzt < b) : (jetzt >= a || jetzt < b); }
     }
     nachtEl.style.display = an ? "block" : "none";
+    if (window.fully && nacht && ambient && an !== nachtPruefen.aus) {          // in Fully: Bildschirm wirklich aus/an (nur beim Wechsel, damit Handeingriffe nicht ueberstimmt werden)
+      nachtPruefen.aus = an;
+      try { if (an) { if (window.fully.turnScreenOff) window.fully.turnScreenOff(true); } else if (window.fully.turnScreenOn) window.fully.turnScreenOn(); } catch (e) {}
+    }
   }
   setInterval(nachtPruefen, 20000);
   function zeigeTitel(text) {
@@ -369,10 +374,16 @@ body.zuschnitt .bild { object-fit: cover; }
   }
   uhrZeigen(); setInterval(uhrZeigen, 10000);
   function verbunden(ok) { punkt.className = ok ? "" : "warn"; }
+  function fullyInfo() {                                                  // laeuft die Seite in Fully Kiosk mit JavaScript-Schnittstelle, meldet sie Akku und Ladezustand selbst
+    var f = window.fully, r = "", b, p;
+    if (!f) return "";
+    try { b = f.getBatteryLevel ? f.getBatteryLevel() : -1; p = f.isPlugged ? (f.isPlugged() ? 1 : 0) : -1; r = "&fj=1&ak=" + (b >= 0 ? Math.round(b) : -1) + "&pl=" + p; } catch (e) { r = "&fj=1"; }
+    return r;
+  }
   function abfrage() {
     if (pinModus) return;
     var meldung = "&ra=" + (laeuft ? Math.round((new Date().getTime() - letzterWechsel) / 1000) : -1) + "&a=" + (ambient ? 1 : 0) + "&s=" + (laeuft && !ambient ? 1 : 0) + "&n=" + encodeURIComponent(laeuft && !ambient ? name : "") + "&m=" + (audio && !audio.paused ? musikKey : "");
-    api("/api/tv/abfrage?ziel=" + ziel + "&seq=" + seq + meldung, function (st, d) {
+    api("/api/tv/abfrage?ziel=" + ziel + "&seq=" + seq + meldung + fullyInfo(), function (st, d) {
       if (st === 401) { zeigePin(); return; }
       if (st === 200 && d) {
         verbunden(true); statusEl.textContent = ""; letzterErfolg = new Date().getTime();
