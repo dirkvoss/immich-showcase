@@ -537,12 +537,13 @@ def logout(response: Response, _=Depends(csrf)):
 
 
 @app.get("/api/config")
-def konfig():
-    """Oeffentliche Darstellung der Installation (kein Geheimnis): Name, Beispiele fuer die Suche, Adresse der Fernseher-Seite."""
+def konfig(ziel: str = ""):
+    """Oeffentliche Darstellung der Installation (kein Geheimnis): Name, Beispiele fuer die Suche, Adresse der Fernseher-Seite. Mit ?ziel= gelten die Einstellungen dieses Geraets."""
+    z = ziel if ziel in GERAETE else None
     return {"name": APP_NAME, "version": VERSION, "modus": MODUS, "auth": AUTH, "musik_upload": MUSIK_UPLOAD, "konfiguriert": konfiguriert(), "tv_url": TV_URL, "beispiele": BEISPIELE, "beispiele_en": BEISPIELE_EN,
             "ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT and k not in RAHMEN_ZIELE},
-            "rahmen": list(RAHMEN_ZIELE), "rahmen_namen": dict(RAHMEN_ZIELE), "rahmen_sek": RAHMEN_SEK, "rahmen_fuellung": RAHMEN_FUELLUNG, "tv_fuellung": TV_FUELLUNG,
-            "rahmen_anzeige": RAHMEN_ANZEIGE, "rahmen_nacht": RAHMEN_NACHT, "rahmen_zusatz": ZUSATZ, "koppeln": True,
+            "rahmen": list(RAHMEN_ZIELE), "rahmen_namen": dict(RAHMEN_ZIELE), "rahmen_sek": gwert(z, "sek", RAHMEN_SEK), "rahmen_fuellung": gwert(z, "fuellung", RAHMEN_FUELLUNG), "tv_fuellung": gwert(z, "fuellung", TV_FUELLUNG),
+            "rahmen_anzeige": gwert(z, "anzeige", RAHMEN_ANZEIGE), "rahmen_nacht": rahmen_nacht(z), "rahmen_zusatz": ZUSATZ, "koppeln": True,
             "alle_ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT}}
 
 
@@ -1053,11 +1054,13 @@ def player_zeigen(name, ids, reihe="alt", ziel=None):
     ziel = ziel or PLAYER
     PLAYER_REIHE[ziel] = reihe
     geordnet = nach_datum(ids, reihe == "alt") if reihe != "zufall" and len(ids) > 1 else list(ids)
-    player_ereignis(ziel, {"ids": geordnet, "name": name, "sek": RAHMEN_SEK, "zufall": reihe == "zufall", "musik": "", "laut": 0.3, "videos": [], "maxv": 0})
+    player_ereignis(ziel, {"ids": geordnet, "name": name, "sek": rahmen_sek(ziel), "zufall": reihe == "zufall", "musik": "", "laut": 0.3, "videos": [], "maxv": 0})
     return len(ids)
 
 
 def rahmen_anzeigen(name, ids, ziel=None):
+    if not PLAYER and REGISTER["aktiv"]:
+        raise ValueError("Es ist noch kein Bilderrahmen eingerichtet (Geräte → Gerät hinzufügen).")
     return player_zeigen(name, ids, ziel=ziel) if PLAYER else H.album_anzeigen(name, ids)
 
 
@@ -1481,6 +1484,85 @@ TV_ZIELE.update(RAHMEN_ZIELE)
 TV_ZIELE["test"] = "Test (nur Entwicklung)"
 TV_VERSTECKT = {"test"}          # Ziele, die in der App nicht erscheinen (Automatiktests laufen auf /tv/?ziel=test statt auf dem echten Fernseher)
 TV = {z: {"hb": 0.0, "seq": 0, "events": [], "aktiv": None, "tv_laeuft": False, "tv_name": "", "tv_musik": ""} for z in TV_ZIELE}
+
+# --------------------------------------------------------------------------- Geraete-Verwaltung (Rahmen und Fernseher in der App anlegen/einstellen)
+# Die Liste der Geraete steht in GERAETE_FILE. Solange es die Datei nicht gibt, gelten die Umgebungsvariablen (RAHMEN_WEB_RAHMEN_ZIELE, RAHMEN_WEB_TV_ZIELE,
+# RAHMEN_WEB_FULLY_<ID>); die erste Aenderung in der App legt die Datei an, danach hat sie Vorrang. Einstellungen je Geraet ueberschreiben die
+# allgemeinen Werte (RAHMEN_WEB_RAHMEN_SEK, ..._FUELLUNG, ..._ANZEIGE, ..._NACHT, ..._QUELLEN, ..._ZEITPLAN); leer = allgemeiner Wert.
+ENV_RAHMEN = dict(RAHMEN_ZIELE)
+ENV_TV = {k: v for k, v in TV_ZIELE.items() if k not in RAHMEN_ZIELE and k not in TV_VERSTECKT}
+GERAETE_FILE = os.environ.get("RAHMEN_WEB_GERAETE_FILE", os.path.join(os.path.dirname(SHOWS_FILE), "rahmen_web_geraete.json"))
+GERAETE = {}                                   # Kennung -> {"art": "rahmen"|"tv", "name": ..., optionale Einstellungen}
+GERAETE_LOCK = threading.RLock()
+REGISTER = {"aktiv": False}                    # True, sobald die Datei gilt (dann gibt es auch ohne Rahmen keinen Kiosk-Weg mehr)
+FULLY = {}
+FULLY_RE = re.compile(r"[A-Za-z0-9.-]+(:\d{1,5})?")
+GERAET_ID_RE = re.compile(r"[a-z0-9]{1,20}")
+
+
+def geraete_aus_env():
+    g = {z: {"art": "tv", "name": n} for z, n in ENV_TV.items()}
+    g.update({z: {"art": "rahmen", "name": n} for z, n in ENV_RAHMEN.items()})
+    for z, e in g.items():
+        h = os.environ.get(f"RAHMEN_WEB_FULLY_{z.upper()}", "").strip()
+        if FULLY_RE.fullmatch(h):
+            e["fully_host"] = h
+            e["fully_pw"] = os.environ.get(f"RAHMEN_WEB_FULLY_PASSWORT_{z.upper()}") or os.environ.get("RAHMEN_WEB_FULLY_PASSWORT", "")
+    return g
+
+
+def geraete_laden():
+    d = lies_json(GERAETE_FILE, None)
+    if isinstance(d, dict) and isinstance(d.get("geraete"), list):
+        g = {}
+        for e in d["geraete"]:
+            if isinstance(e, dict) and GERAET_ID_RE.fullmatch(str(e.get("id", ""))) and e.get("art") in ("rahmen", "tv") and e.get("name"):
+                g[e["id"]] = {k: v for k, v in e.items() if k != "id"}
+        return g, True
+    return geraete_aus_env(), False
+
+
+def geraete_speichern():
+    schreibe_json(GERAETE_FILE, {"version": 1, "geraete": [{"id": z, **e} for z, e in GERAETE.items()]})
+    REGISTER["aktiv"] = True
+
+
+def geraete_anwenden(g):
+    """Setzt Rahmen-/Fernseherlisten, Zustand und Fully-Zuordnung nach g. Die Verzeichnisse werden ersetzt (nicht veraendert), damit laufende Abfragen heil bleiben."""
+    global RAHMEN_ZIELE, TV_ZIELE, TV, FULLY, PLAYER, GERAETE
+    rahmen = {z: e["name"] for z, e in g.items() if e["art"] == "rahmen"}
+    tv = {z: e["name"] for z, e in g.items() if e["art"] == "tv"}
+    ziele = {**tv, **rahmen, "test": "Test (nur Entwicklung)"}
+    fully = {}
+    for z, e in g.items():
+        h = str(e.get("fully_host") or "").strip()
+        if FULLY_RE.fullmatch(h):
+            fully[z] = {"host": h if ":" in h else h + ":2323", "pw": e.get("fully_pw") or os.environ.get("RAHMEN_WEB_FULLY_PASSWORT", "")}
+    neu_tv = {z: TV.get(z) or {"hb": 0.0, "seq": 0, "events": [], "aktiv": None, "tv_laeuft": False, "tv_name": "", "tv_musik": ""} for z in ziele}
+    GERAETE = g
+    TV, TV_ZIELE, RAHMEN_ZIELE, FULLY = neu_tv, ziele, rahmen, fully
+    PLAYER = next(iter(rahmen), None)
+
+
+_g, _aktiv = geraete_laden()
+REGISTER["aktiv"] = _aktiv
+geraete_anwenden(_g)
+
+
+def gwert(z, feld, standard=None):
+    """Einstellung eines Geraets; leer/fehlend = allgemeiner Wert."""
+    v = (GERAETE.get(z) or {}).get(feld)
+    return standard if v in (None, "", []) else v
+
+
+def rahmen_sek(z=None):
+    return gwert(z or PLAYER, "sek", RAHMEN_SEK)
+
+
+def rahmen_nacht(z=None):
+    return gwert(z, "nacht", RAHMEN_NACHT) or ""
+
+
 AKTIV_FILE = os.environ.get("RAHMEN_WEB_AKTIV_FILE", os.path.join(os.path.dirname(SHOWS_FILE), "rahmen_web_aktiv.json"))
 
 
@@ -1679,11 +1761,39 @@ def zeitplan_quellen(regeln, jetzt):
 
 def _je_rahmen(basis, ziel):
     """Einstellung fuer einen bestimmten Rahmen (RAHMEN_WEB_..._<ZIEL>), sonst die allgemeine."""
+    feld = {"RAHMEN_WEB_RAHMEN_ZEITPLAN": "zeitplan", "RAHMEN_WEB_RAHMEN_QUELLEN": "quellen"}.get(basis)
+    if feld and gwert(ziel, feld):
+        return gwert(ziel, feld)
     if ziel and re.fullmatch(r"[a-z0-9]+", ziel):
         wert = os.environ.get(f"{basis}_{ziel.upper()}")
         if wert is not None and wert.strip():
             return wert
     return os.environ.get(basis, "")
+
+
+def quelle_lesen(e):
+    """Eine Quelle ('<album-id>:70', 'neu14', 'heute', '*', 'person=Anna+Ben:60') -> Beschreibung oder None bei Unsinn."""
+    if e.lower().startswith("person="):                              # person=Anna Muster  |  person=oma:60  |  person=Anna+Ben (beide zusammen)
+        rest = e[7:]
+        teil, sep, gw = rest.rpartition(":")
+        if not sep or not re.fullmatch(r"\d+(\.\d+)?", gw):
+            teil, gw = rest, ""
+        namen = [n.strip() for n in teil.split("+") if n.strip()]
+        return {"typ": "person", "namen": namen, "gewicht": float(gw) if gw else 1.0} if namen else None
+    name, _, gw = e.partition(":")
+    try:
+        gewicht = max(0.0, float(gw)) if gw else 1.0
+    except ValueError:
+        return None
+    if name == "*":
+        return {"typ": "alle", "gewicht": gewicht}
+    if re.fullmatch(r"neu\d{1,3}", name):
+        return {"typ": "neu", "tage": int(name[3:]), "gewicht": gewicht}
+    if re.fullmatch(r"heute\d{0,2}", name):
+        return {"typ": "heute", "tage": int(name[5:] or 2), "gewicht": gewicht}
+    if re.fullmatch(r"[0-9a-f-]{36}", name):
+        return {"typ": "album", "id": name, "gewicht": gewicht}
+    return None
 
 
 def rahmen_quellen(ziel=None, jetzt=None):
@@ -1693,32 +1803,11 @@ def rahmen_quellen(ziel=None, jetzt=None):
     if plan:
         roh = zeitplan_quellen(plan, jetzt or datetime.datetime.now())
     if roh is None:
-        eigene = os.environ.get(f"RAHMEN_WEB_RAHMEN_QUELLEN_{ziel.upper()}", "") if ziel and re.fullmatch(r"[a-z0-9]+", ziel) else ""
+        eigene = ""
+        if ziel and re.fullmatch(r"[a-z0-9]+", ziel):
+            eigene = gwert(ziel, "quellen") or os.environ.get(f"RAHMEN_WEB_RAHMEN_QUELLEN_{ziel.upper()}", "")
         roh = [x.strip() for x in eigene.split(",") if x.strip()] if eigene.strip() else RAHMEN_QUELLEN_ROH
-    quellen = []
-    for e in roh:
-        if e.lower().startswith("person="):                              # person=Anna Muster  |  person=oma:60  |  person=Anna+Ben (beide zusammen)
-            rest = e[7:]
-            teil, sep, gw = rest.rpartition(":")
-            if not sep or not re.fullmatch(r"\d+(\.\d+)?", gw):
-                teil, gw = rest, ""
-            namen = [n.strip() for n in teil.split("+") if n.strip()]
-            if namen:
-                quellen.append({"typ": "person", "namen": namen, "gewicht": float(gw) if gw else 1.0})
-            continue
-        name, _, gw = e.partition(":")
-        try:
-            gewicht = max(0.0, float(gw)) if gw else 1.0
-        except ValueError:
-            continue
-        if name == "*":
-            quellen.append({"typ": "alle", "gewicht": gewicht})
-        elif re.fullmatch(r"neu\d{1,3}", name):
-            quellen.append({"typ": "neu", "tage": int(name[3:]), "gewicht": gewicht})
-        elif re.fullmatch(r"heute\d{0,2}", name):
-            quellen.append({"typ": "heute", "tage": int(name[5:] or 2), "gewicht": gewicht})
-        elif re.fullmatch(r"[0-9a-f-]{36}", name):
-            quellen.append({"typ": "album", "id": name, "gewicht": gewicht})
+    quellen = [q for q in (quelle_lesen(e) for e in roh) if q]
     quellen = [q for q in quellen if q["gewicht"] > 0]
     if not quellen:
         quellen = [{"typ": "alben", "gewicht": 1.0}] if (RAHMEN_ALBEN or RAHMEN_MARKER) else [{"typ": "alle", "gewicht": 1.0}]
@@ -2092,12 +2181,6 @@ def rahmen_zusatz(_=Depends(geraet)):
 # --------------------------------------------------------------------------- Geraete: Uebersicht und Kopplung per Code
 # Fully Kiosk (Android-Tablet) fernsteuern: Bildschirm zur Nachtruhe aus/an, Akku melden. RAHMEN_WEB_FULLY_<KENNUNG>=<Adresse[:Port]> und
 # RAHMEN_WEB_FULLY_PASSWORT[_<KENNUNG>] (Fully: Einstellungen -> Remote Admin -> aktivieren, Passwort setzen)
-FULLY = {}
-for _z in TV_ZIELE:
-    _h = os.environ.get(f"RAHMEN_WEB_FULLY_{_z.upper()}", "").strip()
-    if re.fullmatch(r"[A-Za-z0-9.-]+(:\d{1,5})?", _h):
-        FULLY[_z] = {"host": _h if ":" in _h else _h + ":2323",
-                     "pw": os.environ.get(f"RAHMEN_WEB_FULLY_PASSWORT_{_z.upper()}") or os.environ.get("RAHMEN_WEB_FULLY_PASSWORT", "")}
 FULLY_HELLIGKEIT = int(os.environ["RAHMEN_WEB_FULLY_HELLIGKEIT"]) if re.fullmatch(r"\d{1,3}", os.environ.get("RAHMEN_WEB_FULLY_HELLIGKEIT", "")) and int(os.environ["RAHMEN_WEB_FULLY_HELLIGKEIT"]) <= 255 else None
 FULLY_AKKU_MIN = int(os.environ.get("RAHMEN_WEB_FULLY_AKKU_MIN", "20") or 20)
 FULLY_STATE = {}
@@ -2112,8 +2195,8 @@ def fully_befehl(z, cmd, **params):
     return fully_get(f"http://{f['host']}/?" + urllib.parse.urlencode({"cmd": cmd, "password": f["pw"], "type": "json", **params}))
 
 
-def in_nacht(jetzt=None):
-    m = re.fullmatch(r"(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})", RAHMEN_NACHT or "")
+def in_nacht(jetzt=None, ziel=None):
+    m = re.fullmatch(r"(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})", rahmen_nacht(ziel) or "")
     if not m:
         return False
     von, bis = int(m[1]) * 60 + int(m[2]), int(m[3]) * 60 + int(m[4])
@@ -2133,8 +2216,8 @@ def fully_wache_pruefen(jetzt=None):
     """Einmal pro Minute: Nachtruhe (Bildschirm aus/an nur beim Wechsel, damit Handeingriffe nicht ueberstimmt werden) und Akku (alle 5 Minuten)."""
     for z in FULLY:
         st = FULLY_STATE.setdefault(z, {})
-        if RAHMEN_NACHT:
-            soll = "aus" if in_nacht(jetzt) else "an"
+        if rahmen_nacht(z):
+            soll = "aus" if in_nacht(jetzt, z) else "an"
             if st.get("soll") != soll:
                 try:
                     fully_bildschirm(z, soll == "an")
@@ -2167,8 +2250,7 @@ def fully_wache_schleife():
 
 @app.on_event("startup")
 def fully_wache_starten():
-    if FULLY:
-        threading.Thread(target=fully_wache_schleife, daemon=True).start()
+    threading.Thread(target=fully_wache_schleife, daemon=True).start()
 
 
 def geraete_liste():
@@ -2194,6 +2276,163 @@ def geraete_liste():
 def geraete_uebersicht(_=Depends(anmeldung)):
     """Alle Fernseher und Rahmen mit Zustand (fuer die Geraete-Ansicht in der App)."""
     return {"geraete": geraete_liste()}
+
+
+# --------------------------------------------------------------------------- Verwaltung: Rahmen und Fernseher anlegen, einstellen, loeschen
+FUELLUNGEN = ("balken", "unscharf", "zuschnitt")
+NACHT_RE = re.compile(r"(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})")
+
+
+def geraet_ansicht(z, e):
+    return {"id": z, "art": e["art"], "name": e["name"], "sek": e.get("sek"), "fuellung": e.get("fuellung") or "", "anzeige": e.get("anzeige") or [],
+            "nacht": e.get("nacht") or "", "quellen": e.get("quellen") or "", "zeitplan": e.get("zeitplan") or "",
+            "fully_host": e.get("fully_host") or "", "fully_pw_gesetzt": bool(e.get("fully_pw"))}
+
+
+def geraet_kennung(name):
+    t = str(name).lower().translate(str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"}))
+    t = re.sub(r"[^a-z0-9]", "", t)[:16] or "geraet"
+    k, n = t, 2
+    while k in GERAETE or k in TV_ZIELE:
+        k, n = f"{t}{n}", n + 1
+    return k
+
+
+def geraet_felder(daten, art):
+    """Prueft die Eingaben; Rueckgabe: (zu setzen, zu entfernen). Leere Werte entfernen die Einstellung (dann gilt der allgemeine Wert)."""
+    setzen, weg = {}, []
+    if "name" in daten:
+        setzen["name"] = name_pruefen(daten["name"])
+    if "fuellung" in daten:
+        v = str(daten["fuellung"] or "")
+        if v and v not in FUELLUNGEN:
+            raise HTTPException(400, "Unbekannte Hintergrund-Füllung")
+        (setzen.__setitem__("fuellung", v) if v else weg.append("fuellung"))
+    if art == "rahmen":
+        if "sek" in daten:
+            if daten["sek"] in (None, ""):
+                weg.append("sek")
+            else:
+                try:
+                    setzen["sek"] = max(3, min(int(daten["sek"]), 120))
+                except (TypeError, ValueError):
+                    raise HTTPException(400, "Sekunden pro Foto: bitte eine Zahl zwischen 3 und 120")
+        if "anzeige" in daten:
+            a = daten["anzeige"] if isinstance(daten["anzeige"], list) else []
+            if any(x not in ("datum", "ort") for x in a):
+                raise HTTPException(400, "Unbekannte Bildunterschrift")
+            (setzen.__setitem__("anzeige", [x for x in ("datum", "ort") if x in a]) if a else weg.append("anzeige"))
+        if "nacht" in daten:
+            v = str(daten["nacht"] or "").strip()
+            m = NACHT_RE.fullmatch(v)
+            if v and not (m and int(m[1]) < 24 and int(m[3]) < 24 and int(m[2]) < 60 and int(m[4]) < 60):
+                raise HTTPException(400, "Nachtruhe bitte als von-bis, z. B. 22:00-06:30")
+            (setzen.__setitem__("nacht", v) if v else weg.append("nacht"))
+        if "quellen" in daten:
+            v = str(daten["quellen"] or "").strip()
+            for tok in [x.strip() for x in v.split(",") if x.strip()]:
+                if not quelle_lesen(tok):
+                    raise HTTPException(400, f"Unbekannte Quelle: {tok}")
+            (setzen.__setitem__("quellen", v) if v else weg.append("quellen"))
+        if "zeitplan" in daten:
+            v = str(daten["zeitplan"] or "").strip()
+            if v and len(zeitplan_lesen(v)) != len([x for x in v.split(";") if x.strip()]):
+                raise HTTPException(400, "Zeitplan nicht lesbar – Beispiel: Mo-Fr 18:00-22:00 = neu14:70, *:30; Sa,So 08:00-20:00 = *")
+            (setzen.__setitem__("zeitplan", v) if v else weg.append("zeitplan"))
+    if "fully_host" in daten:
+        v = str(daten["fully_host"] or "").strip()
+        if v and not FULLY_RE.fullmatch(v):
+            raise HTTPException(400, "Fully-Adresse bitte als Name oder IP, optional mit :Port")
+        if v:
+            setzen["fully_host"] = v
+        else:
+            weg += ["fully_host", "fully_pw"]
+    if daten.get("fully_pw"):
+        setzen["fully_pw"] = str(daten["fully_pw"])[:200]
+    return setzen, weg
+
+
+def geraete_aendern(g):
+    """Neue Geraeteliste dauerhaft speichern und in Kraft setzen."""
+    try:
+        schreibe_json(GERAETE_FILE, {"version": 1, "geraete": [{"id": z, **e} for z, e in g.items()]})
+    except OSError as e:
+        H.log.error("Geraeteliste nicht speicherbar: %s", e)
+        raise HTTPException(500, "Die Geräteliste konnte nicht gespeichert werden.")
+    REGISTER["aktiv"] = True
+    geraete_anwenden(g)
+
+
+def geraet_aufraeumen(z):
+    AKTIV_BESITZER.pop(z, None)
+    PLAYER_REIHE.pop(z, None)
+    FULLY_STATE.pop(z, None)
+    WACHE["gemeldet"].pop(z, None)
+    AMBIENT_PRO_ZIEL.pop(z, None)
+    aktiv_speichern()
+
+
+@app.get("/api/verwaltung")
+def verwaltung(_=Depends(anmeldung)):
+    return {"geraete": [geraet_ansicht(z, e) for z, e in GERAETE.items()], "register_aktiv": REGISTER["aktiv"],
+            "standard": {"sek": RAHMEN_SEK, "fuellung_rahmen": RAHMEN_FUELLUNG, "fuellung_tv": TV_FUELLUNG, "anzeige": RAHMEN_ANZEIGE, "nacht": RAHMEN_NACHT}}
+
+
+@app.post("/api/verwaltung/geraete")
+def geraet_anlegen(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
+    art = str(daten.get("art", ""))
+    if art not in ("rahmen", "tv"):
+        raise HTTPException(400, "Bitte Rahmen oder Fernseher wählen")
+    name = name_pruefen(daten.get("name"))
+    setzen, _weg = geraet_felder({**daten, "name": name}, art)
+    with GERAETE_LOCK:
+        z = geraet_kennung(name)
+        g = {k: dict(v) for k, v in GERAETE.items()}
+        g[z] = {"art": art, **setzen}
+        geraete_aendern(g)
+    H.log.info("Geraet angelegt: %s (%s) '%s'", z, art, name)
+    return {"ok": True, "id": z, "geraet": geraet_ansicht(z, GERAETE[z]), "nachricht": f"„{name}“ wurde angelegt. Öffne am Gerät die Seite /tv/ und koppele es mit dem Code."}
+
+
+@app.put("/api/verwaltung/geraete/{z}")
+def geraet_aendern(z: str, daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
+    with GERAETE_LOCK:
+        if z not in GERAETE:
+            raise HTTPException(404, "Gerät nicht gefunden")
+        setzen, weg = geraet_felder(daten, GERAETE[z]["art"])
+        g = {k: dict(v) for k, v in GERAETE.items()}
+        g[z].update(setzen)
+        for k in weg:
+            g[z].pop(k, None)
+        geraete_aendern(g)
+    return {"ok": True, "geraet": geraet_ansicht(z, GERAETE[z])}
+
+
+@app.delete("/api/verwaltung/geraete/{z}")
+def geraet_loeschen(z: str, _=Depends(anmeldung), __=Depends(csrf)):
+    with GERAETE_LOCK:
+        if z not in GERAETE:
+            raise HTTPException(404, "Gerät nicht gefunden")
+        name = GERAETE[z]["name"]
+        geraete_aendern({k: dict(v) for k, v in GERAETE.items() if k != z})
+        geraet_aufraeumen(z)
+    H.log.info("Geraet geloescht: %s '%s'", z, name)
+    return {"ok": True, "nachricht": f"„{name}“ wurde entfernt. Gespeicherte Shows bleiben erhalten."}
+
+
+@app.post("/api/verwaltung/fully-test")
+def fully_test(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
+    """Prueft die Verbindung zu Fully Kiosk (Adresse und Passwort aus der Anfrage, sonst die gespeicherten)."""
+    z = str(daten.get("id", ""))
+    host = str(daten.get("fully_host") or (GERAETE.get(z) or {}).get("fully_host") or "").strip()
+    pw = str(daten.get("fully_pw") or (GERAETE.get(z) or {}).get("fully_pw") or os.environ.get("RAHMEN_WEB_FULLY_PASSWORT", ""))
+    if not FULLY_RE.fullmatch(host):
+        raise HTTPException(400, "Bitte die Adresse des Tablets eintragen")
+    try:
+        info = json.loads(fully_get(f"http://{host if ':' in host else host + ':2323'}/?" + urllib.parse.urlencode({"cmd": "deviceInfo", "password": pw, "type": "json"})))
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(502, f"Fully Kiosk antwortet nicht: {e}")
+    return {"ok": True, "akku": info.get("batteryLevel"), "laedt": bool(info.get("isPlugged")), "nachricht": f"Verbunden – Akku {info.get('batteryLevel')} %"}
 
 
 @app.post("/api/geraete/bildschirm")
@@ -2334,7 +2573,7 @@ def rahmen_wache_schleife():
 
 @app.on_event("startup")
 def rahmen_wache_starten():
-    if RAHMEN_ZIELE and RAHMEN_ALARM_MIN:
+    if RAHMEN_ALARM_MIN:
         threading.Thread(target=rahmen_wache_schleife, daemon=True).start()
 
 

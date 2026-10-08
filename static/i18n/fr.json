@@ -346,7 +346,45 @@
   "Konto": "Compte",
   "Geräte": "Appareils",
   "Rahmen wählen": "Choisir le cadre",
-  "Auf diese Rahmen schicken": "Envoyer à ces cadres"
+  "Auf diese Rahmen schicken": "Envoyer à ces cadres",
+  "Gerät einstellen": "Réglages de l’appareil",
+  "Gerät hinzufügen": "Ajouter un appareil",
+  "＋ Gerät hinzufügen": "＋ Ajouter un appareil",
+  "Art": "Type",
+  "Name": "Nom",
+  "Hintergrund": "Arrière-plan",
+  "Standard": "Par défaut",
+  "Unscharf": "Flou",
+  "Zuschnitt": "Recadrer",
+  "Schwarze Balken": "Barres noires",
+  "Sekunden pro Foto": "Secondes par photo",
+  "Bildunterschrift": "Légende",
+  "Datum": "Date",
+  "Ort": "Lieu",
+  "Nachtruhe (Bildschirm aus)": "Repos nocturne (écran éteint)",
+  "von": "de",
+  "bis": "à",
+  "Was der Rahmen zeigt, wenn niemand etwas schickt. Ohne Eintrag gilt die allgemeine Einstellung der Installation.": "Ce que le cadre affiche quand personne n’envoie rien. Sans entrée, le réglage général de l’installation s’applique.",
+  "Ganze Bibliothek": "Toute la bibliothèque",
+  "Neueste Fotos (Tage)": "Photos récentes (jours)",
+  "Heute vor Jahren": "Il y a des années, aujourd’hui",
+  "Album (ID)": "Album (ID)",
+  "＋ Quelle": "＋ Source",
+  "Quelle": "Source",
+  "Gewicht": "Poids",
+  "Entfernen": "Retirer",
+  "Zeitplan (optional)": "Planning (facultatif)",
+  "Zeitplan": "Planning",
+  "Fully Kiosk (Tablet)": "Fully Kiosk (tablette)",
+  "Adresse des Tablets": "Adresse de la tablette",
+  "Verbindung testen": "Tester la connexion",
+  "Speichern": "Enregistrer",
+  "Gerät löschen": "Supprimer l’appareil",
+  "gesetzt – leer lassen zum Behalten": "définie – laisser vide pour conserver",
+  "Bitte einen Namen eingeben.": "Veuillez saisir un nom.",
+  "Nachtruhe: bitte „von“ und „bis“ ausfüllen oder beide leer lassen.": "Repos nocturne : renseignez « de » et « à », ou laissez les deux vides.",
+  "Gespeichert.": "Enregistré.",
+  "Dieses Gerät wirklich entfernen? Gespeicherte Shows bleiben erhalten.": "Retirer vraiment cet appareil ? Les shows enregistrées sont conservées."
  },
  "muster": [
   [
@@ -655,6 +693,18 @@
   [
    "^(.*) zeigt wieder das normale Programm\\.$",
    "$1 reprend son programme normal."
+  ],
+  [
+   "^„(.*)“ wurde angelegt\\. Öffne am Gerät die Seite /tv/ und koppele es mit dem Code\\.$",
+   "« $1 » a été ajouté. Ouvrez la page /tv/ sur l’appareil et associez-le avec le code."
+  ],
+  [
+   "^„(.*)“ wurde entfernt\\. Gespeicherte Shows bleiben erhalten\\.$",
+   "« $1 » a été retiré. Les shows enregistrées sont conservées."
+  ],
+  [
+   "^Verbunden – Akku (.*) %$",
+   "Connecté – batterie $1 %"
   ]
  ],
  "beschreibung": [

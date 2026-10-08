@@ -1,6 +1,15 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.8.0]
+### Neu
+- **Geräte-Verwaltung in der App:** Unter „Geräte“ (⚙ je Gerät, „＋ Gerät hinzufügen“) legst du Bilderrahmen und Fernseher an, stellst sie ein und löschst sie – ohne Docker-Konfiguration und ohne Neustart. Je Rahmen: Name, Sekunden pro Foto, Hintergrund, Bildunterschrift, Nachtruhe, Dauerprogramm (Quellen mit Gewicht), Zeitplan und Fully Kiosk (mit Verbindungstest). Fernseher: Name und Hintergrund.
+- Die Geräteliste liegt in `rahmen_web_geraete.json` im Datenordner (`RAHMEN_WEB_GERAETE_FILE`). Solange es die Datei nicht gibt, gelten wie bisher die Umgebungsvariablen (`RAHMEN_WEB_RAHMEN_ZIELE`, `RAHMEN_WEB_TV_ZIELE`, `RAHMEN_WEB_FULLY_<ID>`); die erste Änderung in der App legt die Datei an, danach hat sie Vorrang. Leere Einstellungen eines Geräts bedeuten: allgemeiner Wert der Installation.
+- Die Rahmen-Seite (`/tv/`) holt ihre Einstellungen je Gerät (`/api/config?ziel=…`).
+- Schnittstellen: `GET /api/verwaltung`, `POST /api/verwaltung/geraete`, `PUT/DELETE /api/verwaltung/geraete/<id>`, `POST /api/verwaltung/fully-test`. Das Fully-Passwort wird nie ausgeliefert.
+### Geändert
+- Die Überwachungen (Rahmen offline, Fully-Nachtruhe/Akku) laufen immer und berücksichtigen neu angelegte Geräte sofort.
+
 ## [2.7.0]
 ### Neu
 - **Mehrere Bilderrahmen:** Jeder Rahmen (`RAHMEN_WEB_RAHMEN_ZIELE`) hat jetzt seinen eigenen Zustand – laufende Show, „Zurück“, Reihenfolge. Beim Senden wählst du in der Auswahlleiste per Häkchen einen oder mehrere Rahmen (dieselbe Show an mehrere, oder nacheinander verschiedene Shows an verschiedene Rahmen). Im Banner oben wählst du, welchen Rahmen „Normal“, „Zurück“ und die Reihenfolge betreffen.

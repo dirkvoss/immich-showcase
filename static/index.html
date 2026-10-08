@@ -190,6 +190,19 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
 .geraet .name { font-weight: 600; }
 .geraet .zustand { font-size: 13px; color: var(--muted); }
 .geraet .art { font-size: 22px; }
+.geraet .einst { flex: none; min-width: 40px; }
+.gf { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin: 10px 0; }
+.gf h3 { margin: 12px 0 0; }
+.gf .tvfeld { min-height: 44px; min-width: 0; }
+.gf .tvfeld > span:first-child { flex: none; max-width: 55%; }
+.gf .tvfeld.stapel { flex-direction: column; align-items: stretch; padding: 8px 12px; gap: 6px; }
+.gf .tvfeld input[type=text], .gf .tvfeld input[type=password], .gf .tvfeld input[type=number] { text-align: right; }
+.gf .reihe { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.gf .reihe label { display: inline-flex; align-items: center; gap: 6px; }
+.qzeile { display: flex; gap: 6px; align-items: center; }
+.qzeile select, .qzeile input { min-height: 38px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: inherit; font: inherit; padding: 0 8px; min-width: 0; }
+.qzeile .qwert { flex: 1; text-align: left !important; }
+.qzeile .qgew { width: 64px; text-align: center !important; }
 #koppelCode { text-transform: uppercase; letter-spacing: 6px; font-size: 22px; font-weight: 600; }
 .tvdialog { position: fixed; inset: 0; z-index: 90; background: rgba(0,0,0,.62); display: flex; align-items: flex-end; justify-content: center; padding: 0; }
 .tvkarte { width: 100%; max-width: 520px; background: var(--card); border-radius: 18px 18px 0 0; padding: 18px 18px calc(env(safe-area-inset-bottom) + 18px); box-shadow: var(--shadow); max-height: 92vh; overflow: auto; }
@@ -531,6 +544,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
   <div class="tvkarte">
     <h2 id="geraeteTitel">📡 Geräte</h2>
     <div id="geraeteListe"></div>
+    <div class="tvknoepfe" style="justify-content:flex-start"><button class="btn" id="geraetNeu" type="button">＋ Gerät hinzufügen</button></div>
     <h3>Gerät koppeln</h3>
     <p class="tipp">Zeigt ein Fernseher oder Tablet einen Code? Gib ihn hier ein und wähle, welches Gerät es sein soll.</p>
     <label class="tvfeld"><span>Code</span> <input id="koppelCode" maxlength="6" autocomplete="off" autocapitalize="characters" aria-label="Code"></label>
@@ -538,6 +552,38 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
     <div class="tvknoepfe" style="justify-content:flex-start"><button class="btn primaer" id="koppelBtn" type="button">Koppeln</button></div>
     <p class="tipp">Am Gerät einfach die Seite /tv/ öffnen – dann erscheint der Code (und ein QR-Code zum Scannen).</p>
     <div class="tvknoepfe"><button class="btn" id="geraeteZu" type="button">Schließen</button></div>
+  </div>
+</div>
+<div id="geraetDialog" class="tvdialog versteckt" role="dialog" aria-modal="true" aria-labelledby="geraetTitel">
+  <div class="tvkarte">
+    <h2 id="geraetTitel">Gerät einstellen</h2>
+    <div class="gf">
+      <div class="tvfeld versteckt" id="gfArtZeile"><span>Art</span>
+        <select id="gfArt" aria-label="Art"><option value="rahmen">Bilderrahmen</option><option value="tv">Fernseher</option></select></div>
+      <label class="tvfeld"><span>Name</span> <input id="gfName" type="text" maxlength="60" autocomplete="off" aria-label="Name"></label>
+      <label class="tvfeld"><span>Hintergrund</span> <select id="gfFuellung" aria-label="Hintergrund"><option value="">Standard</option><option value="unscharf">Unscharf</option><option value="zuschnitt">Zuschnitt</option><option value="balken">Schwarze Balken</option></select></label>
+      <div class="nur-gf-rahmen">
+        <div class="gf">
+          <label class="tvfeld"><span>Sekunden pro Foto</span> <input id="gfSek" type="number" min="3" max="120" inputmode="numeric" aria-label="Sekunden pro Foto"></label>
+          <div class="tvfeld"><span>Bildunterschrift</span><span class="reihe"><label><input type="checkbox" id="gfDatum"> Datum</label><label><input type="checkbox" id="gfOrt"> Ort</label></span></div>
+          <div class="tvfeld"><span>Nachtruhe (Bildschirm aus)</span><span class="reihe"><input id="gfNachtVon" type="time" aria-label="von"> – <input id="gfNachtBis" type="time" aria-label="bis"></span></div>
+          <h3>Dauerprogramm</h3>
+          <p class="tipp">Was der Rahmen zeigt, wenn niemand etwas schickt. Ohne Eintrag gilt die allgemeine Einstellung der Installation.</p>
+          <div id="gfQuellen"></div>
+          <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfQuelleNeu" type="button">＋ Quelle</button></div>
+          <label class="tvfeld stapel"><span>Zeitplan (optional)</span> <input id="gfZeitplan" type="text" autocomplete="off" aria-label="Zeitplan" placeholder="Mo-Fr 18:00-22:00 = neu14:70, *:30; Sa,So 08:00-20:00 = *"></label>
+          <h3>Fully Kiosk (Tablet)</h3>
+          <label class="tvfeld"><span>Adresse des Tablets</span> <input id="gfFullyHost" type="text" autocomplete="off" aria-label="Adresse des Tablets" placeholder="192.168.1.50"></label>
+          <label class="tvfeld"><span>Passwort</span> <input id="gfFullyPw" type="password" autocomplete="new-password" aria-label="Passwort"></label>
+          <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfFullyTest" type="button">Verbindung testen</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="tvknoepfe">
+      <button class="btn gefahr versteckt" id="gfLoeschen" type="button" style="margin-right:auto">Gerät löschen</button>
+      <button class="btn" id="gfAbbrechen" type="button">Abbrechen</button>
+      <button class="btn primaer" id="gfSpeichern" type="button">Speichern</button>
+    </div>
   </div>
 </div>
 <div id="hilfeDialog" class="tvdialog versteckt" role="dialog" aria-modal="true" aria-labelledby="hilfeTitel">
@@ -1432,18 +1478,125 @@ async function geraeteLaden() {
         b.addEventListener("click", async () => { try { await api("geraete/bildschirm", { method: "POST", body: JSON.stringify({ ziel: g.id, an: !an }) }); geraeteLaden(); } catch (e) { fehler(e); } });
         zeile.append(b);
       }
+      const ein = document.createElement("button"); ein.type = "button"; ein.className = "btn klein einst"; ein.textContent = "⚙"; ein.title = RW_T("Gerät einstellen"); ein.setAttribute("aria-label", RW_T("Gerät einstellen"));
+      ein.addEventListener("click", () => geraetDialogOeffnen(g.id)); zeile.append(ein);
       box.append(zeile);
     }
     if (!d.geraete.length) box.textContent = RW_T("Noch keine Geräte eingerichtet.");
   } catch (e) {}
 }
-function geraeteOeffnen(code) {
-  const sel = $("#koppelZiel"); sel.innerHTML = "";
+function koppelZieleBauen() {
+  const sel = $("#koppelZiel"), alt = sel.value; sel.innerHTML = "";
   for (const [id, name] of Object.entries(konfig.alle_ziele || {})) { const o = document.createElement("option"); o.value = id; o.textContent = name; sel.append(o); }
+  if (alt && konfig.alle_ziele && konfig.alle_ziele[alt]) sel.value = alt;
+}
+function geraeteOeffnen(code) {
+  koppelZieleBauen();
   if (code) $("#koppelCode").value = code;
   $("#geraeteDialog").classList.remove("versteckt"); geraeteLaden(); clearInterval(geraeteTimer); geraeteTimer = setInterval(geraeteLaden, 5000);
 }
 $("#geraeteBtn").addEventListener("click", () => geraeteOeffnen(""));
+
+// ---------------------------------------------------------------- Geraete verwalten (Rahmen/Fernseher anlegen und einstellen)
+let gfId = null;                                           // null = neues Geraet
+const QUELLEN_ARTEN = [["alle", "Ganze Bibliothek"], ["neu", "Neueste Fotos (Tage)"], ["heute", "Heute vor Jahren"], ["person", "Person"], ["album", "Album (ID)"]];
+function quelleZeile(q) {
+  q = q || { art: "alle", wert: "", gew: "" };
+  const z = document.createElement("div"); z.className = "qzeile";
+  const sel = document.createElement("select"); sel.className = "qart"; sel.setAttribute("aria-label", RW_T("Quelle"));
+  for (const [k, t] of QUELLEN_ARTEN) { const o = document.createElement("option"); o.value = k; o.textContent = t; sel.append(o); }
+  sel.value = q.art;
+  const wert = document.createElement("input"); wert.type = "text"; wert.className = "qwert"; wert.value = q.wert || ""; wert.autocomplete = "off";
+  const gew = document.createElement("input"); gew.type = "number"; gew.className = "qgew"; gew.min = "0"; gew.step = "any"; gew.value = q.gew || ""; gew.placeholder = "1"; gew.title = RW_T("Gewicht"); gew.setAttribute("aria-label", RW_T("Gewicht"));
+  const weg = document.createElement("button"); weg.type = "button"; weg.className = "btn klein"; weg.textContent = "✕"; weg.setAttribute("aria-label", RW_T("Entfernen"));
+  const anpassen = () => {
+    const a = sel.value; wert.style.visibility = a === "alle" ? "hidden" : "visible";
+    wert.placeholder = a === "neu" ? "14" : a === "heute" ? "2" : a === "person" ? "Anna+Ben" : a === "album" ? "xxxxxxxx-xxxx-…" : "";
+    wert.inputMode = a === "neu" || a === "heute" ? "numeric" : "text";
+  };
+  sel.addEventListener("change", anpassen); weg.addEventListener("click", () => z.remove()); anpassen();
+  z.append(sel, wert, gew, weg); return z;
+}
+function quellenLesen(text) {
+  const reihen = [];
+  for (const tok of (text || "").split(",").map(x => x.trim()).filter(Boolean)) {
+    let m;
+    if (/^person=/i.test(tok)) {
+      let rest = tok.slice(7), gew = ""; const i = rest.lastIndexOf(":");
+      if (i >= 0 && /^\d+(\.\d+)?$/.test(rest.slice(i + 1))) { gew = rest.slice(i + 1); rest = rest.slice(0, i); }
+      reihen.push({ art: "person", wert: rest, gew }); continue;
+    }
+    const i = tok.indexOf(":"), name = i >= 0 ? tok.slice(0, i) : tok, gew = i >= 0 ? tok.slice(i + 1) : "";
+    if (name === "*") reihen.push({ art: "alle", wert: "", gew });
+    else if ((m = name.match(/^neu(\d{1,3})$/))) reihen.push({ art: "neu", wert: m[1], gew });
+    else if ((m = name.match(/^heute(\d{0,2})$/))) reihen.push({ art: "heute", wert: m[1], gew });
+    else if (/^[0-9a-f-]{36}$/.test(name)) reihen.push({ art: "album", wert: name, gew });
+  }
+  return reihen;
+}
+function quellenSchreiben() {
+  const teile = [];
+  for (const z of $$("#gfQuellen .qzeile")) {
+    const a = z.querySelector(".qart").value, w = z.querySelector(".qwert").value.trim().replace(/[,:]/g, ""), g = z.querySelector(".qgew").value.trim();
+    let t = a === "alle" ? "*" : a === "neu" ? "neu" + (w || "14") : a === "heute" ? "heute" + w : a === "person" ? "person=" + w : w;
+    if (!t || t === "person=") continue;
+    teile.push(t + (g && g !== "1" ? ":" + g : ""));
+  }
+  return teile.join(", ");
+}
+function gfArtAnpassen() { document.querySelector(".nur-gf-rahmen").classList.toggle("versteckt", $("#gfArt").value !== "rahmen"); }
+$("#gfArt").addEventListener("change", gfArtAnpassen);
+$("#gfQuelleNeu").addEventListener("click", () => $("#gfQuellen").append(quelleZeile()));
+async function geraetDialogOeffnen(id) {
+  gfId = id || null;
+  let g = { art: "rahmen", name: "", sek: "", fuellung: "", anzeige: [], nacht: "", quellen: "", zeitplan: "", fully_host: "", fully_pw_gesetzt: false };
+  try {
+    const v = await api("verwaltung");
+    if (id) g = v.geraete.find(x => x.id === id) || g;
+    $("#gfSek").placeholder = String(v.standard.sek);
+  } catch (e) { fehler(e); return; }
+  $("#geraetTitel").textContent = RW_T(id ? "Gerät einstellen" : "Gerät hinzufügen");
+  $("#gfArtZeile").classList.toggle("versteckt", !!id); $("#gfArt").value = g.art; gfArtAnpassen();
+  $("#gfName").value = g.name; $("#gfFuellung").value = g.fuellung || "";
+  $("#gfSek").value = g.sek || ""; $("#gfDatum").checked = (g.anzeige || []).includes("datum"); $("#gfOrt").checked = (g.anzeige || []).includes("ort");
+  const [von, bis] = (g.nacht || "-").split("-"); $("#gfNachtVon").value = (von || "").padStart(5, "0"); $("#gfNachtBis").value = (bis || "").padStart(5, "0");
+  if (!g.nacht) { $("#gfNachtVon").value = ""; $("#gfNachtBis").value = ""; }
+  $("#gfQuellen").innerHTML = ""; for (const q of quellenLesen(g.quellen)) $("#gfQuellen").append(quelleZeile(q));
+  $("#gfZeitplan").value = g.zeitplan || ""; $("#gfFullyHost").value = g.fully_host || ""; $("#gfFullyPw").value = "";
+  $("#gfFullyPw").placeholder = g.fully_pw_gesetzt ? RW_T("gesetzt – leer lassen zum Behalten") : "";
+  $("#gfLoeschen").classList.toggle("versteckt", !id);
+  $("#geraetDialog").classList.remove("versteckt"); $("#gfName").focus();
+}
+$("#geraetNeu").addEventListener("click", () => geraetDialogOeffnen(null));
+$("#gfAbbrechen").addEventListener("click", () => $("#geraetDialog").classList.add("versteckt"));
+async function geraeteNeuLesen() { await konfigLaden(); koppelZieleBauen(); geraeteLaden(); statusLaden(); }
+$("#gfSpeichern").addEventListener("click", async () => {
+  const istRahmen = $("#gfArt").value === "rahmen";
+  const name = $("#gfName").value.trim(); if (!name) { toast(RW_T("Bitte einen Namen eingeben."), true); $("#gfName").focus(); return; }
+  const von = $("#gfNachtVon").value, bis = $("#gfNachtBis").value;
+  if (istRahmen && !!von !== !!bis) { toast(RW_T("Nachtruhe: bitte „von“ und „bis“ ausfüllen oder beide leer lassen."), true); return; }
+  const daten = { name, fuellung: $("#gfFuellung").value };
+  if (!gfId) daten.art = $("#gfArt").value;
+  if (istRahmen) {
+    Object.assign(daten, { sek: $("#gfSek").value, anzeige: [$("#gfDatum").checked && "datum", $("#gfOrt").checked && "ort"].filter(Boolean), nacht: von && bis ? von + "-" + bis : "",
+      quellen: quellenSchreiben(), zeitplan: $("#gfZeitplan").value.trim(), fully_host: $("#gfFullyHost").value.trim() });
+    if ($("#gfFullyPw").value) daten.fully_pw = $("#gfFullyPw").value;
+  }
+  const b = $("#gfSpeichern"); b.disabled = true;
+  try {
+    const r = gfId ? await api("verwaltung/geraete/" + encodeURIComponent(gfId), { method: "PUT", body: JSON.stringify(daten) })
+                   : await api("verwaltung/geraete", { method: "POST", body: JSON.stringify(daten) });
+    $("#geraetDialog").classList.add("versteckt"); toast(r.nachricht || RW_T("Gespeichert.")); await geraeteNeuLesen();
+  } catch (e) { fehler(e); }
+  b.disabled = false;
+});
+$("#gfLoeschen").addEventListener("click", async () => {
+  if (!gfId || !confirm(RW_T("Dieses Gerät wirklich entfernen? Gespeicherte Shows bleiben erhalten."))) return;
+  try { const r = await api("verwaltung/geraete/" + encodeURIComponent(gfId), { method: "DELETE" }); $("#geraetDialog").classList.add("versteckt"); toast(r.nachricht); await geraeteNeuLesen(); } catch (e) { fehler(e); }
+});
+$("#gfFullyTest").addEventListener("click", async () => {
+  try { const r = await api("verwaltung/fully-test", { method: "POST", body: JSON.stringify({ id: gfId, fully_host: $("#gfFullyHost").value.trim(), fully_pw: $("#gfFullyPw").value }) }); toast(r.nachricht); } catch (e) { fehler(e); }
+});
 $("#geraeteZu").addEventListener("click", () => { $("#geraeteDialog").classList.add("versteckt"); clearInterval(geraeteTimer); });
 $("#koppelBtn").addEventListener("click", async () => {
   const code = $("#koppelCode").value.trim().toUpperCase(), ziel = $("#koppelZiel").value;

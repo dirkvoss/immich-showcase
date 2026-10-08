@@ -346,7 +346,45 @@
   "Konto": "Account",
   "Geräte": "Devices",
   "Rahmen wählen": "Choose frame",
-  "Auf diese Rahmen schicken": "Send to these frames"
+  "Auf diese Rahmen schicken": "Send to these frames",
+  "Gerät einstellen": "Device settings",
+  "Gerät hinzufügen": "Add device",
+  "＋ Gerät hinzufügen": "＋ Add device",
+  "Art": "Type",
+  "Name": "Name",
+  "Hintergrund": "Background",
+  "Standard": "Default",
+  "Unscharf": "Blurred",
+  "Zuschnitt": "Crop",
+  "Schwarze Balken": "Black bars",
+  "Sekunden pro Foto": "Seconds per photo",
+  "Bildunterschrift": "Caption",
+  "Datum": "Date",
+  "Ort": "Place",
+  "Nachtruhe (Bildschirm aus)": "Night rest (screen off)",
+  "von": "from",
+  "bis": "to",
+  "Was der Rahmen zeigt, wenn niemand etwas schickt. Ohne Eintrag gilt die allgemeine Einstellung der Installation.": "What the frame shows when nobody sends anything. Without an entry the installation’s general setting applies.",
+  "Ganze Bibliothek": "Whole library",
+  "Neueste Fotos (Tage)": "Latest photos (days)",
+  "Heute vor Jahren": "On this day",
+  "Album (ID)": "Album (ID)",
+  "＋ Quelle": "＋ Source",
+  "Quelle": "Source",
+  "Gewicht": "Weight",
+  "Entfernen": "Remove",
+  "Zeitplan (optional)": "Schedule (optional)",
+  "Zeitplan": "Schedule",
+  "Fully Kiosk (Tablet)": "Fully Kiosk (tablet)",
+  "Adresse des Tablets": "Tablet address",
+  "Verbindung testen": "Test connection",
+  "Speichern": "Save",
+  "Gerät löschen": "Delete device",
+  "gesetzt – leer lassen zum Behalten": "set – leave empty to keep",
+  "Bitte einen Namen eingeben.": "Please enter a name.",
+  "Nachtruhe: bitte „von“ und „bis“ ausfüllen oder beide leer lassen.": "Night rest: please fill in “from” and “to”, or leave both empty.",
+  "Gespeichert.": "Saved.",
+  "Dieses Gerät wirklich entfernen? Gespeicherte Shows bleiben erhalten.": "Really remove this device? Saved shows are kept."
  },
  "muster": [
   [
@@ -655,6 +693,18 @@
   [
    "^(.*) zeigt wieder das normale Programm\\.$",
    "$1 goes back to the normal programme."
+  ],
+  [
+   "^„(.*)“ wurde angelegt\\. Öffne am Gerät die Seite /tv/ und koppele es mit dem Code\\.$",
+   "“$1” was added. On the device, open the page /tv/ and pair it with the code."
+  ],
+  [
+   "^„(.*)“ wurde entfernt\\. Gespeicherte Shows bleiben erhalten\\.$",
+   "“$1” was removed. Saved shows are kept."
+  ],
+  [
+   "^Verbunden – Akku (.*) %$",
+   "Connected – battery $1 %"
   ]
  ],
  "beschreibung": [

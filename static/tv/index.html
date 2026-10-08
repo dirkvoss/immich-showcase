@@ -130,7 +130,7 @@ body.zuschnitt .bild { object-fit: cover; }
   if (window.RW_KOPPELN) return;
   var ziel = window.RW_ZIEL;
   var NAMEN = { lg: "LG TV", shield: "Shield" };
-  api("/api/config", function (st, d) {
+  api("/api/config?ziel=" + encodeURIComponent(ziel || ""), function (st, d) {
     if (st === 200 && d && d.alle_ziele && ziel !== "test" && !d.alle_ziele[ziel]) { try { localStorage.removeItem("showcaseZiel"); } catch (e) {} location.replace("/tv/"); return; }
     if (st === 200 && d && d.rahmen_zusatz && d.rahmen_zusatz.length && d.rahmen && d.rahmen.indexOf(ziel) >= 0) zusatzLaden();
     if (st === 200 && d && d.ziele) { for (var k in d.ziele) NAMEN[k] = d.ziele[k]; }

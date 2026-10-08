@@ -346,7 +346,45 @@
   "Konto": "Cuenta",
   "Geräte": "Dispositivos",
   "Rahmen wählen": "Elegir marco",
-  "Auf diese Rahmen schicken": "Enviar a estos marcos"
+  "Auf diese Rahmen schicken": "Enviar a estos marcos",
+  "Gerät einstellen": "Ajustes del dispositivo",
+  "Gerät hinzufügen": "Añadir dispositivo",
+  "＋ Gerät hinzufügen": "＋ Añadir dispositivo",
+  "Art": "Tipo",
+  "Name": "Nombre",
+  "Hintergrund": "Fondo",
+  "Standard": "Predeterminado",
+  "Unscharf": "Desenfocado",
+  "Zuschnitt": "Recortar",
+  "Schwarze Balken": "Barras negras",
+  "Sekunden pro Foto": "Segundos por foto",
+  "Bildunterschrift": "Pie de foto",
+  "Datum": "Fecha",
+  "Ort": "Lugar",
+  "Nachtruhe (Bildschirm aus)": "Descanso nocturno (pantalla apagada)",
+  "von": "de",
+  "bis": "a",
+  "Was der Rahmen zeigt, wenn niemand etwas schickt. Ohne Eintrag gilt die allgemeine Einstellung der Installation.": "Lo que muestra el marco cuando nadie envía nada. Sin entradas se aplica el ajuste general de la instalación.",
+  "Ganze Bibliothek": "Toda la biblioteca",
+  "Neueste Fotos (Tage)": "Fotos más recientes (días)",
+  "Heute vor Jahren": "Tal día como hoy",
+  "Album (ID)": "Álbum (ID)",
+  "＋ Quelle": "＋ Fuente",
+  "Quelle": "Fuente",
+  "Gewicht": "Peso",
+  "Entfernen": "Quitar",
+  "Zeitplan (optional)": "Horario (opcional)",
+  "Zeitplan": "Horario",
+  "Fully Kiosk (Tablet)": "Fully Kiosk (tableta)",
+  "Adresse des Tablets": "Dirección de la tableta",
+  "Verbindung testen": "Probar conexión",
+  "Speichern": "Guardar",
+  "Gerät löschen": "Eliminar dispositivo",
+  "gesetzt – leer lassen zum Behalten": "definida – dejar vacío para conservar",
+  "Bitte einen Namen eingeben.": "Introduce un nombre.",
+  "Nachtruhe: bitte „von“ und „bis“ ausfüllen oder beide leer lassen.": "Descanso nocturno: rellena «de» y «a», o deja ambos vacíos.",
+  "Gespeichert.": "Guardado.",
+  "Dieses Gerät wirklich entfernen? Gespeicherte Shows bleiben erhalten.": "¿Quitar este dispositivo? Las shows guardadas se conservan."
  },
  "muster": [
   [
@@ -655,6 +693,18 @@
   [
    "^(.*) zeigt wieder das normale Programm\\.$",
    "$1 vuelve a su programa normal."
+  ],
+  [
+   "^„(.*)“ wurde angelegt\\. Öffne am Gerät die Seite /tv/ und koppele es mit dem Code\\.$",
+   "«$1» se ha añadido. Abre /tv/ en el dispositivo y empareja con el código."
+  ],
+  [
+   "^„(.*)“ wurde entfernt\\. Gespeicherte Shows bleiben erhalten\\.$",
+   "«$1» se ha quitado. Las shows guardadas se conservan."
+  ],
+  [
+   "^Verbunden – Akku (.*) %$",
+   "Conectado – batería $1 %"
   ]
  ],
  "beschreibung": [

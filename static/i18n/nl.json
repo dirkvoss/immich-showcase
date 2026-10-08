@@ -346,7 +346,45 @@
   "Konto": "Account",
   "Geräte": "Apparaten",
   "Rahmen wählen": "Lijst kiezen",
-  "Auf diese Rahmen schicken": "Naar deze lijsten sturen"
+  "Auf diese Rahmen schicken": "Naar deze lijsten sturen",
+  "Gerät einstellen": "Apparaat instellen",
+  "Gerät hinzufügen": "Apparaat toevoegen",
+  "＋ Gerät hinzufügen": "＋ Apparaat toevoegen",
+  "Art": "Soort",
+  "Name": "Naam",
+  "Hintergrund": "Achtergrond",
+  "Standard": "Standaard",
+  "Unscharf": "Vervaagd",
+  "Zuschnitt": "Bijsnijden",
+  "Schwarze Balken": "Zwarte balken",
+  "Sekunden pro Foto": "Seconden per foto",
+  "Bildunterschrift": "Bijschrift",
+  "Datum": "Datum",
+  "Ort": "Plaats",
+  "Nachtruhe (Bildschirm aus)": "Nachtrust (scherm uit)",
+  "von": "van",
+  "bis": "tot",
+  "Was der Rahmen zeigt, wenn niemand etwas schickt. Ohne Eintrag gilt die allgemeine Einstellung der Installation.": "Wat de lijst toont als niemand iets stuurt. Zonder invoer geldt de algemene instelling van de installatie.",
+  "Ganze Bibliothek": "Hele bibliotheek",
+  "Neueste Fotos (Tage)": "Nieuwste foto’s (dagen)",
+  "Heute vor Jahren": "Vandaag, jaren geleden",
+  "Album (ID)": "Album (ID)",
+  "＋ Quelle": "＋ Bron",
+  "Quelle": "Bron",
+  "Gewicht": "Gewicht",
+  "Entfernen": "Verwijderen",
+  "Zeitplan (optional)": "Schema (optioneel)",
+  "Zeitplan": "Schema",
+  "Fully Kiosk (Tablet)": "Fully Kiosk (tablet)",
+  "Adresse des Tablets": "Adres van de tablet",
+  "Verbindung testen": "Verbinding testen",
+  "Speichern": "Opslaan",
+  "Gerät löschen": "Apparaat verwijderen",
+  "gesetzt – leer lassen zum Behalten": "ingesteld – leeg laten om te behouden",
+  "Bitte einen Namen eingeben.": "Voer een naam in.",
+  "Nachtruhe: bitte „von“ und „bis“ ausfüllen oder beide leer lassen.": "Nachtrust: vul ‘van’ en ‘tot’ in, of laat beide leeg.",
+  "Gespeichert.": "Opgeslagen.",
+  "Dieses Gerät wirklich entfernen? Gespeicherte Shows bleiben erhalten.": "Dit apparaat echt verwijderen? Opgeslagen shows blijven bewaard."
  },
  "muster": [
   [
@@ -655,6 +693,18 @@
   [
    "^(.*) zeigt wieder das normale Programm\\.$",
    "$1 gaat terug naar het normale programma."
+  ],
+  [
+   "^„(.*)“ wurde angelegt\\. Öffne am Gerät die Seite /tv/ und koppele es mit dem Code\\.$",
+   "‘$1’ is toegevoegd. Open op het apparaat de pagina /tv/ en koppel het met de code."
+  ],
+  [
+   "^„(.*)“ wurde entfernt\\. Gespeicherte Shows bleiben erhalten\\.$",
+   "‘$1’ is verwijderd. Opgeslagen shows blijven bewaard."
+  ],
+  [
+   "^Verbunden – Akku (.*) %$",
+   "Verbonden – accu $1 %"
   ]
  ],
  "beschreibung": [
