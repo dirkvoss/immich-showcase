@@ -1368,6 +1368,8 @@ $("#tvLos").addEventListener("click", async () => {
     tv.pause = false; $("#tvPause").textContent = "⏸";
     $("#tvLaeuft").innerHTML = `<b>${esc(tv.quelle.name)}</b> läuft auf <b>${esc(wahl.closest(".tvziel").querySelector(".tvname").textContent.replace("📺", "").trim())}</b>.${r.wartet ? `<br><span class="tipp">${r.wartet} Video${r.wartet === 1 ? " wird" : "s werden"} für den Fernseher vorbereitet – es startet gleich.</span>` : ""}${r.online ? "" : '<br><span class="tipp">Der Fernseher hat die Seite /tv noch nicht geöffnet – es startet, sobald sie offen ist.</span>'}`;
     tvSchritt(4);
+    merke(); auswahl.clear(); showBearbeiten = null; $("#showName").value = ""; $("#merken").checked = false;       // wie beim Rahmen: die Auswahl ist abgeschickt, die Leiste geht zu (mit „Rückgängig“ zurückholbar)
+    $$(".foto.an").forEach(e => { e.classList.remove("an"); e.setAttribute("aria-checked", "false"); }); aktualisiere();
   } catch (e) { fehler(e); }
   b.disabled = false;
 });

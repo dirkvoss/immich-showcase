@@ -1,6 +1,10 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.11.2]
+### Behoben
+- Nach dem Start einer Show auf dem **Fernseher** bleibt die Auswahl nicht mehr stehen: die Leiste „n Fotos ausgewählt“ geht zu wie beim Rahmen (mit „↶ Rückgängig“ zurückholbar).
+
 ## [2.11.1]
 ### Geändert
 - Der Assistent „Gerät hinzufügen“ ist bei **Fernsehern** jetzt auf den einfachen Weg ausgerichtet: kurze Adresse am Fernseher eingeben, den angezeigten Code gleich im Assistenten eintragen („Koppeln“). Link und QR-Code (für Tablets mit Kamera) sind eingeklappt; bei Tablets und Rahmen bleibt der QR-Code oben und das Codefeld darunter.
