@@ -400,7 +400,9 @@
   "Anwenden": "Aplicar",
   "Nicht ändern": "No cambiar",
   "Shows verteilt.": "Shows repartidas.",
-  "Nichts geändert.": "Nada cambiado."
+  "Nichts geändert.": "Nada cambiado.",
+  "Geräte einrichten": "Configurar dispositivos",
+  "Unter „📡 Geräte“ legst du Rahmen und Fernseher mit „＋ Gerät hinzufügen“ an und stellst sie mit ⚙ ein. Bei mehreren Rahmen wählst du beim Senden per Häkchen, wohin die Show geht; unter „Meine Shows“ kannst du jedem Rahmen eine eigene Show geben.": "En «📡 Dispositivos» añades marcos y televisores con «＋ Añadir dispositivo» y los ajustas con ⚙. Con varios marcos marcas al enviar adónde va la show; en «Mis shows» puedes dar a cada marco su propia show."
  },
  "muster": [
   [

@@ -36,7 +36,7 @@ Mit Wetter und Terminen oben rechts, Gerätekopplung per Code/QR am Fernseher un
 - **Verknüpfte Filter** (Person, Jahr, Land, Fotos/Videos), „alle Fotos eines Tages“ auswählen, Rückgängig.
 - **Shows** speichern, benennen und später wieder starten.
 - **Fernseher:** eine Webseite, die du einmal im TV-Browser öffnest (LG webOS, Android TV, Shield, Chromecast mit Browser …). Steuerung vom Handy: Pause, vor/zurück, Musik, Stopp. Videos werden vorab für den Fernseher umgewandelt.
-- **Bilderrahmen:** eigener Player für jedes Tablet (Browser oder [Fully Kiosk](https://www.fully-kiosk.com)). Ohne Wunsch läuft ein Dauerprogramm mit Uhr; eine Show aus der App unterbricht es, „Stopp“ bringt es zurück.
+- **Bilderrahmen:** eigener Player für jedes Tablet (Browser oder [Fully Kiosk](https://www.fully-kiosk.com)). Ohne Wunsch läuft ein Dauerprogramm mit Uhr; eine Show aus der App unterbricht es, „Stopp“ bringt es zurück. **Mehrere Rahmen** sind möglich: in der App anlegen und einstellen (Programm-Quellen, Zeitplan, Nachtruhe, Fully Kiosk), eine Show an einen oder mehrere schicken – oder jedem Rahmen eine eigene Show geben.
 - **Hintergrundmusik** aus eigenen Ordnern (es wird keine mitgeliefert).
 - **Sicher gebaut:** Die App kann **nie ein Foto löschen**, läuft ohne Root in einem schreibgeschützten Container, und jede Person kann ihr eigenes Immich-Konto nutzen.
 
@@ -98,6 +98,9 @@ Die Adresse `http://<server>:8090/tv/` **ohne** `?ziel=…` öffnen, um das Ger�
 4. Am Handy: Fotos auswählen → **Auf den Fernseher** → Fernseher, Zeit pro Foto, Reihenfolge und Musik wählen → **Start**.
 
 ## Bilderrahmen einrichten
+**Am einfachsten in der App:** **📡 Geräte** → **＋ Gerät hinzufügen** → Art „Bilderrahmen“, Name vergeben, mit ⚙ später Sekunden pro Foto, Hintergrund, Bildunterschrift, Nachtruhe, Dauerprogramm (Quellen mit Gewicht), Zeitplan und Fully Kiosk einstellen. Die Geräteliste liegt dann in `rahmen_web_geraete.json` im Datenordner und hat Vorrang vor den Variablen unten (die gelten nur als Startwerte, bis du in der App etwas änderst). Am Tablet öffnest du `http://<server>:8090/tv/` und koppelst es mit dem Code.
+
+Der Weg über die `.env`:
 1. In der `.env`: `RAHMEN_WEB_RAHMEN_ZIELE=rahmen=Bilderrahmen`
 2. Festlegen, was der Rahmen zeigt, wenn niemand etwas ausgewählt hat (`RAHMEN_WEB_RAHMEN_*`, alles optional):
    - **Alben:** `RAHMEN_WEB_RAHMEN_ALBEN=<album-id>,<album-id>` (die IDs stehen in der Immich-Adresse des Albums)
@@ -117,6 +120,7 @@ Die Adresse `http://<server>:8090/tv/` **ohne** `?ziel=…` öffnen, um das Ger�
 **📡 Geräte** in der App listet jeden Fernseher und Rahmen: online oder offline, was gerade läuft, seit wann das aktuelle Bild zu sehen ist und wann das Gerät zuletzt gesehen wurde.
 
 ## Mehrere Rahmen, Zeitplan, „Heute vor Jahren“
+- **Mehrere Rahmen:** In der Auswahlleiste setzt du Häkchen bei den Rahmen, die die Show zeigen sollen (dieselbe Show an mehrere, oder nacheinander verschiedene). Unter „Meine Shows“ verteilt „Shows auf die Rahmen verteilen“ je Rahmen eine eigene Show. Jeder Rahmen hat seinen eigenen Zustand – laufende Show, „Zurück“, Reihenfolge; der Banner oben wechselt zwischen ihnen.
 - **Eigenes Programm je Rahmen:** `RAHMEN_WEB_RAHMEN_QUELLEN_FLUR=<album-id>:70, neu14:30` (Kennung in Großbuchstaben) – siehe `.env.example`.
 - **Zeitplan:** `RAHMEN_WEB_RAHMEN_ZEITPLAN=Mo-Fr 18:00-22:00 = <album-id>:1; Sa,So 08:00-20:00 = heute:50, *:50` – zu verschiedenen Zeiten andere Quellen (auch je Rahmen, Bereiche über Mitternacht sind erlaubt).
 - **Heute vor Jahren:** die Quelle `heute` (oder `heute5` = ±5 Tage) zeigt Fotos von diesem Tag aus früheren Jahren.

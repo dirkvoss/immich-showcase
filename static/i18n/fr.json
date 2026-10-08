@@ -400,7 +400,9 @@
   "Anwenden": "Appliquer",
   "Nicht ändern": "Ne pas modifier",
   "Shows verteilt.": "Shows réparties.",
-  "Nichts geändert.": "Rien n’a changé."
+  "Nichts geändert.": "Rien n’a changé.",
+  "Geräte einrichten": "Configurer les appareils",
+  "Unter „📡 Geräte“ legst du Rahmen und Fernseher mit „＋ Gerät hinzufügen“ an und stellst sie mit ⚙ ein. Bei mehreren Rahmen wählst du beim Senden per Häkchen, wohin die Show geht; unter „Meine Shows“ kannst du jedem Rahmen eine eigene Show geben.": "Sous « 📡 Appareils », ajoutez cadres et téléviseurs avec « ＋ Ajouter un appareil » et réglez-les avec ⚙. Avec plusieurs cadres, cochez la destination lors de l’envoi ; sous « Mes shows », chaque cadre peut avoir sa propre show."
  },
  "muster": [
   [

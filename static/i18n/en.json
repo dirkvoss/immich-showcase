@@ -400,7 +400,9 @@
   "Anwenden": "Apply",
   "Nicht ändern": "Don’t change",
   "Shows verteilt.": "Shows distributed.",
-  "Nichts geändert.": "Nothing changed."
+  "Nichts geändert.": "Nothing changed.",
+  "Geräte einrichten": "Set up devices",
+  "Unter „📡 Geräte“ legst du Rahmen und Fernseher mit „＋ Gerät hinzufügen“ an und stellst sie mit ⚙ ein. Bei mehreren Rahmen wählst du beim Senden per Häkchen, wohin die Show geht; unter „Meine Shows“ kannst du jedem Rahmen eine eigene Show geben.": "Under “📡 Devices” you add frames and TVs with “＋ Add device” and set them up with ⚙. With several frames you tick where a show goes when sending; under “My shows” you can give each frame its own show."
  },
  "muster": [
   [

@@ -36,7 +36,7 @@ With weather and appointments at the top right, device pairing by code/QR on the
 - **Linked filters** (person, year, country, photos/videos), "select the whole day", undo.
 - **Shows:** save, name and restart them later.
 - **TV:** a web page you open once in the TV browser (LG webOS, Android TV, Shield, Chromecast with browser …). Control it from the phone: pause, next/previous, music, stop. Videos are converted in advance so the TV can play them.
-- **Picture frame:** an own player for any tablet (browser or [Fully Kiosk](https://www.fully-kiosk.com)). Without a request it shows a continuous programme with a clock; a show from the app interrupts it, "Stop" brings the programme back.
+- **Picture frames:** an own player for any tablet (browser or [Fully Kiosk](https://www.fully-kiosk.com)). Without a request it shows a continuous programme with a clock; a show from the app interrupts it, "Stop" brings the programme back. **Several frames** are supported: add and set them up in the app (programme sources, schedule, night rest, Fully Kiosk), send a show to one or more of them, or give each frame its own show.
 - **Background music** from your own folders (none is included).
 - **Safe by design:** the app can never delete a photo, runs as non-root in a read-only container, and every person can use their own Immich account.
 
