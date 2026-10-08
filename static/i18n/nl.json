@@ -465,7 +465,13 @@
   "Adresse des Fernsehers": "Adres van de tv",
   "Seite am Fernseher öffnen": "Pagina op de tv openen",
   "Für Fortgeschrittene: per ADB direkt am Fernseher öffnen": "Geavanceerd: rechtstreeks op de tv openen via ADB",
-  "Nur für Android TV, Shield und Fire TV – und nur, wenn dort die Entwickler-Funktion „Netzwerk-Debugging“ (ADB) eingeschaltet ist, was bei den meisten Geräten nicht der Fall ist. Dann öffnet der Server die Seite selbst, ohne Tippen mit der Fernbedienung. Der Server muss den Fernseher im Netz erreichen; beim ersten Mal bestätigst du am Fernseher „Immer erlauben“. Für alle anderen Fernseher gilt: einfach die kurze Adresse oben im Browser eingeben.": "Alleen voor Android TV, Shield en Fire TV – en alleen als de ontwikkelaarsfunctie ‘netwerk-debugging’ (ADB) daar aanstaat, wat bij de meeste toestellen niet zo is. Dan opent de server de pagina zelf, zonder typen met de afstandsbediening. De server moet de tv in het netwerk kunnen bereiken; de eerste keer bevestig je op de tv ‘Altijd toestaan’. Voor alle andere tv’s: voer gewoon het korte adres hierboven in de browser in."
+  "Nur für Android TV, Shield und Fire TV – und nur, wenn dort die Entwickler-Funktion „Netzwerk-Debugging“ (ADB) eingeschaltet ist, was bei den meisten Geräten nicht der Fall ist. Dann öffnet der Server die Seite selbst, ohne Tippen mit der Fernbedienung. Der Server muss den Fernseher im Netz erreichen; beim ersten Mal bestätigst du am Fernseher „Immer erlauben“. Für alle anderen Fernseher gilt: einfach die kurze Adresse oben im Browser eingeben.": "Alleen voor Android TV, Shield en Fire TV – en alleen als de ontwikkelaarsfunctie ‘netwerk-debugging’ (ADB) daar aanstaat, wat bij de meeste toestellen niet zo is. Dan opent de server de pagina zelf, zonder typen met de afstandsbediening. De server moet de tv in het netwerk kunnen bereiken; de eerste keer bevestig je op de tv ‘Altijd toestaan’. Voor alle andere tv’s: voer gewoon het korte adres hierboven in de browser in.",
+  "Gib im Browser des Fernsehers diese kurze Adresse ein:": "Voer op de tv dit korte adres in de browser in:",
+  "Der Fernseher zeigt dann einen Code. Gib ihn hier ein:": "De tv toont dan een code. Voer hem hier in:",
+  "Oder gib hier den Code ein, den das Gerät nach dem Öffnen von /tv/ anzeigt:": "Of voer hier de code in die het apparaat toont na het openen van /tv/:",
+  "Code vom Gerät": "Code van het apparaat",
+  "Gekoppelt": "Gekoppeld",
+  "Link und QR-Code (zum Scannen mit dem Tablet)": "Link en QR-code (om met de tablet te scannen)"
  },
  "muster": [
   [

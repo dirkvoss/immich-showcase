@@ -465,7 +465,13 @@
   "Adresse des Fernsehers": "Dirección del televisor",
   "Seite am Fernseher öffnen": "Abrir la página en el televisor",
   "Für Fortgeschrittene: per ADB direkt am Fernseher öffnen": "Avanzado: abrir directamente en el televisor mediante ADB",
-  "Nur für Android TV, Shield und Fire TV – und nur, wenn dort die Entwickler-Funktion „Netzwerk-Debugging“ (ADB) eingeschaltet ist, was bei den meisten Geräten nicht der Fall ist. Dann öffnet der Server die Seite selbst, ohne Tippen mit der Fernbedienung. Der Server muss den Fernseher im Netz erreichen; beim ersten Mal bestätigst du am Fernseher „Immer erlauben“. Für alle anderen Fernseher gilt: einfach die kurze Adresse oben im Browser eingeben.": "Solo para Android TV, Shield y Fire TV, y solo si ahí está activada la función de desarrollador «depurado de red» (ADB), lo que no ocurre en la mayoría de los aparatos. Entonces el servidor abre la página por sí mismo, sin teclear con el mando. El servidor debe poder alcanzar el televisor en la red; la primera vez confirmas «Permitir siempre» en el televisor. Para el resto de televisores basta con introducir la dirección corta de arriba en el navegador."
+  "Nur für Android TV, Shield und Fire TV – und nur, wenn dort die Entwickler-Funktion „Netzwerk-Debugging“ (ADB) eingeschaltet ist, was bei den meisten Geräten nicht der Fall ist. Dann öffnet der Server die Seite selbst, ohne Tippen mit der Fernbedienung. Der Server muss den Fernseher im Netz erreichen; beim ersten Mal bestätigst du am Fernseher „Immer erlauben“. Für alle anderen Fernseher gilt: einfach die kurze Adresse oben im Browser eingeben.": "Solo para Android TV, Shield y Fire TV, y solo si ahí está activada la función de desarrollador «depurado de red» (ADB), lo que no ocurre en la mayoría de los aparatos. Entonces el servidor abre la página por sí mismo, sin teclear con el mando. El servidor debe poder alcanzar el televisor en la red; la primera vez confirmas «Permitir siempre» en el televisor. Para el resto de televisores basta con introducir la dirección corta de arriba en el navegador.",
+  "Gib im Browser des Fernsehers diese kurze Adresse ein:": "En el televisor, introduce esta dirección corta en el navegador:",
+  "Der Fernseher zeigt dann einen Code. Gib ihn hier ein:": "El televisor muestra entonces un código. Introdúcelo aquí:",
+  "Oder gib hier den Code ein, den das Gerät nach dem Öffnen von /tv/ anzeigt:": "O introduce aquí el código que muestra el dispositivo al abrir /tv/:",
+  "Code vom Gerät": "Código del dispositivo",
+  "Gekoppelt": "Emparejado",
+  "Link und QR-Code (zum Scannen mit dem Tablet)": "Enlace y código QR (para escanear con la tableta)"
  },
  "muster": [
   [

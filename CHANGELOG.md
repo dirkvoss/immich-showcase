@@ -1,6 +1,10 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.11.1]
+### Geändert
+- Der Assistent „Gerät hinzufügen“ ist bei **Fernsehern** jetzt auf den einfachen Weg ausgerichtet: kurze Adresse am Fernseher eingeben, den angezeigten Code gleich im Assistenten eintragen („Koppeln“). Link und QR-Code (für Tablets mit Kamera) sind eingeklappt; bei Tablets und Rahmen bleibt der QR-Code oben und das Codefeld darunter.
+
 ## [2.11.0]
 ### Neu
 - **Fernseher ohne lange Adresse:** Fernseher-Browser (LG, Samsung, Android TV, Fire TV, Chromecast …) werden von der Startadresse des Servers automatisch auf die Fernseher-Seite geleitet (`/?ui=1` zeigt die App). Am Fernseher genügt die kurze Adresse, z. B. `192.168.1.20:8090`; die Rolle wird per Code vom Handy zugewiesen.

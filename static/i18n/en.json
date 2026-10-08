@@ -465,7 +465,13 @@
   "Adresse des Fernsehers": "TV address",
   "Seite am Fernseher öffnen": "Open page on the TV",
   "Für Fortgeschrittene: per ADB direkt am Fernseher öffnen": "Advanced: open directly on the TV via ADB",
-  "Nur für Android TV, Shield und Fire TV – und nur, wenn dort die Entwickler-Funktion „Netzwerk-Debugging“ (ADB) eingeschaltet ist, was bei den meisten Geräten nicht der Fall ist. Dann öffnet der Server die Seite selbst, ohne Tippen mit der Fernbedienung. Der Server muss den Fernseher im Netz erreichen; beim ersten Mal bestätigst du am Fernseher „Immer erlauben“. Für alle anderen Fernseher gilt: einfach die kurze Adresse oben im Browser eingeben.": "Only for Android TV, Shield and Fire TV – and only if the developer feature “network debugging” (ADB) is switched on there, which it isn’t on most devices. Then the server opens the page itself, without typing on the remote. The server must be able to reach the TV on the network; the first time you confirm “Always allow” on the TV. For all other TVs: just enter the short address above in the browser."
+  "Nur für Android TV, Shield und Fire TV – und nur, wenn dort die Entwickler-Funktion „Netzwerk-Debugging“ (ADB) eingeschaltet ist, was bei den meisten Geräten nicht der Fall ist. Dann öffnet der Server die Seite selbst, ohne Tippen mit der Fernbedienung. Der Server muss den Fernseher im Netz erreichen; beim ersten Mal bestätigst du am Fernseher „Immer erlauben“. Für alle anderen Fernseher gilt: einfach die kurze Adresse oben im Browser eingeben.": "Only for Android TV, Shield and Fire TV – and only if the developer feature “network debugging” (ADB) is switched on there, which it isn’t on most devices. Then the server opens the page itself, without typing on the remote. The server must be able to reach the TV on the network; the first time you confirm “Always allow” on the TV. For all other TVs: just enter the short address above in the browser.",
+  "Gib im Browser des Fernsehers diese kurze Adresse ein:": "On the TV, enter this short address in the browser:",
+  "Der Fernseher zeigt dann einen Code. Gib ihn hier ein:": "The TV then shows a code. Enter it here:",
+  "Oder gib hier den Code ein, den das Gerät nach dem Öffnen von /tv/ anzeigt:": "Or enter here the code the device shows after opening /tv/:",
+  "Code vom Gerät": "Code from the device",
+  "Gekoppelt": "Paired",
+  "Link und QR-Code (zum Scannen mit dem Tablet)": "Link and QR code (to scan with the tablet)"
  },
  "muster": [
   [

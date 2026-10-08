@@ -465,7 +465,13 @@
   "Adresse des Fernsehers": "Adresse du téléviseur",
   "Seite am Fernseher öffnen": "Ouvrir la page sur le téléviseur",
   "Für Fortgeschrittene: per ADB direkt am Fernseher öffnen": "Avancé : ouvrir directement sur le téléviseur via ADB",
-  "Nur für Android TV, Shield und Fire TV – und nur, wenn dort die Entwickler-Funktion „Netzwerk-Debugging“ (ADB) eingeschaltet ist, was bei den meisten Geräten nicht der Fall ist. Dann öffnet der Server die Seite selbst, ohne Tippen mit der Fernbedienung. Der Server muss den Fernseher im Netz erreichen; beim ersten Mal bestätigst du am Fernseher „Immer erlauben“. Für alle anderen Fernseher gilt: einfach die kurze Adresse oben im Browser eingeben.": "Uniquement pour Android TV, Shield et Fire TV – et seulement si la fonction développeur « débogage réseau » (ADB) y est activée, ce qui n’est pas le cas sur la plupart des appareils. Le serveur ouvre alors lui-même la page, sans saisie à la télécommande. Le serveur doit pouvoir joindre le téléviseur sur le réseau ; la première fois, vous confirmez « Toujours autoriser » sur le téléviseur. Pour tous les autres téléviseurs : saisissez simplement l’adresse courte ci-dessus dans le navigateur."
+  "Nur für Android TV, Shield und Fire TV – und nur, wenn dort die Entwickler-Funktion „Netzwerk-Debugging“ (ADB) eingeschaltet ist, was bei den meisten Geräten nicht der Fall ist. Dann öffnet der Server die Seite selbst, ohne Tippen mit der Fernbedienung. Der Server muss den Fernseher im Netz erreichen; beim ersten Mal bestätigst du am Fernseher „Immer erlauben“. Für alle anderen Fernseher gilt: einfach die kurze Adresse oben im Browser eingeben.": "Uniquement pour Android TV, Shield et Fire TV – et seulement si la fonction développeur « débogage réseau » (ADB) y est activée, ce qui n’est pas le cas sur la plupart des appareils. Le serveur ouvre alors lui-même la page, sans saisie à la télécommande. Le serveur doit pouvoir joindre le téléviseur sur le réseau ; la première fois, vous confirmez « Toujours autoriser » sur le téléviseur. Pour tous les autres téléviseurs : saisissez simplement l’adresse courte ci-dessus dans le navigateur.",
+  "Gib im Browser des Fernsehers diese kurze Adresse ein:": "Sur le téléviseur, saisissez cette adresse courte dans le navigateur :",
+  "Der Fernseher zeigt dann einen Code. Gib ihn hier ein:": "Le téléviseur affiche alors un code. Saisissez-le ici :",
+  "Oder gib hier den Code ein, den das Gerät nach dem Öffnen von /tv/ anzeigt:": "Ou saisissez ici le code que l’appareil affiche après l’ouverture de /tv/ :",
+  "Code vom Gerät": "Code de l’appareil",
+  "Gekoppelt": "Associé",
+  "Link und QR-Code (zum Scannen mit dem Tablet)": "Lien et code QR (à scanner avec la tablette)"
  },
  "muster": [
   [

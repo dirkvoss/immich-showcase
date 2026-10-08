@@ -621,7 +621,20 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
       <label class="tvfeld"><span>Name</span> <input id="assiName" type="text" maxlength="60" autocomplete="off" aria-label="Name" placeholder="Flur"></label>
       <div class="tvknoepfe"><button class="btn" id="assiAbbrechen" type="button">Abbrechen</button><button class="btn primaer" id="assiWeiter" type="button">Weiter</button></div>
     </div>
-    <div id="assiSchritt2" class="versteckt">
+    <div id="assiSchritt2" class="versteckt" style="display:flex;flex-direction:column">
+      <div id="assiTvTeil" class="versteckt" style="order:0">
+        <p class="tipp">Gib im Browser des Fernsehers diese kurze Adresse ein:</p>
+        <div class="assi-adr"><code id="assiKurzAdresse"></code></div>
+        <p class="tipp">Der Fernseher zeigt dann einen Code. Gib ihn hier ein:</p>
+      </div>
+      <div id="assiCode" style="order:1">
+        <p class="tipp" id="assiCodeText">Oder gib hier den Code ein, den das Gerät nach dem Öffnen von /tv/ anzeigt:</p>
+        <label class="tvfeld"><span>Code vom Gerät</span> <input id="assiCodeFeld" maxlength="6" autocomplete="off" autocapitalize="characters" aria-label="Code vom Gerät" placeholder="ABC123"></label>
+        <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="assiCodeOk" type="button">Koppeln</button></div>
+        <p class="tipp versteckt" id="assiCodeErg" role="status"></p>
+      </div>
+      <details class="gfdetails" id="assiLinkTeil" style="order:2">
+        <summary>Link und QR-Code (zum Scannen mit dem Tablet)</summary>
       <p class="tipp">Öffne am Tablet oder Fernseher diese Adresse im Browser – oder scanne den QR-Code mit der Kamera des Tablets.</p>
       <div id="assiQr"></div>
       <label class="tvfeld"><span>Adresse des Servers</span> <input id="assiBasis" type="text" autocomplete="off" aria-label="Adresse des Servers" placeholder="http://192.168.1.20:8090"></label>
@@ -629,6 +642,8 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
       <div class="tvknoepfe versteckt" id="assiBasisZeile" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="assiBasisSpeichern" type="button">Als Standard speichern</button></div>
       <div class="assi-adr"><code id="assiAdresse"></code></div>
       <p class="tipp" id="assiKurz"></p>
+      </details>
+      <div style="order:3">
       <details class="gfdetails" id="assiDirekt">
         <summary>Für Fortgeschrittene: per ADB direkt am Fernseher öffnen</summary>
         <p class="tipp">Nur für Android TV, Shield und Fire TV – und nur, wenn dort die Entwickler-Funktion „Netzwerk-Debugging“ (ADB) eingeschaltet ist, was bei den meisten Geräten nicht der Fall ist. Dann öffnet der Server die Seite selbst, ohne Tippen mit der Fernbedienung. Der Server muss den Fernseher im Netz erreichen; beim ersten Mal bestätigst du am Fernseher „Immer erlauben“. Für alle anderen Fernseher gilt: einfach die kurze Adresse oben im Browser eingeben.</p>
@@ -636,9 +651,9 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
         <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="assiOeffnen" type="button">Seite am Fernseher öffnen</button></div>
         <p class="tipp versteckt" id="assiOeffnenErg" role="status"></p>
       </details>
-      <p class="assi-status" id="assiStatus">Warte auf das Gerät …</p>
-      <p class="tipp">Alternativ: Am Gerät die Seite /tv/ öffnen und den Code unter „Gerät koppeln“ eingeben.</p>
-      <div class="tvknoepfe"><button class="btn" id="assiEinst" type="button">Einstellungen</button><button class="btn primaer" id="assiZu" type="button">Fertig</button></div>
+      </div>
+      <p class="assi-status" id="assiStatus" style="order:4">Warte auf das Gerät …</p>
+      <div class="tvknoepfe" style="order:5"><button class="btn" id="assiEinst" type="button">Einstellungen</button><button class="btn primaer" id="assiZu" type="button">Fertig</button></div>
     </div>
   </div>
 </div>
@@ -1627,7 +1642,7 @@ function geraeteOeffnen(code) {
 $("#geraeteBtn").addEventListener("click", () => geraeteOeffnen(""));
 
 // ---------------------------------------------------------------- Geraete verwalten (Rahmen/Fernseher anlegen und einstellen)
-let gfId = null;                                           // null = neues Geraet
+let gfId = null, gfArt = "rahmen";                                           // null = neues Geraet
 const QUELLEN_ARTEN = [["alle", "Ganze Bibliothek"], ["neu", "Neueste Fotos (Tage)"], ["heute", "Heute vor Jahren"], ["person", "Person"], ["album", "Album (ID)"]];
 function quelleZeile(q) {
   q = q || { art: "alle", wert: "", gew: "" };
@@ -1740,14 +1755,14 @@ $("#gfOeffnen").addEventListener("click", () => seiteOeffnen(gfId, $("#gfAdb").v
 $("#gfFullyAn").addEventListener("click", () => { $("#gfFullyFelder").classList.remove("versteckt"); $("#gfFullyAnzeigen").classList.add("versteckt"); });
 $("#gfIpNehmen").addEventListener("click", e => { $("#gfFullyHost").value = e.currentTarget.dataset.ip; $("#gfIpZeile").classList.add("versteckt"); });
 async function geraetDialogOeffnen(id) {
-  gfId = id || null;
+  gfId = id || null; gfArt = "rahmen";
   let g = { art: "rahmen", name: "", sek: "", fuellung: "", anzeige: [], nacht: "", quellen: "", zeitplan: "", fully_host: "", fully_pw_gesetzt: false };
   try {
     const v = await api("verwaltung");
     if (id) g = v.geraete.find(x => x.id === id) || g;
     $("#gfSek").placeholder = String(v.standard.sek);
   } catch (e) { fehler(e); return; }
-  $("#geraetTitel").textContent = RW_T(id ? "Gerät einstellen" : "Gerät hinzufügen");
+  gfArt = g.art; $("#geraetTitel").textContent = RW_T(id ? "Gerät einstellen" : "Gerät hinzufügen");
   $("#gfArtZeile").classList.toggle("versteckt", !!id); $("#gfArt").value = g.art; gfArtAnpassen();
   $("#gfName").value = g.name; $("#gfFuellung").value = g.fuellung || "";
   $("#gfSek").value = g.sek || ""; $("#gfDatum").checked = (g.anzeige || []).includes("datum"); $("#gfOrt").checked = (g.anzeige || []).includes("ort"); $("#gfZeit").checked = (g.anzeige || []).includes("zeit");
@@ -1849,13 +1864,17 @@ function assiLink() {
   $("#assiAdresse").textContent = adr;
   let kurz = ""; try { const u = new URL(basis); kurz = u.host; } catch (e) {}
   $("#assiKurz").textContent = kurz ? RW_T("Am Fernseher mit Fernbedienung genügt im Browser die kurze Adresse") + " " + kurz + " – " + RW_T("er findet seine Seite selbst und zeigt einen Code zum Koppeln (App → Geräte).") : "";
+  $("#assiKurzAdresse").textContent = kurz;
   try { const qr = qrcode(0, "M"); qr.addData(adr); qr.make(); $("#assiQr").innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true }); $("#assiQr").style.display = ""; } catch (e) { $("#assiQr").innerHTML = ""; $("#assiQr").style.display = "none"; }
   let host = ""; try { host = new URL(basis).hostname; } catch (e) {}
   $("#assiLocalhost").classList.toggle("versteckt", !/^(localhost|127\.|\[?::1\]?$|0\.0\.0\.0)/.test(host));
   $("#assiBasisZeile").classList.toggle("versteckt", basis === tvBasis() && !!konfig.tv_url);
 }
-function assiVerbinden(id) {
-  assiId = id;
+function assiVerbinden(id, art) {
+  assiId = id; const istTv = art === "tv";
+  $("#assiTvTeil").classList.toggle("versteckt", !istTv); $("#assiLinkTeil").open = !istTv;
+  $("#assiTvTeil").style.order = "0"; $("#assiCode").style.order = istTv ? "1" : "3"; $("#assiLinkTeil").style.order = istTv ? "4" : "1";
+  $("#assiCodeText").classList.toggle("versteckt", istTv); $("#assiCodeFeld").value = ""; $("#assiCodeErg").classList.add("versteckt");
   $("#assiTitel").textContent = RW_T("Gerät verbinden"); $("#assiSchritt1").classList.add("versteckt"); $("#assiSchritt2").classList.remove("versteckt");
   $("#assiBasis").value = tvBasis(); assiLink();
   const st = $("#assiStatus"); st.textContent = RW_T("Warte auf das Gerät …"); st.classList.remove("ok");
@@ -1875,6 +1894,13 @@ $("#assiAbbrechen").addEventListener("click", () => { $("#assiDialog").classList
 $("#assiZu").addEventListener("click", assiSchliessen);
 $("#assiEinst").addEventListener("click", () => { const id = assiId; assiSchliessen(); geraetDialogOeffnen(id); });
 $("#assiBasis").addEventListener("input", assiLink);
+$("#assiCodeFeld").addEventListener("keydown", e => { if (e.key === "Enter") $("#assiCodeOk").click(); });
+$("#assiCodeOk").addEventListener("click", async () => {
+  const code = $("#assiCodeFeld").value.trim().toUpperCase(), erg = $("#assiCodeErg"); erg.classList.remove("versteckt");
+  if (code.length !== 6) { erg.style.color = "var(--danger, #f87171)"; erg.textContent = "✗ " + RW_T("Bitte den 6-stelligen Code eingeben."); return; }
+  try { const r = await api("koppeln", { method: "POST", body: JSON.stringify({ code, ziel: assiId }) }); erg.style.color = "var(--ok, #3ecf8e)"; erg.textContent = "✓ " + RW_T("Gekoppelt") + ": " + r.name; }
+  catch (e) { erg.style.color = "var(--danger, #f87171)"; erg.textContent = "✗ " + e.message; }
+});
 async function seiteOeffnen(id, host, basis, erg, knopf) {
   erg.classList.remove("versteckt"); erg.style.color = ""; erg.textContent = RW_T("Teste …"); knopf.disabled = true;
   try { const r = await api("verwaltung/oeffnen", { method: "POST", body: JSON.stringify({ id, adb_host: host, basis }) }); erg.textContent = "✓ " + r.nachricht; erg.style.color = "var(--ok, #3ecf8e)"; }
@@ -1889,12 +1915,12 @@ $("#assiName").addEventListener("keydown", e => { if (e.key === "Enter") $("#ass
 $("#assiWeiter").addEventListener("click", async () => {
   const name = $("#assiName").value.trim(); if (!name) { toast(RW_T("Bitte einen Namen eingeben."), true); $("#assiName").focus(); return; }
   const b = $("#assiWeiter"); b.disabled = true;
-  try { const r = await api("verwaltung/geraete", { method: "POST", body: JSON.stringify({ art: $("#assiArt").value, name }) }); await konfigLaden(); assiVerbinden(r.id); }
+  try { const r = await api("verwaltung/geraete", { method: "POST", body: JSON.stringify({ art: $("#assiArt").value, name }) }); await konfigLaden(); assiVerbinden(r.id, $("#assiArt").value); }
   catch (e) { fehler(e); }
   b.disabled = false;
 });
 // Verbindungs-Link eines vorhandenen Geraets (z. B. wenn das Tablet neu eingerichtet wird)
-$("#gfVerbinden").addEventListener("click", () => { const id = gfId; $("#geraetDialog").classList.add("versteckt"); if (id) assiVerbinden(id); });
+$("#gfVerbinden").addEventListener("click", () => { const id = gfId; $("#geraetDialog").classList.add("versteckt"); if (id) assiVerbinden(id, gfArt); });
 
 async function verteilenOeffnen(shows) {
   let st; try { st = await api("status?ziel=" + encodeURIComponent(rahmenAktuell())); } catch (e) { fehler(e); return; }
