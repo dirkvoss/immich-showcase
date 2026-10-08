@@ -230,3 +230,18 @@ def test_zufall_nimmt_den_rahmen_aus_der_anfrage(app_laden):
     kueche = c.get("/api/rahmen/zufall?n=10&ziel=kueche").json()["ids"]
     assert flur and all(i in conftest.ALBEN[A] for i in flur)
     assert kueche and all(i in conftest.ALBEN[B] for i in kueche)
+
+
+def test_mehrere_alben_sind_oder_nicht_und(app_laden):
+    """Immich verknuepft mehrere albumIds mit UND; das Dauerprogramm muss Fotos aus JEDEM der Alben mischen."""
+    w, client, schrein = app_laden(RAHMEN_WEB_RAHMEN_ALBEN=f"{A},{B}", **LAN)
+    ids = set(client().get("/api/rahmen/zufall?n=40").json()["ids"])
+    assert ids and ids & set(conftest.ALBEN[A]) and ids & set(conftest.ALBEN[B])
+    assert ids <= set(conftest.ALBEN[A]) | set(conftest.ALBEN[B])
+
+
+def test_mehrere_alben_exklusiv(app_laden, monkeypatch):
+    w, client, schrein = app_laden(RAHMEN_WEB_RAHMEN_MARKER="1", **LAN)
+    monkeypatch.setattr(w, "marker_alben", lambda: ([], [A, B]))
+    ids = client().get("/api/rahmen/zufall?n=30").json()["ids"]
+    assert ids and set(ids) & set(conftest.ALBEN[A]) and set(ids) & set(conftest.ALBEN[B])

@@ -81,7 +81,7 @@ class SchreinImmich:
             return False
         if b.get("country") and a["exifInfo"]["country"] != b["country"]:
             return False
-        if b.get("albumIds") and a["id"] not in {i for alb in b["albumIds"] for i in ALBEN.get(alb, [])}:
+        if b.get("albumIds") and not all(a["id"] in ALBEN.get(alb, []) for alb in b["albumIds"]):         # wie Immich: mehrere Alben = UND
             return False
         if b.get("takenAfter") and a["localDateTime"] < b["takenAfter"][:19]:
             return False

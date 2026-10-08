@@ -1942,25 +1942,44 @@ def rahmen_alben():
 EXKLUSIV_ZEIGER = {}
 
 
+def zufall_aus_alben(body, ids):
+    """Zufallsfotos aus EINEM von mehreren Alben. Immich verknuepft mehrere albumIds mit UND (nur Fotos, die in allen Alben liegen) - deshalb je Album fragen und mischen."""
+    if len(ids) <= 1:
+        return H.api("POST", "/search/random", {**body, "albumIds": list(ids)}) or []
+    items, gesehen = [], set()
+    for aid in ids:
+        for a in H.api("POST", "/search/random", {**body, "albumIds": [aid]}) or []:
+            if a["id"] not in gesehen:
+                gesehen.add(a["id"])
+                items.append(a)
+    random.shuffle(items)
+    return items[:body.get("size", len(items))]
+
+
 def rahmen_exklusiv(ids, n, ziel=None):
     """Exklusiv-Modus (#nurrahmen): nur diese Alben; Reihenfolge wie bei Wunsch-Shows (alt/neu/zufall), laufend weiter statt immer von vorn."""
     reihe = reihe_von(ziel)
-    basis = {"type": "IMAGE", "albumIds": ids, "visibility": "timeline", "withExif": True}
+    basis = {"type": "IMAGE", "visibility": "timeline", "withExif": True}
     if reihe == "zufall":
-        items = H.api("POST", "/search/random", {**basis, "size": max(10, n * 3)}) or []
+        items = zufall_aus_alben({**basis, "size": max(10, n * 3)}, ids)
         ergebnis = [a["id"] for a in items if not H.ist_screenshot(a)][:n]
         random.shuffle(ergebnis)
         return ergebnis
-    schluessel = (tuple(ids), reihe)
-    seite = EXKLUSIV_ZEIGER.get(schluessel, 1)
-    for _ in range(2):
-        antwort = (H.api("POST", "/search/metadata", {**basis, "order": "desc" if reihe == "neu" else "asc", "size": n, "page": seite}) or {}).get("assets") or {}
-        items = antwort.get("items") or []
-        if items:
-            break
-        seite = 1                                                      # Ende erreicht: wieder von vorn
-    EXKLUSIV_ZEIGER[schluessel] = int(antwort["nextPage"]) if items and antwort.get("nextPage") else 1
-    return [a["id"] for a in items if not H.ist_screenshot(a)]
+    gesammelt = []
+    for aid in ids:                                                    # je Album eine eigene Position (mehrere albumIds waeren UND, nicht ODER)
+        schluessel = (aid, reihe)
+        seite = EXKLUSIV_ZEIGER.get(schluessel, 1)
+        for _ in range(2):
+            antwort = (H.api("POST", "/search/metadata", {**basis, "albumIds": [aid], "order": "desc" if reihe == "neu" else "asc", "size": n, "page": seite}) or {}).get("assets") or {}
+            items = antwort.get("items") or []
+            if items:
+                break
+            seite = 1                                                  # Ende erreicht: wieder von vorn
+        EXKLUSIV_ZEIGER[schluessel] = int(antwort["nextPage"]) if items and antwort.get("nextPage") else 1
+        gesammelt += items
+    if len(ids) > 1:
+        gesammelt.sort(key=lambda a: a.get("localDateTime") or a.get("fileCreatedAt") or "", reverse=(reihe == "neu"))
+    return [a["id"] for a in gesammelt if not H.ist_screenshot(a)]
 
 
 def verteilen(gewichte, n):
@@ -2008,7 +2027,7 @@ def rahmen_auswahl(n, ziel=None):
         if q["typ"] == "album":
             body["albumIds"] = [q["id"]]
         elif q["typ"] == "alben":
-            body["albumIds"] = alben_ids or RAHMEN_ALBEN
+            alben_liste = alben_ids or RAHMEN_ALBEN
         elif q["typ"] == "person":
             pids = person_ids(q["namen"])
             if not pids:
@@ -2017,7 +2036,7 @@ def rahmen_auswahl(n, ziel=None):
         elif q["typ"] == "neu":
             body["createdAfter"] = (datetime.datetime.utcnow() - datetime.timedelta(days=q["tage"])).strftime("%Y-%m-%dT%H:%M:%S.000Z")
         try:
-            items = H.api("POST", "/search/random", body) or []
+            items = zufall_aus_alben(body, alben_liste) if q["typ"] == "alben" else (H.api("POST", "/search/random", body) or [])
         except Exception as e:  # noqa: BLE001 - eine kaputte Quelle (z. B. geloeschtes Album) legt das Dauerprogramm nicht lahm
             H.log.warning("Rahmen-Quelle %s: %s", q, e)
             continue

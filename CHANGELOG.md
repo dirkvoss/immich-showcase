@@ -1,6 +1,10 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.10.2]
+### Behoben
+- Das Dauerprogramm lieferte keine Fotos, wenn **mehrere Alben** eingestellt waren (`RAHMEN_WEB_RAHMEN_ALBEN=a,b`): Immich verknüpft mehrere `albumIds` mit UND (nur Fotos, die in allen Alben liegen). Jetzt wird je Album gefragt und gemischt – auch im Marker-Modus (`#nurrahmen` an mehreren Alben, dort jetzt je Album mit eigener Position).
+
 ## [2.10.1]
 ### Behoben
 - Im Banner gibt es wieder einen Knopf **„■ Show beenden“** (zurück ins Dauerprogramm), solange eine Show läuft – er war beim neuen Aussehen versehentlich versteckt, sodass sich eine laufende Show nur mit „Zurück zu …“ beenden ließ.
