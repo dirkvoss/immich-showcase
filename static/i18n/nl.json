@@ -344,7 +344,9 @@
   "Tastatur (Rechner)": "Toetsenbord (computer)",
   "Mit „/“ springst du zur Suche, mit „Esc“ schließt du Fenster.": "Met “/” ga je naar zoeken en met “Esc” sluit je vensters.",
   "Konto": "Account",
-  "Geräte": "Apparaten"
+  "Geräte": "Apparaten",
+  "Rahmen wählen": "Lijst kiezen",
+  "Auf diese Rahmen schicken": "Naar deze lijsten sturen"
  },
  "muster": [
   [
@@ -645,6 +647,14 @@
   [
    "^Immich Showcase(?: \\(.*\\))? ([\\w.\\-]+)$",
    "Immich Showcase $1"
+  ],
+  [
+   "^\\\"(.*)\\\" mit (\\d+) Fotos läuft gleich auf (.*)\\.$",
+   "‘$1’ met $2 foto’s speelt zo meteen op $3."
+  ],
+  [
+   "^(.*) zeigt wieder das normale Programm\\.$",
+   "$1 gaat terug naar het normale programma."
   ]
  ],
  "beschreibung": [

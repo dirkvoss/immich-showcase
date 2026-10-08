@@ -1,6 +1,12 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.7.0]
+### Neu
+- **Mehrere Bilderrahmen:** Jeder Rahmen (`RAHMEN_WEB_RAHMEN_ZIELE`) hat jetzt seinen eigenen Zustand – laufende Show, „Zurück“, Reihenfolge. Beim Senden wählst du in der Auswahlleiste per Häkchen einen oder mehrere Rahmen (dieselbe Show an mehrere, oder nacheinander verschiedene Shows an verschiedene Rahmen). Im Banner oben wählst du, welchen Rahmen „Normal“, „Zurück“ und die Reihenfolge betreffen.
+- Gespeicherte Shows („Meine Shows“) laufen auf den gewählten Rahmen.
+- Schnittstellen: `/api/anzeigen` und `/api/shows/<id>/anzeigen` nehmen `ziele` (Liste), `/api/status`, `/api/zurueck`, `/api/normal` und `/api/reihenfolge` nehmen `ziel`. Ohne Angabe gilt der erste Rahmen – bestehende Einrichtungen und Automationen ändern sich nicht.
+
 ## [2.6.2]
 ### Behoben
 - Am Rechner wurde die Auswahl-Seitenleiste rechts abgeschnitten (z. B. „merken“); Inhalt bleibt jetzt in der Leistenbreite, die Zeile „Name der Show“ darf umbrechen.

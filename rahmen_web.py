@@ -541,7 +541,7 @@ def konfig():
     """Oeffentliche Darstellung der Installation (kein Geheimnis): Name, Beispiele fuer die Suche, Adresse der Fernseher-Seite."""
     return {"name": APP_NAME, "version": VERSION, "modus": MODUS, "auth": AUTH, "musik_upload": MUSIK_UPLOAD, "konfiguriert": konfiguriert(), "tv_url": TV_URL, "beispiele": BEISPIELE, "beispiele_en": BEISPIELE_EN,
             "ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT and k not in RAHMEN_ZIELE},
-            "rahmen": list(RAHMEN_ZIELE), "rahmen_sek": RAHMEN_SEK, "rahmen_fuellung": RAHMEN_FUELLUNG, "tv_fuellung": TV_FUELLUNG,
+            "rahmen": list(RAHMEN_ZIELE), "rahmen_namen": dict(RAHMEN_ZIELE), "rahmen_sek": RAHMEN_SEK, "rahmen_fuellung": RAHMEN_FUELLUNG, "tv_fuellung": TV_FUELLUNG,
             "rahmen_anzeige": RAHMEN_ANZEIGE, "rahmen_nacht": RAHMEN_NACHT, "rahmen_zusatz": ZUSATZ, "koppeln": True,
             "alle_ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT}}
 
@@ -994,8 +994,38 @@ def jetzt():
 # --------------------------------------------------------------------------- Rahmen: Player oder immich-kiosk
 # Mit RAHMEN_WEB_RAHMEN_ZIELE laeuft der Rahmen ueber den eigenen Player (Seite /tv/?ziel=...): Shows sind Ereignisse fuer dieses Ziel.
 # Ohne laeuft er wie bisher ueber ein temporaeres Immich-Album, das immich-kiosk anzeigt (Helfer + Sync-Skript auf dem Host).
-PLAYER = next(iter(RAHMEN_ZIELE), None)
-PLAYER_REIHE = {"v": "alt"}
+PLAYER = next(iter(RAHMEN_ZIELE), None)          # Standard-Rahmen (der erste); weitere Rahmen werden mit 'ziel' angesprochen
+PLAYER_REIHE = {}                                # Rahmen -> "alt" | "neu" | "zufall"
+
+
+def reihe_von(z):
+    return PLAYER_REIHE.get(z or PLAYER, "alt")
+
+
+def rahmen_pruefen(z):
+    """Kennung eines Rahmens pruefen; leer = Standard-Rahmen. Ohne Eigenplayer (Kiosk-Weg) gibt es nur den einen Rahmen: None."""
+    if not PLAYER:
+        return None
+    z = str(z or "").strip() or PLAYER
+    if z not in RAHMEN_ZIELE:
+        raise HTTPException(400, "Unbekannter Rahmen")
+    return z
+
+
+def rahmen_liste_pruefen(daten):
+    """'ziele': [...] (oder 'ziel': '...') -> Liste gueltiger Rahmen ohne Doppelte; leer = Standard-Rahmen."""
+    roh = daten.get("ziele")
+    if roh is None:
+        roh = [daten.get("ziel")]
+    if not isinstance(roh, list):
+        raise HTTPException(400, "Ungueltige Rahmen-Auswahl")
+    liste = list(dict.fromkeys(rahmen_pruefen(z) for z in roh if z or len(roh) == 1))
+    return liste or [rahmen_pruefen(None)]
+
+
+def rahmen_namen(liste):
+    namen = [RAHMEN_ZIELE.get(z, "Bilderrahmen") for z in liste if z]
+    return ", ".join(namen) if namen else "dem Bilderrahmen"
 
 
 AKTIV_BESITZER = {}        # Ziel -> (Menge der Medien-IDs, Benutzer-ID): Geraete holen Fotos mit dem Schluessel dessen, der die Show geschickt hat
@@ -1019,37 +1049,40 @@ def player_ereignis(z, felder):
     aktiv_speichern()
 
 
-def player_zeigen(name, ids, reihe="alt"):
-    PLAYER_REIHE["v"] = reihe
+def player_zeigen(name, ids, reihe="alt", ziel=None):
+    ziel = ziel or PLAYER
+    PLAYER_REIHE[ziel] = reihe
     geordnet = nach_datum(ids, reihe == "alt") if reihe != "zufall" and len(ids) > 1 else list(ids)
-    player_ereignis(PLAYER, {"ids": geordnet, "name": name, "sek": RAHMEN_SEK, "zufall": reihe == "zufall", "musik": "", "laut": 0.3, "videos": [], "maxv": 0})
+    player_ereignis(ziel, {"ids": geordnet, "name": name, "sek": RAHMEN_SEK, "zufall": reihe == "zufall", "musik": "", "laut": 0.3, "videos": [], "maxv": 0})
     return len(ids)
 
 
-def rahmen_anzeigen(name, ids):
-    return player_zeigen(name, ids) if PLAYER else H.album_anzeigen(name, ids)
+def rahmen_anzeigen(name, ids, ziel=None):
+    return player_zeigen(name, ids, ziel=ziel) if PLAYER else H.album_anzeigen(name, ids)
 
 
-def rahmen_normal():
+def rahmen_normal(ziel=None):
     if PLAYER:
-        t = TV[PLAYER]
+        ziel = ziel or PLAYER
+        t = TV[ziel]
         with TV_EV:
             t["seq"] += 1
             t["events"] = (t["events"] + [{"seq": t["seq"], "typ": "steuer", "aktion": "stopp", "wert": ""}])[-30:]
             t["aktiv"] = None
-        AKTIV_BESITZER.pop(PLAYER, None)
+        AKTIV_BESITZER.pop(ziel, None)
         aktiv_speichern()
-        return {"ok": True, "nachricht": "Der Bilderrahmen zeigt wieder das normale Programm."}
+        return {"ok": True, "nachricht": "Der Bilderrahmen zeigt wieder das normale Programm." if len(RAHMEN_ZIELE) < 2 else f"{RAHMEN_ZIELE[ziel]} zeigt wieder das normale Programm."}
     return H.normal()
 
 
-def rahmen_state():
+def rahmen_state(ziel=None):
     """Was laeuft gerade auf dem Rahmen? {'wunsch','ids','seit','anzahl','reihenfolge','album'} (wunsch None = normales Programm)."""
     if PLAYER:
-        ev = TV[PLAYER]["aktiv"]
+        ziel = ziel or PLAYER
+        ev = TV[ziel]["aktiv"]
         if ev and ev.get("typ") == "start":
-            return {"wunsch": ev["name"], "ids": ev["ids"], "seit": ev.get("seit"), "anzahl": len(ev["ids"]), "reihenfolge": PLAYER_REIHE["v"], "album": None}
-        return {"wunsch": None, "ids": [], "seit": None, "anzahl": None, "reihenfolge": PLAYER_REIHE["v"], "album": None}
+            return {"wunsch": ev["name"], "ids": ev["ids"], "seit": ev.get("seit"), "anzahl": len(ev["ids"]), "reihenfolge": reihe_von(ziel), "album": None}
+        return {"wunsch": None, "ids": [], "seit": None, "anzahl": None, "reihenfolge": reihe_von(ziel), "album": None}
     st = H.lade_state()
     return {"wunsch": st.get("wunsch") if st.get("album") else None, "ids": None, "seit": st.get("seit"), "anzahl": st.get("anzahl"),
             "reihenfolge": st.get("reihenfolge", "alt"), "album": st.get("album")}
@@ -1088,10 +1121,24 @@ def finde(d, show_id):
     return next((s for s in d["shows"] if s["id"] == show_id), None)
 
 
-def aktuelle_erfassen(d):
+def zurueck_holen(d, ziel=None):
+    """'Zurueck'-Merker eines Rahmens: der Standard-Rahmen nutzt das alte Feld 'zurueck', weitere stehen in 'zurueck_je'."""
+    if not ziel or ziel == PLAYER:
+        return d.get("zurueck")
+    return (d.get("zurueck_je") or {}).get(ziel)
+
+
+def zurueck_setzen(d, ziel, wert):
+    if not ziel or ziel == PLAYER:
+        d["zurueck"] = wert
+    else:
+        d.setdefault("zurueck_je", {})[ziel] = wert
+
+
+def aktuelle_erfassen(d, ziel=None):
     """Was laeuft gerade auf dem Rahmen? Gibt {'typ':'normal'} oder {'typ':'show','id':...} zurueck und legt bei
     Bedarf einen Verlaufseintrag an (auch fuer Shows, die ueber HA/Siri gestartet wurden)."""
-    st = rahmen_state()
+    st = rahmen_state(ziel)
     if not st["wunsch"]:
         return {"typ": "normal"}
     name = (st["wunsch"] or "Unbenannt").strip()
@@ -1110,10 +1157,10 @@ def aktuelle_erfassen(d):
     return {"typ": "show", "id": e["id"]}
 
 
-def zeigen(d, name, ids, gemerkt=None, show_id=None):
+def zeigen(d, name, ids, gemerkt=None, show_id=None, ziel=None):
     """Zeigt eine Auswahl auf dem Rahmen, fuehrt Verlauf und 'Zurueck' mit. Aufrufer haelt H.LOCK."""
-    vorher = aktuelle_erfassen(d)
-    anzahl = rahmen_anzeigen(name, ids)
+    vorher = aktuelle_erfassen(d, ziel)
+    anzahl = rahmen_anzeigen(name, ids, ziel)
     e = finde(d, show_id) if show_id else next((s for s in d["shows"] if H.norm(s["name"]) == H.norm(name)), None)
     if e:
         e.update({"ids": ids, "zeit": jetzt(), "name": name})
@@ -1124,13 +1171,13 @@ def zeigen(d, name, ids, gemerkt=None, show_id=None):
         e = neue_show(name, ids, bool(gemerkt))
     d["shows"].insert(0, e)
     if not (vorher.get("typ") == "show" and vorher.get("id") == e["id"]):
-        d["zurueck"] = vorher
+        zurueck_setzen(d, ziel, vorher)
     daten_schreiben(d)
     return anzahl, e
 
 
-def zurueck_name(d):
-    z = d.get("zurueck")
+def zurueck_name(d, ziel=None):
+    z = zurueck_holen(d, ziel)
     if not z:
         return None
     if z.get("typ") == "normal":
@@ -1144,26 +1191,29 @@ def anzeigen(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
     """Schickt eine Auswahl auf den Rahmen. 'dry': nur pruefen. 'speichern': zusaetzlich dauerhaft merken (Stern)."""
     name = name_pruefen(daten.get("name"))
     ids = ids_pruefen(daten.get("ids"))
+    ziele = rahmen_liste_pruefen(daten)
     if daten.get("dry"):
-        return {"ok": True, "nachricht": f"(Test) {len(ids)} Fotos als \"{name}\" wuerden auf den Rahmen gehen.", "anzahl": len(ids)}
+        return {"ok": True, "nachricht": f"(Test) {len(ids)} Fotos als \"{name}\" wuerden auf den Rahmen gehen.", "anzahl": len(ids), "ziele": ziele}
     with H.LOCK:
         d = daten_lesen()
         try:
-            anzahl, e = zeigen(d, name, ids, gemerkt=bool(daten.get("speichern")))
+            for z in ziele:
+                anzahl, e = zeigen(d, name, ids, gemerkt=bool(daten.get("speichern")), ziel=z)
         except ValueError as ex:
             raise HTTPException(400, str(ex))
-    H.log.info("Rahmen-Web: '%s' mit %d Fotos auf den Rahmen", name, anzahl)
-    return {"ok": True, "anzahl": anzahl, "show": e["id"], "zurueck": zurueck_name(d),
-            "nachricht": f"\"{name}\" mit {anzahl} Fotos läuft gleich auf dem Bilderrahmen."}
+    H.log.info("Rahmen-Web: '%s' mit %d Fotos auf %s", name, anzahl, ", ".join(z or "den Rahmen" for z in ziele))
+    return {"ok": True, "anzahl": anzahl, "show": e["id"], "zurueck": zurueck_name(d, ziele[0]), "ziele": ziele,
+            "nachricht": f"\"{name}\" mit {anzahl} Fotos läuft gleich auf {'dem Bilderrahmen' if len(RAHMEN_ZIELE) < 2 else rahmen_namen(ziele)}."}
 
 
 @app.get("/api/shows")
 def shows(_=Depends(anmeldung)):
     d = daten_lesen()
-    aktuell = H.norm(rahmen_state()["wunsch"] or "")
+    je = {z: H.norm(rahmen_state(z)["wunsch"] or "") for z in (RAHMEN_ZIELE or [None])}
     return {"zurueck": zurueck_name(d),
             "shows": [{"id": s["id"], "name": s["name"], "anzahl": len(s["ids"]), "zeit": s.get("zeit"),
-                       "gemerkt": s.get("gemerkt", True), "laeuft": H.norm(s["name"]) == aktuell} for s in d["shows"]]}
+                       "gemerkt": s.get("gemerkt", True), "laeuft": H.norm(s["name"]) in je.values(),
+                       "laeuft_auf": [z for z, n in je.items() if z and H.norm(s["name"]) == n]} for s in d["shows"]]}
 
 
 @app.get("/api/shows/{show_id}")
@@ -1213,52 +1263,55 @@ def show_anzeigen(show_id: str, daten: dict = None, _=Depends(anmeldung), __=Dep
         s = finde(d, show_id)
         if not s:
             raise HTTPException(404, "Show nicht gefunden")
+        ziele = rahmen_liste_pruefen(daten or {})
         if (daten or {}).get("dry"):
-            return {"ok": True, "nachricht": f"(Test) \"{s['name']}\" mit {len(s['ids'])} Fotos wuerde laufen.", "anzahl": len(s["ids"])}
+            return {"ok": True, "nachricht": f"(Test) \"{s['name']}\" mit {len(s['ids'])} Fotos wuerde laufen.", "anzahl": len(s["ids"]), "ziele": ziele}
         try:
-            anzahl, _e = zeigen(d, s["name"], list(s["ids"]), show_id=show_id)
+            for z in ziele:
+                anzahl, _e = zeigen(d, s["name"], list(s["ids"]), show_id=show_id, ziel=z)
         except ValueError as ex:
             raise HTTPException(400, str(ex))
-    return {"ok": True, "anzahl": anzahl, "zurueck": zurueck_name(d),
-            "nachricht": f"\"{s['name']}\" mit {anzahl} Fotos läuft gleich auf dem Bilderrahmen."}
+    return {"ok": True, "anzahl": anzahl, "zurueck": zurueck_name(d, ziele[0]), "ziele": ziele,
+            "nachricht": f"\"{s['name']}\" mit {anzahl} Fotos läuft gleich auf {'dem Bilderrahmen' if len(RAHMEN_ZIELE) < 2 else rahmen_namen(ziele)}."}
 
 
 @app.post("/api/zurueck")
 def zurueck(daten: dict = None, _=Depends(anmeldung), __=Depends(csrf)):
     """Springt auf das zuvor gezeigte Album (oder das normale Programm) zurueck; nochmal tippen wechselt wieder."""
+    rz = rahmen_pruefen((daten or {}).get("ziel"))
     with H.LOCK:
         d = daten_lesen()
-        z = d.get("zurueck")
+        z = zurueck_holen(d, rz)
         if not z:
             raise HTTPException(404, "Es gibt noch nichts, wohin ich zurückgehen könnte.")
         ziel = None if z.get("typ") == "normal" else finde(d, z.get("id"))
         if z.get("typ") != "normal" and not ziel:
-            d["zurueck"] = None
+            zurueck_setzen(d, rz, None)
             daten_schreiben(d)
             raise HTTPException(404, "Die vorherige Show gibt es nicht mehr.")
         if (daten or {}).get("dry"):
-            return {"ok": True, "nachricht": f"(Test) Zurück zu: {zurueck_name(d)}", "ziel": zurueck_name(d)}
-        vorher = aktuelle_erfassen(d)
+            return {"ok": True, "nachricht": f"(Test) Zurück zu: {zurueck_name(d, rz)}", "ziel": zurueck_name(d, rz)}
+        vorher = aktuelle_erfassen(d, rz)
         if ziel is None:
-            rahmen_normal()
-            text = "Der Bilderrahmen zeigt wieder das normale Programm."
+            text = rahmen_normal(rz)["nachricht"]
         else:
             try:
-                rahmen_anzeigen(ziel["name"], list(ziel["ids"]))
+                rahmen_anzeigen(ziel["name"], list(ziel["ids"]), rz)
             except ValueError as ex:
                 raise HTTPException(400, str(ex))
             ziel["zeit"] = jetzt()
             d["shows"].remove(ziel)
             d["shows"].insert(0, ziel)
             text = f"Zurück bei \"{ziel['name']}\" ({len(ziel['ids'])} Fotos) – läuft gleich auf dem Rahmen."
-        d["zurueck"] = vorher if vorher != z else None
+        zurueck_setzen(d, rz, vorher if vorher != z else None)
         daten_schreiben(d)
-    return {"ok": True, "nachricht": text, "zurueck": zurueck_name(d)}
+    return {"ok": True, "nachricht": text, "zurueck": zurueck_name(d, rz)}
 
 
 @app.get("/api/status")
-def status(_=Depends(anmeldung)):
-    st = rahmen_state()
+def status(ziel: str = "", _=Depends(anmeldung)):
+    rz = rahmen_pruefen(ziel)
+    st = rahmen_state(rz)
     titelbild = None
     if st["album"]:
         try:
@@ -1269,9 +1322,11 @@ def status(_=Depends(anmeldung)):
         nachricht = f"Läuft gerade: \"{st['wunsch']}\" ({st['anzahl']} Fotos, seit {st['seit']})"
     else:
         nachricht = "Der Bilderrahmen zeigt das normale Programm."
+    d = daten_lesen()
     return {"ok": True, "nachricht": nachricht, "laeuft": st["wunsch"], "anzahl": st["anzahl"],
-            "seit": st["seit"], "zurueck": zurueck_name(daten_lesen()), "titelbild": titelbild,
-            "reihenfolge": st["reihenfolge"]}
+            "seit": st["seit"], "zurueck": zurueck_name(d, rz), "titelbild": titelbild,
+            "reihenfolge": st["reihenfolge"], "ziel": rz,
+            "rahmen": [{"id": z, "name": n, "laeuft": rahmen_state(z)["wunsch"], "online": time.time() - TV[z]["hb"] < 10} for z, n in RAHMEN_ZIELE.items()]}
 
 
 @app.post("/api/reihenfolge")
@@ -1280,11 +1335,12 @@ def reihenfolge(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
     if r not in ("alt", "neu", "zufall"):
         raise HTTPException(400, "Unbekannte Reihenfolge")
     if PLAYER:
-        st = rahmen_state()
+        rz = rahmen_pruefen(daten.get("ziel"))
+        st = rahmen_state(rz)
         if st["wunsch"]:
-            player_zeigen(st["wunsch"], list(st["ids"]), r)      # gleiche Show, neu geordnet, beginnt von vorn
+            player_zeigen(st["wunsch"], list(st["ids"]), r, rz)      # gleiche Show, neu geordnet, beginnt von vorn
         else:
-            PLAYER_REIHE["v"] = r
+            PLAYER_REIHE[rz] = r
     else:
         try:
             H.reihenfolge_setzen(r)
@@ -1294,15 +1350,16 @@ def reihenfolge(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
 
 
 @app.post("/api/normal")
-def normal(_=Depends(anmeldung), __=Depends(csrf)):
+def normal(daten: dict = None, _=Depends(anmeldung), __=Depends(csrf)):
+    rz = rahmen_pruefen((daten or {}).get("ziel"))
     with H.LOCK:
         d = daten_lesen()
-        vorher = aktuelle_erfassen(d)
-        r = rahmen_normal()
+        vorher = aktuelle_erfassen(d, rz)
+        r = rahmen_normal(rz)
         if vorher.get("typ") == "show":
-            d["zurueck"] = vorher
+            zurueck_setzen(d, rz, vorher)
         daten_schreiben(d)
-    r["zurueck"] = zurueck_name(d)
+    r["zurueck"] = zurueck_name(d, rz)
     return r
 
 
@@ -1751,9 +1808,9 @@ def rahmen_alben():
 EXKLUSIV_ZEIGER = {}
 
 
-def rahmen_exklusiv(ids, n):
+def rahmen_exklusiv(ids, n, ziel=None):
     """Exklusiv-Modus (#nurrahmen): nur diese Alben; Reihenfolge wie bei Wunsch-Shows (alt/neu/zufall), laufend weiter statt immer von vorn."""
-    reihe = PLAYER_REIHE["v"]
+    reihe = reihe_von(ziel)
     basis = {"type": "IMAGE", "albumIds": ids, "visibility": "timeline", "withExif": True}
     if reihe == "zufall":
         items = H.api("POST", "/search/random", {**basis, "size": max(10, n * 3)}) or []
@@ -1790,7 +1847,7 @@ def rahmen_auswahl(n, ziel=None):
     alben_ids, exklusiv = rahmen_alben()
     if exklusiv:
         try:
-            ergebnis = rahmen_exklusiv(alben_ids, n)
+            ergebnis = rahmen_exklusiv(alben_ids, n, ziel)
         except Exception as e:  # noqa: BLE001 - Dauerprogramm faellt auf die normalen Quellen zurueck
             H.log.warning("Exklusiv-Album: %s", e)
             ergebnis = []

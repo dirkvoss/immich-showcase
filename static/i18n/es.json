@@ -344,7 +344,9 @@
   "Tastatur (Rechner)": "Teclado (ordenador)",
   "Mit „/“ springst du zur Suche, mit „Esc“ schließt du Fenster.": "Con «/» vas a la búsqueda y con «Esc» cierras las ventanas.",
   "Konto": "Cuenta",
-  "Geräte": "Dispositivos"
+  "Geräte": "Dispositivos",
+  "Rahmen wählen": "Elegir marco",
+  "Auf diese Rahmen schicken": "Enviar a estos marcos"
  },
  "muster": [
   [
@@ -645,6 +647,14 @@
   [
    "^Immich Showcase(?: \\(.*\\))? ([\\w.\\-]+)$",
    "Immich Showcase $1"
+  ],
+  [
+   "^\\\"(.*)\\\" mit (\\d+) Fotos läuft gleich auf (.*)\\.$",
+   "«$1» con $2 fotos se reproducirá en breve en $3."
+  ],
+  [
+   "^(.*) zeigt wieder das normale Programm\\.$",
+   "$1 vuelve a su programa normal."
   ]
  ],
  "beschreibung": [

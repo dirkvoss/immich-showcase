@@ -344,7 +344,9 @@
   "Tastatur (Rechner)": "Keyboard (computer)",
   "Mit „/“ springst du zur Suche, mit „Esc“ schließt du Fenster.": "Press “/” to jump to search and “Esc” to close windows.",
   "Konto": "Account",
-  "Geräte": "Devices"
+  "Geräte": "Devices",
+  "Rahmen wählen": "Choose frame",
+  "Auf diese Rahmen schicken": "Send to these frames"
  },
  "muster": [
   [
@@ -645,6 +647,14 @@
   [
    "^Immich Showcase(?: \\(.*\\))? ([\\w.\\-]+)$",
    "Immich Showcase $1"
+  ],
+  [
+   "^\\\"(.*)\\\" mit (\\d+) Fotos läuft gleich auf (.*)\\.$",
+   "“$1” with $2 photos will play on $3 shortly."
+  ],
+  [
+   "^(.*) zeigt wieder das normale Programm\\.$",
+   "$1 goes back to the normal programme."
   ]
  ],
  "beschreibung": [

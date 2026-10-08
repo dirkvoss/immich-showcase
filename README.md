@@ -108,6 +108,8 @@ Use `http://<server>:8090/tv/` **without** `?ziel=…` to pair the device by cod
 4. On the tablet, open `http://<server>:8090/tv/?ziel=frame` in full screen – or set it as the start page of Fully Kiosk.
    *Tip (Fully Kiosk):* if you use it as the **screensaver**, enter the address as the screensaver playlist item and restart the app once – Fully Kiosk only reads changes to the playlist after a restart.
 
+**Several frames:** list them separated by commas (`RAHMEN_WEB_RAHMEN_ZIELE=hall=Hallway,kitchen=Kitchen`). In the selection bar you then tick the frames to send to – the same show to several frames, or a different show to each (send one after the other). Each frame keeps its own running show, "Back" and order; the banner at the top switches between them. Per-frame sources and schedules: `RAHMEN_WEB_RAHMEN_QUELLEN_<ID>` / `RAHMEN_WEB_RAHMEN_ZEITPLAN_<ID>`.
+
 ## Pair devices by code (no typing of addresses)
 1. On the TV or tablet, open **`http://<server>:8090/tv/`** (no `?ziel=`). It shows a 6-character **code** and a **QR code**.
 2. In the app tap **📡 Devices**, enter the code (or scan the QR code with your phone camera – the code is filled in), choose which TV/frame this is, tap **Pair**.

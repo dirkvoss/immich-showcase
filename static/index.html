@@ -268,12 +268,13 @@ header { background: var(--bg); padding: calc(env(safe-area-inset-top) + 8px) 16
 /* Rahmen-Status: schmale Leiste, kein Kleingedrucktes ueber der Ueberschrift */
 .laeuft { padding: 6px 12px; min-height: 42px; border-radius: var(--r); background: transparent; border: 1px solid var(--line); gap: 6px 10px; flex-wrap: wrap; }
 .laeuft.aktiv { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }
-.laeuft-text { flex: 1 1 220px; flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
+.laeuft-text { flex: 1 1 220px; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 2px 10px; }
 .laeuft-label { font-size: 13px; letter-spacing: 0; text-transform: none; font-weight: 500; color: var(--muted); }
 .laeuft.aktiv .laeuft-label { color: var(--accent); }
 .laeuft-name { font: 600 20px/1.15 var(--serif); }
 .laeuft-meta { flex-basis: 100%; }
-.reihe-sel { min-height: 36px; border-radius: 999px; background: var(--card); }
+.reihe-sel { min-height: 36px; margin-top: 0; border-radius: 999px; background: var(--card); }
+#rahmenWahl { margin: 0; align-self: center; flex: 0 0 auto; font-weight: 600; }
 .btn.zurueck { flex: 1 1 100%; max-width: none; white-space: normal; text-overflow: clip; }
 @media (min-width: 700px) { .btn.zurueck { flex: 0 1 auto; } .laeuft-meta { flex-basis: auto; } }
 
@@ -342,6 +343,9 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
 .leiste .zeile2 { display: flex; align-items: center; gap: 10px; }
 .leiste input[type=text] { min-height: 46px; border-radius: var(--r); background: var(--bg); }
 .leiste .merken { padding: 0 2px; }
+.rahmenwahl { display: flex; flex-wrap: wrap; gap: 6px 8px; }
+.rahmenwahl .rchip { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); font-size: 14px; cursor: pointer; }
+.rahmenwahl .rchip:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
 .leiste .zeile3 { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
 .leiste .zeile3 .btn { min-height: 50px; font-size: 16px; }
 
@@ -442,6 +446,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
       <div class="benutzer" id="benutzer"><button type="button" id="geraeteBtn" class="ik" aria-label="Geräte" title="Geräte">📡 Geräte</button><button type="button" id="hilfeBtn" class="ik" aria-label="Hilfe" title="Hilfe">❓ Hilfe</button><details class="konto" id="konto"><summary aria-label="Konto" title="Konto"><svg class="ic" aria-hidden="true"><use href="#i-konto"/></svg></summary><div class="konto-menu"><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><span class="versionskurz" data-version-kurz></span></div></details></div>
       <button class="btn klein nur-rahmen" id="normalBtn" title="Der Rahmen zeigt wieder das normale Programm">Normal</button>
       <div class="laeuft nur-rahmen" id="laeuft" aria-live="polite">
+        <select id="rahmenWahl" class="reihe-sel versteckt" aria-label="Rahmen wählen"></select>
         <div class="laeuft-text">
           <span class="laeuft-label" id="laeuftLabel">Rahmen</span>
           <span class="laeuft-name" id="laeuftName">…</span>
@@ -509,6 +514,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
         <input type="text" id="showName" maxlength="60" placeholder="Name der Show" aria-label="Name der Show" enterkeyhint="send">
         <label class="merken" title="Dauerhaft unter „Gemerkt“ speichern – sonst steht die Show nur unter „Zuletzt gezeigt“"><input type="checkbox" id="merken"> ⭐ merken</label>
       </div>
+      <div class="rahmenwahl versteckt nur-rahmen" id="rahmenAuswahl" role="group" aria-label="Auf diese Rahmen schicken"></div>
       <div class="zeile3">
         <button class="btn primaer nur-rahmen" id="senden">Auf den Rahmen</button>
         <button class="btn nur-tv" id="tvBtn" title="Die Auswahl per AirPlay auf LG TV oder Shield abspielen">📺 Auf den TV</button>
@@ -886,7 +892,7 @@ function showKarte(s) {
   k.addEventListener("click", async e => {
     const a = e.target.dataset.a; if (!a) return;
     try {
-      if (a === "an") { e.target.disabled = true; const r = await api(`shows/${s.id}/anzeigen`, { method: "POST", body: "{}" }); toast(r.nachricht); statusLaden(); showsLaden(); }
+      if (a === "an") { e.target.disabled = true; const r = await api(`shows/${s.id}/anzeigen`, { method: "POST", body: JSON.stringify({ ziele: sendeZiele() }) }); toast(r.nachricht); statusLaden(); showsLaden(); }
       if (a === "tv") { const d4 = await api(`shows/${s.id}`); tvOeffnen(d4.fotos.map(f => ({ id: f.id, tag: "" })), d4.name); }
       if (a === "dia") { const d3 = await api(`shows/${s.id}`); diashow(d3.fotos.map(f => ({ id: f.id, tag: "" })), d3.name); }
       if (a === "stern") { await api(`shows/${s.id}`, { method: "PUT", body: JSON.stringify({ gemerkt: !s.gemerkt }) }); showsLaden(); }
@@ -961,7 +967,7 @@ $("#senden").addEventListener("click", async () => {
   if (!nurFotos.length) { toast("Auf den Rahmen gehen nur Fotos – diese Auswahl enthält nur Videos. Nutze „📺 Auf den TV“.", true); return; }
   const b = $("#senden"); b.disabled = true; b.textContent = "Sende …";
   try {
-    const r = await api("anzeigen", { method: "POST", body: JSON.stringify({ name, ids: nurFotos, speichern: $("#merken").checked }) });
+    const r = await api("anzeigen", { method: "POST", body: JSON.stringify({ name, ids: nurFotos, speichern: $("#merken").checked, ziele: sendeZiele() }) });
     if (nurFotos.length < auswahl.size) toast(`${auswahl.size - nurFotos.length} Video(s) wurden nicht auf den Rahmen geschickt (er zeigt nur Fotos).`);
     toast(r.nachricht + (r.zurueck ? `  ↩ Zurück zu „${r.zurueck}“ jederzeit oben möglich.` : ""));
     merke(); auswahl.clear(); showBearbeiten = null; $("#showName").value = ""; $("#merken").checked = false;
@@ -971,7 +977,7 @@ $("#senden").addEventListener("click", async () => {
 });
 $("#normalBtn").addEventListener("click", async () => {
   if (!confirm("Der Rahmen soll wieder das normale Programm zeigen?")) return;
-  try { const r = await api("normal", { method: "POST", body: "{}" }); toast(r.nachricht); statusLaden(); } catch (e) { fehler(e); }
+  try { const r = await api("normal", { method: "POST", body: JSON.stringify({ ziel: rahmenAktuell() }) }); toast(r.nachricht); statusLaden(); } catch (e) { fehler(e); }
 });
 
 // ---------------------------------------------------------------- Diashow (im Browser, ohne den Rahmen zu aendern)
@@ -1304,11 +1310,41 @@ function zurueckZeigen(name) {
   if (name) { const n = RW_T(name); b.textContent = `↩ Zurück zu „${n}“`; b.title = `Zurück zu: ${n}`; }
 }
 $("#rahmenReihe").addEventListener("change", async e => {
-  try { const r = await api("reihenfolge", { method: "POST", body: JSON.stringify({ reihenfolge: e.target.value }) }); toast(r.nachricht); } catch (err) { fehler(err); }
+  try { const r = await api("reihenfolge", { method: "POST", body: JSON.stringify({ reihenfolge: e.target.value, ziel: rahmenAktuell() }) }); toast(r.nachricht); } catch (err) { fehler(err); }
+});
+let rahmenWahlId = "", sendeRahmen = [];
+try { rahmenWahlId = localStorage.getItem("rwRahmen") || ""; sendeRahmen = JSON.parse(localStorage.getItem("rwSendeRahmen") || "[]"); } catch (e) {}
+const rahmenIds = () => konfig.rahmen || [];
+const rahmenName = z => (konfig.rahmen_namen || {})[z] || z;
+const rahmenAktuell = () => { const ids = rahmenIds(); return ids.includes(rahmenWahlId) ? rahmenWahlId : (ids[0] || ""); };
+function sendeZiele() { const ids = rahmenIds(), z = sendeRahmen.filter(x => ids.includes(x)); return z.length ? z : ids.slice(0, 1); }
+function rahmenAuswahlBauen() {
+  const ids = rahmenIds(), box = $("#rahmenAuswahl"), ak = sendeZiele();
+  box.classList.toggle("versteckt", ids.length < 2);
+  if (ids.length < 2) { box.innerHTML = ""; return; }
+  box.innerHTML = ids.map(z => `<label class="rchip"><input type="checkbox" value="${esc(z)}"${ak.includes(z) ? " checked" : ""}> ${esc(rahmenName(z))}</label>`).join("");
+}
+$("#rahmenAuswahl").addEventListener("change", e => {
+  const gewaehlt = [...$$("#rahmenAuswahl input:checked")].map(i => i.value);
+  if (!gewaehlt.length) { e.target.checked = true; return; }                  // mindestens ein Rahmen bleibt gewaehlt
+  sendeRahmen = gewaehlt;
+  try { localStorage.setItem("rwSendeRahmen", JSON.stringify(sendeRahmen)); } catch (err) {}
+});
+function rahmenWahlBauen(liste) {
+  const sel = $("#rahmenWahl"), ids = rahmenIds();
+  sel.classList.toggle("versteckt", ids.length < 2);
+  if (ids.length < 2) return;
+  sel.innerHTML = ids.map(z => { const x = (liste || []).find(l => l.id === z); return `<option value="${esc(z)}">${esc(rahmenName(z))}${x && x.laeuft ? " ●" : ""}</option>`; }).join("");
+  sel.value = rahmenAktuell();
+}
+$("#rahmenWahl").addEventListener("change", e => {
+  rahmenWahlId = e.target.value; try { localStorage.setItem("rwRahmen", rahmenWahlId); } catch (err) {}
+  statusLaden();
 });
 async function statusLaden() {
   try {
-    const d = await api("status"), box = $("#laeuft");
+    const d = await api("status" + (rahmenIds().length > 1 ? "?ziel=" + encodeURIComponent(rahmenAktuell()) : "")), box = $("#laeuft");
+    rahmenWahlBauen(d.rahmen);
     box.classList.toggle("aktiv", !!d.laeuft);
     $("#laeuftLabel").textContent = d.laeuft ? "● Läuft gerade auf dem Rahmen" : "Bilderrahmen";
     $("#laeuftName").textContent = d.laeuft ? d.laeuft : "Normales Programm";
@@ -1319,7 +1355,7 @@ async function statusLaden() {
 }
 $("#zurueckBtn").addEventListener("click", async () => {
   const b = $("#zurueckBtn"); b.disabled = true;
-  try { const r = await api("zurueck", { method: "POST", body: "{}" }); toast(r.nachricht); await statusLaden(); if (tab === "shows") showsLaden(); }
+  try { const r = await api("zurueck", { method: "POST", body: JSON.stringify({ ziel: rahmenAktuell() }) }); toast(r.nachricht); await statusLaden(); if (tab === "shows") showsLaden(); }
   catch (e) { fehler(e); }
   b.disabled = false;
 });
@@ -1342,6 +1378,7 @@ async function konfigLaden() {
       $("#sucheText").placeholder = RW_T("z. B.") + " " + bsp.slice(0, 2).join(", ");
       $("#sucheBsp").textContent = q[0] + bsp[0] + q[1];
     }
+    rahmenAuswahlBauen(); rahmenWahlBauen(); if (rahmenIds().length > 1) statusLaden();
     if (konfig.tv_url) $("#tvTippAdr").innerHTML = `Am Fernseher einmal im Browser <b>${esc(konfig.tv_url)}</b> öffnen` + (konfig.ziele.shield ? ` (${esc(konfig.ziele.shield)}: <b>${esc(konfig.tv_url)}/s</b>)` : "");
   } catch (e) { document.body.classList.remove("modus-laden"); }
 }
