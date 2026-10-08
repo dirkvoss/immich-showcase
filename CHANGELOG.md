@@ -1,6 +1,10 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [Nächste Version]
+### Neu
+- **iPhone-App „Showcase Immich“** (Ordner `ios/`, SwiftUI + Web-Ansicht): Einrichtung per Adresse oder QR-Code, Face-ID-Sperre, Fehlerseite ohne Verbindung; TestFlight-Skripte. In der Web-App gibt es dafür unter *Einstellungen → iPhone-App verbinden* einen QR-Code und in der App *Konto → App-Einstellungen*.
+
 ## [2.11.2]
 ### Behoben
 - Nach dem Start einer Show auf dem **Fernseher** bleibt die Auswahl nicht mehr stehen: die Leiste „n Fotos ausgewählt“ geht zu wie beim Rahmen (mit „↶ Rückgängig“ zurückholbar).

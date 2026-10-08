@@ -1,0 +1,4 @@
+build/
+*.xcodeproj
+DerivedData/
+scripts/release.env

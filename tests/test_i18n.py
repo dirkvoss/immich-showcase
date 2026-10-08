@@ -34,12 +34,12 @@ def test_statische_dateien_vorhanden():
 def test_oberflaeche_enthaelt_keine_privaten_daten():
     verboten = ("dirk-voss", "mail@dirk")      # persoenliche Daten des Autors; allgemeine Beispiel-Adressen sind erlaubt
     for wurzel, _, dateien in os.walk(RAIZ):
-        if ".git" in wurzel.split(os.sep) or "tests" in wurzel.split(os.sep):
+        if {".git", "tests", "build"} & set(wurzel.split(os.sep)) or wurzel.endswith(".xcodeproj"):
             continue
         for d in dateien:
             if d.endswith((".png", ".woff2", ".pyc")) or d in ("LICENSE", "OFL.txt"):
                 continue
-            inhalt = open(os.path.join(wurzel, d), errors="ignore").read()
+            inhalt = open(os.path.join(wurzel, d), errors="ignore").read().replace("com.dirk-voss", "")      # Bundle-ID der iPhone-App (ios/) ist bewusst oeffentlich
             for v in verboten:
                 assert v not in inhalt or d in ("conftest.py",), f"{v} in {d}"
 

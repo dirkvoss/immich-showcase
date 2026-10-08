@@ -471,7 +471,10 @@
   "Oder gib hier den Code ein, den das Gerät nach dem Öffnen von /tv/ anzeigt:": "Or enter here the code the device shows after opening /tv/:",
   "Code vom Gerät": "Code from the device",
   "Gekoppelt": "Paired",
-  "Link und QR-Code (zum Scannen mit dem Tablet)": "Link and QR code (to scan with the tablet)"
+  "Link und QR-Code (zum Scannen mit dem Tablet)": "Link and QR code (to scan with the tablet)",
+  "📱 App-Einstellungen": "📱 App settings",
+  "iPhone-App verbinden": "Connect iPhone app",
+  "In der App „Showcase Immich“ den QR-Code scannen – sie trägt die Adresse dieses Servers selbst ein.": "Scan the QR code in the “Showcase Immich” app – it enters this server’s address itself."
  },
  "muster": [
   [

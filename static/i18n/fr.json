@@ -471,7 +471,10 @@
   "Oder gib hier den Code ein, den das Gerät nach dem Öffnen von /tv/ anzeigt:": "Ou saisissez ici le code que l’appareil affiche après l’ouverture de /tv/ :",
   "Code vom Gerät": "Code de l’appareil",
   "Gekoppelt": "Associé",
-  "Link und QR-Code (zum Scannen mit dem Tablet)": "Lien et code QR (à scanner avec la tablette)"
+  "Link und QR-Code (zum Scannen mit dem Tablet)": "Lien et code QR (à scanner avec la tablette)",
+  "📱 App-Einstellungen": "📱 Réglages de l’appli",
+  "iPhone-App verbinden": "Connecter l’appli iPhone",
+  "In der App „Showcase Immich“ den QR-Code scannen – sie trägt die Adresse dieses Servers selbst ein.": "Scannez le code QR dans l’appli « Showcase Immich » : elle saisit elle-même l’adresse de ce serveur."
  },
  "muster": [
   [

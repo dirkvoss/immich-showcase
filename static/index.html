@@ -480,7 +480,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
     <div class="kopf">
       <h1><button type="button" class="kopf-home" id="kopfHome" aria-label="Immich Showcase – zur Startseite"><span class="logo" id="logo" aria-hidden="true"><img alt="" src="/icon-192.png"></span><span class="kopf-name">Immich Showcase</span></button></h1>
       <button class="btn klein versteckt" id="undoKopf" title="Letzte Änderung an der Auswahl rückgängig machen" aria-label="Rückgängig"><span aria-hidden="true">↶</span><span class="undo-text"> Rückgängig</span></button>
-      <div class="benutzer" id="benutzer"><button type="button" id="geraeteBtn" class="ik" aria-label="Geräte" title="Geräte">📡 Geräte</button><button type="button" id="hilfeBtn" class="ik" aria-label="Hilfe" title="Hilfe">❓ Hilfe</button><details class="konto" id="konto"><summary aria-label="Konto" title="Konto"><svg class="ic" aria-hidden="true"><use href="#i-konto"/></svg></summary><div class="konto-menu"><button type="button" id="einstBtn">⚙ Einstellungen</button><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><span class="versionskurz" data-version-kurz></span></div></details></div>
+      <div class="benutzer" id="benutzer"><button type="button" id="geraeteBtn" class="ik" aria-label="Geräte" title="Geräte">📡 Geräte</button><button type="button" id="hilfeBtn" class="ik" aria-label="Hilfe" title="Hilfe">❓ Hilfe</button><details class="konto" id="konto"><summary aria-label="Konto" title="Konto"><svg class="ic" aria-hidden="true"><use href="#i-konto"/></svg></summary><div class="konto-menu"><button type="button" id="einstBtn">⚙ Einstellungen</button><button type="button" id="appEinstBtn" class="versteckt">📱 App-Einstellungen</button><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><span class="versionskurz" data-version-kurz></span></div></details></div>
       <div class="laeuft nur-rahmen" id="laeuft" aria-live="polite">
         <select id="rahmenWahl" class="reihe-sel versteckt" aria-label="Rahmen wählen"></select>
         <div class="laeuft-text">
@@ -605,6 +605,10 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
       <p class="tipp">Damit die Suche „Oma“ versteht, obwohl die Person in Immich anders heißt.</p>
       <div id="eAliase"></div>
       <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="eAliasNeu" type="button">＋ Spitzname</button></div>
+      <h3>iPhone-App verbinden</h3>
+      <p class="tipp">In der App „Showcase Immich“ den QR-Code scannen – sie trägt die Adresse dieses Servers selbst ein.</p>
+      <div id="eAppQr" style="width:180px;max-width:60%;margin:6px auto;background:#fff;padding:10px;border-radius:12px"></div>
+      <p class="tipp" id="eAppAdresse" style="text-align:center"></p>
       <h3>Adresse der Fernseher-Seite</h3>
       <label class="tvfeld"><span>Adresse</span> <input id="eTvUrl" type="text" autocomplete="off" aria-label="Adresse der Fernseher-Seite" placeholder="tv.example.com"></label>
       <p class="tipp">Wird für die Anleitungen und QR-Codes beim Verbinden von Geräten genutzt.</p>
@@ -1808,10 +1812,16 @@ function einstFuellen(d) {
   let dl = $("#ePersonenListe"); if (!dl) { dl = document.createElement("datalist"); dl.id = "ePersonenListe"; document.body.append(dl); }
   dl.innerHTML = ""; for (const n of d.personen) { const o = document.createElement("option"); o.value = n; dl.append(o); }
 }
+function appQrZeigen() {                                    // QR mit der Adresse, unter der DU diese Seite gerade erreichst (bei localhost: die Server-Adresse aus den Einstellungen)
+  let basis = location.origin; try { if (/^(localhost|127\.|\[?::1)/.test(location.hostname)) basis = tvBasis(); } catch (e) {}
+  const link = "showcase://verbinden?adresse=" + encodeURIComponent(basis);
+  try { const qr = qrcode(0, "M"); qr.addData(link); qr.make(); $("#eAppQr").innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true }); } catch (e) { $("#eAppQr").innerHTML = ""; }
+  $("#eAppAdresse").textContent = basis;
+}
 async function einstOeffnen() {
   $("#konto").open = false;
   try { einstFuellen(await api("einstellungen")); } catch (e) { fehler(e); return; }
-  $("#einstDialog").classList.remove("versteckt");
+  appQrZeigen(); $("#einstDialog").classList.remove("versteckt");
 }
 function einstSammeln() {
   const k = { sek: $("#eSek").value, fuellung_rahmen: $("#eFuellungR").value, fuellung_tv: $("#eFuellungT").value, tv_url: $("#eTvUrl").value.trim(), alarm_min: $("#eAlarm").value,
@@ -1826,6 +1836,10 @@ async function einstSpeichern(still) {
   einstFuellen(r.einstellungen); if (!still) toast(RW_T("Gespeichert.")); return r;
 }
 $("#einstBtn").addEventListener("click", einstOeffnen);
+if (/ShowcaseApp\//.test(navigator.userAgent) && window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.showcase) {      // in der iPhone-App: Zugang zu den App-Einstellungen
+  $("#appEinstBtn").classList.remove("versteckt");
+  $("#appEinstBtn").addEventListener("click", () => { $("#konto").open = false; window.webkit.messageHandlers.showcase.postMessage({ aktion: "einstellungen" }); });
+}
 $("#einstAbbrechen").addEventListener("click", () => $("#einstDialog").classList.add("versteckt"));
 $("#einstSpeichern").addEventListener("click", async () => { try { await einstSpeichern(); await konfigLaden(); statusLaden(); } catch (e) { fehler(e); } });
 $("#eAliasNeu").addEventListener("click", () => $("#eAliase").append(aliasZeile()));
