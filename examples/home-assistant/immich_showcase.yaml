@@ -10,7 +10,9 @@ rest:
     headers:
       X-Rahmen: "1"
     sensor:
-      # Zustand je Geraet: offline | bereit | spielt | dauerprogramm   (Kennung "rahmen" durch deine Kennung ersetzen, so oft wie noetig kopieren)
+      # Zustand je Geraet: offline | bereit | spielt | dauerprogramm
+      # Die Kennung eines Geraets steht in der App unter Geraete -> ⚙ ("Kennung"). Fuer jeden weiteren Rahmen/Fernseher diesen Block kopieren und
+      # 'rahmen' durch dessen Kennung ersetzen (auch in "name" und "unique_id"); neue Geraete aus der App erscheinen hier nicht von selbst.
       - name: "Showcase Rahmen"
         unique_id: showcase_rahmen
         value_template: "{{ (value_json.geraete | selectattr('id', 'eq', 'rahmen') | first).zustand }}"

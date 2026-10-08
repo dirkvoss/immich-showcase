@@ -117,3 +117,16 @@ def test_datei_hat_vorrang_nach_neustart(app_laden, tmp_path):
     w2, client2, _ = app_laden(**{**LAN, "RAHMEN_WEB_GERAETE_FILE": pfad, "RAHMEN_WEB_RAHMEN_ZIELE": "nurenv=Nur Umgebung"})
     namen = [g["id"] for g in client2().get("/api/verwaltung").json()["geraete"]]
     assert "kuechetv" in namen and "nurenv" not in namen and w2.REGISTER["aktiv"] is True
+
+
+def test_zeitplan_im_format_der_app(app_laden):
+    """Der Zeitplan-Editor der App schreibt Tage als Liste ('Mo,Di,Mi') bzw. 'taeglich' - der Server muss das lesen."""
+    w, client, _ = app_laden(**LAN)
+    c = client()
+    A = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa"
+    plan = f"Mo,Di,Mi,Do,Fr 18:00-22:00 = neu14:70, *:30; Sa,So 08:00-20:00 = {A}; taeglich 00:00-06:00 = person=Anna:50"
+    assert c.post("/api/verwaltung/geraete", json={"art": "rahmen", "name": "Flur", "zeitplan": plan}, headers=H).status_code == 200
+    dt = w.datetime.datetime
+    assert [q["typ"] for q in w.rahmen_quellen("flur", dt(2026, 10, 5, 19, 0))] == ["neu", "alle"]          # Montag Abend
+    assert w.rahmen_quellen("flur", dt(2026, 10, 10, 9, 0))[0]["id"] == A                                  # Samstag Vormittag
+    assert w.rahmen_quellen("flur", dt(2026, 10, 7, 3, 0))[0]["typ"] == "person"                           # taeglich nachts

@@ -384,7 +384,23 @@
   "Bitte einen Namen eingeben.": "Introduce un nombre.",
   "Nachtruhe: bitte „von“ und „bis“ ausfüllen oder beide leer lassen.": "Descanso nocturno: rellena «de» y «a», o deja ambos vacíos.",
   "Gespeichert.": "Guardado.",
-  "Dieses Gerät wirklich entfernen? Gespeicherte Shows bleiben erhalten.": "¿Quitar este dispositivo? Las shows guardadas se conservan."
+  "Dieses Gerät wirklich entfernen? Gespeicherte Shows bleiben erhalten.": "¿Quitar este dispositivo? Las shows guardadas se conservan.",
+  "＋ Zeitfenster": "＋ Franja horaria",
+  "Zu bestimmten Tagen und Uhrzeiten zeigt der Rahmen andere Quellen als das Dauerprogramm oben.": "En ciertos días y horas el marco muestra otras fuentes distintas del programa continuo de arriba.",
+  "Kennung (z. B. für Home Assistant)": "ID (p. ej. para Home Assistant)",
+  "Mo": "Lun",
+  "Di": "Mar",
+  "Mi": "Mié",
+  "Do": "Jue",
+  "Fr": "Vie",
+  "Sa": "Sáb",
+  "So": "Dom",
+  "Shows auf die Rahmen verteilen": "Repartir shows entre los marcos",
+  "Wähle für jeden Rahmen, was er zeigen soll. „Nicht ändern“ lässt einen Rahmen in Ruhe.": "Elige qué debe mostrar cada marco. «No cambiar» deja un marco como está.",
+  "Anwenden": "Aplicar",
+  "Nicht ändern": "No cambiar",
+  "Shows verteilt.": "Shows repartidas.",
+  "Nichts geändert.": "Nada cambiado."
  },
  "muster": [
   [

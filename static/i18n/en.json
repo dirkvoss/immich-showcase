@@ -384,7 +384,23 @@
   "Bitte einen Namen eingeben.": "Please enter a name.",
   "Nachtruhe: bitte „von“ und „bis“ ausfüllen oder beide leer lassen.": "Night rest: please fill in “from” and “to”, or leave both empty.",
   "Gespeichert.": "Saved.",
-  "Dieses Gerät wirklich entfernen? Gespeicherte Shows bleiben erhalten.": "Really remove this device? Saved shows are kept."
+  "Dieses Gerät wirklich entfernen? Gespeicherte Shows bleiben erhalten.": "Really remove this device? Saved shows are kept.",
+  "＋ Zeitfenster": "＋ Time window",
+  "Zu bestimmten Tagen und Uhrzeiten zeigt der Rahmen andere Quellen als das Dauerprogramm oben.": "On certain days and times the frame shows other sources than the continuous programme above.",
+  "Kennung (z. B. für Home Assistant)": "ID (e.g. for Home Assistant)",
+  "Mo": "Mon",
+  "Di": "Tue",
+  "Mi": "Wed",
+  "Do": "Thu",
+  "Fr": "Fri",
+  "Sa": "Sat",
+  "So": "Sun",
+  "Shows auf die Rahmen verteilen": "Distribute shows to the frames",
+  "Wähle für jeden Rahmen, was er zeigen soll. „Nicht ändern“ lässt einen Rahmen in Ruhe.": "Choose what each frame should show. “Don’t change” leaves a frame alone.",
+  "Anwenden": "Apply",
+  "Nicht ändern": "Don’t change",
+  "Shows verteilt.": "Shows distributed.",
+  "Nichts geändert.": "Nothing changed."
  },
  "muster": [
   [

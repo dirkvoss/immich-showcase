@@ -1,6 +1,12 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.9.0]
+### Neu
+- **Zeitplan mit Eingabemaske:** Zeitfenster mit Wochentagen, Uhrzeit von–bis und eigenen Quellen (statt Textfeld); bestehende Zeitpläne werden gelesen und wieder geschrieben.
+- **Shows auf die Rahmen verteilen:** Unter „Meine Shows“ (ab zwei Rahmen) wählst du in einem Dialog für jeden Rahmen eine eigene Show, „Normales Programm“ oder „Nicht ändern“.
+- Im Geräte-Dialog steht die **Kennung** des Geräts (für Home Assistant); das HA-Beispiel erklärt, wie weitere Geräte ergänzt werden.
+
 ## [2.8.0]
 ### Neu
 - **Geräte-Verwaltung in der App:** Unter „Geräte“ (⚙ je Gerät, „＋ Gerät hinzufügen“) legst du Bilderrahmen und Fernseher an, stellst sie ein und löschst sie – ohne Docker-Konfiguration und ohne Neustart. Je Rahmen: Name, Sekunden pro Foto, Hintergrund, Bildunterschrift, Nachtruhe, Dauerprogramm (Quellen mit Gewicht), Zeitplan und Fully Kiosk (mit Verbindungstest). Fernseher: Name und Hintergrund.

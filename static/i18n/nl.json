@@ -384,7 +384,23 @@
   "Bitte einen Namen eingeben.": "Voer een naam in.",
   "Nachtruhe: bitte „von“ und „bis“ ausfüllen oder beide leer lassen.": "Nachtrust: vul ‘van’ en ‘tot’ in, of laat beide leeg.",
   "Gespeichert.": "Opgeslagen.",
-  "Dieses Gerät wirklich entfernen? Gespeicherte Shows bleiben erhalten.": "Dit apparaat echt verwijderen? Opgeslagen shows blijven bewaard."
+  "Dieses Gerät wirklich entfernen? Gespeicherte Shows bleiben erhalten.": "Dit apparaat echt verwijderen? Opgeslagen shows blijven bewaard.",
+  "＋ Zeitfenster": "＋ Tijdvenster",
+  "Zu bestimmten Tagen und Uhrzeiten zeigt der Rahmen andere Quellen als das Dauerprogramm oben.": "Op bepaalde dagen en tijden toont de lijst andere bronnen dan het doorlopende programma hierboven.",
+  "Kennung (z. B. für Home Assistant)": "ID (bijv. voor Home Assistant)",
+  "Mo": "Ma",
+  "Di": "Di",
+  "Mi": "Wo",
+  "Do": "Do",
+  "Fr": "Vr",
+  "Sa": "Za",
+  "So": "Zo",
+  "Shows auf die Rahmen verteilen": "Shows over de lijsten verdelen",
+  "Wähle für jeden Rahmen, was er zeigen soll. „Nicht ändern“ lässt einen Rahmen in Ruhe.": "Kies wat elke lijst moet tonen. ‘Niet wijzigen’ laat een lijst met rust.",
+  "Anwenden": "Toepassen",
+  "Nicht ändern": "Niet wijzigen",
+  "Shows verteilt.": "Shows verdeeld.",
+  "Nichts geändert.": "Niets gewijzigd."
  },
  "muster": [
   [

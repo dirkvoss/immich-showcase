@@ -199,7 +199,22 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
 .gf .tvfeld input[type=text], .gf .tvfeld input[type=password], .gf .tvfeld input[type=number] { text-align: right; }
 .gf .reihe { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
 .gf .reihe label { display: inline-flex; align-items: center; gap: 6px; }
-.qzeile { display: flex; gap: 6px; align-items: center; }
+.plan { border: 1px solid var(--line); border-radius: 12px; padding: 10px; margin: 8px 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; background: var(--bg); }
+.plan .planquellen { display: grid; gap: 6px; min-width: 0; }
+.plan .tage { display: flex; flex-wrap: wrap; gap: 6px; }
+.plan .tage label { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; min-height: 36px; padding: 0 8px; border: 1px solid var(--line); border-radius: 999px; cursor: pointer; font-size: 14px; background: var(--card); }
+.plan .tage label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+.plan .tage input { position: absolute; opacity: 0; pointer-events: none; }
+.plan .zeiten { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.plan .zeiten input[type=time] { min-height: 38px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: inherit; font: inherit; padding: 0 8px; }
+.plan .zeiten .btn { margin-left: auto; }
+.verteil { display: grid; gap: 8px; margin: 10px 0; grid-template-columns: minmax(0, 1fr); }
+.verteil .tvfeld { min-height: 52px; }
+.verteil .tvfeld > span:first-child { flex: none; max-width: 40%; }
+.verteil .tvfeld select { flex: 1; min-width: 0; text-align: right; }
+.verteil small { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
+.qzeile { display: flex; gap: 6px; align-items: center; min-width: 0; }
+.qzeile select { max-width: 46%; }
 .qzeile select, .qzeile input { min-height: 38px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: inherit; font: inherit; padding: 0 8px; min-width: 0; }
 .qzeile .qwert { flex: 1; text-align: left !important; }
 .qzeile .qgew { width: 64px; text-align: center !important; }
@@ -560,6 +575,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
     <div class="gf">
       <div class="tvfeld versteckt" id="gfArtZeile"><span>Art</span>
         <select id="gfArt" aria-label="Art"><option value="rahmen">Bilderrahmen</option><option value="tv">Fernseher</option></select></div>
+      <div class="tvfeld versteckt" id="gfKennungZeile"><span>Kennung (z. B. für Home Assistant)</span><code id="gfKennung"></code></div>
       <label class="tvfeld"><span>Name</span> <input id="gfName" type="text" maxlength="60" autocomplete="off" aria-label="Name"></label>
       <label class="tvfeld"><span>Hintergrund</span> <select id="gfFuellung" aria-label="Hintergrund"><option value="">Standard</option><option value="unscharf">Unscharf</option><option value="zuschnitt">Zuschnitt</option><option value="balken">Schwarze Balken</option></select></label>
       <div class="nur-gf-rahmen">
@@ -571,7 +587,10 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
           <p class="tipp">Was der Rahmen zeigt, wenn niemand etwas schickt. Ohne Eintrag gilt die allgemeine Einstellung der Installation.</p>
           <div id="gfQuellen"></div>
           <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfQuelleNeu" type="button">＋ Quelle</button></div>
-          <label class="tvfeld stapel"><span>Zeitplan (optional)</span> <input id="gfZeitplan" type="text" autocomplete="off" aria-label="Zeitplan" placeholder="Mo-Fr 18:00-22:00 = neu14:70, *:30; Sa,So 08:00-20:00 = *"></label>
+          <h3>Zeitplan (optional)</h3>
+          <p class="tipp">Zu bestimmten Tagen und Uhrzeiten zeigt der Rahmen andere Quellen als das Dauerprogramm oben.</p>
+          <div id="gfPlan"></div>
+          <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfPlanNeu" type="button">＋ Zeitfenster</button></div>
           <h3>Fully Kiosk (Tablet)</h3>
           <label class="tvfeld"><span>Adresse des Tablets</span> <input id="gfFullyHost" type="text" autocomplete="off" aria-label="Adresse des Tablets" placeholder="192.168.1.50"></label>
           <label class="tvfeld"><span>Passwort</span> <input id="gfFullyPw" type="password" autocomplete="new-password" aria-label="Passwort"></label>
@@ -584,6 +603,14 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
       <button class="btn" id="gfAbbrechen" type="button">Abbrechen</button>
       <button class="btn primaer" id="gfSpeichern" type="button">Speichern</button>
     </div>
+  </div>
+</div>
+<div id="verteilenDialog" class="tvdialog versteckt" role="dialog" aria-modal="true" aria-labelledby="verteilenTitel">
+  <div class="tvkarte">
+    <h2 id="verteilenTitel">Shows auf die Rahmen verteilen</h2>
+    <p class="tipp">Wähle für jeden Rahmen, was er zeigen soll. „Nicht ändern“ lässt einen Rahmen in Ruhe.</p>
+    <div class="verteil" id="verteilenListe"></div>
+    <div class="tvknoepfe"><button class="btn" id="verteilenAbbrechen" type="button">Abbrechen</button><button class="btn primaer" id="verteilenOk" type="button">Anwenden</button></div>
   </div>
 </div>
 <div id="hilfeDialog" class="tvdialog versteckt" role="dialog" aria-modal="true" aria-labelledby="hilfeTitel">
@@ -959,6 +986,10 @@ async function showsLaden() {
     const d = await api("shows");
     zurueckZeigen(d.zurueck);
     l.innerHTML = "";
+    if (rahmenIds().length > 1 && d.shows.length) {
+      const v = document.createElement("button"); v.type = "button"; v.className = "btn"; v.textContent = RW_T("Shows auf die Rahmen verteilen"); v.style.margin = "4px 0 8px";
+      v.addEventListener("click", () => verteilenOeffnen(d.shows)); l.appendChild(v);
+    }
     const gruppe = (titel, liste, leer) => {
       const h = document.createElement("div"); h.className = "tag"; h.innerHTML = `<h2>${titel}</h2>`; l.appendChild(h);
       if (!liste.length) { const p = document.createElement("div"); p.className = "leer"; p.style.padding = "14px 8px"; p.innerHTML = leer; l.appendChild(p); }
@@ -1534,9 +1565,9 @@ function quellenLesen(text) {
   }
   return reihen;
 }
-function quellenSchreiben() {
+function quellenSchreiben(box) {
   const teile = [];
-  for (const z of $$("#gfQuellen .qzeile")) {
+  for (const z of (box || $("#gfQuellen")).querySelectorAll(".qzeile")) {
     const a = z.querySelector(".qart").value, w = z.querySelector(".qwert").value.trim().replace(/[,:]/g, ""), g = z.querySelector(".qgew").value.trim();
     let t = a === "alle" ? "*" : a === "neu" ? "neu" + (w || "14") : a === "heute" ? "heute" + w : a === "person" ? "person=" + w : w;
     if (!t || t === "person=") continue;
@@ -1547,6 +1578,55 @@ function quellenSchreiben() {
 function gfArtAnpassen() { document.querySelector(".nur-gf-rahmen").classList.toggle("versteckt", $("#gfArt").value !== "rahmen"); }
 $("#gfArt").addEventListener("change", gfArtAnpassen);
 $("#gfQuelleNeu").addEventListener("click", () => $("#gfQuellen").append(quelleZeile()));
+
+// Zeitplan: "Mo-Fr 18:00-22:00 = neu14:70, *:30; Sa,So 08:00-20:00 = *"  <->  Zeitfenster-Karten
+const WOCHE = [["mo", "Mo"], ["di", "Di"], ["mi", "Mi"], ["do", "Do"], ["fr", "Fr"], ["sa", "Sa"], ["so", "So"]];
+const TAG_ALIAS = { mon: "mo", tue: "di", wed: "mi", thu: "do", fri: "fr", sat: "sa", sun: "so" };
+function tageLesen(text) {
+  text = text.trim().toLowerCase().replace(/ä/g, "ae");
+  if (["taeglich", "daily", "alle", "*"].includes(text)) return WOCHE.map(t => t[0]);
+  const idx = t => WOCHE.findIndex(w => w[0] === (TAG_ALIAS[t] || t)), tage = [];
+  for (let teil of text.split(",")) {
+    teil = teil.trim(); const m = teil.split("-").map(x => x.trim());
+    if (m.length === 2 && idx(m[0]) >= 0 && idx(m[1]) >= 0) { let i = idx(m[0]); for (let n = 0; n < 7; n++) { tage.push(WOCHE[i][0]); if (i === idx(m[1])) break; i = (i + 1) % 7; } }
+    else if (m.length === 1 && idx(m[0]) >= 0) tage.push(WOCHE[idx(m[0])][0]);
+  }
+  return tage;
+}
+function planKarte(f) {
+  f = f || { tage: ["mo", "di", "mi", "do", "fr"], von: "18:00", bis: "22:00", quellen: "" };
+  const k = document.createElement("div"); k.className = "plan";
+  const tage = document.createElement("div"); tage.className = "tage"; tage.setAttribute("role", "group");
+  for (const [id, kurz] of WOCHE) { const l = document.createElement("label"), c = document.createElement("input"); c.type = "checkbox"; c.value = id; c.checked = f.tage.includes(id); l.append(c, document.createTextNode(kurz)); tage.append(l); }
+  const zeiten = document.createElement("div"); zeiten.className = "zeiten";
+  const von = document.createElement("input"), bis = document.createElement("input"); von.type = bis.type = "time"; von.value = f.von; bis.value = f.bis; von.setAttribute("aria-label", RW_T("von")); bis.setAttribute("aria-label", RW_T("bis"));
+  const weg = document.createElement("button"); weg.type = "button"; weg.className = "btn klein gefahr"; weg.textContent = "✕"; weg.setAttribute("aria-label", RW_T("Entfernen")); weg.addEventListener("click", () => k.remove());
+  zeiten.append(von, document.createTextNode(" – "), bis, weg);
+  const qs = document.createElement("div"); qs.className = "planquellen"; for (const q of quellenLesen(f.quellen)) qs.append(quelleZeile(q));
+  const plus = document.createElement("button"); plus.type = "button"; plus.className = "btn klein"; plus.textContent = "＋ Quelle"; plus.style.justifySelf = "start"; plus.addEventListener("click", () => qs.append(quelleZeile()));
+  k.append(tage, zeiten, qs, plus); return k;
+}
+function planLesen(text) {
+  const karten = [];
+  for (const e of (text || "").split(";").map(x => x.trim()).filter(Boolean)) {
+    const i = e.indexOf("="); if (i < 0) continue;
+    const m = e.slice(0, i).trim().match(/^(.+?)\s+(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})$/); if (!m) continue;
+    const tage = tageLesen(m[1]); if (!tage.length) continue;
+    karten.push({ tage, von: m[2].padStart(2, "0") + ":" + m[3], bis: m[4].padStart(2, "0") + ":" + m[5], quellen: e.slice(i + 1).trim() });
+  }
+  return karten;
+}
+function planSchreiben() {
+  const eintraege = [];
+  for (const k of $$("#gfPlan .plan")) {
+    const tage = [...k.querySelectorAll(".tage input:checked")].map(c => c.value), z = k.querySelectorAll(".zeiten input");
+    if (!tage.length || !z[0].value || !z[1].value) continue;
+    const namen = tage.length === 7 ? "taeglich" : tage.map(t => WOCHE.find(w => w[0] === t)[1]).join(",");
+    eintraege.push(`${namen} ${z[0].value}-${z[1].value} = ${quellenSchreiben(k.querySelector(".planquellen")) || "*"}`);
+  }
+  return eintraege.join("; ");
+}
+$("#gfPlanNeu").addEventListener("click", () => $("#gfPlan").append(planKarte()));
 async function geraetDialogOeffnen(id) {
   gfId = id || null;
   let g = { art: "rahmen", name: "", sek: "", fuellung: "", anzeige: [], nacht: "", quellen: "", zeitplan: "", fully_host: "", fully_pw_gesetzt: false };
@@ -1562,12 +1642,44 @@ async function geraetDialogOeffnen(id) {
   const [von, bis] = (g.nacht || "-").split("-"); $("#gfNachtVon").value = (von || "").padStart(5, "0"); $("#gfNachtBis").value = (bis || "").padStart(5, "0");
   if (!g.nacht) { $("#gfNachtVon").value = ""; $("#gfNachtBis").value = ""; }
   $("#gfQuellen").innerHTML = ""; for (const q of quellenLesen(g.quellen)) $("#gfQuellen").append(quelleZeile(q));
-  $("#gfZeitplan").value = g.zeitplan || ""; $("#gfFullyHost").value = g.fully_host || ""; $("#gfFullyPw").value = "";
+  $("#gfPlan").innerHTML = ""; for (const f of planLesen(g.zeitplan)) $("#gfPlan").append(planKarte(f));
+  $("#gfKennungZeile").classList.toggle("versteckt", !id); $("#gfKennung").textContent = id || "";
+  $("#gfFullyHost").value = g.fully_host || ""; $("#gfFullyPw").value = "";
   $("#gfFullyPw").placeholder = g.fully_pw_gesetzt ? RW_T("gesetzt – leer lassen zum Behalten") : "";
   $("#gfLoeschen").classList.toggle("versteckt", !id);
   $("#geraetDialog").classList.remove("versteckt"); $("#gfName").focus();
 }
 $("#geraetNeu").addEventListener("click", () => geraetDialogOeffnen(null));
+
+async function verteilenOeffnen(shows) {
+  let st; try { st = await api("status?ziel=" + encodeURIComponent(rahmenAktuell())); } catch (e) { fehler(e); return; }
+  const box = $("#verteilenListe"); box.innerHTML = "";
+  for (const z of rahmenIds()) {
+    const lauf = ((st.rahmen || []).find(x => x.id === z) || {}).laeuft;
+    const zeile = document.createElement("label"); zeile.className = "tvfeld"; zeile.dataset.ziel = z;
+    const n = document.createElement("span"); n.textContent = rahmenName(z);
+    if (lauf) { const k = document.createElement("small"); k.textContent = "▶ " + lauf; n.append(k); }
+    const sel = document.createElement("select"); sel.setAttribute("aria-label", rahmenName(z));
+    const opt = (v, t) => { const o = document.createElement("option"); o.value = v; o.textContent = t; sel.append(o); };
+    opt("", RW_T("Nicht ändern")); opt("#normal", RW_T("Normales Programm")); for (const s of shows) opt(s.id, s.name);
+    zeile.append(n, sel); box.append(zeile);
+  }
+  $("#verteilenDialog").classList.remove("versteckt");
+}
+$("#verteilenAbbrechen").addEventListener("click", () => $("#verteilenDialog").classList.add("versteckt"));
+$("#verteilenOk").addEventListener("click", async () => {
+  const b = $("#verteilenOk"); b.disabled = true; let n = 0;
+  try {
+    for (const z of $$("#verteilenListe .tvfeld")) {
+      const w = z.querySelector("select").value; if (!w) continue;
+      if (w === "#normal") await api("normal", { method: "POST", body: JSON.stringify({ ziel: z.dataset.ziel }) });
+      else await api(`shows/${w}/anzeigen`, { method: "POST", body: JSON.stringify({ ziele: [z.dataset.ziel] }) });
+      n++;
+    }
+    $("#verteilenDialog").classList.add("versteckt"); toast(RW_T(n ? "Shows verteilt." : "Nichts geändert.")); statusLaden(); showsLaden();
+  } catch (e) { fehler(e); }
+  b.disabled = false;
+});
 $("#gfAbbrechen").addEventListener("click", () => $("#geraetDialog").classList.add("versteckt"));
 async function geraeteNeuLesen() { await konfigLaden(); koppelZieleBauen(); geraeteLaden(); statusLaden(); }
 $("#gfSpeichern").addEventListener("click", async () => {
@@ -1579,7 +1691,7 @@ $("#gfSpeichern").addEventListener("click", async () => {
   if (!gfId) daten.art = $("#gfArt").value;
   if (istRahmen) {
     Object.assign(daten, { sek: $("#gfSek").value, anzeige: [$("#gfDatum").checked && "datum", $("#gfOrt").checked && "ort"].filter(Boolean), nacht: von && bis ? von + "-" + bis : "",
-      quellen: quellenSchreiben(), zeitplan: $("#gfZeitplan").value.trim(), fully_host: $("#gfFullyHost").value.trim() });
+      quellen: quellenSchreiben(), zeitplan: planSchreiben(), fully_host: $("#gfFullyHost").value.trim() });
     if ($("#gfFullyPw").value) daten.fully_pw = $("#gfFullyPw").value;
   }
   const b = $("#gfSpeichern"); b.disabled = true;

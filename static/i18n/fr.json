@@ -384,7 +384,23 @@
   "Bitte einen Namen eingeben.": "Veuillez saisir un nom.",
   "Nachtruhe: bitte „von“ und „bis“ ausfüllen oder beide leer lassen.": "Repos nocturne : renseignez « de » et « à », ou laissez les deux vides.",
   "Gespeichert.": "Enregistré.",
-  "Dieses Gerät wirklich entfernen? Gespeicherte Shows bleiben erhalten.": "Retirer vraiment cet appareil ? Les shows enregistrées sont conservées."
+  "Dieses Gerät wirklich entfernen? Gespeicherte Shows bleiben erhalten.": "Retirer vraiment cet appareil ? Les shows enregistrées sont conservées.",
+  "＋ Zeitfenster": "＋ Plage horaire",
+  "Zu bestimmten Tagen und Uhrzeiten zeigt der Rahmen andere Quellen als das Dauerprogramm oben.": "À certains jours et heures, le cadre affiche d’autres sources que le programme continu ci-dessus.",
+  "Kennung (z. B. für Home Assistant)": "Identifiant (p. ex. pour Home Assistant)",
+  "Mo": "Lun",
+  "Di": "Mar",
+  "Mi": "Mer",
+  "Do": "Jeu",
+  "Fr": "Ven",
+  "Sa": "Sam",
+  "So": "Dim",
+  "Shows auf die Rahmen verteilen": "Répartir les shows sur les cadres",
+  "Wähle für jeden Rahmen, was er zeigen soll. „Nicht ändern“ lässt einen Rahmen in Ruhe.": "Choisissez ce que chaque cadre doit afficher. « Ne pas modifier » laisse un cadre tranquille.",
+  "Anwenden": "Appliquer",
+  "Nicht ändern": "Ne pas modifier",
+  "Shows verteilt.": "Shows réparties.",
+  "Nichts geändert.": "Rien n’a changé."
  },
  "muster": [
   [
