@@ -9,6 +9,8 @@ Suche in ganzen Sätzen („Oma und Anna Weihnachten 2019 am Strand“), tippe d
 
 > Immich Showcase ist ein unabhängiges Community-Projekt und steht in keiner Verbindung zum Immich-Projekt oder dessen Betreibern. „Immich“ ist der Name der Software, mit der es zusammenarbeitet.
 
+<p align="center"><img src="docs/demo.gif" width="720" alt="Immich Showcase Ablauf"><br><sub><em>(Ablauf aus den Screenshots darunter; alle Fotos sind erfundene Beispiele.)</em></sub></p>
+
 | Anmelden | Neueste Fotos | Auswahl | Auf den Fernseher |
 |---|---|---|---|
 | ![Anmelden](docs/screenshots/login.png) | ![Neueste](docs/screenshots/neueste.png) | ![Auswahl](docs/screenshots/auswahl.png) | ![Fernseher](docs/screenshots/fernseher.png) |

@@ -9,6 +9,8 @@ Search in plain sentences ("Grandma and Anna, Christmas 2019, on the beach"), ta
 
 > Immich Showcase is an independent community project. It is not affiliated with, endorsed by, or part of the Immich project. "Immich" is the name of the software it works with.
 
+<p align="center"><img src="docs/demo.gif" width="720" alt="Immich Showcase walkthrough"><br><sub><em>(Walkthrough built from the screenshots below; all photos are invented samples.)</em></sub></p>
+
 | Sign in | Latest photos | Selection | Send to TV |
 |---|---|---|---|
 | ![Sign in](docs/screenshots/login.png) | ![Latest](docs/screenshots/neueste.png) | ![Selection](docs/screenshots/auswahl.png) | ![TV](docs/screenshots/fernseher.png) |
