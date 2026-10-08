@@ -191,3 +191,16 @@ def test_fully_test_meldet_passwort_und_erreichbarkeit(app_laden, monkeypatch):
     monkeypatch.setattr(w, "fully_get", kaputt)
     r = c.post("/api/verwaltung/fully-test", json={"id": "rahmen", "fully_host": "tablet.lan", "fully_pw": "x"}, headers=H)
     assert r.status_code == 502 and "nicht erreichbar" in r.json()["nachricht"]
+
+
+def test_adresse_wird_verworfen_wenn_das_tablet_sich_selbst_steuert(app_laden):
+    w, client, _ = app_laden(**LAN)
+    c = client()
+    c.put("/api/verwaltung/geraete/rahmen", json={"fully_host": "tablet.lan", "fully_pw": "geheim"}, headers=H)       # noch nicht selbstmeldend: wird gespeichert
+    assert w.FULLY["rahmen"]["host"] == "tablet.lan:2323"
+    c.get("/api/tv/abfrage?ziel=rahmen&seq=-1&fj=1&ak=80&pl=1")                                                          # jetzt meldet sich das Tablet selbst
+    g = [x for x in c.get("/api/geraete").json()["geraete"] if x["id"] == "rahmen"][0]
+    assert g["selbst"] is True and g["fully"] is False                                                                    # kein "Bildschirm aus"-Knopf per Fernsteuerung
+    r = c.put("/api/verwaltung/geraete/rahmen", json={"name": "Flur", "fully_host": "tablet.lan"}, headers=H).json()
+    assert "nicht übernommen" in r["nachricht"] and r["geraet"]["fully_host"] == "" and "rahmen" not in w.FULLY
+    assert "fully_host" not in w.GERAETE["rahmen"] and "fully_pw" not in w.GERAETE["rahmen"]

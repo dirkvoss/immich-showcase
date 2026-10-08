@@ -1,6 +1,10 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.10.3]
+### Geändert
+- Meldet sich ein Tablet selbst über die Fully-Schnittstelle, werden **Adresse und Passwort der Fully-Fernbedienung automatisch verworfen** (beim Speichern, mit Hinweis) und nicht mehr abgefragt – kein Dauer-Versuch mehr, ein Tablet zu erreichen, das der Server (z. B. aus der DMZ) gar nicht erreichen darf. Der Knopf „Bildschirm aus/an“ per Fernsteuerung entfällt dann in der Geräteliste.
+
 ## [2.10.2]
 ### Behoben
 - Das Dauerprogramm lieferte keine Fotos, wenn **mehrere Alben** eingestellt waren (`RAHMEN_WEB_RAHMEN_ALBEN=a,b`): Immich verknüpft mehrere `albumIds` mit UND (nur Fotos, die in allen Alben liegen). Jetzt wird je Album gefragt und gemischt – auch im Marker-Modus (`#nurrahmen` an mehreren Alben, dort jetzt je Album mit eigener Position).

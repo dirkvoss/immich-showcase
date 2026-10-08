@@ -2308,6 +2308,8 @@ def meldet_selbst(z):
 def fully_wache_pruefen(jetzt=None):
     """Einmal pro Minute: Nachtruhe (Bildschirm aus/an nur beim Wechsel, damit Handeingriffe nicht ueberstimmt werden) und Akku (alle 5 Minuten)."""
     for z in FULLY:
+        if meldet_selbst(z):                                      # das Tablet steuert sich selbst: keine (aussichtslose) Fernsteuerung von aussen
+            continue
         st = FULLY_STATE.setdefault(z, {})
         if rahmen_nacht(z) and not meldet_selbst(z):               # meldet sich das Tablet selbst, schaltet es den Bildschirm selbst
             soll = "aus" if in_nacht(jetzt, z) else "an"
@@ -2357,7 +2359,7 @@ def geraete_liste():
                       "zustand": "offline" if not online else "spielt" if spielt else "dauerprogramm" if dauer else "bereit",
                       "zuletzt_vor_s": int(jetzt - d["hb"]) if d["hb"] else None, "spielt": spielt, "dauerprogramm": dauer,
                       "bild_alter_s": d.get("bild_alter") if online else None,
-                      "fully": z in FULLY, "selbst": meldet_selbst(z), "bildschirm": st.get("bildschirm"), "akku": st.get("akku"), "laedt": st.get("laedt")})
+                      "fully": z in FULLY and not meldet_selbst(z), "selbst": meldet_selbst(z), "bildschirm": st.get("bildschirm"), "akku": st.get("akku"), "laedt": st.get("laedt")})
     return liste
 
 
@@ -2490,12 +2492,21 @@ def geraet_aendern(z: str, daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
         if z not in GERAETE:
             raise HTTPException(404, "Gerät nicht gefunden")
         setzen, weg = geraet_felder(daten, GERAETE[z]["art"])
+        verworfen = meldet_selbst(z) and (bool(setzen.get("fully_host")) or "fully_host" in GERAETE[z])
+        if meldet_selbst(z):                                    # das Tablet steuert sich selbst -> Adresse und Passwort sind ueberfluessig (und aus dem DMZ-Netz oft gar nicht erreichbar)
+            for k in ("fully_host", "fully_pw"):
+                setzen.pop(k, None)
+                if k not in weg:
+                    weg.append(k)
         g = {k: dict(v) for k, v in GERAETE.items()}
         g[z].update(setzen)
         for k in weg:
             g[z].pop(k, None)
         geraete_aendern(g)
-    return {"ok": True, "geraet": geraet_ansicht(z, GERAETE[z])}
+    r = {"ok": True, "geraet": geraet_ansicht(z, GERAETE[z])}
+    if verworfen:
+        r["nachricht"] = "Gespeichert. Adresse und Passwort wurden nicht übernommen – das Tablet steuert sich bereits selbst."
+    return r
 
 
 @app.delete("/api/verwaltung/geraete/{z}")
