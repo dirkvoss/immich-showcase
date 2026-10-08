@@ -158,7 +158,7 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
 .benutzer button { border: 0; background: none; color: var(--accent); font-size: 14px; cursor: pointer; padding: 4px 6px; }
 .fehler { color: var(--danger); min-height: 1.4em; margin-top: 10px; font-size: 14px; }
 
-.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom) + 190px); z-index: 60;
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom) + 190px); z-index: 120;
   background: #1f2a37; color: #fff; padding: 12px 16px; border-radius: 12px; max-width: 90vw; box-shadow: var(--shadow); font-size: 15px; }
 .toast.schlecht { background: var(--danger); }
 .diashow { position: fixed; inset: 0; z-index: 100; background: #000; color: #fff; user-select: none; -webkit-user-select: none; touch-action: none; }
@@ -296,7 +296,7 @@ header { background: var(--bg); padding: calc(env(safe-area-inset-top) + 8px) 16
 .konto-menu #benutzerName { font-weight: 600; color: var(--text); }
 .konto-menu #abmelden { text-align: left; color: var(--text); font-weight: 600; padding: 10px 0 4px; margin-top: 4px; border-top: 1px solid var(--line); }
 .konto-menu .versionskurz { margin: 4px 0 0; }
-#normalBtn { display: none !important; }
+
 @media (min-width: 700px) {
   .benutzer .ik { font-size: 14px; font-weight: 600; width: auto; padding: 0 12px; gap: 6px; }
   .benutzer .ik .ic { width: 18px; height: 18px; }
@@ -481,7 +481,6 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
       <h1><button type="button" class="kopf-home" id="kopfHome" aria-label="Immich Showcase – zur Startseite"><span class="logo" id="logo" aria-hidden="true"><img alt="" src="/icon-192.png"></span><span class="kopf-name">Immich Showcase</span></button></h1>
       <button class="btn klein versteckt" id="undoKopf" title="Letzte Änderung an der Auswahl rückgängig machen" aria-label="Rückgängig"><span aria-hidden="true">↶</span><span class="undo-text"> Rückgängig</span></button>
       <div class="benutzer" id="benutzer"><button type="button" id="geraeteBtn" class="ik" aria-label="Geräte" title="Geräte">📡 Geräte</button><button type="button" id="hilfeBtn" class="ik" aria-label="Hilfe" title="Hilfe">❓ Hilfe</button><details class="konto" id="konto"><summary aria-label="Konto" title="Konto"><svg class="ic" aria-hidden="true"><use href="#i-konto"/></svg></summary><div class="konto-menu"><button type="button" id="einstBtn">⚙ Einstellungen</button><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><span class="versionskurz" data-version-kurz></span></div></details></div>
-      <button class="btn klein nur-rahmen" id="normalBtn" title="Der Rahmen zeigt wieder das normale Programm">Normal</button>
       <div class="laeuft nur-rahmen" id="laeuft" aria-live="polite">
         <select id="rahmenWahl" class="reihe-sel versteckt" aria-label="Rahmen wählen"></select>
         <div class="laeuft-text">
@@ -491,6 +490,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
           <select id="rahmenReihe" class="reihe-sel versteckt" aria-label="Reihenfolge auf dem Rahmen"><option value="alt">Zeitlich: ältestes zuerst</option><option value="neu">Zeitlich: neuestes zuerst</option><option value="zufall">Zufällig</option></select>
         </div>
         <button class="btn klein zurueck versteckt" id="zurueckBtn"></button>
+        <button class="btn klein versteckt" id="normalBtn" title="Der Rahmen zeigt wieder das normale Programm">■ Show beenden</button>
       </div>
       <div class="tvchip versteckt nur-tv" id="tvChip"><button class="tvchip-text" id="tvChipOpen" aria-label="Fernbedienung für den Fernseher öffnen"></button><button class="btn klein gefahr" id="tvChipStopp" aria-label="Fernseher stoppen">⏹ Stopp</button></div>
     </div>
@@ -669,6 +669,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
               <div class="tvknoepfe versteckt" id="gfIpZeile" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfIpNehmen" type="button"></button></div>
               <label class="tvfeld"><span>Passwort</span> <input id="gfFullyPw" type="password" autocomplete="new-password" aria-label="Passwort"></label>
               <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfFullyTest" type="button">Verbindung testen</button></div>
+              <p class="tipp versteckt" id="gfFullyErg" role="status"></p>
             </div>
           </details>
         </div>
@@ -1507,6 +1508,7 @@ async function statusLaden() {
     $("#laeuftMeta").textContent = d.laeuft ? `${d.anzahl} Fotos${d.seit ? " · seit " + new Date(d.seit).toLocaleTimeString(RW_LOCALE, { hour: "2-digit", minute: "2-digit" }) + " Uhr" : ""}` : "Dauer-Diashow, keine Wunsch-Show aktiv";
     const rr = $("#rahmenReihe"); rr.classList.toggle("versteckt", !d.laeuft); if (d.reihenfolge && document.activeElement !== rr) rr.value = d.reihenfolge;
     zurueckZeigen(d.zurueck);
+    $("#normalBtn").classList.toggle("versteckt", !d.laeuft);
   } catch (e) { $("#laeuftName").textContent = ""; }
 }
 $("#zurueckBtn").addEventListener("click", async () => {
@@ -1910,7 +1912,9 @@ $("#gfLoeschen").addEventListener("click", async () => {
   try { const r = await api("verwaltung/geraete/" + encodeURIComponent(gfId), { method: "DELETE" }); $("#geraetDialog").classList.add("versteckt"); toast(r.nachricht); await geraeteNeuLesen(); } catch (e) { fehler(e); }
 });
 $("#gfFullyTest").addEventListener("click", async () => {
-  try { const r = await api("verwaltung/fully-test", { method: "POST", body: JSON.stringify({ id: gfId, fully_host: $("#gfFullyHost").value.trim(), fully_pw: $("#gfFullyPw").value }) }); toast(r.nachricht); } catch (e) { fehler(e); }
+  const erg = $("#gfFullyErg"); erg.classList.remove("versteckt"); erg.style.color = ""; erg.textContent = RW_T("Teste …");
+  try { const r = await api("verwaltung/fully-test", { method: "POST", body: JSON.stringify({ id: gfId, fully_host: $("#gfFullyHost").value.trim(), fully_pw: $("#gfFullyPw").value }) }); erg.textContent = "✓ " + r.nachricht; erg.style.color = "var(--ok, #3ecf8e)"; }
+  catch (e) { erg.textContent = "✗ " + e.message; erg.style.color = "var(--danger, #f87171)"; }
 });
 $("#geraeteZu").addEventListener("click", () => { $("#geraeteDialog").classList.add("versteckt"); clearInterval(geraeteTimer); });
 $("#koppelBtn").addEventListener("click", async () => {

@@ -1,6 +1,11 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.10.1]
+### Behoben
+- Im Banner gibt es wieder einen Knopf **„■ Show beenden“** (zurück ins Dauerprogramm), solange eine Show läuft – er war beim neuen Aussehen versehentlich versteckt, sodass sich eine laufende Show nur mit „Zurück zu …“ beenden ließ.
+- „Verbindung testen“ (Fully): Die Meldung lag hinter dem Dialog und war unsichtbar; sie steht jetzt auch direkt unter dem Knopf. Falsches Passwort und nicht erreichbares Tablet werden klar unterschieden (vorher hätte ein falsches Passwort „Verbunden“ gezeigt).
+
 ## [2.10.0]
 ### Neu
 - **Assistent „Gerät hinzufügen“:** Name und Art eingeben, dann zeigt die App Adresse und QR-Code zum Verbinden und wartet live, bis sich das Tablet/der Fernseher meldet („✓ Verbunden“). Den Verbindungs-Link gibt es auch später im ⚙ des Geräts. Der Kopplungs-Code bleibt als Alternative.

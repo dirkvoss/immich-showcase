@@ -174,3 +174,20 @@ def test_ohne_fully_meldet_das_geraet_nichts_selbst(app_laden):
     c = client()
     c.get("/api/tv/abfrage?ziel=rahmen&seq=-1")
     assert [x for x in c.get("/api/verwaltung").json()["geraete"] if x["id"] == "rahmen"][0]["selbst"] is False
+
+
+def test_fully_test_meldet_passwort_und_erreichbarkeit(app_laden, monkeypatch):
+    w, client, _ = app_laden(**LAN)
+    c = client()
+    monkeypatch.setattr(w, "fully_get", lambda url, timeout=6: '{"status":"Error","statustext":"Please login"}')
+    r = c.post("/api/verwaltung/fully-test", json={"id": "rahmen", "fully_host": "tablet.lan", "fully_pw": "falsch"}, headers=H)
+    assert r.status_code == 401 and "Passwort stimmt nicht" in r.json()["nachricht"]
+    monkeypatch.setattr(w, "fully_get", lambda url, timeout=6: '{"batteryLevel": 71, "isPlugged": true}')
+    r = c.post("/api/verwaltung/fully-test", json={"id": "rahmen", "fully_host": "tablet.lan", "fully_pw": "ok"}, headers=H).json()
+    assert r["ok"] and r["akku"] == 71 and "71" in r["nachricht"]
+
+    def kaputt(url, timeout=6):
+        raise OSError("timed out")
+    monkeypatch.setattr(w, "fully_get", kaputt)
+    r = c.post("/api/verwaltung/fully-test", json={"id": "rahmen", "fully_host": "tablet.lan", "fully_pw": "x"}, headers=H)
+    assert r.status_code == 502 and "nicht erreichbar" in r.json()["nachricht"]

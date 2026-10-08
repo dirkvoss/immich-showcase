@@ -2501,8 +2501,12 @@ def fully_test(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
         raise HTTPException(400, "Bitte die Adresse des Tablets eintragen")
     try:
         info = json.loads(fully_get(f"http://{host if ':' in host else host + ':2323'}/?" + urllib.parse.urlencode({"cmd": "deviceInfo", "password": pw, "type": "json"})))
-    except Exception as e:  # noqa: BLE001
-        raise HTTPException(502, f"Fully Kiosk antwortet nicht: {e}")
+    except (OSError, ValueError) as e:
+        raise HTTPException(502, "Das Tablet ist von diesem Server aus nicht erreichbar (Adresse falsch, Tablet aus, „Remote Admin“ in Fully nicht eingeschaltet oder eine Firewall/ein anderes Netz dazwischen). "
+                                 f"Technisch: {e}")
+    if str(info.get("status", "")).lower() == "error":
+        raise HTTPException(401 if "login" in str(info.get("statustext", "")).lower() else 502,
+                            "Das Passwort stimmt nicht – es ist das „Remote Admin Password“ aus den Fully-Einstellungen." if "login" in str(info.get("statustext", "")).lower() else f"Fully meldet: {info.get('statustext')}")
     return {"ok": True, "akku": info.get("batteryLevel"), "laedt": bool(info.get("isPlugged")), "nachricht": f"Verbunden – Akku {info.get('batteryLevel')} %"}
 
 
