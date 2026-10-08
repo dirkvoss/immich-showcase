@@ -454,7 +454,18 @@
   "Nichts gefunden.": "Niets gevonden.",
   "Teste …": "Testen …",
   "■ Show beenden": "■ Show beëindigen",
-  "Gespeichert. Adresse und Passwort wurden nicht übernommen – das Tablet steuert sich bereits selbst.": "Opgeslagen. Adres en wachtwoord zijn niet bewaard – de tablet regelt zichzelf al."
+  "Gespeichert. Adresse und Passwort wurden nicht übernommen – das Tablet steuert sich bereits selbst.": "Opgeslagen. Adres en wachtwoord zijn niet bewaard – de tablet regelt zichzelf al.",
+  "Adresse des Servers": "Serveradres",
+  "Diese Adresse funktioniert nur auf diesem Rechner. Trage oben die Adresse des Servers im Heimnetz ein, zum Beispiel http://192.168.1.20:8090.": "Dit adres werkt alleen op deze computer. Voer hierboven het adres van de server in het thuisnetwerk in, bijvoorbeeld http://192.168.1.20:8090.",
+  "Als Standard speichern": "Als standaard opslaan",
+  "Am Fernseher mit Fernbedienung genügt im Browser die kurze Adresse": "Op een tv met afstandsbediening volstaat in de browser het korte adres:",
+  "er findet seine Seite selbst und zeigt einen Code zum Koppeln (App → Geräte).": "hij vindt zijn pagina zelf en toont een code om te koppelen (app → Apparaten).",
+  "Direkt am Fernseher öffnen (Android TV, Shield, Fire TV)": "Rechtstreeks op de tv openen (Android TV, Shield, Fire TV)",
+  "Kein Tippen mit der Fernbedienung: Der Server öffnet die Seite selbst. Am Fernseher muss in den Entwickleroptionen das „Netzwerk-Debugging“ (ADB) eingeschaltet sein, und der Server muss den Fernseher im Netz erreichen. Beim ersten Mal bestätigst du am Fernseher mit „Immer erlauben“.": "Niet typen met de afstandsbediening: de server opent de pagina zelf. Op de tv moet in de ontwikkelaarsopties ‘netwerk-debugging’ (ADB) aanstaan en de server moet de tv in het netwerk kunnen bereiken. De eerste keer bevestig je op de tv met ‘Altijd toestaan’.",
+  "Adresse des Fernsehers": "Adres van de tv",
+  "Seite am Fernseher öffnen": "Pagina op de tv openen",
+  "Für Fortgeschrittene: per ADB direkt am Fernseher öffnen": "Geavanceerd: rechtstreeks op de tv openen via ADB",
+  "Nur für Android TV, Shield und Fire TV – und nur, wenn dort die Entwickler-Funktion „Netzwerk-Debugging“ (ADB) eingeschaltet ist, was bei den meisten Geräten nicht der Fall ist. Dann öffnet der Server die Seite selbst, ohne Tippen mit der Fernbedienung. Der Server muss den Fernseher im Netz erreichen; beim ersten Mal bestätigst du am Fernseher „Immer erlauben“. Für alle anderen Fernseher gilt: einfach die kurze Adresse oben im Browser eingeben.": "Alleen voor Android TV, Shield en Fire TV – en alleen als de ontwikkelaarsfunctie ‘netwerk-debugging’ (ADB) daar aanstaat, wat bij de meeste toestellen niet zo is. Dan opent de server de pagina zelf, zonder typen met de afstandsbediening. De server moet de tv in het netwerk kunnen bereiken; de eerste keer bevestig je op de tv ‘Altijd toestaan’. Voor alle andere tv’s: voer gewoon het korte adres hierboven in de browser in."
  },
  "muster": [
   [

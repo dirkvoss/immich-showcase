@@ -624,7 +624,18 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
     <div id="assiSchritt2" class="versteckt">
       <p class="tipp">Öffne am Tablet oder Fernseher diese Adresse im Browser – oder scanne den QR-Code mit der Kamera des Tablets.</p>
       <div id="assiQr"></div>
+      <label class="tvfeld"><span>Adresse des Servers</span> <input id="assiBasis" type="text" autocomplete="off" aria-label="Adresse des Servers" placeholder="http://192.168.1.20:8090"></label>
+      <p class="tipp versteckt" id="assiLocalhost">Diese Adresse funktioniert nur auf diesem Rechner. Trage oben die Adresse des Servers im Heimnetz ein, zum Beispiel http://192.168.1.20:8090.</p>
+      <div class="tvknoepfe versteckt" id="assiBasisZeile" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="assiBasisSpeichern" type="button">Als Standard speichern</button></div>
       <div class="assi-adr"><code id="assiAdresse"></code></div>
+      <p class="tipp" id="assiKurz"></p>
+      <details class="gfdetails" id="assiDirekt">
+        <summary>Für Fortgeschrittene: per ADB direkt am Fernseher öffnen</summary>
+        <p class="tipp">Nur für Android TV, Shield und Fire TV – und nur, wenn dort die Entwickler-Funktion „Netzwerk-Debugging“ (ADB) eingeschaltet ist, was bei den meisten Geräten nicht der Fall ist. Dann öffnet der Server die Seite selbst, ohne Tippen mit der Fernbedienung. Der Server muss den Fernseher im Netz erreichen; beim ersten Mal bestätigst du am Fernseher „Immer erlauben“. Für alle anderen Fernseher gilt: einfach die kurze Adresse oben im Browser eingeben.</p>
+        <label class="tvfeld"><span>Adresse des Fernsehers</span> <input id="assiAdb" type="text" autocomplete="off" aria-label="Adresse des Fernsehers" placeholder="192.168.1.30"></label>
+        <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="assiOeffnen" type="button">Seite am Fernseher öffnen</button></div>
+        <p class="tipp versteckt" id="assiOeffnenErg" role="status"></p>
+      </details>
       <p class="assi-status" id="assiStatus">Warte auf das Gerät …</p>
       <p class="tipp">Alternativ: Am Gerät die Seite /tv/ öffnen und den Code unter „Gerät koppeln“ eingeben.</p>
       <div class="tvknoepfe"><button class="btn" id="assiEinst" type="button">Einstellungen</button><button class="btn primaer" id="assiZu" type="button">Fertig</button></div>
@@ -637,6 +648,12 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
     <div class="gf">
       <div class="tvfeld versteckt" id="gfArtZeile"><span>Art</span>
         <select id="gfArt" aria-label="Art"><option value="rahmen">Bilderrahmen</option><option value="tv">Fernseher</option></select></div>
+      <details class="gfdetails versteckt" id="gfDirekt">
+        <summary>Für Fortgeschrittene: per ADB direkt am Fernseher öffnen</summary>
+        <label class="tvfeld"><span>Adresse des Fernsehers</span> <input id="gfAdb" type="text" autocomplete="off" aria-label="Adresse des Fernsehers" placeholder="192.168.1.30"></label>
+        <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfOeffnen" type="button">Seite am Fernseher öffnen</button></div>
+        <p class="tipp versteckt" id="gfOeffnenErg" role="status"></p>
+      </details>
       <div class="tvknoepfe versteckt" id="gfVerbindenZeile" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfVerbinden" type="button">Verbindungs-Link und QR-Code anzeigen</button></div>
       <div class="tvfeld versteckt" id="gfKennungZeile"><span>Kennung (z. B. für Home Assistant)</span><code id="gfKennung"></code></div>
       <label class="tvfeld"><span>Name</span> <input id="gfName" type="text" maxlength="60" autocomplete="off" aria-label="Name"></label>
@@ -1719,6 +1736,7 @@ function tabletBereich(g) {                                // zwei Wege zur Tabl
   $("#gfIpZeile").classList.toggle("versteckt", !ip); b.dataset.ip = ip; b.textContent = ip ? RW_T("Erkannte Adresse übernehmen") + ": " + ip : "";
   $("#gfTablet").open = selbst || hat;
 }
+$("#gfOeffnen").addEventListener("click", () => seiteOeffnen(gfId, $("#gfAdb").value.trim(), tvBasis(), $("#gfOeffnenErg"), $("#gfOeffnen")));
 $("#gfFullyAn").addEventListener("click", () => { $("#gfFullyFelder").classList.remove("versteckt"); $("#gfFullyAnzeigen").classList.add("versteckt"); });
 $("#gfIpNehmen").addEventListener("click", e => { $("#gfFullyHost").value = e.currentTarget.dataset.ip; $("#gfIpZeile").classList.add("versteckt"); });
 async function geraetDialogOeffnen(id) {
@@ -1737,6 +1755,7 @@ async function geraetDialogOeffnen(id) {
   if (!g.nacht) { $("#gfNachtVon").value = ""; $("#gfNachtBis").value = ""; }
   $("#gfQuellen").innerHTML = ""; for (const q of quellenLesen(g.quellen)) $("#gfQuellen").append(quelleZeile(q));
   $("#gfPlan").innerHTML = ""; for (const f of planLesen(g.zeitplan)) $("#gfPlan").append(planKarte(f));
+  $("#gfDirekt").classList.toggle("versteckt", !id); $("#gfAdb").value = g.adb_host || ""; $("#gfDirekt").open = !!g.adb_host; $("#gfOeffnenErg").classList.add("versteckt");
   $("#gfKennungZeile").classList.toggle("versteckt", !id); $("#gfVerbindenZeile").classList.toggle("versteckt", !id); $("#gfKennung").textContent = id || "";
   $("#gfFullyHost").value = g.fully_host || ""; $("#gfFullyPw").value = "";
   tabletBereich(g);
@@ -1820,15 +1839,25 @@ $("#eKalWeg").addEventListener("click", async () => { try { const r = await api(
 $("#ePoWeg").addEventListener("click", async () => { try { const r = await api("einstellungen", { method: "PUT", body: JSON.stringify({ pushover: null }) }); einstFuellen(r.einstellungen); } catch (e) { fehler(e); } });
 
 let assiTimer = 0, assiId = null;
-function tvBasis() {
-  const u = (konfig.tv_url || "").trim(); if (!u) return location.origin;
+function basisNormal(u) {
+  u = (u || "").trim().replace(/\/+$/, ""); if (!u) return "";
   return /^https?:\/\//.test(u) ? u : (/^[\d.]+(:\d+)?(\/|$)/.test(u) ? "http://" : "https://") + u;
 }
+function tvBasis() { return basisNormal(konfig.tv_url) || location.origin; }
+function assiLink() {
+  const basis = basisNormal($("#assiBasis").value) || tvBasis(), adr = basis + "/tv/?ziel=" + encodeURIComponent(assiId);
+  $("#assiAdresse").textContent = adr;
+  let kurz = ""; try { const u = new URL(basis); kurz = u.host; } catch (e) {}
+  $("#assiKurz").textContent = kurz ? RW_T("Am Fernseher mit Fernbedienung genügt im Browser die kurze Adresse") + " " + kurz + " – " + RW_T("er findet seine Seite selbst und zeigt einen Code zum Koppeln (App → Geräte).") : "";
+  try { const qr = qrcode(0, "M"); qr.addData(adr); qr.make(); $("#assiQr").innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true }); $("#assiQr").style.display = ""; } catch (e) { $("#assiQr").innerHTML = ""; $("#assiQr").style.display = "none"; }
+  let host = ""; try { host = new URL(basis).hostname; } catch (e) {}
+  $("#assiLocalhost").classList.toggle("versteckt", !/^(localhost|127\.|\[?::1\]?$|0\.0\.0\.0)/.test(host));
+  $("#assiBasisZeile").classList.toggle("versteckt", basis === tvBasis() && !!konfig.tv_url);
+}
 function assiVerbinden(id) {
-  assiId = id; const adr = tvBasis() + "/tv/?ziel=" + encodeURIComponent(id);
+  assiId = id;
   $("#assiTitel").textContent = RW_T("Gerät verbinden"); $("#assiSchritt1").classList.add("versteckt"); $("#assiSchritt2").classList.remove("versteckt");
-  $("#assiAdresse").textContent = adr; $("#assiQr").innerHTML = "";
-  try { const qr = qrcode(0, "M"); qr.addData(adr); qr.make(); $("#assiQr").innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true }); $("#assiQr").style.display = ""; } catch (e) { $("#assiQr").style.display = "none"; }
+  $("#assiBasis").value = tvBasis(); assiLink();
   const st = $("#assiStatus"); st.textContent = RW_T("Warte auf das Gerät …"); st.classList.remove("ok");
   $("#assiDialog").classList.remove("versteckt"); clearInterval(assiTimer);
   const pruefen = async () => {
@@ -1845,6 +1874,17 @@ $("#geraetNeu").addEventListener("click", assiOeffnen);
 $("#assiAbbrechen").addEventListener("click", () => { $("#assiDialog").classList.add("versteckt"); });
 $("#assiZu").addEventListener("click", assiSchliessen);
 $("#assiEinst").addEventListener("click", () => { const id = assiId; assiSchliessen(); geraetDialogOeffnen(id); });
+$("#assiBasis").addEventListener("input", assiLink);
+async function seiteOeffnen(id, host, basis, erg, knopf) {
+  erg.classList.remove("versteckt"); erg.style.color = ""; erg.textContent = RW_T("Teste …"); knopf.disabled = true;
+  try { const r = await api("verwaltung/oeffnen", { method: "POST", body: JSON.stringify({ id, adb_host: host, basis }) }); erg.textContent = "✓ " + r.nachricht; erg.style.color = "var(--ok, #3ecf8e)"; }
+  catch (e) { erg.textContent = "✗ " + e.message; erg.style.color = "var(--danger, #f87171)"; }
+  knopf.disabled = false;
+}
+$("#assiOeffnen").addEventListener("click", () => seiteOeffnen(assiId, $("#assiAdb").value.trim(), basisNormal($("#assiBasis").value) || tvBasis(), $("#assiOeffnenErg"), $("#assiOeffnen")));
+$("#assiBasisSpeichern").addEventListener("click", async () => {
+  try { await api("einstellungen", { method: "PUT", body: JSON.stringify({ tv_url: basisNormal($("#assiBasis").value) }) }); await konfigLaden(); assiLink(); toast(RW_T("Gespeichert.")); } catch (e) { fehler(e); }
+});
 $("#assiName").addEventListener("keydown", e => { if (e.key === "Enter") $("#assiWeiter").click(); });
 $("#assiWeiter").addEventListener("click", async () => {
   const name = $("#assiName").value.trim(); if (!name) { toast(RW_T("Bitte einen Namen eingeben."), true); $("#assiName").focus(); return; }
@@ -1893,6 +1933,7 @@ $("#gfSpeichern").addEventListener("click", async () => {
   const von = $("#gfNachtVon").value, bis = $("#gfNachtBis").value;
   if (istRahmen && !!von !== !!bis) { toast(RW_T("Nachtruhe: bitte „von“ und „bis“ ausfüllen oder beide leer lassen."), true); return; }
   const daten = { name, fuellung: $("#gfFuellung").value };
+  if (gfId) daten.adb_host = $("#gfAdb").value.trim();
   if (!gfId) daten.art = $("#gfArt").value;
   if (istRahmen) {
     Object.assign(daten, { sek: $("#gfSek").value, anzeige: [$("#gfDatum").checked && "datum", $("#gfZeit").checked && "zeit", $("#gfOrt").checked && "ort"].filter(Boolean), nacht: von && bis ? von + "-" + bis : "",

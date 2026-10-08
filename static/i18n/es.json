@@ -454,7 +454,18 @@
   "Nichts gefunden.": "No se encontró nada.",
   "Teste …": "Probando …",
   "■ Show beenden": "■ Terminar show",
-  "Gespeichert. Adresse und Passwort wurden nicht übernommen – das Tablet steuert sich bereits selbst.": "Guardado. No se conservaron la dirección ni la contraseña: la tableta ya se controla sola."
+  "Gespeichert. Adresse und Passwort wurden nicht übernommen – das Tablet steuert sich bereits selbst.": "Guardado. No se conservaron la dirección ni la contraseña: la tableta ya se controla sola.",
+  "Adresse des Servers": "Dirección del servidor",
+  "Diese Adresse funktioniert nur auf diesem Rechner. Trage oben die Adresse des Servers im Heimnetz ein, zum Beispiel http://192.168.1.20:8090.": "Esta dirección solo funciona en este equipo. Introduce arriba la dirección del servidor en la red doméstica, por ejemplo http://192.168.1.20:8090.",
+  "Als Standard speichern": "Guardar como predeterminada",
+  "Am Fernseher mit Fernbedienung genügt im Browser die kurze Adresse": "En un televisor con mando a distancia basta con la dirección corta en el navegador:",
+  "er findet seine Seite selbst und zeigt einen Code zum Koppeln (App → Geräte).": "encuentra su página solo y muestra un código para emparejar (app → Dispositivos).",
+  "Direkt am Fernseher öffnen (Android TV, Shield, Fire TV)": "Abrir directamente en el televisor (Android TV, Shield, Fire TV)",
+  "Kein Tippen mit der Fernbedienung: Der Server öffnet die Seite selbst. Am Fernseher muss in den Entwickleroptionen das „Netzwerk-Debugging“ (ADB) eingeschaltet sein, und der Server muss den Fernseher im Netz erreichen. Beim ersten Mal bestätigst du am Fernseher mit „Immer erlauben“.": "Sin teclear con el mando: el servidor abre la página por sí mismo. En el televisor debe estar activado el «depurado de red» (ADB) en las opciones de desarrollador, y el servidor debe poder alcanzar el televisor en la red. La primera vez confirma en el televisor con «Permitir siempre».",
+  "Adresse des Fernsehers": "Dirección del televisor",
+  "Seite am Fernseher öffnen": "Abrir la página en el televisor",
+  "Für Fortgeschrittene: per ADB direkt am Fernseher öffnen": "Avanzado: abrir directamente en el televisor mediante ADB",
+  "Nur für Android TV, Shield und Fire TV – und nur, wenn dort die Entwickler-Funktion „Netzwerk-Debugging“ (ADB) eingeschaltet ist, was bei den meisten Geräten nicht der Fall ist. Dann öffnet der Server die Seite selbst, ohne Tippen mit der Fernbedienung. Der Server muss den Fernseher im Netz erreichen; beim ersten Mal bestätigst du am Fernseher „Immer erlauben“. Für alle anderen Fernseher gilt: einfach die kurze Adresse oben im Browser eingeben.": "Solo para Android TV, Shield y Fire TV, y solo si ahí está activada la función de desarrollador «depurado de red» (ADB), lo que no ocurre en la mayoría de los aparatos. Entonces el servidor abre la página por sí mismo, sin teclear con el mando. El servidor debe poder alcanzar el televisor en la red; la primera vez confirmas «Permitir siempre» en el televisor. Para el resto de televisores basta con introducir la dirección corta de arriba en el navegador."
  },
  "muster": [
   [

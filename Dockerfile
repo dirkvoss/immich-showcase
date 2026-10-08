@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 RAHMEN_HELFER_DIR=/app \
     RAHMEN_WEB_PIN_FILE=/data/pin RAHMEN_WEB_SECRET_FILE=/data/secret RAHMEN_WEB_AUTH_STATE=/data/auth.json \
     RAHMEN_WEB_SHOWS_FILE=/data/shows.json RAHMEN_WEB_BENUTZER_FILE=/data/benutzer.json RAHMEN_WEB_PUSHOVER_FILE=/data/pushover \
     RAHMEN_STATE_DIR=/data/state
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg adb \
  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY requirements.txt .

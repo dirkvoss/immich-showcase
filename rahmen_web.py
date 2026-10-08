@@ -52,7 +52,7 @@ sys.path.insert(0, os.environ.get("RAHMEN_HELFER_DIR", "/opt/bilderrahmen"))
 import rahmen_helfer as H  # noqa: E402
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response  # noqa: E402
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse  # noqa: E402
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, StreamingResponse  # noqa: E402
 from fastapi.staticfiles import StaticFiles  # noqa: E402
 
 PIN_FILE = os.environ.get("RAHMEN_WEB_PIN_FILE", "/root/.rahmen_web_pin")
@@ -2378,7 +2378,7 @@ def geraet_ansicht(z, e):
     t = TV.get(z) or {}
     return {"selbst": meldet_selbst(z), "ip": t.get("ip") or "", "akku": (FULLY_STATE.get(z) or {}).get("akku"), "id": z, "art": e["art"], "name": e["name"], "sek": e.get("sek"), "fuellung": e.get("fuellung") or "", "anzeige": e.get("anzeige") or [],
             "nacht": e.get("nacht") or "", "quellen": e.get("quellen") or "", "zeitplan": e.get("zeitplan") or "",
-            "fully_host": e.get("fully_host") or "", "fully_pw_gesetzt": bool(e.get("fully_pw"))}
+            "fully_host": e.get("fully_host") or "", "fully_pw_gesetzt": bool(e.get("fully_pw")), "adb_host": e.get("adb_host") or ""}
 
 
 def geraet_kennung(name):
@@ -2441,6 +2441,11 @@ def geraet_felder(daten, art):
             weg += ["fully_host", "fully_pw"]
     if daten.get("fully_pw"):
         setzen["fully_pw"] = str(daten["fully_pw"])[:200]
+    if "adb_host" in daten:
+        v = str(daten["adb_host"] or "").strip()
+        if v and not FULLY_RE.fullmatch(v):
+            raise HTTPException(400, "Adresse des Fernsehers bitte als IP oder Name, optional mit :Port")
+        (setzen.__setitem__("adb_host", v) if v else weg.append("adb_host"))
     return setzen, weg
 
 
@@ -2519,6 +2524,64 @@ def geraet_loeschen(z: str, _=Depends(anmeldung), __=Depends(csrf)):
         geraet_aufraeumen(z)
     H.log.info("Geraet geloescht: %s '%s'", z, name)
     return {"ok": True, "nachricht": f"„{name}“ wurde entfernt. Gespeicherte Shows bleiben erhalten."}
+
+
+# --------------------------------------------------------------------------- Seite direkt am Fernseher oeffnen (Android TV, Shield, Fire TV per ADB)
+ADB_HOME = os.path.join(os.path.dirname(SHOWS_FILE), "adb-home")        # hier merkt sich der Server seinen Schluessel; der Fernseher fragt nur einmal um Erlaubnis
+ADB_URL_RE = re.compile(r"https?://[A-Za-z0-9.:/_?=&%-]{3,300}")
+
+
+def adb(args, timeout=10):
+    os.makedirs(ADB_HOME, exist_ok=True)
+    env = {**os.environ, "HOME": ADB_HOME, "ANDROID_USER_HOME": os.path.join(ADB_HOME, ".android"), "ADB_VENDOR_KEYS": ""}
+    try:
+        r = subprocess.run(["adb"] + args, capture_output=True, text=True, timeout=timeout, env=env)
+    except FileNotFoundError:
+        raise HTTPException(501, "Auf diesem Server ist das Programm „adb“ nicht installiert (nur im Docker-Image enthalten).")
+    except subprocess.TimeoutExpired:
+        return "timeout"
+    return (r.stdout + r.stderr).strip()
+
+
+def fernseher_oeffnen(z, host, basis):
+    """Oeffnet die Fernseher-Seite per ADB im Browser eines Android-TV-Geraets. Beim ersten Mal fragt der Fernseher um Erlaubnis."""
+    adr = host if ":" in host else host + ":5555"
+    url = f"{basis.rstrip('/')}/tv/?ziel={z}"
+    if not ADB_URL_RE.fullmatch(url):
+        raise HTTPException(400, "Adresse der Fernseher-Seite ungültig")
+    out = adb(["connect", adr], 8).lower()
+    if not ("connected to" in out or "already connected" in out):
+        raise HTTPException(502, "Der Fernseher ist von diesem Server aus nicht erreichbar. Schalte am Fernseher unter Entwickleroptionen das „Netzwerk-Debugging“ (ADB) ein und prüfe die Adresse. "
+                                 "Der Server und der Fernseher müssen im selben Netz sein (nicht durch eine Firewall getrennt).")
+    out = adb(["-s", adr, "shell", f"am start -a android.intent.action.VIEW -d '{url}'"], 10)
+    low = out.lower()
+    if "unauthorized" in low or "device offline" in low or "timeout" in low:
+        return {"ok": True, "wartet": True, "nachricht": "Der Fernseher fragt jetzt, ob dieser Server zugreifen darf. Bitte mit der Fernbedienung „Immer erlauben“ bestätigen und dann noch einmal tippen."}
+    if "unable to resolve" in low or "error" in low:
+        raise HTTPException(502, "Auf dem Fernseher ist kein Browser installiert, der Adressen öffnen kann. Installiere einen Browser (z. B. Puffin TV oder Silk/Firefox) und versuche es erneut.")
+    return {"ok": True, "wartet": False, "nachricht": "Die Seite wurde am Fernseher geöffnet. Er zeigt gleich einen Code zum Koppeln oder startet direkt."}
+
+
+@app.post("/api/verwaltung/oeffnen")
+def fernseher_seite_oeffnen(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
+    z = str(daten.get("id", ""))
+    if z not in GERAETE:
+        raise HTTPException(404, "Gerät nicht gefunden")
+    host = str(daten.get("adb_host") or GERAETE[z].get("adb_host") or "").strip()
+    if not FULLY_RE.fullmatch(host):
+        raise HTTPException(400, "Bitte die Adresse des Fernsehers eintragen (IP oder Name)")
+    basis = str(daten.get("basis") or tv_url() or "").strip()
+    if basis and not re.match(r"^https?://", basis):
+        basis = ("http://" if re.match(r"^[\d.]+(:\d+)?(/|$)", basis) else "https://") + basis
+    if not basis:
+        raise HTTPException(400, "Bitte zuerst die Adresse des Servers eintragen (Einstellungen)")
+    r = fernseher_oeffnen(z, host, basis)
+    if GERAETE[z].get("adb_host") != host:                    # beim ersten Erfolg die Adresse merken
+        with GERAETE_LOCK:
+            g = {k: dict(v) for k, v in GERAETE.items()}
+            g[z]["adb_host"] = host
+            geraete_aendern(g)
+    return r
 
 
 @app.post("/api/verwaltung/fully-test")
@@ -3248,6 +3311,15 @@ async def kein_cache(request: Request, call_next):
 
 
 if os.path.isdir(STATIC_DIR):
+    TV_BROWSER_RE = re.compile(r"NetCast|Web0S|webOS|SMART-TV|SmartTV|Tizen|CrKey|BRAVIA|HbbTV|VIDAA|Android TV|\bAFT[A-Z0-9]{1,4}\b|Roku", re.I)
+
+    @app.get("/", include_in_schema=False)
+    def startseite(request: Request, ui: int = 0):
+        """Fernseher-Browser (LG, Samsung, Android TV, Fire TV ...) landen direkt auf der Fernseher-Seite: am Fernseher genuegt die kurze Adresse des Servers. Mit ?ui=1 bleibt die App."""
+        if not ui and TV_BROWSER_RE.search(request.headers.get("user-agent", "")):
+            return RedirectResponse("/tv/", status_code=302)
+        return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+
     app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
 
 

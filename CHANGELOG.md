@@ -1,6 +1,13 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.11.0]
+### Neu
+- **Fernseher ohne lange Adresse:** Fernseher-Browser (LG, Samsung, Android TV, Fire TV, Chromecast …) werden von der Startadresse des Servers automatisch auf die Fernseher-Seite geleitet (`/?ui=1` zeigt die App). Am Fernseher genügt die kurze Adresse, z. B. `192.168.1.20:8090`; die Rolle wird per Code vom Handy zugewiesen.
+- `./install.sh --port 80`: Immich Showcase auf Port 80 – dann genügt am Fernseher die reine IP. `install.sh` trägt die erkannte Adresse (`RAHMEN_WEB_TV_URL`) selbst in die `.env` ein.
+- Der Assistent „Gerät hinzufügen“ zeigt die **Adresse des Servers als bearbeitbares Feld** (mit „Als Standard speichern“ und Hinweis bei `localhost`) und die kurze Fernseher-Adresse.
+- **Für Fortgeschrittene – Seite per ADB direkt am Fernseher öffnen (nur Android TV, Shield, Fire TV; die Entwickler-Funktion ist bei den meisten Geräten aus):** Der Server öffnet die Fernseher-Seite per ADB im Browser des Fernsehers – ohne Tippen und ohne Home Assistant. Voraussetzungen: „Netzwerk-Debugging“ am Fernseher und Netzverbindung vom Server zum Fernseher; beim ersten Mal bestätigt man am Fernseher einmal „Immer erlauben“. Das Docker-Image enthält dafür `adb`.
+
 ## [2.10.3]
 ### Geändert
 - Meldet sich ein Tablet selbst über die Fully-Schnittstelle, werden **Adresse und Passwort der Fully-Fernbedienung automatisch verworfen** (beim Speichern, mit Hinweis) und nicht mehr abgefragt – kein Dauer-Versuch mehr, ein Tablet zu erreichen, das der Server (z. B. aus der DMZ) gar nicht erreichen darf. Der Knopf „Bildschirm aus/an“ per Fernsteuerung entfällt dann in der Geräteliste.
