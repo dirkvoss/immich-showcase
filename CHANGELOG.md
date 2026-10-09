@@ -1,6 +1,10 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.13.2]
+### Behoben
+- **Hochladen aus der iPhone-Mediathek:** Fotos in Originalgröße (HEIC) wurden von Immich schon beim Senden abgelehnt und der Fehler als „nicht erreichbar“ gemeldet. Die Dateiauswahl bietet jetzt JPEG, PNG und WebP an, dadurch wandelt iOS Mediatheksfotos selbst in JPEG um. Lehnt Immich ein Foto ab, liest der Server jetzt auch dann seine Antwort, wenn die Verbindung beim Senden abbricht, und meldet den echten Grund.
+
 ## [2.13.1]
 ### Geändert
 - Beim Hochladen eigener Fotos protokolliert der Server jetzt genau, was Immich antwortet bzw. woran die Verbindung scheitert (ohne Geheimnisse), und die Fehlermeldung nennt die Fehlerart. Das erleichtert die Suche, wenn ein Upload fehlschlägt.

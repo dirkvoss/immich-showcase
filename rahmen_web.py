@@ -15,6 +15,7 @@ import contextvars
 import datetime
 import hashlib
 import hmac
+import http.client
 import ipaddress
 import json
 import logging
@@ -3368,29 +3369,42 @@ def upload_album_id():
     return zwischenspeicher("upload-album", 600, holen)
 
 
+def upload_senden(pfad, body, kopf):
+    """POST an Immich. Lehnt Immich ein grosses Foto schon waehrend des Sendens ab, schliesst es die Verbindung (Broken pipe) - dann trotzdem seine Antwort lesen."""
+    u = urllib.parse.urlsplit(H.IMMICH + pfad)
+    verbindung = (http.client.HTTPSConnection if u.scheme == "https" else http.client.HTTPConnection)(u.hostname, u.port, timeout=120)
+    try:
+        try:
+            verbindung.request("POST", u.path, body=body, headers=kopf)
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+        r = verbindung.getresponse()
+        return r.status, r.read()
+    finally:
+        verbindung.close()
+
+
 def upload_zu_immich(daten, typ, name, datum_ms):
     wann = datetime.datetime.fromtimestamp((datum_ms or time.time() * 1000) / 1000, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
     sha = hashlib.sha1(daten).hexdigest()
     body, ctype = upload_multipart({"deviceAssetId": "showcase-" + sha, "deviceId": "immich-showcase", "fileCreatedAt": wann, "fileModifiedAt": wann, "isFavorite": "false"},
                                    name, typ, daten)
-    req = urllib.request.Request(H.IMMICH + "/assets", method="POST", data=body, headers={"x-api-key": UPLOAD_KEY, "Content-Type": ctype, "Accept": "application/json", "x-immich-checksum": sha})
     try:
-        with urllib.request.urlopen(req, timeout=120) as r:
-            antwort = json.loads(r.read())
-    except urllib.error.HTTPError as e:
-        try:
-            detail = e.read()[:300].decode("utf-8", "replace")
-        except Exception:
-            detail = ""
-        H.log.warning("Upload: Immich antwortet %s: %s", e.code, schwaerzen(detail))
-        if e.code in (401, 403):
-            raise HTTPException(502, "Der Immich-Schluessel fuer Uploads hat nicht genug Rechte")
-        raise HTTPException(502, f"Immich hat das Foto abgelehnt ({e.code})")
-    except (urllib.error.URLError, TimeoutError, OSError) as e:
-        H.log.warning("Upload: Verbindung zu Immich fehlgeschlagen: %s %s", type(e).__name__, schwaerzen(str(e)))
+        status, antwort = upload_senden("/assets", body, {"x-api-key": UPLOAD_KEY, "Content-Type": ctype, "Content-Length": str(len(body)), "Accept": "application/json", "x-immich-checksum": sha})
+    except (OSError, http.client.HTTPException) as e:
+        H.log.warning("Upload: Verbindung zu Immich fehlgeschlagen (%s, %d KB, %s): %s %s", name, len(daten) // 1024, typ, type(e).__name__, schwaerzen(str(e)))
         raise HTTPException(502, f"Immich ist gerade nicht erreichbar ({type(e).__name__})")
-    except (ValueError, KeyError) as e:
-        H.log.warning("Upload: unerwartete Antwort von Immich: %s %s", type(e).__name__, schwaerzen(str(e)))
+    if status not in (200, 201):
+        detail = antwort[:300].decode("utf-8", "replace")
+        H.log.warning("Upload: Immich antwortet %s (%s, %d KB, %s): %s", status, name, len(daten) // 1024, typ, schwaerzen(detail))
+        if status in (401, 403):
+            raise HTTPException(502, "Der Immich-Schluessel fuer Uploads hat nicht genug Rechte")
+        raise HTTPException(502, f"Immich hat das Foto abgelehnt ({status})")
+    try:
+        antwort = json.loads(antwort)
+        antwort["id"]
+    except (ValueError, KeyError, TypeError) as e:
+        H.log.warning("Upload: unerwartete Antwort von Immich: %s", type(e).__name__)
         raise HTTPException(502, "Immich hat unerwartet geantwortet")
     asset = antwort["id"]
     try:

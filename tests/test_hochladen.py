@@ -78,22 +78,15 @@ def test_zu_viele_uploads_pro_stunde(app_laden, monkeypatch):
     assert [c.put("/api/hochladen", content=JPEG, headers=H).status_code for _ in range(3)] == [200, 200, 429]
 
 
-class _Antwort:
-    def __init__(self, daten): self._d = daten
-    def read(self): return self._d
-    def __enter__(self): return self
-    def __exit__(self, *a): return False
-
-
 def test_weitergabe_an_immich_mit_album_und_vorschau(app_laden, monkeypatch):
     w, c = aktiv(app_laden)
     aufrufe = []
 
-    def urlopen(req, timeout=0):
-        aufrufe.append((req.get_method(), req.full_url.replace("http://immich.test/api", ""), dict((k.lower(), v) for k, v in req.header_items()), req.data))
-        return _Antwort(json.dumps({"id": "11111111-1111-4111-8111-111111111111", "status": "created"}).encode())
+    def senden(pfad, body, kopf):
+        aufrufe.append(("POST", pfad, kopf, body))
+        return 201, json.dumps({"id": "11111111-1111-4111-8111-111111111111", "status": "created"}).encode()
 
-    monkeypatch.setattr(w.urllib.request, "urlopen", urlopen)
+    monkeypatch.setattr(w, "upload_senden", senden)
     monkeypatch.setattr(w, "immich_aufruf", lambda m, p, d=None, **k: aufrufe.append((m, p, k, d)) or ([] if m == "GET" else {"id": "alb"}))
     monkeypatch.setattr(w, "immich_roh", lambda pfad, **k: aufrufe.append(("GET", pfad, {}, None)) or (b"x", "image/jpeg"))
     r = c.put("/api/hochladen", content=JPEG, headers={**H, "X-Dateiname": "a.jpg", "X-Datum": "1700000000000"})
@@ -109,13 +102,41 @@ def test_weitergabe_an_immich_mit_album_und_vorschau(app_laden, monkeypatch):
 
 def test_immich_lehnt_ab_gibt_verstaendliche_meldung(app_laden, monkeypatch):
     w, c = aktiv(app_laden)
-
-    def urlopen(req, timeout=0):
-        raise urllib.error.HTTPError("x", 403, "nein", {}, None)
-
-    monkeypatch.setattr(w.urllib.request, "urlopen", urlopen)
+    monkeypatch.setattr(w, "upload_senden", lambda *a: (403, b'{"message":"Missing required permission: asset.upload"}'))
     r = c.put("/api/hochladen", content=JPEG, headers=H)
     assert r.status_code == 502 and "Rechte" in r.json()["nachricht"]
+    monkeypatch.setattr(w, "upload_senden", lambda *a: (400, b'{"message":"Unsupported file type"}'))
+    r = c.put("/api/hochladen", content=JPEG, headers=H)
+    assert r.status_code == 502 and "(400)" in r.json()["nachricht"]
+
+
+def test_verbindungsfehler_nennt_die_art(app_laden, monkeypatch):
+    w, c = aktiv(app_laden)
+
+    def kaputt(*a):
+        raise ConnectionRefusedError("weg")
+
+    monkeypatch.setattr(w, "upload_senden", kaputt)
+    r = c.put("/api/hochladen", content=JPEG, headers=H)
+    assert r.status_code == 502 and "ConnectionRefusedError" in r.json()["nachricht"]
+
+
+def test_upload_senden_liest_antwort_auch_nach_broken_pipe(app_laden, monkeypatch):
+    """Lehnt Immich ein grosses Foto waehrend des Sendens ab, bricht das Senden ab - die Antwort muss trotzdem gelesen werden."""
+    w, c = aktiv(app_laden)
+
+    class Verbindung:
+        def __init__(self, *a, **k): pass
+        def request(self, *a, **k): raise BrokenPipeError(32, "Broken pipe")
+        def getresponse(self):
+            class R:
+                status = 400
+                def read(self): return b'{"message":"Unsupported file type"}'
+            return R()
+        def close(self): pass
+
+    monkeypatch.setattr(w.http.client, "HTTPConnection", Verbindung)
+    assert w.upload_senden("/assets", b"x", {}) == (400, b'{"message":"Unsupported file type"}')
 
 
 def test_schluessel_wird_in_der_diagnose_geschwaerzt(app_laden):
