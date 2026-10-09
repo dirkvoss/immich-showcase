@@ -29,6 +29,7 @@ struct EinrichtungAnsicht: View {
                 .font(.footnote).frame(maxWidth: .infinity, alignment: .leading).padding(14)
                 .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
 
+                zuletzt
                 serverSuche
 
                 VStack(alignment: .leading, spacing: 8) {
@@ -49,8 +50,17 @@ struct EinrichtungAnsicht: View {
                     Button { scannerOffen = true } label: { Label("QR-Code scannen", systemImage: "qrcode.viewfinder").frame(maxWidth: .infinity).padding(.vertical, 12) }
                         .buttonStyle(.bordered).tint(gold)
                 }
-                Text("Die Adresse und den QR-Code findest du in der Web-App unter Konto → Einstellungen → „iPhone-App verbinden“.")
-                    .font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center).padding(.top, 8)
+                VStack(alignment: .leading, spacing: 8) {
+                    Label("So kommst du an den QR-Code", systemImage: "qrcode").font(.subheadline.weight(.semibold)).foregroundStyle(gold)
+                    schritt("1", "Öffne die Showcase-Seite deines Servers am Computer oder in einem Browser, zum Beispiel unter der Adresse, die du auch hier eintippen würdest (192.168.1.20:8090).")
+                    schritt("2", "Tippe oben rechts auf das **Konto-Symbol** (Person) und wähle **Einstellungen**.")
+                    schritt("3", "Ganz unten steht **„iPhone-App verbinden“** mit einem QR-Code.")
+                    schritt("4", "Tippe hier auf **QR-Code scannen** und halte die Kamera auf diesen Code. Fertig.")
+                    Text("Den Code findest du auch am Ende der Einrichtung des Servers (Seite „/setup/“). Er enthält nur die Adresse, keine PIN und kein Passwort.")
+                        .font(.footnote).foregroundStyle(.secondary).padding(.top, 2)
+                }
+                .font(.footnote).frame(maxWidth: .infinity, alignment: .leading).padding(14)
+                .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12)).padding(.top, 8)
             }.padding(.horizontal, 24).frame(maxWidth: 520)
         }
         .sheet(isPresented: $scannerOffen) {
@@ -85,7 +95,7 @@ struct EinrichtungAnsicht: View {
         HStack(spacing: 8) { Text("Gefunden im WLAN").font(.footnote).foregroundStyle(.secondary); if laeuft { ProgressView().controlSize(.mini) } }
         ForEach(liste) { s in
             Button { eingabe = s.url.absoluteString; verbinden() } label: {
-                HStack { VStack(alignment: .leading) { Text(s.name).fontWeight(.semibold); Text(s.anzeigeAdresse).font(.footnote).foregroundStyle(.secondary) }; Spacer(); Image(systemName: "chevron.right").foregroundStyle(.secondary) }
+                HStack { VStack(alignment: .leading) { Text(s.name).fontWeight(.semibold); Text(s.anzeigeAdresse).font(.footnote).foregroundStyle(.secondary); if let a = s.anmeldungText { Text(a).font(.caption).foregroundStyle(.secondary) } }; Spacer(); Image(systemName: "chevron.right").foregroundStyle(.secondary) }
                     .padding(12).background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
             }.buttonStyle(.plain).disabled(prueft)
         }
@@ -107,6 +117,24 @@ struct EinrichtungAnsicht: View {
             }
         }
         .font(.footnote).tint(gold)
+    }
+
+    @ViewBuilder private var zuletzt: some View {
+        if let u = Adresse.normalisieren(modell.letzterServer) {
+            Button { eingabe = u.absoluteString; verbinden() } label: {
+                HStack { Image(systemName: "clock.arrow.circlepath").foregroundStyle(gold)
+                    VStack(alignment: .leading) { Text("Zuletzt verbunden").font(.footnote).foregroundStyle(.secondary); Text(u.host.map { $0 + (u.port.map { ":\($0)" } ?? "") } ?? u.absoluteString).fontWeight(.semibold) }
+                    Spacer(); Image(systemName: "chevron.right").foregroundStyle(.secondary) }
+                    .padding(12).background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+            }.buttonStyle(.plain).disabled(prueft)
+        }
+    }
+
+    private func schritt(_ nr: String, _ text: LocalizedStringKey) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Text(nr).font(.caption.weight(.bold)).foregroundStyle(.black).frame(width: 20, height: 20).background(gold, in: Circle())
+            Text(text).foregroundStyle(.primary)
+        }
     }
 
     private func starteSuche(weitere: [String] = []) {

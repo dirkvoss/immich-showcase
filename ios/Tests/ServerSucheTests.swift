@@ -41,4 +41,11 @@ final class ServerSucheTests: XCTestCase {
         XCTAssertEqual(Set(u), [URL(string: "http://showcase:8090")!, URL(string: "http://showcase")!])
         XCTAssertEqual(ServerSuche.namenKandidaten().count, ServerSuche.bekannteNamen.count * 2)
     }
+
+    func testAnmeldeartWirdGelesen() {
+        let i = ServerSuche.showcaseInfo(Data(#"{"name":"S","version":"1","modus":"beides","auth":"immich"}"#.utf8))
+        XCTAssertEqual(i?.auth, "immich")
+        XCTAssertEqual(GefundenerServer(url: URL(string: "http://x")!, name: "S", anmeldung: "immich").anmeldungText, "Anmeldung mit Immich-Konto")
+        XCTAssertNil(GefundenerServer(url: URL(string: "http://x")!, name: "S").anmeldungText)
+    }
 }

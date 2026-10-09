@@ -1,7 +1,10 @@
 import SwiftUI
 import LocalAuthentication
 
-extension Notification.Name { static let showcaseHilfe = Notification.Name("showcaseHilfe") }
+extension Notification.Name {
+    static let showcaseHilfe = Notification.Name("showcaseHilfe")
+    static let showcaseGesundheit = Notification.Name("showcaseGesundheit")
+}
 
 struct EinstellungenAnsicht: View {
     @EnvironmentObject var modell: AppModell
@@ -14,10 +17,11 @@ struct EinstellungenAnsicht: View {
                 Section("Server") {
                     if modell.demoAktiv {
                         Text("Demo-Modus: Beispielfotos, es wird nichts gesendet.").foregroundStyle(.secondary)
-                        Button("Demo beenden und eigenen Server verbinden") { modell.demoBeenden(); modell.serverSetzen(nil); schliessen() }
+                        Button(modell.server == nil ? "Demo beenden und eigenen Server verbinden" : "Demo beenden (zurück zu deinem Server)") { modell.demoBeenden(); schliessen() }
                     } else {
                         Text(modell.server?.absoluteString ?? "nicht verbunden").foregroundStyle(.secondary)
                         Button("Server ändern", role: .destructive) { modell.serverSetzen(nil); schliessen() }
+                        Button("Demo ansehen (Beispielfotos, ohne Server)") { modell.demoStarten(); schliessen() }
                     }
                 }
                 Section("Sicherheit") {
@@ -26,6 +30,7 @@ struct EinstellungenAnsicht: View {
                 }
                 Section("Hilfe") {
                     Button("Hilfe anzeigen") { schliessen(); NotificationCenter.default.post(name: .showcaseHilfe, object: nil) }
+                    Button("Alles in Ordnung? (Status)") { schliessen(); NotificationCenter.default.post(name: .showcaseGesundheit, object: nil) }
                     Link("Anleitung auf GitHub", destination: URL(string: "https://github.com/dirkvoss/immich-showcase#readme")!)
                     Text("Die App zeigt deinen eigenen Immich-Showcase-Server. Sie verbindet sich nicht direkt mit Immich.").font(.footnote).foregroundStyle(.secondary)
                 }

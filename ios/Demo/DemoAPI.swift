@@ -33,6 +33,7 @@ final class DemoAPI {
             guard teile.count == 3, let f = DemoDaten.foto(id: teile[2]) else { return fehler(404, "Foto nicht verfügbar") }
             let gross = abfrage["s"] == "gross"
             return Antwort(daten: DemoBild.jpeg(f, breite: gross ? 1280 : 360), mime: "image/jpeg")
+        case ("GET", "gesundheit"): return json(gesundheit())
         case ("GET", "status"): return json(status())
         case ("GET", "geraete"): return json(["geraete": [geraet()]])
         case ("POST", "anzeigen"): return anzeigen(koerper)
@@ -93,6 +94,15 @@ final class DemoAPI {
         if l.isEmpty { return ["ok": true, "nachricht": "Dazu habe ich keine Fotos gefunden (Demo).", "erkannt": info, "gesamt": 0, "fotos": [Any]()] }
         let hinweis = erkannt.isEmpty ? "Demo: Die Suche versteht hier Orte (Sardinien, Alpen, Nordsee, Lissabon), Jahre 2021–2025 und die Namen Anna und Opa Karl." : "\(l.count) Fotos gefunden (Demo)."
         return ["ok": true, "nachricht": hinweis, "erkannt": info, "gesamt": l.count, "fotos": l.map(\.json)]
+    }
+
+    private func gesundheit() -> [String: Any] {
+        func p(_ id: String, _ titel: String, _ status: String, _ text: String) -> [String: Any] { ["id": id, "titel": titel, "status": status, "text": text, "hinweis": ""] }
+        return ["gesamt": "ok", "pruefungen": [
+            p("immich", "Immich", "ok", "Demo: Immich ist erreichbar."),
+            p("fotos", "Fotos und Schlüssel", "ok", "\(DemoDaten.anzahl) Fotos sichtbar (erfundene Beispielfotos)."),
+            p("g-rahmen", Self.rahmenName, "ok", "Online."),
+            p("version", "Showcase", "info", "Demo-Modus, \(version).")]]
     }
 
     private func status() -> [String: Any] {

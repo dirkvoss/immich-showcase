@@ -89,4 +89,10 @@ final class DemoTests: XCTestCase {
         XCTAssertEqual(DemoServer.datei("/i18n/en.json").status, 200)
         XCTAssertEqual(DemoServer.datei("/../Info.plist").status, 400)
     }
+
+    func testGesundheitImDemo() {
+        let g = get(DemoAPI(), "/api/gesundheit")
+        XCTAssertEqual(g["gesamt"] as? String, "ok")
+        XCTAssertGreaterThanOrEqual((g["pruefungen"] as? [[String: Any]])?.count ?? 0, 3)
+    }
 }

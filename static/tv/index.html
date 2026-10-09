@@ -384,10 +384,12 @@ body.zuschnitt .bild { object-fit: cover; }
     if (pinModus) return;
     var meldung = "&ra=" + (laeuft ? Math.round((new Date().getTime() - letzterWechsel) / 1000) : -1) + "&a=" + (ambient ? 1 : 0) + "&s=" + (laeuft && !ambient ? 1 : 0) + "&n=" + encodeURIComponent(laeuft && !ambient ? name : "") + "&m=" + (audio && !audio.paused ? musikKey : "");
     api("/api/tv/abfrage?ziel=" + ziel + "&seq=" + seq + meldung + fullyInfo(), function (st, d) {
-      if (st === 401) { zeigePin(); return; }
+      letzterStatus = st;
+      if (st === 401) { zugangKopplung(); return; }
       if (st === 200 && d) {
         verbunden(true); statusEl.textContent = ""; letzterErfolg = new Date().getTime();
         var i;
+        if (d.befehl) { befehlAusfuehren(d.befehl); return; }
         for (i = 0; i < d.events.length; i++) behandle(d.events[i]);
         seq = d.seq;
         if (!laeuft && verbinde) { verbinde = false; bereit(); }
@@ -397,6 +399,45 @@ body.zuschnitt .bild { object-fit: cover; }
       }
       setTimeout(abfrage, 2000);
     });
+  }
+  // Befehl aus der App (Geraete -> Seite neu laden / Anzeige neu starten)
+  function befehlAusfuehren(b) {
+    try { if (b === "neustart" && window.fully && window.fully.restartApp) { window.fully.restartApp(); return; } } catch (e) {}
+    location.reload();
+  }
+  // Ausserhalb des Heimnetzes: das Geraet bekommt per Kopplungs-Code einen eigenen Zugang (nur fuer diese Rahmen-Seiten); mit einer Fernbedienung geht weiter die PIN
+  var letzterStatus = 200;
+  var kopplungAktiv = false, kopplungCode = "", kopplungTimer = 0, kopplungEl = document.getElementById("kopplung");
+  function zugangKopplung() {
+    if (kopplungAktiv || pinModus) return;
+    kopplungAktiv = true; pinModus = true;
+    kopplungEl.style.display = "block";
+    document.getElementById("kopplungTitel").textContent = "Zugang einrichten";
+    document.getElementById("kopplungText").textContent = "Öffne am Handy Immich Showcase, tippe auf „Geräte“ und gib diesen Code ein – mit einer Fernbedienung geht auch die 6-stellige PIN:";
+    document.getElementById("kopplungHinweis").textContent = "Das Gerät merkt sich den Zugang und braucht ihn nur einmal.";
+    neuerKopplungsCode();
+  }
+  function neuerKopplungsCode() {
+    api("/api/koppeln/neu", function (st, d) {
+      if (!kopplungAktiv) return;
+      if (st !== 200 || !d) { document.getElementById("kopplungCode").textContent = "?"; kopplungTimer = setTimeout(neuerKopplungsCode, 8000); return; }
+      kopplungCode = d.code; document.getElementById("kopplungCode").textContent = kopplungCode;
+      try { var qr = qrcode(0, "M"); qr.addData(location.origin + "/?koppeln=" + kopplungCode); qr.make(); document.getElementById("kopplungQr").innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true }); } catch (e) { document.getElementById("kopplungQr").style.display = "none"; }
+      kopplungPruefen();
+    }, "POST", {});
+  }
+  function kopplungPruefen() {
+    clearTimeout(kopplungTimer);
+    api("/api/koppeln/status?code=" + kopplungCode, function (st, d) {
+      if (!kopplungAktiv) return;
+      if (st === 200 && d && d.ziel) { location.replace("/tv/?ziel=" + d.ziel); return; }
+      if (st === 404) { neuerKopplungsCode(); return; }
+      kopplungTimer = setTimeout(kopplungPruefen, 3000);
+    });
+  }
+  function kopplungZurPin(taste) {
+    kopplungAktiv = false; clearTimeout(kopplungTimer); kopplungEl.style.display = "none";
+    pinModus = false; zeigePin(); pinTaste(taste);
   }
   // Falls diese Adresse nicht im vertrauten Netz liegt: PIN mit der Fernbedienung eingeben
   function zeigePin() {
@@ -415,6 +456,7 @@ body.zuschnitt .bild { object-fit: cover; }
   }
   document.addEventListener("keydown", function (e) {
     var k = e.keyCode;
+    if (kopplungAktiv) { if (k >= 48 && k <= 57) kopplungZurPin(String(k - 48)); else if (k >= 96 && k <= 105) kopplungZurPin(String(k - 96)); return; }
     if (pinModus) { if (k >= 48 && k <= 57) pinTaste(String(k - 48)); else if (k >= 96 && k <= 105) pinTaste(String(k - 96)); return; }
     if (musikBlockiert && audio) { musikBlockiert = false; try { audio.play(); } catch (e2) {} }   // erste Taste erlaubt den Ton
     if (vorn === vid && vid.muted) { vid.muted = false; }                                             // Video-Ton freigeben
@@ -432,7 +474,7 @@ body.zuschnitt .bild { object-fit: cover; }
   setInterval(function () {
     var jetzt = new Date().getTime();
     if (ambient && !pausiert && jetzt - letzterWechsel > (sek * 4 + 90) * 1000) location.reload();
-    else if (jetzt - letzterErfolg > 10 * 60 * 1000) location.reload();
+    else if (jetzt - letzterErfolg > 10 * 60 * 1000 && letzterStatus !== 0) location.reload();      // NICHT bei fehlendem Netz (Status 0): dann laeuft das Dauerprogramm mit den geladenen Fotos weiter, ein Neuladen wuerde nur eine Fehlerseite zeigen
   }, 30000);
   mitteTitel.textContent = "Immich Showcase";
   abfrage();

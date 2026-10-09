@@ -4,7 +4,16 @@ import Darwin
 struct GefundenerServer: Identifiable, Hashable {
     let url: URL
     let name: String
+    var anmeldung: String? = nil          // was die Seite verlangt (aus /api/config "auth")
     var id: URL { url }
+    var anmeldungText: String? {
+        switch anmeldung {
+        case "pin": return "Anmeldung mit PIN (im Heimnetz oft ohne)"
+        case "immich": return "Anmeldung mit Immich-Konto"
+        case "beide": return "Anmeldung mit PIN oder Immich-Konto"
+        default: return nil
+        }
+    }
     var anzeigeAdresse: String { (url.host ?? "") + (url.port.map { ":\($0)" } ?? "") }
 }
 
@@ -56,10 +65,12 @@ enum ServerSuche {
     }
 
     /// Ist die Antwort von /api/config die eines Showcase-Servers? Dann sein Name.
-    static func showcaseName(_ daten: Data) -> String? {
+    static func showcaseName(_ daten: Data) -> String? { showcaseInfo(daten)?.name }
+
+    static func showcaseInfo(_ daten: Data) -> (name: String, auth: String?)? {
         guard let j = (try? JSONSerialization.jsonObject(with: daten)) as? [String: Any], j["modus"] != nil, j["version"] != nil,
               let n = j["name"] as? String, !n.isEmpty else { return nil }
-        return n
+        return (n, j["auth"] as? String)
     }
 
     static func kandidaten(praefixe: [String]) -> [URL] {
@@ -68,10 +79,10 @@ enum ServerSuche {
 
     private static func pruefe(_ url: URL, sitzung: URLSession) async -> GefundenerServer? {
         var r = URLRequest(url: url.appendingPathComponent("api/config")); r.timeoutInterval = 1.2
-        guard let (d, a) = try? await sitzung.data(for: r), (a as? HTTPURLResponse)?.statusCode == 200, let n = showcaseName(d) else { return nil }
+        guard let (d, a) = try? await sitzung.data(for: r), (a as? HTTPURLResponse)?.statusCode == 200, let info = showcaseInfo(d) else { return nil }
         var basis = URLComponents(url: a.url ?? url, resolvingAgainstBaseURL: false)                  // nach einer Weiterleitung (z. B. auf https) gilt die Endadresse
         basis?.path = ""; basis?.query = nil
-        return GefundenerServer(url: basis?.url ?? url, name: n)
+        return GefundenerServer(url: basis?.url ?? url, name: info.name, anmeldung: info.auth)
     }
 
     /// `gefunden` wird für jeden Treffer sofort aufgerufen (die Liste muss nicht bis zum Ende warten).

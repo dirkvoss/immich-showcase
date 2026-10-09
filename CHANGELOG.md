@@ -1,6 +1,16 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.16.0]
+### Neu
+- **Rahmen an einem anderen Ort (Eltern, Ferienhaus):** Ein Tablet außerhalb des Heimnetzes bekommt beim Koppeln (Code am Rahmen, in der App „Gerät koppeln“) einen **eigenen Zugang**, der nur die Rahmen-Seiten öffnet (nicht die App, nicht die Fotoübersicht, nicht die Home-Assistant-Schnittstellen) und nur für dieses Gerät gilt. Er wird bei jeder Nutzung erneuert und läuft praktisch nie ab; je Gerät widerrufbar (⚙ → *Wartung und Zugang von außen* → *Zugang widerrufen*), ohne die PIN zu ändern. Anleitung: README, Abschnitt „Rahmen an einem anderen Ort“.
+- **Fernsteuerung je Rahmen** in der App: *Seite neu laden* und *Anzeige neu starten* (mit Fully). Dazu eine eigene **Meldezeit** (Pushover) je Rahmen, wenn er nicht erreichbar ist.
+- **„Alles in Ordnung?“** (Konto-Menü, in der iPhone-App unter App-Einstellungen): prüft Immich, Schlüssel, Bildsuche, Upload, jeden Rahmen und Fernseher (online, Akku, hängendes Bild), Speicherplatz und Version und sagt, was zu tun ist. Ein farbiger Punkt am Konto-Symbol zeigt Warnungen an.
+- **Willkommens-Rundgang** beim ersten Start (einmal je Gerät; unter *Hilfe* wiederholbar), auch in der Demo.
+- **iPhone-App:** Demo-Modus, Suche nach Servern im WLAN (auch in einem anderen Netz und über bekannte Namen), „Zuletzt verbunden“, Rückweg von der Anmeldeseite, Anleitung „So kommst du an den QR-Code“, „Demo ansehen“ in den Einstellungen, QR-Code am Ende der Server-Einrichtung.
+### Behoben
+- Die Rahmen-Seite lädt sich bei fehlendem Netz nicht mehr neu (das zeigte eine Fehlerseite); das Dauerprogramm läuft mit den geladenen Fotos weiter und verbindet sich von selbst wieder.
+
 ## [2.15.0]
 ### Neu
 - **iPhone-App – Demo-Modus:** „Demo ausprobieren (ohne Server)“ zeigt die echte Oberfläche mit erfundenen, gemalten Beispielfotos; es wird nichts gesendet. Ein Banner führt jederzeit zum Verbinden des eigenen Servers. Auch für die Prüfung im App Store gedacht.

@@ -47,6 +47,20 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 250px); }
 button, select, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
 .versteckt { display: none !important; }
+/* Status "Alles in Ordnung?" und Rundgang */
+.gs { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+.gs .pkt { width: 12px; height: 12px; border-radius: 50%; margin-top: 5px; flex: none; background: #6b7280; }
+.gs .pkt.ok { background: #3ecf8e; } .gs .pkt.warnung { background: #e0b359; } .gs .pkt.fehler { background: #e5484d; }
+.gs .titel { font-weight: 600; } .gs .hinweis { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.konto summary { position: relative; }
+.konto summary.punkt-warnung::after, .konto summary.punkt-fehler::after { content: ""; position: absolute; top: 5px; right: 5px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--bg, #111); }
+.konto summary.punkt-warnung::after { background: #e0b359; } .konto summary.punkt-fehler::after { background: #e5484d; }
+#tourDialog .tvkarte { text-align: center; }
+#tourDialog .tour-icon { font-size: 54px; line-height: 1.1; margin: 4px 0 6px; }
+#tourDialog h2 { margin: 0 0 8px; } #tourDialog p { margin: 0 auto 10px; max-width: 34em; }
+#tourPunkte { display: flex; justify-content: center; gap: 7px; margin: 14px 0 6px; }
+#tourPunkte span { width: 8px; height: 8px; border-radius: 50%; background: var(--line, #444); } #tourPunkte span.an { background: var(--accent, #e0b359); }
+
 /* Einsatzzweck der Installation (Konfiguration RAHMEN_WEB_MODUS): Elemente nur fuer Rahmen / nur fuer Fernseher */
 body.modus-rahmen .nur-tv, body.modus-tv .nur-rahmen, body.modus-laden .nur-tv, body.modus-laden .nur-rahmen { display: none !important; }
 
@@ -464,6 +478,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
   <h1>Immich Showcase</h1>
   <p class="untertitel">Dein Blick in die Fotos</p>
   <form id="immichForm" class="versteckt">
+    <p class="tipp" style="margin:0 0 6px">Melde dich mit deinem Immich-Konto an – dieselbe E-Mail und dasselbe Passwort wie in Immich.</p>
     <input id="mail" type="email" autocomplete="username" autocapitalize="none" placeholder="E-Mail-Adresse (Immich)" aria-label="E-Mail-Adresse" required>
     <input id="pw" type="password" autocomplete="current-password" placeholder="Passwort" aria-label="Passwort" required>
     <input id="schluesselFeld" class="versteckt" type="password" autocomplete="off" autocapitalize="none" placeholder="Immich-API-Schlüssel" aria-label="Immich-API-Schlüssel">
@@ -476,6 +491,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
     <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" aria-label="PIN, 6 Ziffern">
   </div>
   <div id="loginFehler" class="fehler" role="alert"></div>
+  <p id="loginServer" class="versteckt" style="margin-top:14px"><button type="button" class="btn klein" id="loginServerBtn">Mit einem anderen Server verbinden</button></p>
   <p class="versionszeile" data-version></p>
 </div>
 
@@ -488,7 +504,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
     <div class="kopf">
       <h1><button type="button" class="kopf-home" id="kopfHome" aria-label="Immich Showcase – zur Startseite"><span class="logo" id="logo" aria-hidden="true"><img alt="" src="/icon-192.png"></span><span class="kopf-name">Immich Showcase</span></button></h1>
       <button class="btn klein versteckt" id="undoKopf" title="Letzte Änderung an der Auswahl rückgängig machen" aria-label="Rückgängig"><span aria-hidden="true">↶</span><span class="undo-text"> Rückgängig</span></button>
-      <div class="benutzer" id="benutzer"><button type="button" id="hochladenBtn" class="ik versteckt" aria-label="Eigene Fotos senden" title="Fotos von diesem Gerät auswählen und auf den Rahmen schicken"><span aria-hidden="true">📤</span><span class="ik-text">Meine Fotos</span></button><input type="file" id="hochladenDatei" accept="image/jpeg,image/png,image/webp" multiple hidden><button type="button" id="geraeteBtn" class="ik" aria-label="Geräte" title="Geräte"><span aria-hidden="true">📡</span><span class="ik-text">Geräte</span></button><button type="button" id="hilfeBtn" class="ik" aria-label="Hilfe" title="Hilfe"><span aria-hidden="true">❓</span><span class="ik-text">Hilfe</span></button><details class="konto" id="konto"><summary aria-label="Konto" title="Konto"><svg class="ic" aria-hidden="true"><use href="#i-konto"/></svg></summary><div class="konto-menu"><button type="button" id="einstBtn">⚙ Einstellungen</button><button type="button" id="appEinstBtn" class="versteckt">📱 App-Einstellungen</button><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><span class="versionskurz" data-version-kurz></span></div></details></div>
+      <div class="benutzer" id="benutzer"><button type="button" id="hochladenBtn" class="ik versteckt" aria-label="Eigene Fotos senden" title="Fotos von diesem Gerät auswählen und auf den Rahmen schicken"><span aria-hidden="true">📤</span><span class="ik-text">Meine Fotos</span></button><input type="file" id="hochladenDatei" accept="image/jpeg,image/png,image/webp" multiple hidden><button type="button" id="geraeteBtn" class="ik" aria-label="Geräte" title="Geräte"><span aria-hidden="true">📡</span><span class="ik-text">Geräte</span></button><button type="button" id="hilfeBtn" class="ik" aria-label="Hilfe" title="Hilfe"><span aria-hidden="true">❓</span><span class="ik-text">Hilfe</span></button><details class="konto" id="konto"><summary aria-label="Konto" title="Konto"><svg class="ic" aria-hidden="true"><use href="#i-konto"/></svg></summary><div class="konto-menu"><button type="button" id="gesundBtn">✅ Alles in Ordnung?</button><button type="button" id="einstBtn">⚙ Einstellungen</button><button type="button" id="appEinstBtn" class="versteckt">📱 App-Einstellungen</button><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><span class="versionskurz" data-version-kurz></span></div></details></div>
       <div class="laeuft nur-rahmen" id="laeuft" aria-live="polite">
         <select id="rahmenWahl" class="reihe-sel versteckt" aria-label="Rahmen wählen"></select>
         <div class="laeuft-text">
@@ -698,6 +714,18 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
           <p class="tipp">Zu bestimmten Tagen und Uhrzeiten zeigt der Rahmen andere Quellen als das Dauerprogramm oben.</p>
           <div id="gfPlan"></div>
           <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfPlanNeu" type="button">＋ Zeitfenster</button></div>
+          <details id="gfWartung" class="gfdetails versteckt">
+            <summary>Wartung und Zugang von außen</summary>
+            <label class="tvfeld"><span>Meldung aufs Handy, wenn der Rahmen länger nicht erreichbar ist (Minuten, 0 = nie)</span> <input id="gfAlarm" type="number" min="0" max="1440" inputmode="numeric" aria-label="Meldung nach Minuten"></label>
+            <p class="tipp">Leer lassen = allgemeine Einstellung. Für einen Rahmen an einem anderen Ort ist ein größerer Wert sinnvoll, damit kurze Störungen nicht gleich melden.</p>
+            <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0;flex-wrap:wrap">
+              <button class="btn klein" id="gfNeuladen" type="button">↻ Seite neu laden</button>
+              <button class="btn klein" id="gfNeustart" type="button">⟳ Anzeige neu starten (Fully)</button>
+              <button class="btn klein gefahr" id="gfZugangWeg" type="button">Zugang widerrufen</button>
+            </div>
+            <p class="tipp">Steht der Rahmen außerhalb deines Heimnetzes, bekommt er beim Koppeln (Code am Rahmen, in der App unter „Gerät koppeln“) einen eigenen Zugang, der nur die Rahmen-Seiten öffnet. „Zugang widerrufen“ sperrt ihn, ohne die PIN zu ändern; danach muss der Rahmen neu gekoppelt werden.</p>
+            <p class="tipp versteckt" id="gfWartungErg" role="status"></p>
+          </details>
           <details id="gfTablet" class="gfdetails">
             <summary>Tablet-Steuerung (optional)</summary>
             <p class="tipp"><b>Du brauchst nichts zu installieren:</b> Der Rahmen läuft in jedem normalen Browser. Fully Kiosk ist nur ein optionales Extra (ca. 8 €), damit sich der Bildschirm nachts wirklich ausschaltet und der Akkustand gemeldet wird.</p>
@@ -752,6 +780,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
     <p class="tipp">Mit „📤 Meine Fotos“ schickst du Fotos von diesem Gerät an Immich (Album „Showcase-Uploads“) und kannst sie mit anderen Fotos mischen. Mit der Kamera hier aufgenommene Fotos liegen danach nur in Immich, nicht in der Fotos-Mediathek des Handys. In der iPhone-App geht es auch über „Teilen“ in der Fotos-App und über Siri und Kurzbefehle.</p>
     <h3>Geräte einrichten</h3>
     <p class="tipp">Unter „📡 Geräte“ legst du Rahmen und Fernseher mit „＋ Gerät hinzufügen“ an und stellst sie mit ⚙ ein. Bei mehreren Rahmen wählst du beim Senden per Häkchen, wohin die Show geht; unter „Meine Shows“ kannst du jedem Rahmen eine eigene Show geben.</p>
+    <div class="tvknoepfe" style="justify-content:flex-start"><button class="btn" id="tourNochmal" type="button">🎓 Rundgang noch einmal ansehen</button></div>
     <h3>Tastatur (Rechner)</h3>
     <p class="tipp">Mit „/“ springst du zur Suche, mit „Esc“ schließt du Fenster.</p>
     <h3>Sprache / Language</h3>
@@ -775,6 +804,25 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
     <p class="tipp"><b>Wichtig:</b> Direkt hier mit der Kamera aufgenommene Fotos liegen danach <b>nur in Immich</b> – nicht in deiner Fotos-Mediathek. Willst du ein Foto auch auf dem Handy behalten, nimm es mit der normalen Kamera-App auf und wähle es dann hier aus.</p>
     <label class="merken"><input type="checkbox" id="uploadNichtMehr"> Diesen Hinweis nicht mehr zeigen</label>
     <div class="tvknoepfe"><button class="btn" id="uploadAbbruch" type="button">Abbrechen</button><button class="btn primaer" id="uploadWeiter" type="button">Fotos auswählen</button></div>
+  </div>
+</div>
+
+<div id="gesundDialog" class="tvdialog versteckt" role="dialog" aria-modal="true" aria-labelledby="gesundTitel">
+  <div class="tvkarte">
+    <h2 id="gesundTitel">✅ Alles in Ordnung?</h2>
+    <p class="tipp" id="gesundSumme" role="status"></p>
+    <div id="gesundListe"></div>
+    <div class="tvknoepfe"><button class="btn" id="gesundNeu" type="button">Aktualisieren</button><button class="btn primaer" id="gesundZu" type="button">Schließen</button></div>
+  </div>
+</div>
+
+<div id="tourDialog" class="tvdialog versteckt" role="dialog" aria-modal="true" aria-labelledby="tourTitel">
+  <div class="tvkarte">
+    <div class="tour-icon" id="tourIcon" aria-hidden="true"></div>
+    <h2 id="tourTitel"></h2>
+    <p class="tipp" id="tourText"></p>
+    <div id="tourPunkte" aria-hidden="true"></div>
+    <div class="tvknoepfe"><button class="btn" id="tourSkip" type="button">Überspringen</button><button class="btn" id="tourZurueck" type="button">Zurück</button><button class="btn primaer" id="tourWeiter" type="button">Weiter</button></div>
   </div>
 </div>
 
@@ -912,8 +960,10 @@ async function zeigeLogin() {
   const mitImmich = art !== "pin", mitPin = art !== "immich";
   $("#immichForm").classList.toggle("versteckt", !mitImmich); $("#pinBlock").classList.toggle("versteckt", !mitPin);
   $("#pinOder").classList.toggle("versteckt", !(mitImmich && mitPin));
+  $("#loginServer").classList.toggle("versteckt", !/ShowcaseApp/.test(navigator.userAgent));        // nur in der iPhone-App: Weg zurueck zu den Server-Einstellungen
   (mitImmich ? $("#mail") : $("#pin")).focus();
 }
+$("#loginServerBtn").addEventListener("click", () => { try { window.webkit.messageHandlers.showcase.postMessage({ aktion: "einstellungen" }); } catch (e) {} });
 $("#keyUmschalten").addEventListener("click", () => {
   const an = $("#schluesselFeld").classList.contains("versteckt");                      // true: jetzt auf Schluessel umstellen
   $("#schluesselFeld").classList.toggle("versteckt", !an); $("#mail").classList.toggle("versteckt", an); $("#pw").classList.toggle("versteckt", an);
@@ -1841,6 +1891,7 @@ async function geraetDialogOeffnen(id) {
   gfArt = g.art; $("#geraetTitel").textContent = RW_T(id ? "Gerät einstellen" : "Gerät hinzufügen");
   $("#gfArtZeile").classList.toggle("versteckt", !!id); $("#gfArt").value = g.art; gfArtAnpassen();
   $("#gfName").value = g.name; $("#gfFuellung").value = g.fuellung || "";
+  $("#gfAlarm").value = g.alarm_min == null ? "" : g.alarm_min; $("#gfWartung").classList.toggle("versteckt", !id || g.art !== "rahmen"); $("#gfWartungErg").classList.add("versteckt");
   $("#gfSek").value = g.sek || ""; $("#gfDatum").checked = (g.anzeige || []).includes("datum"); $("#gfOrt").checked = (g.anzeige || []).includes("ort"); $("#gfZeit").checked = (g.anzeige || []).includes("zeit");
   const [von, bis] = (g.nacht || "-").split("-"); $("#gfNachtVon").value = (von || "").padStart(5, "0"); $("#gfNachtBis").value = (bis || "").padStart(5, "0");
   if (!g.nacht) { $("#gfNachtVon").value = ""; $("#gfNachtBis").value = ""; }
@@ -2049,7 +2100,7 @@ $("#gfSpeichern").addEventListener("click", async () => {
   if (!gfId) daten.art = $("#gfArt").value;
   if (istRahmen) {
     Object.assign(daten, { sek: $("#gfSek").value, anzeige: [$("#gfDatum").checked && "datum", $("#gfZeit").checked && "zeit", $("#gfOrt").checked && "ort"].filter(Boolean), nacht: von && bis ? von + "-" + bis : "",
-      quellen: quellenSchreiben(), zeitplan: planSchreiben(), fully_host: $("#gfFullyHost").value.trim() });
+      quellen: quellenSchreiben(), zeitplan: planSchreiben(), fully_host: $("#gfFullyHost").value.trim(), alarm_min: $("#gfAlarm").value });
     if ($("#gfFullyPw").value) daten.fully_pw = $("#gfFullyPw").value;
   }
   const b = $("#gfSpeichern"); b.disabled = true;
@@ -2060,6 +2111,15 @@ $("#gfSpeichern").addEventListener("click", async () => {
   } catch (e) { fehler(e); }
   b.disabled = false;
 });
+async function gfWartung(pfad, body, frage) {
+  if (!gfId || (frage && !confirm(RW_T(frage)))) return;
+  const erg = $("#gfWartungErg"); erg.classList.remove("versteckt");
+  try { const r = await api(pfad, { method: "POST", body: JSON.stringify(body || {}) }); erg.style.color = "var(--ok, #3ecf8e)"; erg.textContent = "✓ " + r.nachricht; }
+  catch (e) { erg.style.color = "#e5484d"; erg.textContent = e.message; }
+}
+$("#gfNeuladen").addEventListener("click", () => gfWartung("geraete/" + encodeURIComponent(gfId) + "/befehl", { aktion: "neuladen" }));
+$("#gfNeustart").addEventListener("click", () => gfWartung("geraete/" + encodeURIComponent(gfId) + "/befehl", { aktion: "neustart" }));
+$("#gfZugangWeg").addEventListener("click", () => gfWartung("verwaltung/geraete/" + encodeURIComponent(gfId) + "/zugang-widerrufen", {}, "Den Zugang dieses Geräts widerrufen? Es zeigt danach einen Kopplungs-Code und muss neu gekoppelt werden."));
 $("#gfLoeschen").addEventListener("click", async () => {
   if (!gfId || !confirm(RW_T("Dieses Gerät wirklich entfernen? Gespeicherte Shows bleiben erhalten."))) return;
   try { const r = await api("verwaltung/geraete/" + encodeURIComponent(gfId), { method: "DELETE" }); $("#geraetDialog").classList.add("versteckt"); toast(r.nachricht); await geraeteNeuLesen(); } catch (e) { fehler(e); }
@@ -2107,6 +2167,74 @@ async function versionPruefen() {
   } catch (e) {}
 }
 $("#updateBanner").addEventListener("click", () => location.reload());
+
+// ---------------------------------------------------------------- Status "Alles in Ordnung?"
+const GESUND_TEXT = { ok: "Alles in Ordnung.", warnung: "Es gibt Hinweise.", fehler: "Es gibt Probleme." };
+function gesundPunkt(gesamt) {
+  const k = $("#konto summary"); if (!k) return;
+  k.classList.toggle("punkt-warnung", gesamt === "warnung"); k.classList.toggle("punkt-fehler", gesamt === "fehler");
+}
+async function gesundLaden() {
+  try {
+    const d = await api("gesundheit"), box = $("#gesundListe"); box.innerHTML = "";
+    $("#gesundSumme").textContent = (d.gesamt === "ok" ? "✓ " : "") + RW_T(GESUND_TEXT[d.gesamt] || "");
+    for (const p of d.pruefungen) {
+      const z = document.createElement("div"); z.className = "gs";
+      const punkt = document.createElement("span"); punkt.className = "pkt " + p.status;
+      const m = document.createElement("div");
+      const t = document.createElement("div"); t.className = "titel"; t.textContent = RW_T(p.titel);
+      const x = document.createElement("div"); x.textContent = RW_T(p.text);
+      m.append(t, x);
+      if (p.hinweis) { const h = document.createElement("div"); h.className = "hinweis"; h.textContent = RW_T(p.hinweis); m.append(h); }
+      z.append(punkt, m); box.append(z);
+    }
+    gesundPunkt(d.gesamt);
+  } catch (e) { fehler(e); }
+}
+async function gesundKurz() {                                   // nur den Punkt am Konto-Symbol aktuell halten
+  if (document.visibilityState !== "visible" || $("#appAnsicht").classList.contains("versteckt")) return;
+  try { gesundPunkt((await api("gesundheit")).gesamt); } catch (e) {}
+}
+$("#gesundBtn").addEventListener("click", () => { $("#konto").open = false; $("#gesundDialog").classList.remove("versteckt"); gesundLaden(); });
+$("#gesundNeu").addEventListener("click", gesundLaden);
+$("#gesundZu").addEventListener("click", () => $("#gesundDialog").classList.add("versteckt"));
+window.rwGesundheitOeffnen = () => $("#gesundBtn").click();      // fuer die iPhone-App
+setTimeout(gesundKurz, 4000); setInterval(gesundKurz, 120000);
+
+// ---------------------------------------------------------------- Willkommens-Rundgang (einmal je Gerat)
+function tourSchritte() {
+  const imApp = /ShowcaseApp/.test(navigator.userAgent), demo = !!(konfig && konfig.demo);
+  const l = [{ i: "🖼️", t: "Willkommen bei Immich Showcase", x: demo ? "Du siehst gerade die Demo mit erfundenen Beispielfotos. Alles lässt sich ausprobieren, es wird nichts gesendet." : "Zeige deine Immich-Fotos auf dem Bilderrahmen oder dem Fernseher – und alle in der Familie können es vom Handy aus." },
+    { i: "🔎", t: "Fotos finden", x: "Unter „Neueste“ blätterst du, unter „Suchen“ schreibst du ganze Sätze, zum Beispiel „Sommer 2022 am Strand“. Mit den Filtern grenzt du nach Person, Jahr und Land ein." },
+    { i: "✅", t: "Auswählen und senden", x: "Tippe Fotos an, gib der Auswahl einen Namen und tippe unten auf „Auf den Rahmen“. Die Show läuft sofort; „Zurück“ bringt die vorherige wieder." }];
+  if (konfig && konfig.hochladen) l.push({ i: "📤", t: "Eigene Fotos senden", x: "Mit „Meine Fotos“ schickst du Fotos von diesem Gerät. Sie werden in Immich gespeichert und lassen sich mit anderen Fotos mischen." });
+  if (imApp && !demo) l.push({ i: "📱", t: "In der iPhone-App", x: "Teile Fotos aus der Fotos-App direkt an den Rahmen, nutze Siri („Zeige Fotos auf dem Rahmen mit Showcase Immich“) und das Widget „Bilderrahmen“." });
+  l.push({ i: "❓", t: "Hilfe und Status", x: "Unter „Hilfe“ steht alles Wichtige. Im Konto-Menü zeigt „Alles in Ordnung?“, ob Immich und die Rahmen laufen." });
+  return l;
+}
+let tourListe = [], tourNr = 0;
+function tourZeigen() {
+  const s = tourListe[tourNr], letzter = tourNr === tourListe.length - 1;
+  $("#tourIcon").textContent = s.i; $("#tourTitel").textContent = RW_T(s.t); $("#tourText").textContent = RW_T(s.x);
+  $("#tourPunkte").innerHTML = tourListe.map((_, k) => `<span class="${k === tourNr ? "an" : ""}"></span>`).join("");
+  $("#tourZurueck").classList.toggle("versteckt", tourNr === 0); $("#tourSkip").classList.toggle("versteckt", letzter);
+  $("#tourWeiter").textContent = RW_T(letzter ? "Los geht’s" : "Weiter");
+}
+function tourStart(erzwingen) {
+  try { if (!erzwingen && localStorage.getItem("rwTourGesehen") === "1") return false; } catch (e) {}
+  tourListe = tourSchritte(); tourNr = 0; tourZeigen(); $("#tourDialog").classList.remove("versteckt"); return true;
+}
+function tourEnde() { $("#tourDialog").classList.add("versteckt"); try { localStorage.setItem("rwTourGesehen", "1"); } catch (e) {} }
+$("#tourWeiter").addEventListener("click", () => { if (tourNr >= tourListe.length - 1) tourEnde(); else { tourNr++; tourZeigen(); } });
+$("#tourZurueck").addEventListener("click", () => { if (tourNr > 0) { tourNr--; tourZeigen(); } });
+$("#tourSkip").addEventListener("click", tourEnde);
+$("#tourNochmal").addEventListener("click", () => { $("#hilfeDialog").classList.add("versteckt"); tourStart(true); });
+let tourVersuche = 0;
+(function tourPruefen() {                                         // erst, wenn die App sichtbar ist (nicht auf der Anmeldeseite); hoechstens ein paar Versuche
+  if (++tourVersuche > 8) return;
+  if ($("#appAnsicht").classList.contains("versteckt") || !konfig || konfig.modus === undefined) { setTimeout(tourPruefen, 4000); return; }
+  tourStart(false);
+})();
 $("#demoEnde").addEventListener("click", () => { try { window.webkit.messageHandlers.showcase.postMessage({ aktion: "demoBeenden" }); } catch (e) {} });
 // Zustand des Rahmens aktuell halten: auch Siri, Teilen, Widget und andere Handys aendern ihn von aussen.
 function statusAuffrischen(alles) {

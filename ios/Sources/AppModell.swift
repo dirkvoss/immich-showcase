@@ -6,6 +6,7 @@ final class AppModell: ObservableObject {
     @AppStorage("serverAdresse") private var gespeichert = ""
     @AppStorage("faceIDAktiv") var faceIDAktiv = false
     @AppStorage("demoAktiv") var demoAktiv = false
+    @AppStorage("letzterServer") var letzterServer = ""
 
     @Published var server: URL?
     @Published var gesperrt = false
@@ -25,6 +26,7 @@ final class AppModell: ObservableObject {
     func serverSetzen(_ url: URL?) {
         demoAktiv = false
         server = url
+        if let url { letzterServer = url.absoluteString }
         gespeichert = url?.absoluteString ?? ""
         Task { await ServerKlient.fuerErweiterungenSichern(server: url) }
     }

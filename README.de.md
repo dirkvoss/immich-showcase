@@ -133,6 +133,14 @@ Der Weg über die `.env`:
 ## Rahmenprogramm nach Person
 `person=<name>` bei den Quellen: `RAHMEN_WEB_RAHMEN_QUELLEN=person=Anna Muster:60, person=oma:20, *:20` zeigt Fotos dieser Person (Name wie in Immich oder ein Spitzname aus `RAHMEN_WEB_ALIASE`; `Anna+Ben` = beide zusammen). Ein unbekannter Name wird übersprungen, die anderen Quellen laufen weiter.
 
+## Rahmen an einem anderen Ort (Eltern, Ferienhaus)
+Ein Tablet außerhalb deines Heimnetzes holt sich Programm und Fotos über das Internet von deinem Server und lässt sich wie jeder andere Rahmen aus der App beschicken.
+1. **Server von außen erreichbar machen:** Der Server braucht eine Adresse mit HTTPS, die das Tablet erreicht (zum Beispiel über einen Reverse-Proxy). Beschränke sie, wenn möglich, auf das, was die Rahmen-Seite braucht: `/tv/`, `/api/tv/`, `/api/vorschau/`, `/api/rahmen/`, `/api/bildinfo/`, `/api/koppeln/`, `/api/version`, `/api/config`, `/api/login` (nur für PIN-Geräte) und die Dateien `/i18n.js`, `/i18n/`, `/fonts/`, `/qrcode.js`, `/icon-512.png`; die App selbst muss nicht von außen erreichbar sein.
+2. **Rahmen anlegen:** App → **📡 Geräte** → **＋ Gerät hinzufügen** → Bilderrahmen, mit eigenem Namen und eigenem **Dauerprogramm** (zum Beispiel ein Album „Für die Eltern“ und „neu in den letzten 14 Tagen“).
+3. **Koppeln, solange das Tablet noch bei dir ist:** Am Tablet im Browser `https://<deine-adresse>/tv/` öffnen, es zeigt einen Code. In der App unter *Geräte → Gerät koppeln* den Code eingeben und den Rahmen wählen. Außerhalb des Heimnetzes bekommt das Tablet dabei einen **eigenen, lange gültigen Zugang**, der nur die Rahmen-Seiten öffnet (nicht die App, nicht deine Fotos-Übersicht) und je Gerät widerrufbar ist (⚙ am Gerät → *Zugang widerrufen*). Er wird bei jeder Nutzung erneuert und läuft praktisch nie ab (nur nach über 400 Tagen ohne Verbindung).
+4. **Testen wie von außen:** Das Tablet über den Hotspot deines Handys laufen lassen, Strom ziehen, WLAN aus und an. Das Dauerprogramm läuft mit den geladenen Fotos weiter, wenn das Netz ausfällt; kommt es zurück, verbindet sich die Seite von selbst.
+5. **Wenn niemand vor Ort ist:** Mit **Fully Kiosk Plus** startet das Tablet nach einem Neustart die Seite von selbst (*Start-URL*, *Beim Start öffnen*, *Bildschirm anlassen*, *Neu laden bei Netzwerk-Wiederkehr*, *Neustart der Anzeige nachts*). Unter ⚙ → *Wartung und Zugang von außen* kannst du aus der Ferne die **Seite neu laden** und die **Anzeige neu starten** und einstellen, nach wie vielen Minuten ohne Verbindung du eine **Meldung aufs Handy** bekommst (Pushover). Bei komplett leerem Akku muss jemand den Einschalter drücken.
+
 ## Tablet-Bildschirm nachts ausschalten (optional, mit Fully Kiosk)
 *Nur ein Komfort:* Im normalen Browser wird der Rahmen nachts einfach schwarz und läuft weiter; der Bildschirm bleibt dabei eingeschaltet.
 

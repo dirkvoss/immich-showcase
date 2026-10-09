@@ -133,6 +133,14 @@ Use `http://<server>:8090/tv/` **without** `?ziel=…` to pair the device by cod
 ## Frame programme by person
 Add `person=<name>` to the sources: `RAHMEN_WEB_RAHMEN_QUELLEN=person=Anna Muster:60, person=grandma:20, *:20` shows photos of that person (name as in Immich, or a nickname from `RAHMEN_WEB_ALIASE`; `Anna+Ben` = both together). An unknown name is skipped, the other sources continue.
 
+## A frame somewhere else (parents, holiday home)
+A tablet outside your home network fetches its programme and photos from your server over the internet and can be sent shows from the app like any other frame.
+1. **Make the server reachable from outside:** it needs an HTTPS address the tablet can reach (for example through a reverse proxy). If possible restrict it to what the frame page needs: `/tv/`, `/api/tv/`, `/api/vorschau/`, `/api/rahmen/`, `/api/bildinfo/`, `/api/koppeln/`, `/api/version`, `/api/config`, `/api/login` (only for PIN devices) and the files `/i18n.js`, `/i18n/`, `/fonts/`, `/qrcode.js`, `/icon-512.png`; the app itself does not have to be reachable from outside.
+2. **Add the frame:** app → **📡 Devices** → **＋ Add device** → picture frame, with its own name and its own **continuous programme** (for example an album "For the parents" plus "new in the last 14 days").
+3. **Pair it while the tablet is still with you:** open `https://<your-address>/tv/` in the tablet's browser, it shows a code. In the app under *Devices → Pair device* enter the code and choose the frame. Outside your home network the tablet gets **its own long-lived access** that only opens the frame pages (not the app, not your photo overview) and can be revoked per device (⚙ on the device → *Revoke access*). It is renewed on every use and practically never expires (only after more than 400 days without a connection).
+4. **Test it as if from outside:** run the tablet through your phone's hotspot, pull the power, switch Wi-Fi off and on. The continuous programme keeps running with the photos already loaded when the network drops; when it returns the page reconnects by itself.
+5. **When nobody is there:** with **Fully Kiosk Plus** the tablet opens the page by itself after a restart (*Start URL*, *Launch on boot*, *Keep screen on*, *Reload on network reconnect*, *Restart the display at night*). Under ⚙ → *Maintenance and remote access* you can **reload the page** and **restart the display** remotely and set after how many minutes without a connection you get a **phone alert** (Pushover). With a completely empty battery someone has to press the power button.
+
 ## Switch the tablet screen off at night (optional, with Fully Kiosk)
 *Just a convenience:* in a normal browser the frame simply goes black at night and keeps running; the screen stays on.
 

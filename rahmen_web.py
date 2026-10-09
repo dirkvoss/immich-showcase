@@ -262,6 +262,45 @@ def sitzung_gueltig(wert):
     return sitzung_lesen(wert) is not None
 
 
+# Geraete-Zugang: ein Tablet ausserhalb des Heimnetzes bekommt beim Koppeln einen eigenen, lange gueltigen Cookie, der NUR die Rahmen-/Fernseher-Seiten
+# oeffnet (keine App, keine Einstellungen) und je Geraet widerrufen werden kann (ohne die PIN zu aendern).
+GERAET_COOKIE = "rw_geraet"
+GERAET_COOKIE_TAGE = 400                    # Chrome erlaubt Cookies hoechstens ~400 Tage; der Zugang wird bei jeder Nutzung erneuert (siehe tv_abfrage), laeuft also praktisch nie ab
+GERAET_ERNEUERT = {}                        # Geraet -> wann der Cookie zuletzt erneuert wurde
+ZUGANG_FILE = os.environ.get("RAHMEN_WEB_ZUGANG_FILE", os.path.join(os.path.dirname(AUTH_STATE), "rahmen_web_geraetezugang.json"))
+
+
+def zugang_version(z):
+    try:
+        return int((lies_json(ZUGANG_FILE, {}) or {}).get(z, 0))
+    except (TypeError, ValueError):
+        return 0
+
+
+def zugang_ausstellen(z):
+    nutzlast = f"g.{z}.{zugang_version(z)}"
+    sig = hmac.new(geheimnis(), nutzlast.encode(), hashlib.sha256).hexdigest()
+    return base64.urlsafe_b64encode(f"{nutzlast}.{sig}".encode()).decode()
+
+
+def zugang_lesen(wert):
+    """Kennung des Geraets, wenn der Cookie echt ist und nicht widerrufen wurde, sonst None."""
+    try:
+        g, z, ver, sig = base64.urlsafe_b64decode(wert.encode()).decode().split(".")
+    except (ValueError, UnicodeError, AttributeError):
+        return None
+    soll = hmac.new(geheimnis(), f"{g}.{z}.{ver}".encode(), hashlib.sha256).hexdigest()
+    if g != "g" or not hmac.compare_digest(sig, soll) or z not in TV_ZIELE or str(zugang_version(z)) != ver:
+        return None
+    return z
+
+
+def zugang_widerrufen(z):
+    d = lies_json(ZUGANG_FILE, {}) or {}
+    d[z] = zugang_version(z) + 1
+    schreibe_json(ZUGANG_FILE, d)
+
+
 def client_ip(request):
     peer = request.client.host if request.client else "0.0.0.0"
     if peer in TRUSTED_PROXIES:
@@ -316,8 +355,8 @@ def anmeldung(request: Request):
     raise HTTPException(401, "Anmeldung erforderlich" if AUTH != "pin" else "PIN erforderlich")
 
 
-def geraet(request: Request):
-    """Fernseher/Rahmen-Seiten (kein Login moeglich): vertrautes Netz oder Sitzung."""
+def geraet_voll(request: Request):
+    """Wie geraet(), aber OHNE Geraete-Zugang: Home-Assistant-Schnittstellen (Show setzen, Bildschirm schalten) sind nichts fuer ein Tablet von aussen."""
     ip = client_ip(request)
     wert = request.cookies.get(COOKIE)
     sitzung = sitzung_lesen(wert) if wert else None
@@ -326,6 +365,17 @@ def geraet(request: Request):
     if ist_lan(ip) or selbsttest_ok(request):
         return {"lan": True, "ip": ip}
     raise HTTPException(401, "Anmeldung erforderlich" if AUTH != "pin" else "PIN erforderlich")
+
+
+def geraet(request: Request):
+    """Fernseher/Rahmen-Seiten (kein Login moeglich): vertrautes Netz, Sitzung oder Geraete-Zugang (nur dieses Geraet)."""
+    try:
+        return geraet_voll(request)
+    except HTTPException:
+        z = zugang_lesen(request.cookies.get(GERAET_COOKIE) or "")
+        if z:
+            return {"lan": False, "ip": client_ip(request), "typ": "geraet", "geraet": z}
+        raise
 
 
 @app.middleware("http")
@@ -742,6 +792,84 @@ def diagnose(_=Depends(anmeldung)):
         "geraete": [{"id": z, "name": n, "zuletzt_gesehen_vor_s": int(jetzt - TV[z]["hb"]) if TV[z]["hb"] else None, "spielt": TV[z]["tv_name"] if TV[z]["tv_laeuft"] else None} for z, n in TV_ZIELE.items() if z not in TV_VERSTECKT],
         "protokoll": [schwaerzen(z) for z in LOGRING],
     }
+
+
+# --------------------------------------------------------------------------- Status: "Alles in Ordnung?"
+
+def gesundheit_pruefungen():
+    """Prueft, was zum Betrieb noetig ist, und sagt verstaendlich, was zu tun ist. status: ok | warnung | fehler | info."""
+    liste = []
+
+    def add(kennung, titel, status, text, hinweis=""):
+        liste.append({"id": kennung, "titel": titel, "status": status, "text": text, "hinweis": hinweis})
+
+    try:
+        v = immich_aufruf("GET", "/server/version")
+        add("immich", "Immich", "ok", f"Immich ist erreichbar (Version {v['major']}.{v['minor']}.{v['patch']}).")
+    except Exception as e:  # noqa: BLE001
+        H.log.warning("Gesundheit: Immich nicht erreichbar: %s", schwaerzen(str(e))[:150])
+        add("immich", "Immich", "fehler", "Immich antwortet nicht.", "Läuft Immich? Stimmt die Adresse in den Einstellungen? Bei einem Docker-Setup: Sind Showcase und Immich im selben Docker-Netz?")
+    try:
+        n = int(H.api("POST", "/search/statistics", {"type": "IMAGE", "visibility": "timeline"})["total"])
+        add("fotos", "Fotos und Schlüssel", "ok" if n else "warnung", f"{n:,} Fotos sichtbar.".replace(",", ".") if n else "Der Schlüssel funktioniert, aber es sind keine Fotos sichtbar.",
+            "" if n else "Hat das Immich-Konto, zu dem der Schlüssel gehört, Fotos? Wurden sie schon verarbeitet?")
+    except Exception as e:  # noqa: BLE001
+        add("fotos", "Fotos und Schlüssel", "fehler", "Der Immich-Schlüssel wird abgelehnt oder die Suche schlägt fehl.", "Neuen Schlüssel in Immich anlegen (Rechte laut Anleitung) und in den Einstellungen eintragen. " + schwaerzen(str(e))[:80])
+    try:
+        ml = H.ml_url().rsplit("/", 1)[0] + "/ping"
+        urllib.request.urlopen(ml, timeout=4).read()
+        add("ml", "Bildsuche (Motive)", "ok", "Die Bildsuche („Strand“, „Hund“ …) ist verfügbar.")
+    except Exception:  # noqa: BLE001
+        add("ml", "Bildsuche (Motive)", "warnung", "Die Motivsuche ist gerade nicht erreichbar.", "Suchen nach Person, Zeit und Ort geht weiter. Läuft der Immich-Dienst „machine-learning“?")
+    if UPLOAD_KEY:
+        try:
+            immich_aufruf("GET", "/albums", schluessel=UPLOAD_KEY)
+            add("upload", "Eigene Fotos senden", "ok", f"Bereit (Album „{UPLOAD_ALBUM}“).")
+        except Exception:  # noqa: BLE001
+            add("upload", "Eigene Fotos senden", "warnung", "Der Upload-Schlüssel wird von Immich abgelehnt.", "Neuen Schlüssel mit asset.upload und Albumrechten anlegen (siehe Anleitung).")
+    else:
+        add("upload", "Eigene Fotos senden", "info", "Nicht eingerichtet.", "Optional: mit einem Upload-Schlüssel können Handys Fotos direkt hochladen (Anleitung: .env.example).")
+    jetzt = time.time()
+    for z, name in TV_ZIELE.items():
+        if z in TV_VERSTECKT:
+            continue
+        t, titel = TV[z], name
+        zuletzt = jetzt - t["hb"] if t["hb"] else None
+        alarm = gwert(z, "alarm_min", std_alarm_min())
+        if zuletzt is None:
+            add("g-" + z, titel, "info", "Hat sich noch nie gemeldet.", f"Am Gerät die Seite /tv/ öffnen und mit dem Code koppeln (App → Geräte).")
+        elif zuletzt < 15:
+            akku = (FULLY_STATE.get(z) or {}).get("akku")
+            laedt = (FULLY_STATE.get(z) or {}).get("laedt")
+            if akku is not None and akku <= FULLY_AKKU_MIN and not laedt:
+                add("g-" + z, titel, "warnung", f"Online, aber der Akku ist bei {akku} % und lädt nicht.", "Netzteil prüfen.")
+            elif t.get("ambient") and t.get("bild_alter") is not None and t["bild_alter"] > max(std_sek() * 6, 180):
+                add("g-" + z, titel, "warnung", f"Online, aber seit {int(t['bild_alter'] // 60)} Minuten kein Bildwechsel.", "In der App unter Geräte → ⚙ → „Seite neu laden“.")
+            else:
+                add("g-" + z, titel, "ok", "Online." + (f" Akku {akku} %." if akku is not None else ""))
+        else:
+            minuten = int(zuletzt // 60)
+            wann = f"seit {minuten} Minuten" if minuten < 120 else f"seit {minuten // 60} Stunden"
+            kritisch = bool(alarm) and minuten >= alarm
+            add("g-" + z, titel, "fehler" if kritisch else "warnung", f"Nicht erreichbar ({wann}).",
+                "Strom, WLAN und Internet am Gerät prüfen. Mit Fully: App → Geräte → ⚙ → „Anzeige neu starten“ geht erst, wenn es wieder online ist.")
+    try:
+        du = shutil.disk_usage(os.path.dirname(AUTH_STATE) or "/")
+        frei = du.free / du.total * 100
+        add("speicher", "Speicherplatz", "fehler" if frei < 5 else "warnung" if frei < 12 else "ok", f"{du.free // 2**30} GB frei ({frei:.0f} %).",
+            "Platz schaffen (z. B. Video-Zwischenspeicher verkleinern)." if frei < 12 else "")
+    except OSError:
+        pass
+    sek = int(jetzt - WACHE["start"])
+    add("version", "Showcase", "info", f"Version {VERSION}, läuft seit " + (f"{sek // 86400} Tagen" if sek >= 172800 else f"{sek // 3600} Stunden" if sek >= 7200 else f"{max(sek // 60, 1)} Minuten") + ".")
+    return liste
+
+
+@app.get("/api/gesundheit")
+def gesundheit(_=Depends(anmeldung)):
+    p = zwischenspeicher("gesundheit", 20, gesundheit_pruefungen)
+    gesamt = "fehler" if any(x["status"] == "fehler" for x in p) else "warnung" if any(x["status"] == "warnung" for x in p) else "ok"
+    return {"gesamt": gesamt, "pruefungen": p}
 
 
 @app.get("/api/me")
@@ -2084,8 +2212,10 @@ def rahmen_auswahl(n, ziel=None):
 
 
 @app.get("/api/rahmen/zufall")
-def rahmen_zufall(n: int = 40, ziel: str = "", _=Depends(geraet)):
+def rahmen_zufall(n: int = 40, ziel: str = "", g=Depends(geraet)):
     """Dauerprogramm des Rahmens: zufaellige Fotos nach Quellen und Gewicht (ohne Screenshots, ohne kuerzlich gezeigte); je Rahmen und nach Zeitplan."""
+    if g.get("typ") == "geraet" and ziel and g.get("geraet") != ziel:
+        raise HTTPException(403, "Dieser Zugang gilt nur fuer ein anderes Geraet")
     return {"ids": rahmen_auswahl(max(5, min(n, 100)), ziel if ziel in RAHMEN_ZIELE else None)}
 
 
@@ -2402,7 +2532,7 @@ def geraet_ansicht(z, e):
     t = TV.get(z) or {}
     return {"selbst": meldet_selbst(z), "ip": t.get("ip") or "", "akku": (FULLY_STATE.get(z) or {}).get("akku"), "id": z, "art": e["art"], "name": e["name"], "sek": e.get("sek"), "fuellung": e.get("fuellung") or "", "anzeige": e.get("anzeige") or [],
             "nacht": e.get("nacht") or "", "quellen": e.get("quellen") or "", "zeitplan": e.get("zeitplan") or "",
-            "fully_host": e.get("fully_host") or "", "fully_pw_gesetzt": bool(e.get("fully_pw")), "adb_host": e.get("adb_host") or ""}
+            "fully_host": e.get("fully_host") or "", "fully_pw_gesetzt": bool(e.get("fully_pw")), "adb_host": e.get("adb_host") or "", "alarm_min": e.get("alarm_min")}
 
 
 def geraet_kennung(name):
@@ -2450,6 +2580,14 @@ def geraet_felder(daten, art):
                 if not quelle_lesen(tok):
                     raise HTTPException(400, f"Unbekannte Quelle: {tok}")
             (setzen.__setitem__("quellen", v) if v else weg.append("quellen"))
+        if "alarm_min" in daten:
+            if daten["alarm_min"] in (None, ""):
+                weg.append("alarm_min")
+            else:
+                try:
+                    setzen["alarm_min"] = max(0, min(int(daten["alarm_min"]), 1440))
+                except (TypeError, ValueError):
+                    raise HTTPException(400, "Meldung nach: bitte Minuten angeben (0 = nie, höchstens 1440)")
         if "zeitplan" in daten:
             v = str(daten["zeitplan"] or "").strip()
             if v and len(zeitplan_lesen(v)) != len([x for x in v.split(";") if x.strip()]):
@@ -2548,6 +2686,29 @@ def geraet_loeschen(z: str, _=Depends(anmeldung), __=Depends(csrf)):
         geraet_aufraeumen(z)
     H.log.info("Geraet geloescht: %s '%s'", z, name)
     return {"ok": True, "nachricht": f"„{name}“ wurde entfernt. Gespeicherte Shows bleiben erhalten."}
+
+
+@app.post("/api/verwaltung/geraete/{z}/zugang-widerrufen")
+def geraet_zugang_widerrufen(z: str, _=Depends(anmeldung), __=Depends(csrf)):
+    """Der Geraete-Zugang dieses Geraets (Cookie von der Kopplung) wird ungueltig; es muss neu gekoppelt werden. Die PIN bleibt unveraendert."""
+    if z not in TV_ZIELE:
+        raise HTTPException(404, "Gerät nicht gefunden")
+    zugang_widerrufen(z)
+    H.log.info("Geraete-Zugang widerrufen: %s", z)
+    return {"ok": True, "nachricht": f"Der Zugang von „{TV_ZIELE[z]}“ wurde widerrufen. Das Gerät zeigt einen neuen Kopplungs-Code, sobald es den Server von außerhalb des Heimnetzes erreicht."}
+
+
+@app.post("/api/geraete/{z}/befehl")
+def geraet_befehl(z: str, daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
+    """Schickt einem Geraet (beim naechsten Abruf, meist binnen 2 s) einen Befehl: 'neuladen' (Seite neu laden) oder 'neustart' (Anzeige neu starten, mit Fully)."""
+    aktion = str((daten or {}).get("aktion", ""))
+    if z not in TV_ZIELE:
+        raise HTTPException(404, "Gerät nicht gefunden")
+    if aktion not in ("neuladen", "neustart"):
+        raise HTTPException(400, "Unbekannter Befehl")
+    TV[z]["befehl"] = aktion
+    H.log.info("Befehl an %s: %s", z, aktion)
+    return {"ok": True, "nachricht": "Der Befehl wird beim nächsten Abruf des Geräts ausgeführt (meist innerhalb weniger Sekunden). Ist das Gerät offline, geht er verloren."}
 
 
 # --------------------------------------------------------------------------- Seite direkt am Fernseher oeffnen (Android TV, Shield, Fire TV per ADB)
@@ -2811,19 +2972,19 @@ def bildschirm_schalten(daten):
 # --------------------------------------------------------------------------- Home Assistant (und andere Automationen): Zustand lesen, steuern
 # Zugriff wie bei den Geraeteseiten: aus dem vertrauten Netz (RAHMEN_WEB_LAN muss die Adresse von Home Assistant enthalten) oder mit Sitzung.
 @app.get("/api/ha/status")
-def ha_status(_=Depends(geraet)):
+def ha_status(_=Depends(geraet_voll)):
     return {"version": VERSION, "geraete": geraete_liste(), "shows": [x["name"] for x in daten_lesen()["shows"]]}
 
 
 @app.post("/api/ha/steuer")
-def ha_steuer(daten: dict, _=Depends(geraet), __=Depends(csrf)):
+def ha_steuer(daten: dict, _=Depends(geraet_voll), __=Depends(csrf)):
     if str(daten.get("aktion", "")) not in ("pause", "weiter", "vor", "zurueck", "stopp", "lauter", "leiser", "naechster"):
         raise HTTPException(400, "Unbekannte Aktion")
     return steuer_senden({"ziel": daten.get("ziel"), "aktion": daten.get("aktion")})
 
 
 @app.post("/api/ha/show")
-def ha_show(daten: dict, _=Depends(geraet), __=Depends(csrf)):
+def ha_show(daten: dict, _=Depends(geraet_voll), __=Depends(csrf)):
     """Eine gespeicherte Show (nach Name) auf einem Fernseher/Rahmen starten."""
     name = H.norm(str(daten.get("show", "")))
     show = next((x for x in daten_lesen()["shows"] if H.norm(x["name"]) == name), None)
@@ -2837,7 +2998,7 @@ def ha_show(daten: dict, _=Depends(geraet), __=Depends(csrf)):
 
 
 @app.post("/api/ha/bildschirm")
-def ha_bildschirm(daten: dict, _=Depends(geraet), __=Depends(csrf)):
+def ha_bildschirm(daten: dict, _=Depends(geraet_voll), __=Depends(csrf)):
     return bildschirm_schalten(daten)
 
 
@@ -2866,13 +3027,17 @@ def koppeln_neu(request: Request, _=Depends(csrf)):
 
 
 @app.get("/api/koppeln/status")
-def koppeln_status(code: str = ""):
+def koppeln_status(request: Request, response: Response, code: str = ""):
     with KOPPEL_LOCK:
         koppel_aufraeumen(time.time())
         eintrag = KOPPEL.get(code.strip().upper())
     if not eintrag:
         raise HTTPException(404, "Code unbekannt oder abgelaufen")
     z = eintrag["ziel"]
+    if z and z in TV_ZIELE:                      # das Geraet ist zugewiesen: es bekommt seinen eigenen, lange gueltigen Zugang (nur fuer die Rahmen-Seiten)
+        response.set_cookie(GERAET_COOKIE, zugang_ausstellen(z), max_age=GERAET_COOKIE_TAGE * 86400, httponly=True,
+                            samesite="strict", secure=request.headers.get("x-forwarded-proto") == "https")
+        H.log.info("Geraete-Zugang ausgestellt fuer %s (von %s)", z, client_ip(request))
     return {"ziel": z, "name": TV_ZIELE.get(z) if z else None}
 
 
@@ -2902,9 +3067,10 @@ def rahmen_wache_pruefen(jetzt=None):
         zuletzt = max(t["hb"], WACHE["start"])
         offline_min = (jetzt - zuletzt) / 60
         alter = t.get("bild_alter")
-        haengt = (jetzt - t["hb"] < 20 and t.get("ambient") and alter is not None and alter > max(std_sek() * 6, 180) + std_alarm_min() * 60)
+        haengt = (jetzt - t["hb"] < 20 and t.get("ambient") and alter is not None and alter > max(std_sek() * 6, 180) + gwert(z, "alarm_min", std_alarm_min()) * 60)
         gemeldet = WACHE["gemeldet"].get(z)
-        if std_alarm_min() and offline_min >= std_alarm_min() and gemeldet != "offline":
+        alarm = gwert(z, "alarm_min", std_alarm_min())
+        if alarm and offline_min >= alarm and gemeldet != "offline":
             WACHE["gemeldet"][z] = "offline"
             meldungen.append((f"{name} nicht erreichbar", f"Der Rahmen meldet sich seit {int(offline_min)} Minuten nicht mehr (Tablet aus, WLAN oder Browser beendet?)."))
         elif haengt and gemeldet != "haengt":
@@ -3057,8 +3223,15 @@ def steuer_senden(daten):
 
 
 @app.get("/api/tv/abfrage")
-def tv_abfrage(request: Request, ziel: str, seq: int = -1, s: int = 0, n: str = "", m: str = "", ra: int = -1, a: int = 0, fj: int = 0, ak: int = -1, pl: int = -1, _=Depends(geraet)):
+def tv_abfrage(request: Request, response: Response, ziel: str, seq: int = -1, s: int = 0, n: str = "", m: str = "", ra: int = -1, a: int = 0, fj: int = 0, ak: int = -1, pl: int = -1, g=Depends(geraet)):
     """Vom Fernseher alle 2 s aufgerufen (zaehlt zugleich als 'online'). s/n/m = was der Fernseher gerade wirklich tut."""
+    if g.get("typ") == "geraet":
+        if g.get("geraet") != ziel:
+            raise HTTPException(403, "Dieser Zugang gilt nur fuer ein anderes Geraet")
+        if time.time() - GERAET_ERNEUERT.get(ziel, 0) > 86400:          # Zugang verlaengern (gleitend): einmal am Tag genuegt
+            GERAET_ERNEUERT[ziel] = time.time()
+            response.set_cookie(GERAET_COOKIE, zugang_ausstellen(ziel), max_age=GERAET_COOKIE_TAGE * 86400, httponly=True,
+                                samesite="strict", secure=request.headers.get("x-forwarded-proto") == "https")
     t = tv_ziel(ziel)
     t["hb"] = time.time()
     t["tv_laeuft"], t["tv_name"], t["tv_musik"] = bool(s), n[:60], (m if KAT_RE.match(m or "") else "")
@@ -3071,11 +3244,13 @@ def tv_abfrage(request: Request, ziel: str, seq: int = -1, s: int = 0, n: str = 
         t["ip"] = ""
     if fj and 0 <= ak <= 100:
         akku_melden(ziel, ak, pl == 1)
+    befehl = t.pop("befehl", None)               # einmalig: "neuladen" oder "neustart" (aus der App ausgeloest)
+    extra = {"befehl": befehl} if befehl else {}
     if seq < 0:                                   # Seite neu geladen: laufende Show fortsetzen
-        return {"seq": t["seq"], "events": [t["aktiv"]] if t["aktiv"] else []}
+        return {"seq": t["seq"], "events": [t["aktiv"]] if t["aktiv"] else [], **extra}
     if seq > t["seq"]:                            # Server wurde neu gestartet
-        return {"seq": t["seq"], "events": []}
-    return {"seq": t["seq"], "events": [e for e in t["events"] if e["seq"] > seq]}
+        return {"seq": t["seq"], "events": [], **extra}
+    return {"seq": t["seq"], "events": [e for e in t["events"] if e["seq"] > seq], **extra}
 
 
 VIDEO_LOCK = threading.Lock()
