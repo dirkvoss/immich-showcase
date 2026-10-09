@@ -479,6 +479,10 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
   <p class="versionszeile" data-version></p>
 </div>
 
+<div id="demoBanner" class="versteckt" role="status" style="position:sticky;top:0;z-index:60;padding:8px 14px;background:#e0b359;color:#1b1608;font-size:14px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap">
+  <span>Demo-Modus: erfundene Beispielfotos – es wird nichts an einen echten Rahmen gesendet.</span>
+  <button type="button" id="demoEnde" style="padding:4px 10px;border-radius:8px;border:1px solid #1b160855;background:#fff8;color:inherit;font:inherit;font-weight:600;cursor:pointer">Eigenen Server verbinden</button>
+</div>
 <div id="appAnsicht" class="versteckt">
   <header>
     <div class="kopf">
@@ -1637,6 +1641,7 @@ async function konfigLaden() {
       $("#sucheBsp").textContent = q[0] + bsp[0] + q[1];
     }
     $("#hochladenBtn").classList.toggle("versteckt", !konfig.hochladen);
+    $("#demoBanner").classList.toggle("versteckt", !konfig.demo);
     rahmenAuswahlBauen(); rahmenWahlBauen(); if (rahmenIds().length) statusLaden();
     if (konfig.tv_url) $("#tvTippAdr").innerHTML = `Am Fernseher einmal im Browser <b>${esc(konfig.tv_url)}</b> öffnen` + (konfig.ziele.shield ? ` (${esc(konfig.ziele.shield)}: <b>${esc(konfig.tv_url)}/s</b>)` : "");
   } catch (e) { document.body.classList.remove("modus-laden"); }
@@ -2102,6 +2107,7 @@ async function versionPruefen() {
   } catch (e) {}
 }
 $("#updateBanner").addEventListener("click", () => location.reload());
+$("#demoEnde").addEventListener("click", () => { try { window.webkit.messageHandlers.showcase.postMessage({ aktion: "demoBeenden" }); } catch (e) {} });
 // Zustand des Rahmens aktuell halten: auch Siri, Teilen, Widget und andere Handys aendern ihn von aussen.
 function statusAuffrischen(alles) {
   if (document.visibilityState !== "visible" || !konfig || !rahmenIds().length || $("#appAnsicht").classList.contains("versteckt")) return;

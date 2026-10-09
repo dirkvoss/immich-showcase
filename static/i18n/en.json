@@ -490,7 +490,11 @@
   "Unabhängiges Projekt, nicht mit dem Immich-Projekt verbunden.": "Independent project, not affiliated with the Immich project.",
   "Mit „📤 Meine Fotos“ schickst du Fotos von diesem Gerät an Immich (Album „Showcase-Uploads“) und kannst sie mit anderen Fotos mischen. Mit der Kamera hier aufgenommene Fotos liegen danach nur in Immich, nicht in der Fotos-Mediathek des Handys. In der iPhone-App geht es auch über „Teilen“ in der Fotos-App und über Siri und Kurzbefehle.": "With “📤 My photos” you send photos from this device to Immich (album “Showcase-Uploads”) and can mix them with other photos. Photos taken here with the camera are then only in Immich, not in the phone’s photo library. In the iPhone app you can also use “Share” in the Photos app, and Siri and Shortcuts.",
   "Du brauchst nichts zu installieren:": "You don’t need to install anything:",
-  "Der Rahmen läuft in jedem normalen Browser. Fully Kiosk ist nur ein optionales Extra (ca. 8 €), damit sich der Bildschirm nachts wirklich ausschaltet und der Akkustand gemeldet wird.": "The frame runs in any normal browser. Fully Kiosk is just an optional extra (about €8) so the screen really switches off at night and the battery level is reported."
+  "Der Rahmen läuft in jedem normalen Browser. Fully Kiosk ist nur ein optionales Extra (ca. 8 €), damit sich der Bildschirm nachts wirklich ausschaltet und der Akkustand gemeldet wird.": "The frame runs in any normal browser. Fully Kiosk is just an optional extra (about €8) so the screen really switches off at night and the battery level is reported.",
+  "Demo-Modus: erfundene Beispielfotos – es wird nichts an einen echten Rahmen gesendet.": "Demo mode: invented sample photos – nothing is sent to a real frame.",
+  "Eigenen Server verbinden": "Connect your own server",
+  "iPhone-App verbinden:": "Connect the iPhone app:",
+  "In der App „QR-Code scannen“ wählen und diesen Code scannen.": "In the app choose “Scan QR code” and scan this code."
  },
  "muster": [
   [

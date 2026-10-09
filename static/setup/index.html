@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <script src="/i18n.js"></script>
+<script src="/qrcode.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -89,6 +90,11 @@ button:disabled { opacity: .5; }
       <p><b>Geschafft.</b> Immich Showcase startet jetzt neu …</p>
       <div id="pinBox" class="versteckt"><p>Deine PIN (bitte merken, sie wird nur jetzt angezeigt):</p><div class="pin" id="pinAnzeige"></div></div>
       <p class="tipp" id="warte">Einen Moment, die Seite öffnet sich gleich von selbst.</p>
+      <div id="appBox" class="versteckt" style="text-align:center;margin-top:18px">
+        <p><b>iPhone-App verbinden:</b> In der App „QR-Code scannen“ wählen und diesen Code scannen.</p>
+        <div id="appQr" style="width:180px;margin:10px auto;background:#fff;padding:8px;border-radius:10px"></div>
+        <p class="tipp" id="appAdresse"></p>
+      </div>
     </section>
   </div>
 </main>
@@ -117,6 +123,14 @@ $("#w2").addEventListener("click", () => {
   if (modus === "key" && !$("#key").value.trim()) return meld("#m2", "Bitte den API-Schlüssel eingeben.");
   meld("#m2", ""); schritt(3);
 });
+function appQr() {                                           // QR fuer die iPhone-App: Adresse, unter der du diese Seite gerade erreichst
+  try {
+    const link = "showcase://verbinden?adresse=" + encodeURIComponent(location.origin);
+    const qr = qrcode(0, "M"); qr.addData(link); qr.make();
+    $("#appQr").innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true });
+    $("#appAdresse").textContent = location.origin; $("#appBox").classList.remove("versteckt");
+  } catch (e) {}
+}
 $("#z3").addEventListener("click", () => schritt(2));
 $("#w3").addEventListener("click", async () => {
   meld("#m3", ""); $("#w3").disabled = true;
@@ -127,7 +141,7 @@ $("#w3").addEventListener("click", async () => {
     if (r.pin) { $("#pinAnzeige").textContent = r.pin; $("#pinBox").classList.remove("versteckt"); }
     for (let i = 0; i < 60; i++) {
       await new Promise(f => setTimeout(f, 1500));
-      try { const c = await (await fetch("/api/config", { cache: "no-store" })).json(); if (c.konfiguriert) { $("#warte").textContent = "Fertig – du kannst jetzt starten."; const a = document.createElement("button"); a.className = "primaer"; a.textContent = "Immich Showcase öffnen"; a.onclick = () => location.href = "/"; $("#s4").appendChild(a); if (!r.pin) location.href = "/"; return; } } catch (e) {}
+      try { const c = await (await fetch("/api/config", { cache: "no-store" })).json(); if (c.konfiguriert) { $("#warte").textContent = "Fertig – du kannst jetzt starten."; appQr(); const a = document.createElement("button"); a.className = "primaer"; a.textContent = "Immich Showcase öffnen"; a.onclick = () => location.href = "/"; $("#s4").appendChild(a); if (!r.pin) location.href = "/"; return; } } catch (e) {}
     }
   } catch (e) { meld("#m3", e.message); $("#w3").disabled = false; }
 });

@@ -5,6 +5,7 @@ import LocalAuthentication
 final class AppModell: ObservableObject {
     @AppStorage("serverAdresse") private var gespeichert = ""
     @AppStorage("faceIDAktiv") var faceIDAktiv = false
+    @AppStorage("demoAktiv") var demoAktiv = false
 
     @Published var server: URL?
     @Published var gesperrt = false
@@ -18,7 +19,11 @@ final class AppModell: ObservableObject {
         Task { await ServerKlient.fuerErweiterungenSichern(server: s) }
     }
 
+    func demoStarten() { demoAktiv = true; objectWillChange.send() }
+    func demoBeenden() { demoAktiv = false; objectWillChange.send() }
+
     func serverSetzen(_ url: URL?) {
+        demoAktiv = false
         server = url
         gespeichert = url?.absoluteString ?? ""
         Task { await ServerKlient.fuerErweiterungenSichern(server: url) }

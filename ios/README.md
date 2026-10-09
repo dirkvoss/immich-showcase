@@ -13,6 +13,8 @@ cd ios
 Das Xcode-Projekt wird aus `project.yml` erzeugt und nicht eingecheckt.
 
 ## Verbinden
+- **Im WLAN suchen:** Beim ersten Start sucht die App im eigenen Netz (/24, Ports 8090 und 80) nach Showcase-Servern und zeigt Treffer zum Antippen an. Dafür fragt iOS einmal nach dem Zugriff auf das lokale Netzwerk. Zusätzlich probiert die Suche bekannte Namen (`showcase`, `immich-showcase`, `bilderrahmen`, auch mit `.local`), das klappt über Netzgrenzen hinweg, wenn dein DNS den Namen kennt. Für ein anderes Netz oder VLAN gibt es unter „Server in einem anderen Netz suchen“ ein Eingabefeld (z. B. `192.168.2`); die Suche beschränkt sich auf private Adressbereiche.
+- **Demo ohne Server:** „Demo ausprobieren“ zeigt die echte Oberfläche mit erfundenen Beispielfotos (gemalt, keine echten Fotos). Es wird nichts gesendet. Technisch liefert die App die Oberfläche (Kopie von `static/` im Paket) und eine Mini-Schnittstelle unter `showcase-demo://demo/` selbst aus (`ios/Demo/`).
 - Adresse des Servers eintippen (zum Beispiel `192.168.1.20:8090`), oder
 - in der Web-App unter *Konto → Einstellungen → iPhone-App verbinden* den QR-Code zeigen und in der App scannen.
 

@@ -7,7 +7,10 @@ struct WurzelAnsicht: View {
     var body: some View {
         ZStack {
             Color(red: 0.07, green: 0.08, blue: 0.11).ignoresSafeArea()
-            if let server = modell.server {
+            if modell.demoAktiv {
+                WebAnsicht(server: DemoServer.startURL, demo: true)
+                    .ignoresSafeArea(edges: .bottom)
+            } else if let server = modell.server {
                 WebAnsicht(server: server)
                     .ignoresSafeArea(edges: .bottom)
             } else {

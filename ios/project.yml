@@ -39,7 +39,15 @@ targets:
   ShowcaseImmich:
     type: application
     platform: iOS
-    sources: [Sources, Shared, Resources]
+    sources:
+      - Sources
+      - Shared
+      - Resources
+      - Demo
+      - path: ../static
+        name: web
+        type: folder
+        buildPhase: resources
     dependencies:
       - target: ShowcaseTeilen
       - target: ShowcaseWidget

@@ -12,8 +12,13 @@ struct EinstellungenAnsicht: View {
         NavigationStack {
             Form {
                 Section("Server") {
-                    Text(modell.server?.absoluteString ?? "nicht verbunden").foregroundStyle(.secondary)
-                    Button("Server ändern", role: .destructive) { modell.serverSetzen(nil); schliessen() }
+                    if modell.demoAktiv {
+                        Text("Demo-Modus: Beispielfotos, es wird nichts gesendet.").foregroundStyle(.secondary)
+                        Button("Demo beenden und eigenen Server verbinden") { modell.demoBeenden(); modell.serverSetzen(nil); schliessen() }
+                    } else {
+                        Text(modell.server?.absoluteString ?? "nicht verbunden").foregroundStyle(.secondary)
+                        Button("Server ändern", role: .destructive) { modell.serverSetzen(nil); schliessen() }
+                    }
                 }
                 Section("Sicherheit") {
                     Toggle("Mit Face ID sperren", isOn: Binding(get: { modell.faceIDAktiv }, set: { an in faceID(an) }))

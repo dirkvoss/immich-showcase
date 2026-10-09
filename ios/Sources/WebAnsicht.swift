@@ -5,13 +5,14 @@ import WebKit
 struct WebAnsicht: View {
     @EnvironmentObject var modell: AppModell
     let server: URL
+    var demo = false
     @State private var fehler: String?
     @State private var ladeNummer = 0
 
     var body: some View {
         ZStack {
-            WebKitAnsicht(server: server, neuLaden: ladeNummer,
-                          fehler: { fehler = $0 }, einstellungen: { modell.einstellungenOffen = true })
+            WebKitAnsicht(server: server, demo: demo, neuLaden: ladeNummer,
+                          fehler: { fehler = $0 }, einstellungen: { modell.einstellungenOffen = true }, demoBeenden: { modell.demoBeenden() })
                 .opacity(fehler == nil ? 1 : 0)
             if let fehler {
                 VStack(spacing: 16) {
@@ -28,9 +29,11 @@ struct WebAnsicht: View {
 
 struct WebKitAnsicht: UIViewRepresentable {
     let server: URL
+    var demo = false
     let neuLaden: Int
     let fehler: (String) -> Void
     let einstellungen: () -> Void
+    var demoBeenden: () -> Void = {}
 
     func makeCoordinator() -> Koordinator { Koordinator(self) }
 
@@ -39,6 +42,7 @@ struct WebKitAnsicht: UIViewRepresentable {
         konfig.allowsInlineMediaPlayback = true
         konfig.applicationNameForUserAgent = "ShowcaseApp/\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0")"
         konfig.userContentController.add(context.coordinator, name: "showcase")
+        if demo { konfig.setURLSchemeHandler(DemoServer(), forURLScheme: DemoServer.schema) }
         let web = WKWebView(frame: .zero, configuration: konfig)
         web.navigationDelegate = context.coordinator
         web.uiDelegate = context.coordinator
@@ -86,7 +90,7 @@ struct WebKitAnsicht: UIViewRepresentable {
 
         func webView(_ webView: WKWebView, decidePolicyFor aktion: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
             guard let ziel = aktion.request.url else { return decisionHandler(.allow) }
-            if ["about", "blob", "data"].contains(ziel.scheme ?? "") { return decisionHandler(.allow) }
+            if ["about", "blob", "data", DemoServer.schema].contains(ziel.scheme ?? "") { return decisionHandler(.allow) }
             if ["http", "https"].contains(ziel.scheme ?? ""), !Adresse.gehoertZumServer(ziel, server: eltern.server) {
                 UIApplication.shared.open(ziel)                              // fremde Seiten (z. B. GitHub) im Browser
                 return decisionHandler(.cancel)
@@ -96,8 +100,7 @@ struct WebKitAnsicht: UIViewRepresentable {
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             webView.scrollView.refreshControl?.endRefreshing()
-            let s = eltern.server
-            Task { await ServerKlient.fuerErweiterungenSichern(server: s) }      // Anmeldung (PIN-Cookie) für Teilen-Erweiterung und Widget merken
+            if !eltern.demo { let s = eltern.server; Task { await ServerKlient.fuerErweiterungenSichern(server: s) } }      // Anmeldung (PIN-Cookie) für Teilen-Erweiterung und Widget merken
         }
         func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { melden(error, webView) }
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { melden(error, webView) }
@@ -128,6 +131,7 @@ struct WebKitAnsicht: UIViewRepresentable {
         func userContentController(_ c: WKUserContentController, didReceive m: WKScriptMessage) {
             guard let d = m.body as? [String: Any], let aktion = d["aktion"] as? String else { return }
             if aktion == "einstellungen" { DispatchQueue.main.async { self.eltern.einstellungen() } }
+            if aktion == "demoBeenden" { DispatchQueue.main.async { self.eltern.demoBeenden() } }
         }
     }
 }

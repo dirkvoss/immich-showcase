@@ -1,6 +1,12 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.15.0]
+### Neu
+- **iPhone-App – Demo-Modus:** „Demo ausprobieren (ohne Server)“ zeigt die echte Oberfläche mit erfundenen, gemalten Beispielfotos; es wird nichts gesendet. Ein Banner führt jederzeit zum Verbinden des eigenen Servers. Auch für die Prüfung im App Store gedacht.
+- **iPhone-App – Server finden:** Die App sucht Showcase-Server im eigenen WLAN (/24, Ports 8090 und 80) und probiert bekannte Namen (`showcase`, `immich-showcase`, `bilderrahmen`, auch `.local`). Treffer erscheinen sofort zum Antippen. Für ein anderes Netz gibt es ein Eingabefeld (nur private Adressbereiche).
+- **Einrichtungsassistent:** Am Ende zeigt `/setup/` einen QR-Code „iPhone-App verbinden“.
+
 ## [2.14.3]
 ### Geändert
 - **Ein normaler Browser genügt:** Die Anleitung stellt den einfachen Weg (Chrome bzw. Safari, „Zum Startbildschirm hinzufügen“) an die erste Stelle; Fully Kiosk wird als optionales Extra beschrieben (Bildschirm nachts wirklich aus, Akkustand). Ein Hinweis im Geräte-Dialog sagt das auch in der Oberfläche.

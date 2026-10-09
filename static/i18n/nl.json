@@ -490,7 +490,11 @@
   "Unabhängiges Projekt, nicht mit dem Immich-Projekt verbunden.": "Onafhankelijk project, niet verbonden met het Immich-project.",
   "Mit „📤 Meine Fotos“ schickst du Fotos von diesem Gerät an Immich (Album „Showcase-Uploads“) und kannst sie mit anderen Fotos mischen. Mit der Kamera hier aufgenommene Fotos liegen danach nur in Immich, nicht in der Fotos-Mediathek des Handys. In der iPhone-App geht es auch über „Teilen“ in der Fotos-App und über Siri und Kurzbefehle.": "Met “📤 Mijn foto's” stuur je foto's van dit apparaat naar Immich (album “Showcase-Uploads”) en kun je ze met andere foto's mengen. Foto's die je hier met de camera maakt, staan daarna alleen in Immich, niet in de fotobibliotheek van de telefoon. In de iPhone-app kan ook via “Deel” in Foto's en via Siri en Opdrachten.",
   "Du brauchst nichts zu installieren:": "Je hoeft niets te installeren:",
-  "Der Rahmen läuft in jedem normalen Browser. Fully Kiosk ist nur ein optionales Extra (ca. 8 €), damit sich der Bildschirm nachts wirklich ausschaltet und der Akkustand gemeldet wird.": "De lijst werkt in elke gewone browser. Fully Kiosk is slechts een optionele extra (ca. € 8) zodat het scherm 's nachts echt uitgaat en de batterijstand wordt doorgegeven."
+  "Der Rahmen läuft in jedem normalen Browser. Fully Kiosk ist nur ein optionales Extra (ca. 8 €), damit sich der Bildschirm nachts wirklich ausschaltet und der Akkustand gemeldet wird.": "De lijst werkt in elke gewone browser. Fully Kiosk is slechts een optionele extra (ca. € 8) zodat het scherm 's nachts echt uitgaat en de batterijstand wordt doorgegeven.",
+  "Demo-Modus: erfundene Beispielfotos – es wird nichts an einen echten Rahmen gesendet.": "Demomodus: verzonnen voorbeeldfoto's – er wordt niets naar een echte lijst gestuurd.",
+  "Eigenen Server verbinden": "Eigen server verbinden",
+  "iPhone-App verbinden:": "iPhone-app verbinden:",
+  "In der App „QR-Code scannen“ wählen und diesen Code scannen.": "Kies in de app “QR-code scannen” en scan deze code."
  },
  "muster": [
   [
