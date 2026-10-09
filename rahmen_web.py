@@ -3359,13 +3359,17 @@ def upload_multipart(felder, dateiname, typ, daten):
     return b"".join(teile), "multipart/form-data; boundary=" + grenze
 
 
+UPLOAD_ALBUM_LOCK = threading.Lock()
+
+
 def upload_album_id():
-    """Das Upload-Album (wird beim ersten Mal angelegt)."""
+    """Das Upload-Album (wird beim ersten Mal angelegt). Gibt es mehrere gleichnamige, gilt das mit den meisten Fotos (bei Gleichstand das aelteste)."""
     def holen():
-        for a in immich_aufruf("GET", "/albums", schluessel=UPLOAD_KEY) or []:
-            if a.get("albumName") == UPLOAD_ALBUM and a.get("ownerId") not in ("", None):
-                return a["id"]
-        return immich_aufruf("POST", "/albums", {"albumName": UPLOAD_ALBUM, "description": "Von der Showcase-App hochgeladene Fotos"}, schluessel=UPLOAD_KEY)["id"]
+        with UPLOAD_ALBUM_LOCK:
+            passend = [a for a in immich_aufruf("GET", "/albums", schluessel=UPLOAD_KEY) or [] if a.get("albumName") == UPLOAD_ALBUM]
+            if passend:
+                return sorted(passend, key=lambda a: (-(a.get("assetCount") or 0), a.get("createdAt") or ""))[0]["id"]
+            return immich_aufruf("POST", "/albums", {"albumName": UPLOAD_ALBUM, "description": "Von der Showcase-App hochgeladene Fotos"}, schluessel=UPLOAD_KEY)["id"]
     return zwischenspeicher("upload-album", 600, holen)
 
 

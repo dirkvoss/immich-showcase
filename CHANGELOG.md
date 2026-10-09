@@ -1,6 +1,10 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.14.1]
+### Behoben
+- **Upload-Album:** Der Server legte beim Hochladen nach jedem Neustart ein neues Album „Showcase-Uploads“ an, weil er das vorhandene nicht fand (Immich nennt in der Albumliste keinen Besitzer). Es wird jetzt wiedergefunden; bei mehreren gleichnamigen gilt das mit den meisten Fotos.
+
 ## [2.14.0]
 ### Neu
 - **iPhone-App – Siri und Kurzbefehle:** „Fotos auf den Rahmen zeigen“ (Suchtext wie in der Web-App), „Show beenden“, „Zur vorherigen Show zurück“.

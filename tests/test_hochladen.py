@@ -142,3 +142,25 @@ def test_upload_senden_liest_antwort_auch_nach_broken_pipe(app_laden, monkeypatc
 def test_schluessel_wird_in_der_diagnose_geschwaerzt(app_laden):
     w, c = aktiv(app_laden)
     assert "upload-key" not in w.schwaerzen("Fehler mit upload-key im Text")
+
+
+def test_vorhandenes_album_wird_wiederverwendet_nicht_neu_angelegt(app_laden, monkeypatch):
+    """Immich nennt in der Albumliste keinen Besitzer - das Album muss trotzdem gefunden werden (sonst entsteht bei jedem Start ein neues)."""
+    w, c = aktiv(app_laden)
+    aufrufe = []
+
+    def aufruf(m, p, d=None, **k):
+        aufrufe.append((m, p))
+        if m == "GET":
+            return [{"id": "leer", "albumName": "Showcase-Uploads", "assetCount": 0, "createdAt": "2026-10-09T11:00"},
+                    {"id": "voll", "albumName": "Showcase-Uploads", "assetCount": 3, "createdAt": "2026-10-09T12:00"},
+                    {"id": "anderes", "albumName": "Urlaub", "assetCount": 99}]
+        return {"id": "neu"}
+
+    monkeypatch.setattr(w, "immich_aufruf", aufruf)
+    w.CACHE.clear()
+    assert w.upload_album_id() == "voll"
+    assert ("POST", "/albums") not in aufrufe
+    w.CACHE.clear()
+    monkeypatch.setattr(w, "immich_aufruf", lambda m, p, d=None, **k: [] if m == "GET" else {"id": "neu"})
+    assert w.upload_album_id() == "neu"
