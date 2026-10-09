@@ -33,4 +33,13 @@ final class AdresseTests: XCTestCase {
         XCTAssertFalse(Adresse.gehoertZumServer(URL(string: "https://github.com/x")!, server: s))
         XCTAssertFalse(Adresse.gehoertZumServer(URL(string: "http://192.168.1.20:2283/")!, server: s))
     }
+    func testKandidatenOhneSchemaProbierenBeide() {
+        XCTAssertEqual(Adresse.kandidaten("bilderrahmen.example.com").map(\.absoluteString), ["https://bilderrahmen.example.com", "http://bilderrahmen.example.com"])
+        XCTAssertEqual(Adresse.kandidaten("192.168.1.20:8090").map(\.absoluteString), ["http://192.168.1.20:8090", "https://192.168.1.20:8090"])
+    }
+    func testKandidatenMitSchemaNurEiner() {
+        XCTAssertEqual(Adresse.kandidaten("https://x.de/").map(\.absoluteString), ["https://x.de"])
+        XCTAssertEqual(Adresse.kandidaten("http://192.168.1.2").map(\.absoluteString), ["http://192.168.1.2"])
+        XCTAssertTrue(Adresse.kandidaten("zwei woerter").isEmpty)
+    }
 }

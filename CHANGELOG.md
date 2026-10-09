@@ -1,6 +1,12 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.12.1]
+### Geändert
+- **iPhone-App:** Die Server-Adresse darf ohne `http://`/`https://` eingegeben werden; die App probiert beide Varianten durch und nennt bei einem Fehler die genaue Ursache.
+- **iPhone-App:** Der Startbildschirm weist jetzt deutlich darauf hin, dass die App einen eigenen Immich-Showcase-Server braucht und sich nicht direkt mit Immich verbindet.
+- iPhone-App trägt jetzt die Version 1.0 (Versions- und Build-Nummer kommen aus den Projekteinstellungen).
+
 ## [2.12.0]
 ### Neu
 - **iPhone-App „Showcase Immich“** (Ordner `ios/`, SwiftUI + Web-Ansicht): Einrichtung per Adresse oder QR-Code, Face-ID-Sperre, Fehlerseite ohne Verbindung; TestFlight-Skripte. In der Web-App gibt es dafür unter *Einstellungen → iPhone-App verbinden* einen QR-Code und in der App *Konto → App-Einstellungen*.

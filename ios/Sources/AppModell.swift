@@ -37,14 +37,17 @@ final class AppModell: ObservableObject {
             return .success(name)
         } catch let e as URLError where e.code == .notConnectedToInternet || e.code == .cannotFindHost || e.code == .timedOut || e.code == .cannotConnectToHost {
             return .failure(.nichtErreichbar)
+        } catch let e as URLError {
+            return .failure(.verbindung("\(e.localizedDescription) (\(e.code.rawValue))"))
         } catch { return .failure(.keinShowcase) }
     }
 
-    enum Fehler: Error { case nichtErreichbar, keinShowcase
+    enum Fehler: Error { case nichtErreichbar, keinShowcase, verbindung(String)
         var text: String {
             switch self {
             case .nichtErreichbar: return "Der Server ist nicht erreichbar. Prüfe die Adresse und ob du im richtigen Netz bist."
             case .keinShowcase: return "Unter dieser Adresse antwortet kein Immich Showcase."
+            case .verbindung(let d): return "Die Verbindung ist fehlgeschlagen: \(d)"
             }
         }
     }

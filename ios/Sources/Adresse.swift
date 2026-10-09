@@ -19,6 +19,18 @@ enum Adresse {
         return u
     }
 
+    /// Alle Adressen, die beim Verbinden der Reihe nach probiert werden. Mit Schema (http:// oder https://) genau eine;
+    /// ohne Schema erst die wahrscheinlichere Variante (Domain -> https, IP/lokaler Name -> http), danach die andere.
+    static func kandidaten(_ roh: String) -> [URL] {
+        guard let erste = normalisieren(roh) else { return [] }
+        let t = roh.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if t.hasPrefix("http://") || t.hasPrefix("https://") { return [erste] }
+        var comp = URLComponents(url: erste, resolvingAgainstBaseURL: false)
+        comp?.scheme = erste.scheme == "https" ? "http" : "https"
+        guard let zweite = comp?.url else { return [erste] }
+        return [erste, zweite]
+    }
+
     /// Verbindungs-Link aus dem QR-Code der Web-App: showcase://verbinden?adresse=<url>
     static func ausVerbindungsLink(_ url: URL) -> URL? {
         guard url.scheme == "showcase", url.host == "verbinden",
