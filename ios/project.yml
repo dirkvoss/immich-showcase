@@ -6,6 +6,7 @@
 name: ShowcaseImmich
 options:
   bundleIdPrefix: com.dirk-voss
+  developmentLanguage: de
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
@@ -23,6 +24,8 @@ schemes:
     build:
       targets:
         ShowcaseImmich: all
+        ShowcaseTeilen: all
+        ShowcaseWidget: all
         ShowcaseImmichTests: [test]
     run:
       config: Debug
@@ -36,7 +39,14 @@ targets:
   ShowcaseImmich:
     type: application
     platform: iOS
-    sources: [Sources, Resources]
+    sources: [Sources, Shared, Resources]
+    dependencies:
+      - target: ShowcaseTeilen
+      - target: ShowcaseWidget
+    entitlements:
+      path: Resources/ShowcaseImmich.entitlements
+      properties:
+        keychain-access-groups: ["$(AppIdentifierPrefix)com.dirk-voss.showcase.geteilt"]
     info:
       path: Resources/Info.plist
       properties:
@@ -48,6 +58,7 @@ targets:
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
         UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
         ITSAppUsesNonExemptEncryption: false
+        KeychainGruppe: "$(AppIdentifierPrefix)com.dirk-voss.showcase.geteilt"
         NSCameraUsageDescription: "Die Kamera wird nur zum Scannen des QR-Codes deines Servers genutzt."
         NSFaceIDUsageDescription: "Face ID schützt die App, wenn du das in den App-Einstellungen eingeschaltet hast."
         NSLocalNetworkUsageDescription: "Die App verbindet sich mit deinem Immich-Showcase-Server im Heimnetz."
@@ -68,6 +79,66 @@ targets:
           CODE_SIGN_STYLE: Manual
           CODE_SIGN_IDENTITY: "Apple Distribution"
           PROVISIONING_PROFILE_SPECIFIER: "Showcase Immich App Store"
+  ShowcaseTeilen:
+    type: app-extension
+    platform: iOS
+    sources: [ShareExtension, Shared]
+    info:
+      path: ShareExtension/Info.plist
+      properties:
+        CFBundleDisplayName: Showcase Immich
+        CFBundleName: Showcase Immich
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        KeychainGruppe: "$(AppIdentifierPrefix)com.dirk-voss.showcase.geteilt"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsImageWithMaxCount: 30
+    entitlements:
+      path: ShareExtension/Teilen.entitlements
+      properties:
+        keychain-access-groups: ["$(AppIdentifierPrefix)com.dirk-voss.showcase.geteilt"]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.dirk-voss.showcase.teilen
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SKIP_INSTALL: YES
+      configs:
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "Showcase Immich Teilen App Store"
+  ShowcaseWidget:
+    type: app-extension
+    platform: iOS
+    sources: [Widget, Shared]
+    info:
+      path: Widget/Info.plist
+      properties:
+        CFBundleDisplayName: Bilderrahmen
+        CFBundleName: Bilderrahmen
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        KeychainGruppe: "$(AppIdentifierPrefix)com.dirk-voss.showcase.geteilt"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: Widget/Widget.entitlements
+      properties:
+        keychain-access-groups: ["$(AppIdentifierPrefix)com.dirk-voss.showcase.geteilt"]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.dirk-voss.showcase.widget
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SKIP_INSTALL: YES
+      configs:
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "Showcase Immich Widget App Store"
   ShowcaseImmichTests:
     type: bundle.unit-test
     platform: iOS

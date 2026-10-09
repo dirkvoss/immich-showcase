@@ -5,6 +5,12 @@
 'use strict';
 const fs = require('fs'), path = require('path'), crypto = require('crypto'), https = require('https'), os = require('os');
 const BUNDLE_ID = 'com.dirk-voss.showcase', PROFIL_NAME = 'Showcase Immich App Store';
+// App und Erweiterungen: je App-ID ein eigenes App-Store-Profil
+const PROFILE = [
+  { bundle: BUNDLE_ID, name: PROFIL_NAME, titel: 'Showcase Immich' },
+  { bundle: BUNDLE_ID + '.teilen', name: 'Showcase Immich Teilen App Store', titel: 'Showcase Immich Teilen' },
+  { bundle: BUNDLE_ID + '.widget', name: 'Showcase Immich Widget App Store', titel: 'Showcase Immich Widget' },
+];
 
 const env = {};
 for (const z of fs.readFileSync(path.join(__dirname, 'release.env'), 'utf8').split('\n')) { const t = z.match(/^([A-Z_]+)=(.+)$/); if (t) env[t[1]] = t[2].trim(); }
@@ -32,19 +38,24 @@ function ruf(methode, pfad, koerper) {
 }
 
 async function profil() {
-  const bundle = (await ruf('GET', `/v1/bundleIds?filter[identifier]=${BUNDLE_ID}`)).data.find(b => b.attributes.identifier === BUNDLE_ID);
-  if (!bundle) throw new Error(`Bundle-ID ${BUNDLE_ID} fehlt im Portal`);
   const zert = (await ruf('GET', '/v1/certificates?filter[certificateType]=DISTRIBUTION&limit=50')).data.filter(c => new Date(c.attributes.expirationDate) > new Date());
   if (!zert.length) throw new Error('Kein gueltiges Apple-Distribution-Zertifikat gefunden');
-  const vorhanden = (await ruf('GET', `/v1/profiles?filter[name]=${encodeURIComponent(PROFIL_NAME)}&limit=10`)).data;
-  for (const p of vorhanden) { console.log('Altes Profil wird ersetzt:', p.id); await ruf('DELETE', `/v1/profiles/${p.id}`); }
-  const neu = (await ruf('POST', '/v1/profiles', { data: { type: 'profiles', attributes: { name: PROFIL_NAME, profileType: 'IOS_APP_STORE' },
-    relationships: { bundleId: { data: { type: 'bundleIds', id: bundle.id } }, certificates: { data: zert.map(c => ({ type: 'certificates', id: c.id })) } } } })).data;
   const ordner = `${os.homedir()}/Library/Developer/Xcode/UserData/Provisioning Profiles`;
   fs.mkdirSync(ordner, { recursive: true });
-  const datei = path.join(ordner, `${neu.attributes.uuid}.mobileprovision`);
-  fs.writeFileSync(datei, Buffer.from(neu.attributes.profileContent, 'base64'));
-  console.log(`Profil "${PROFIL_NAME}" angelegt (UUID ${neu.attributes.uuid}), gueltig bis ${neu.attributes.expirationDate.slice(0, 10)}\nInstalliert: ${datei}`);
+  for (const p of PROFILE) {
+    let bundle = (await ruf('GET', `/v1/bundleIds?filter[identifier]=${p.bundle}`)).data.find(b => b.attributes.identifier === p.bundle);
+    if (!bundle) {
+      bundle = (await ruf('POST', '/v1/bundleIds', { data: { type: 'bundleIds', attributes: { identifier: p.bundle, name: p.titel, platform: 'IOS' } } })).data;
+      console.log(`App-ID ${p.bundle} angelegt`);
+    }
+    const vorhanden = (await ruf('GET', `/v1/profiles?filter[name]=${encodeURIComponent(p.name)}&limit=10`)).data;
+    for (const v of vorhanden) { console.log('Altes Profil wird ersetzt:', v.id); await ruf('DELETE', `/v1/profiles/${v.id}`); }
+    const neu = (await ruf('POST', '/v1/profiles', { data: { type: 'profiles', attributes: { name: p.name, profileType: 'IOS_APP_STORE' },
+      relationships: { bundleId: { data: { type: 'bundleIds', id: bundle.id } }, certificates: { data: zert.map(c => ({ type: 'certificates', id: c.id })) } } } })).data;
+    const datei = path.join(ordner, `${neu.attributes.uuid}.mobileprovision`);
+    fs.writeFileSync(datei, Buffer.from(neu.attributes.profileContent, 'base64'));
+    console.log(`Profil "${p.name}" angelegt (UUID ${neu.attributes.uuid}), gueltig bis ${neu.attributes.expirationDate.slice(0, 10)}`);
+  }
 }
 
 async function app() {

@@ -8,6 +8,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 export DEVELOPER_DIR="${DEVELOPER_DIR:-$(xcode-select -p)}"
 SCHEMA="ShowcaseImmich"; BUNDLE_ID="com.dirk-voss.showcase"; PROFIL="Showcase Immich App Store"
+PROFIL_TEILEN="Showcase Immich Teilen App Store"; PROFIL_WIDGET="Showcase Immich Widget App Store"
 ARCHIV_ORDNER="build/archive"; NUR_BAUEN=0; VERSION=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -25,8 +26,11 @@ SCHLUESSEL="${SCHLUESSEL:-$HOME/.appstoreconnect/private_keys/AuthKey_$KEY_ID.p8
 [[ -f "$SCHLUESSEL" ]] || abbruch "API-Schlüssel nicht gefunden: $SCHLUESSEL"
 command -v xcodegen >/dev/null || abbruch "xcodegen fehlt (brew install xcodegen)"
 security find-identity -v -p codesigning | grep -q "Apple Distribution" || abbruch "Kein Apple-Distribution-Zertifikat im Schlüsselbund"
-ls "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles" 2>/dev/null | head -50 | while read -r f; do grep -a -q "$PROFIL" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/$f" 2>/dev/null && echo found && break; done | grep -q found \
-  || abbruch "Verteilungsprofil '$PROFIL' fehlt – einmalig: node scripts/asc.js profil"
+for P in "$PROFIL" "$PROFIL_TEILEN" "$PROFIL_WIDGET"; do
+  gefunden=0
+  for f in "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"/*.mobileprovision; do grep -a -q "$P" "$f" 2>/dev/null && { gefunden=1; break; }; done
+  [[ "$gefunden" == 1 ]] || abbruch "Verteilungsprofil '$P' fehlt – einmalig: node scripts/asc.js profil"
+done
 
 meldung "Tests"; ./scripts/test.sh | tail -3
 BUILD="$(date +%Y%m%d%H%M)"                                   # steigt immer; App Store Connect nimmt keine Nummer zweimal
@@ -54,7 +58,7 @@ cat > "$ARCHIV_ORDNER/export.plist" <<PLIST
   <key>signingStyle</key><string>manual</string>
   <key>signingCertificate</key><string>Apple Distribution</string>
   <key>teamID</key><string>${TEAM_ID}</string>
-  <key>provisioningProfiles</key><dict><key>${BUNDLE_ID}</key><string>${PROFIL}</string></dict>
+  <key>provisioningProfiles</key><dict><key>${BUNDLE_ID}</key><string>${PROFIL}</string><key>${BUNDLE_ID}.teilen</key><string>${PROFIL_TEILEN}</string><key>${BUNDLE_ID}.widget</key><string>${PROFIL_WIDGET}</string></dict>
 </dict></plist>
 PLIST
 xcodebuild -exportArchive -archivePath "$ARCHIV" -exportOptionsPlist "$ARCHIV_ORDNER/export.plist" -allowProvisioningUpdates \

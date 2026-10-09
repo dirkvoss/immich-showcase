@@ -2075,6 +2075,16 @@ async function versionPruefen() {
   } catch (e) {}
 }
 $("#updateBanner").addEventListener("click", () => location.reload());
+// Zustand des Rahmens aktuell halten: auch Siri, Teilen, Widget und andere Handys aendern ihn von aussen.
+function statusAuffrischen(alles) {
+  if (document.visibilityState !== "visible" || !konfig || !rahmenIds().length || $("#appAnsicht").classList.contains("versteckt")) return;
+  statusLaden();
+  if (alles && tab === "shows") showsLaden();
+}
+setInterval(statusAuffrischen, 10000);
+document.addEventListener("visibilitychange", () => statusAuffrischen(true));
+window.addEventListener("pageshow", () => statusAuffrischen(true));
+window.rwAktualisieren = () => statusAuffrischen(true);       // wird von der iPhone-App aufgerufen, sobald sie wieder vorne ist
 versionPruefen(); setInterval(versionPruefen, 120000);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") versionPruefen(); });
 if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));

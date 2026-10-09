@@ -69,7 +69,15 @@ struct WebKitAnsicht: UIViewRepresentable {
         var eltern: WebKitAnsicht
         weak var web: WKWebView?
         var letzteNummer = 0
-        init(_ eltern: WebKitAnsicht) { self.eltern = eltern }
+        init(_ eltern: WebKitAnsicht) {
+            self.eltern = eltern
+            super.init()
+            // Kommt die App wieder nach vorne, den Zustand des Rahmens neu laden (Siri, Teilen oder das Widget haben ihn evtl. geändert)
+            NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+                self?.web?.evaluateJavaScript("window.rwAktualisieren && window.rwAktualisieren()")
+            }
+        }
+        deinit { NotificationCenter.default.removeObserver(self) }
 
         @objc func neuLadenGezogen(_ r: UIRefreshControl) { web?.reload() }
 
@@ -83,7 +91,11 @@ struct WebKitAnsicht: UIViewRepresentable {
             decisionHandler(.allow)
         }
 
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { webView.scrollView.refreshControl?.endRefreshing() }
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            webView.scrollView.refreshControl?.endRefreshing()
+            let s = eltern.server
+            Task { await ServerKlient.fuerErweiterungenSichern(server: s) }      // Anmeldung (PIN-Cookie) für Teilen-Erweiterung und Widget merken
+        }
         func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { melden(error, webView) }
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { melden(error, webView) }
         private func melden(_ error: Error, _ webView: WKWebView) {

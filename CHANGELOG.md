@@ -1,6 +1,14 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.14.0]
+### Neu
+- **iPhone-App – Siri und Kurzbefehle:** „Fotos auf den Rahmen zeigen“ (Suchtext wie in der Web-App), „Show beenden“, „Zur vorherigen Show zurück“.
+- **iPhone-App – Teilen aus der Fotos-App:** Fotos wählen, Teilen, „Showcase Immich“: Die Fotos werden hochgeladen und laufen auf dem Rahmen (bei mehreren Rahmen mit Auswahl). Benötigt `RAHMEN_IMMICH_UPLOAD_KEY` am Server.
+- **iPhone-App – Widget „Bilderrahmen“:** zeigt, was auf dem Rahmen läuft, mit den Knöpfen „Beenden“ und „Zurück“.
+### Geändert
+- Die Oberfläche hält den Zustand des Rahmens aktuell (alle 10 Sekunden und beim Zurückkehren auf die Seite bzw. in die App), auch wenn er von Siri, dem Widget oder einem anderen Gerät geändert wurde.
+
 ## [2.13.2]
 ### Behoben
 - **Hochladen aus der iPhone-Mediathek:** Fotos in Originalgröße (HEIC) wurden von Immich schon beim Senden abgelehnt und der Fehler als „nicht erreichbar“ gemeldet. Die Dateiauswahl bietet jetzt JPEG, PNG und WebP an, dadurch wandelt iOS Mediatheksfotos selbst in JPEG um. Lehnt Immich ein Foto ab, liest der Server jetzt auch dann seine Antwort, wenn die Verbindung beim Senden abbricht, und meldet den echten Grund.

@@ -14,11 +14,14 @@ final class AppModell: ObservableObject {
     init() {
         server = Adresse.normalisieren(gespeichert)
         gesperrt = faceIDAktiv
+        let s = server
+        Task { await ServerKlient.fuerErweiterungenSichern(server: s) }
     }
 
     func serverSetzen(_ url: URL?) {
         server = url
         gespeichert = url?.absoluteString ?? ""
+        Task { await ServerKlient.fuerErweiterungenSichern(server: url) }
     }
 
     func verbindungsLinkOeffnen(_ url: URL) {
