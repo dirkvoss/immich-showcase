@@ -36,7 +36,7 @@ With weather and appointments at the top right, device pairing by code/QR on the
 - **Linked filters** (person, year, country, photos/videos), "select the whole day", undo.
 - **Shows:** save, name and restart them later.
 - **TV:** a web page you open once in the TV browser (LG webOS, Android TV, Shield, Chromecast with browser …). Control it from the phone: pause, next/previous, music, stop. Videos are converted in advance so the TV can play them.
-- **Picture frames:** an own player for any tablet (browser or [Fully Kiosk](https://www.fully-kiosk.com)). Without a request it shows a continuous programme with a clock; a show from the app interrupts it, "Stop" brings the programme back. **Several frames** are supported: add and set them up in the app (programme sources, schedule, night rest, Fully Kiosk), send a show to one or more of them, or give each frame its own show.
+- **Picture frames:** an own player for any tablet – **a plain browser is enough** ([Fully Kiosk](https://www.fully-kiosk.com) is an optional extra). Without a request it shows a continuous programme with a clock; a show from the app interrupts it, "Stop" brings the programme back. **Several frames** are supported: add and set them up in the app (programme sources, schedule, night rest, Fully Kiosk), send a show to one or more of them, or give each frame its own show.
 - **Background music** from your own folders (none is included).
 - **Safe by design:** the app can never delete a photo, runs as non-root in a read-only container, and every person can use their own Immich account.
 
@@ -70,12 +70,12 @@ The app restarts by itself. On an iPhone: Share → "Add to Home Screen".
 **Prefer no wizard?** Put `RAHMEN_IMMICH_URL` and `RAHMEN_IMMICH_KEY` into `.env`. Values in `.env` always win over the wizard.
 
 ## What can be used as a picture frame?
-Any device with a **web browser** that can open an address. A **kiosk mode** (full screen, screen stays on, nothing else reachable) is not required but recommended.
+Any device with a **web browser** that can open an address. **A kiosk mode or add-on apps such as Fully Kiosk are not required** – the browser is enough. The page asks the browser to keep the screen awake; where that does not work, set the device's auto-lock to "Never". A kiosk mode (full screen, nothing else reachable) is only a convenience you can add if you like.
 
 | Device | How |
 |---|---|
 | **Raspberry Pi + any monitor/TV** (cheapest permanent solution) | `./examples/raspberry-pi/setup-kiosk.sh http://<server>:8090/tv/` – installs Chromium in kiosk mode and starts it on power-up (see below) |
-| **Android tablet or old phone** | [Fully Kiosk](https://www.fully-kiosk.com) (about 8 € once; needed for the remote control of night mode and battery), or free: Chrome → open the address → "Add to Home screen" → open it from there (full screen) and set the screen timeout to "never" |
+| **Android tablet or old phone** | Free and sufficient: Chrome → open the address → "Add to Home screen" → open it from there (full screen) and set the screen timeout to "never". *Optional:* [Fully Kiosk](https://www.fully-kiosk.com) (about 8 € once) really switches the screen off at night and reports the battery level |
 | **iPad / old iPhone** | Safari → open the address → Share → "Add to Home Screen"; use **Guided Access** (Settings → Accessibility → Guided Access) as kiosk mode and set Auto-Lock to "Never" |
 | **TV, Fire TV, Android TV, Chromecast with Google TV, Shield** | open the browser, enter the address, bookmark it |
 | **Old laptop / mini PC** | Chrome with `--kiosk <address>` in autostart |
@@ -105,7 +105,7 @@ Use `http://<server>:8090/tv/` **without** `?ziel=…` to pair the device by cod
    - **Weighted sources:** `RAHMEN_WEB_RAHMEN_QUELLEN=<album-id>:70, neu14:20, *:10` (an album, "uploaded in the last 14 days", the whole library – with weights)
    - Seconds per photo `RAHMEN_WEB_RAHMEN_SEK`, background `RAHMEN_WEB_RAHMEN_FUELLUNG` (`unscharf` = blurred, `zuschnitt` = crop, `balken` = black bars), caption `RAHMEN_WEB_RAHMEN_ANZEIGE=datum,zeit,ort`, night rest `RAHMEN_WEB_RAHMEN_NACHT=22:00-06:30`
 3. `docker compose up -d`
-4. On the tablet, open `http://<server>:8090/tv/?ziel=frame` in full screen – or set it as the start page of Fully Kiosk.
+4. On the tablet, open `http://<server>:8090/tv/?ziel=frame` in the browser (full screen) – if you use Fully Kiosk, set it as its start page.
    *Tip (Fully Kiosk):* if you use it as the **screensaver**, enter the address as the screensaver playlist item and restart the app once – Fully Kiosk only reads changes to the playlist after a restart.
 
 **In the app instead of `.env`:** open **Devices** (📡) → **＋ Add device** to create frames and TVs and set them up (seconds per photo, background, caption, night rest, continuous programme sources, schedule, Fully Kiosk). The list is then stored in `rahmen_web_geraete.json` in the data folder and takes precedence over the variables above (they only serve as the starting point until the first change in the app).
@@ -133,7 +133,9 @@ Use `http://<server>:8090/tv/` **without** `?ziel=…` to pair the device by cod
 ## Frame programme by person
 Add `person=<name>` to the sources: `RAHMEN_WEB_RAHMEN_QUELLEN=person=Anna Muster:60, person=grandma:20, *:20` shows photos of that person (name as in Immich, or a nickname from `RAHMEN_WEB_ALIASE`; `Anna+Ben` = both together). An unknown name is skipped, the other sources continue.
 
-## Switch the tablet screen off at night (Fully Kiosk)
+## Switch the tablet screen off at night (optional, with Fully Kiosk)
+*Just a convenience:* in a normal browser the frame simply goes black at night and keeps running; the screen stays on.
+
 With `RAHMEN_WEB_RAHMEN_NACHT=22:00-06:30` the frame goes black. Fully Kiosk can really switch the **screen off** (saves power, protects the display): in Fully enable *Remote Administration* and set a password, then set `RAHMEN_WEB_FULLY_RAHMEN=<tablet address>` and `RAHMEN_WEB_FULLY_PASSWORT=…`. The screen is switched only at the **change** (so a manual wake-up is not overruled). In **📡 Devices** you can switch it by hand, see the **battery level**, and you get a Pushover alert when the tablet is almost empty and not charging.
 
 ## Home Assistant

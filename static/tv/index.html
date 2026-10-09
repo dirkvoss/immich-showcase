@@ -438,5 +438,17 @@ body.zuschnitt .bild { object-fit: cover; }
   abfrage();
 })();
 </script>
+<script>
+/* Bildschirm wach halten, soweit der Browser es erlaubt (Wake Lock); sonst bleibt nur die Auto-Sperre des Geraets auf "Nie" zu stellen. */
+(function () {
+  function an() {
+    try {
+      if (navigator.wakeLock && document.visibilityState === "visible") navigator.wakeLock.request("screen").then(function () {}, function () {});
+    } catch (e) {}
+  }
+  an();
+  document.addEventListener("visibilitychange", an);
+})();
+</script>
 </body>
 </html>

@@ -1,6 +1,11 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.14.3]
+### Geändert
+- **Ein normaler Browser genügt:** Die Anleitung stellt den einfachen Weg (Chrome bzw. Safari, „Zum Startbildschirm hinzufügen“) an die erste Stelle; Fully Kiosk wird als optionales Extra beschrieben (Bildschirm nachts wirklich aus, Akkustand). Ein Hinweis im Geräte-Dialog sagt das auch in der Oberfläche.
+- Die Rahmen- und Fernseher-Seite bittet den Browser jetzt, den Bildschirm wach zu halten (Wake Lock), wo er das unterstützt.
+
 ## [2.14.2]
 ### Neu
 - **Hilfe und Urheberangabe:** Der Hilfe-Dialog hat einen Abschnitt „Eigene Fotos senden“ und „Über Immich Showcase“ (Entwickelt von Dirk Voß, GitHub, Hinweis auf das unabhängige Projekt); die Versionszeile nennt den Urheber. In der iPhone-App gibt es unter *App-Einstellungen* „Hilfe anzeigen“, einen Link zur Anleitung und „Entwickelt von“.

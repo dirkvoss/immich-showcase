@@ -36,7 +36,7 @@ Mit Wetter und Terminen oben rechts, Gerätekopplung per Code/QR am Fernseher un
 - **Verknüpfte Filter** (Person, Jahr, Land, Fotos/Videos), „alle Fotos eines Tages“ auswählen, Rückgängig.
 - **Shows** speichern, benennen und später wieder starten.
 - **Fernseher:** eine Webseite, die du einmal im TV-Browser öffnest (LG webOS, Android TV, Shield, Chromecast mit Browser …). Steuerung vom Handy: Pause, vor/zurück, Musik, Stopp. Videos werden vorab für den Fernseher umgewandelt.
-- **Bilderrahmen:** eigener Player für jedes Tablet (Browser oder [Fully Kiosk](https://www.fully-kiosk.com)). Ohne Wunsch läuft ein Dauerprogramm mit Uhr; eine Show aus der App unterbricht es, „Stopp“ bringt es zurück. **Mehrere Rahmen** sind möglich: in der App anlegen und einstellen (Programm-Quellen, Zeitplan, Nachtruhe, Fully Kiosk), eine Show an einen oder mehrere schicken – oder jedem Rahmen eine eigene Show geben.
+- **Bilderrahmen:** eigener Player für jedes Tablet – **ein ganz normaler Browser genügt** ([Fully Kiosk](https://www.fully-kiosk.com) ist ein optionales Extra). Ohne Wunsch läuft ein Dauerprogramm mit Uhr; eine Show aus der App unterbricht es, „Stopp“ bringt es zurück. **Mehrere Rahmen** sind möglich: in der App anlegen und einstellen (Programm-Quellen, Zeitplan, Nachtruhe, Fully Kiosk), eine Show an einen oder mehrere schicken – oder jedem Rahmen eine eigene Show geben.
 - **Hintergrundmusik** aus eigenen Ordnern (es wird keine mitgeliefert).
 - **Sicher gebaut:** Die App kann **nie ein Foto löschen**, läuft ohne Root in einem schreibgeschützten Container, und jede Person kann ihr eigenes Immich-Konto nutzen.
 
@@ -70,12 +70,12 @@ Danach startet die App von selbst neu. Auf dem iPhone: Teilen → „Zum Home-Bi
 **Lieber ohne Assistent?** `RAHMEN_IMMICH_URL` und `RAHMEN_IMMICH_KEY` in die `.env` eintragen. Werte aus der `.env` haben immer Vorrang vor dem Assistenten.
 
 ## Was kann als Bilderrahmen dienen?
-Jedes Gerät mit einem **Webbrowser**, das eine Adresse öffnen kann. Ein **Kiosk-Modus** (Vollbild, Bildschirm bleibt an, nichts anderes erreichbar) ist nicht nötig, aber empfehlenswert.
+Jedes Gerät mit einem **Webbrowser**, das eine Adresse öffnen kann. **Ein Kiosk-Modus oder Zusatz-Apps wie Fully Kiosk sind nicht nötig** – der Browser genügt. Die Seite bittet den Browser, den Bildschirm wach zu halten; wo das nicht klappt, stellst du die Auto-Sperre des Geräts auf „Nie“. Ein Kiosk-Modus (Vollbild, nichts anderes erreichbar) ist nur ein Komfort, den du bei Bedarf dazunehmen kannst.
 
 | Gerät | So geht es |
 |---|---|
 | **Raspberry Pi + beliebiger Monitor/Fernseher** (günstigste Dauerlösung) | `./examples/raspberry-pi/setup-kiosk.sh http://<server>:8090/tv/` – installiert Chromium im Kiosk-Modus und startet es beim Einschalten (siehe unten) |
-| **Android-Tablet oder altes Handy** | [Fully Kiosk](https://www.fully-kiosk.com) (einmalig ca. 8 €; nötig für die Fernsteuerung von Nachtruhe und Akku) oder kostenlos: Chrome → Adresse öffnen → „Zum Startbildschirm hinzufügen“ → von dort öffnen (Vollbild) und die Bildschirm-Auszeit auf „nie“ stellen |
+| **Android-Tablet oder altes Handy** | Kostenlos und ausreichend: Chrome → Adresse öffnen → „Zum Startbildschirm hinzufügen“ → von dort öffnen (Vollbild) und die Bildschirm-Auszeit auf „nie“ stellen. *Optional:* [Fully Kiosk](https://www.fully-kiosk.com) (einmalig ca. 8 €) schaltet den Bildschirm nachts wirklich aus und meldet den Akkustand |
 | **iPad / altes iPhone** | Safari → Adresse öffnen → Teilen → „Zum Home-Bildschirm“; als Kiosk-Modus den **Geführten Zugriff** nutzen (Einstellungen → Bedienungshilfen) und die Auto-Sperre auf „Nie“ stellen |
 | **Fernseher, Fire TV, Android TV, Chromecast mit Google TV, Shield** | Browser öffnen, Adresse eingeben, als Lesezeichen speichern |
 | **Alter Laptop / Mini-PC** | Chrome mit `--kiosk <Adresse>` im Autostart |
@@ -112,7 +112,7 @@ Der Weg über die `.env`:
    - **Gewichtete Quellen:** `RAHMEN_WEB_RAHMEN_QUELLEN=<album-id>:70, neu14:20, *:10` (ein Album, „in den letzten 14 Tagen hochgeladen“, die ganze Bibliothek – mit Gewichten)
    - Sekunden pro Foto `RAHMEN_WEB_RAHMEN_SEK`, Hintergrund `RAHMEN_WEB_RAHMEN_FUELLUNG` (`unscharf`, `zuschnitt` oder `balken`), Bildunterschrift `RAHMEN_WEB_RAHMEN_ANZEIGE=datum,zeit,ort`, Nachtruhe `RAHMEN_WEB_RAHMEN_NACHT=22:00-06:30`
 3. `docker compose up -d`
-4. Am Tablet `http://<server>:8090/tv/?ziel=rahmen` im Vollbild öffnen – oder als Startseite in Fully Kiosk eintragen.
+4. Am Tablet `http://<server>:8090/tv/?ziel=rahmen` im Browser öffnen (Vollbild) – wer Fully Kiosk nutzt, trägt sie dort als Startseite ein.
    *Tipp (Fully Kiosk):* Nutzt du die Adresse als **Bildschirmschoner**, trage sie in der Bildschirmschoner-Playlist ein und starte die App einmal neu – Fully Kiosk liest Änderungen an der Playlist erst nach einem Neustart.
 
 ## Geräte per Code koppeln (keine Adressen tippen)
@@ -133,7 +133,9 @@ Der Weg über die `.env`:
 ## Rahmenprogramm nach Person
 `person=<name>` bei den Quellen: `RAHMEN_WEB_RAHMEN_QUELLEN=person=Anna Muster:60, person=oma:20, *:20` zeigt Fotos dieser Person (Name wie in Immich oder ein Spitzname aus `RAHMEN_WEB_ALIASE`; `Anna+Ben` = beide zusammen). Ein unbekannter Name wird übersprungen, die anderen Quellen laufen weiter.
 
-## Tablet-Bildschirm nachts ausschalten (Fully Kiosk)
+## Tablet-Bildschirm nachts ausschalten (optional, mit Fully Kiosk)
+*Nur ein Komfort:* Im normalen Browser wird der Rahmen nachts einfach schwarz und läuft weiter; der Bildschirm bleibt dabei eingeschaltet.
+
 Mit `RAHMEN_WEB_RAHMEN_NACHT=22:00-06:30` wird der Rahmen schwarz. Fully Kiosk kann den **Bildschirm wirklich ausschalten** (spart Strom, schont das Display): In Fully *Remote Administration* aktivieren und ein Passwort setzen, dann `RAHMEN_WEB_FULLY_RAHMEN=<Adresse des Tablets>` und `RAHMEN_WEB_FULLY_PASSWORT=…` eintragen. Geschaltet wird nur beim **Wechsel** (ein Aufwecken von Hand wird nicht überstimmt). Unter **📡 Geräte** kannst du den Bildschirm von Hand schalten, siehst den **Akkustand** und bekommst eine Pushover-Meldung, wenn das Tablet fast leer ist und nicht lädt.
 
 ## Home Assistant
