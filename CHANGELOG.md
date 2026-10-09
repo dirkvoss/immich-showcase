@@ -1,9 +1,10 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
-## [Nächste Version]
+## [2.12.0]
 ### Neu
 - **iPhone-App „Showcase Immich“** (Ordner `ios/`, SwiftUI + Web-Ansicht): Einrichtung per Adresse oder QR-Code, Face-ID-Sperre, Fehlerseite ohne Verbindung; TestFlight-Skripte. In der Web-App gibt es dafür unter *Einstellungen → iPhone-App verbinden* einen QR-Code und in der App *Konto → App-Einstellungen*.
+- **Neues App-Symbol** (goldener Bilderrahmen mit Berglandschaft) für die iPhone-App und die Web-App (Startbildschirm-Symbol).
 
 ## [2.11.2]
 ### Behoben
