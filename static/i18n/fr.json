@@ -477,7 +477,18 @@
   "In der App „Showcase Immich“ den QR-Code scannen – sie trägt die Adresse dieses Servers selbst ein.": "Scannez le code QR dans l’appli « Showcase Immich » : elle saisit elle-même l’adresse de ce serveur.",
   "Eigene Fotos senden": "Envoyer mes photos",
   "Fotos von diesem Gerät auswählen und auf den Rahmen schicken": "Choisir des photos sur cet appareil et les envoyer au cadre",
-  "Meine Fotos": "Mes photos"
+  "Meine Fotos": "Mes photos",
+  "Entwickelt von": "Créé par",
+  "📤 Eigene Fotos senden": "📤 Envoyer mes photos",
+  "Die Fotos werden an Immich geschickt und dort im Album „Showcase-Uploads“ gespeichert. Du kannst sie danach mit anderen Fotos mischen und auf den Rahmen schicken.": "Les photos sont envoyées à Immich et enregistrées dans l’album « Showcase-Uploads ». Vous pouvez ensuite les mélanger à d’autres photos et les envoyer au cadre.",
+  "Direkt hier mit der Kamera aufgenommene Fotos liegen danach nur in Immich – nicht in deiner Fotos-Mediathek. Willst du ein Foto auch auf dem Handy behalten, nimm es mit der normalen Kamera-App auf und wähle es dann hier aus.": "Les photos prises ici avec l’appareil photo ne sont ensuite que dans Immich – pas dans votre photothèque. Pour garder une photo aussi sur le téléphone, prenez-la avec l’appareil photo habituel puis choisissez-la ici.",
+  "Wichtig:": "Important :",
+  "nur in Immich": "uniquement dans Immich",
+  "Diesen Hinweis nicht mehr zeigen": "Ne plus afficher cette note",
+  "Fotos auswählen": "Choisir des photos",
+  "Über Immich Showcase": "À propos d’Immich Showcase",
+  "Unabhängiges Projekt, nicht mit dem Immich-Projekt verbunden.": "Projet indépendant, sans lien avec le projet Immich.",
+  "Mit „📤 Meine Fotos“ schickst du Fotos von diesem Gerät an Immich (Album „Showcase-Uploads“) und kannst sie mit anderen Fotos mischen. Mit der Kamera hier aufgenommene Fotos liegen danach nur in Immich, nicht in der Fotos-Mediathek des Handys. In der iPhone-App geht es auch über „Teilen“ in der Fotos-App und über Siri und Kurzbefehle.": "Avec « 📤 Mes photos », vous envoyez des photos de cet appareil à Immich (album « Showcase-Uploads ») et pouvez les mélanger à d’autres photos. Les photos prises ici avec l’appareil photo ne sont ensuite que dans Immich, pas dans la photothèque du téléphone. Dans l’app iPhone, vous pouvez aussi utiliser « Partager » dans Photos, ainsi que Siri et Raccourcis."
  },
  "muster": [
   [

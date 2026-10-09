@@ -1,6 +1,13 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.14.2]
+### Neu
+- **Hilfe und Urheberangabe:** Der Hilfe-Dialog hat einen Abschnitt „Eigene Fotos senden“ und „Über Immich Showcase“ (Entwickelt von Dirk Voß, GitHub, Hinweis auf das unabhängige Projekt); die Versionszeile nennt den Urheber. In der iPhone-App gibt es unter *App-Einstellungen* „Hilfe anzeigen“, einen Link zur Anleitung und „Entwickelt von“.
+- **Hinweis beim Senden eigener Fotos:** Beim ersten Mal erklärt ein Fenster, dass die Fotos in Immich gespeichert werden und mit der Kamera aufgenommene Fotos danach nur dort (nicht in der Fotos-Mediathek) liegen; mit „Nicht mehr zeigen“.
+### Behoben
+- „📡 Geräte“, „❓ Hilfe“ und „📤 Meine Fotos“ waren auf schmalen Bildschirmen (Handy) unsichtbar; dort erscheinen jetzt die Symbole.
+
 ## [2.14.1]
 ### Behoben
 - **Upload-Album:** Der Server legte beim Hochladen nach jedem Neustart ein neues Album „Showcase-Uploads“ an, weil er das vorhandene nicht fand (Immich nennt in der Albumliste keinen Besitzer). Es wird jetzt wiedergefunden; bei mehreren gleichnamigen gilt das mit den meisten Fotos.

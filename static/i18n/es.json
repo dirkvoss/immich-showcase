@@ -477,7 +477,18 @@
   "In der App „Showcase Immich“ den QR-Code scannen – sie trägt die Adresse dieses Servers selbst ein.": "Escanea el código QR en la app «Showcase Immich»: ella misma introduce la dirección de este servidor.",
   "Eigene Fotos senden": "Enviar mis fotos",
   "Fotos von diesem Gerät auswählen und auf den Rahmen schicken": "Elige fotos de este dispositivo y envíalas al marco",
-  "Meine Fotos": "Mis fotos"
+  "Meine Fotos": "Mis fotos",
+  "Entwickelt von": "Creado por",
+  "📤 Eigene Fotos senden": "📤 Enviar mis fotos",
+  "Die Fotos werden an Immich geschickt und dort im Album „Showcase-Uploads“ gespeichert. Du kannst sie danach mit anderen Fotos mischen und auf den Rahmen schicken.": "Las fotos se envían a Immich y se guardan en el álbum «Showcase-Uploads». Después puedes mezclarlas con otras fotos y enviarlas al marco.",
+  "Direkt hier mit der Kamera aufgenommene Fotos liegen danach nur in Immich – nicht in deiner Fotos-Mediathek. Willst du ein Foto auch auf dem Handy behalten, nimm es mit der normalen Kamera-App auf und wähle es dann hier aus.": "Las fotos hechas aquí con la cámara quedan solo en Immich, no en tu fototeca. Para conservar una foto también en el móvil, hazla con la app de cámara normal y elígela aquí.",
+  "Wichtig:": "Importante:",
+  "nur in Immich": "solo en Immich",
+  "Diesen Hinweis nicht mehr zeigen": "No volver a mostrar este aviso",
+  "Fotos auswählen": "Elegir fotos",
+  "Über Immich Showcase": "Acerca de Immich Showcase",
+  "Unabhängiges Projekt, nicht mit dem Immich-Projekt verbunden.": "Proyecto independiente, sin relación con el proyecto Immich.",
+  "Mit „📤 Meine Fotos“ schickst du Fotos von diesem Gerät an Immich (Album „Showcase-Uploads“) und kannst sie mit anderen Fotos mischen. Mit der Kamera hier aufgenommene Fotos liegen danach nur in Immich, nicht in der Fotos-Mediathek des Handys. In der iPhone-App geht es auch über „Teilen“ in der Fotos-App und über Siri und Kurzbefehle.": "Con «📤 Mis fotos» envías fotos de este dispositivo a Immich (álbum «Showcase-Uploads») y puedes mezclarlas con otras fotos. Las fotos hechas aquí con la cámara quedan solo en Immich, no en la fototeca del móvil. En la app para iPhone también puedes usar «Compartir» en Fotos, y Siri y Atajos."
  },
  "muster": [
   [

@@ -76,6 +76,9 @@ struct WebKitAnsicht: UIViewRepresentable {
             NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
                 self?.web?.evaluateJavaScript("window.rwAktualisieren && window.rwAktualisieren()")
             }
+            NotificationCenter.default.addObserver(forName: .showcaseHilfe, object: nil, queue: .main) { [weak self] _ in
+                self?.web?.evaluateJavaScript("window.rwHilfeOeffnen && window.rwHilfeOeffnen()")
+            }
         }
         deinit { NotificationCenter.default.removeObserver(self) }
 

@@ -477,7 +477,18 @@
   "In der App „Showcase Immich“ den QR-Code scannen – sie trägt die Adresse dieses Servers selbst ein.": "Scan the QR code in the “Showcase Immich” app – it enters this server’s address itself.",
   "Eigene Fotos senden": "Send my own photos",
   "Fotos von diesem Gerät auswählen und auf den Rahmen schicken": "Pick photos from this device and send them to the frame",
-  "Meine Fotos": "My photos"
+  "Meine Fotos": "My photos",
+  "Entwickelt von": "Created by",
+  "📤 Eigene Fotos senden": "📤 Send my own photos",
+  "Die Fotos werden an Immich geschickt und dort im Album „Showcase-Uploads“ gespeichert. Du kannst sie danach mit anderen Fotos mischen und auf den Rahmen schicken.": "The photos are sent to Immich and stored in the album “Showcase-Uploads”. You can then mix them with other photos and send them to the frame.",
+  "Direkt hier mit der Kamera aufgenommene Fotos liegen danach nur in Immich – nicht in deiner Fotos-Mediathek. Willst du ein Foto auch auf dem Handy behalten, nimm es mit der normalen Kamera-App auf und wähle es dann hier aus.": "Photos taken here with the camera are then only in Immich – not in your photo library. To keep a photo on your phone too, take it with the normal camera app and then pick it here.",
+  "Wichtig:": "Important:",
+  "nur in Immich": "only in Immich",
+  "Diesen Hinweis nicht mehr zeigen": "Don’t show this note again",
+  "Fotos auswählen": "Choose photos",
+  "Über Immich Showcase": "About Immich Showcase",
+  "Unabhängiges Projekt, nicht mit dem Immich-Projekt verbunden.": "Independent project, not affiliated with the Immich project.",
+  "Mit „📤 Meine Fotos“ schickst du Fotos von diesem Gerät an Immich (Album „Showcase-Uploads“) und kannst sie mit anderen Fotos mischen. Mit der Kamera hier aufgenommene Fotos liegen danach nur in Immich, nicht in der Fotos-Mediathek des Handys. In der iPhone-App geht es auch über „Teilen“ in der Fotos-App und über Siri und Kurzbefehle.": "With “📤 My photos” you send photos from this device to Immich (album “Showcase-Uploads”) and can mix them with other photos. Photos taken here with the camera are then only in Immich, not in the phone’s photo library. In the iPhone app you can also use “Share” in the Photos app, and Siri and Shortcuts."
  },
  "muster": [
   [
