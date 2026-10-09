@@ -1,6 +1,10 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.13.1]
+### Geändert
+- Beim Hochladen eigener Fotos protokolliert der Server jetzt genau, was Immich antwortet bzw. woran die Verbindung scheitert (ohne Geheimnisse), und die Fehlermeldung nennt die Fehlerart. Das erleichtert die Suche, wenn ein Upload fehlschlägt.
+
 ## [2.13.0]
 ### Neu
 - **Eigene Fotos vom Handy senden** („📤 Meine Fotos“ oben, auch in der iPhone-App): Fotos aus der Mediathek werden hochgeladen und zur Auswahl gelegt – so lassen sie sich mit Fotos aus Immich mischen und gemeinsam auf den Rahmen schicken. Der Nutzer braucht dafür kein Immich-Konto. Die Fotos landen in Immich im Album „Showcase-Uploads“ (`RAHMEN_WEB_UPLOAD_ALBUM`). Nur mit einem eigenen Immich-Schlüssel (`RAHMEN_IMMICH_UPLOAD_KEY`, Rechte `asset.upload` und Albumverwaltung, keine Löschrechte); ohne ihn bleibt die Funktion aus. Nur Fotos (JPEG, PNG, HEIC, WebP), höchstens 40 MB je Foto (`RAHMEN_WEB_UPLOAD_MAX_MB`) und 300 pro Stunde.

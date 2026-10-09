@@ -3378,11 +3378,20 @@ def upload_zu_immich(daten, typ, name, datum_ms):
         with urllib.request.urlopen(req, timeout=120) as r:
             antwort = json.loads(r.read())
     except urllib.error.HTTPError as e:
+        try:
+            detail = e.read()[:300].decode("utf-8", "replace")
+        except Exception:
+            detail = ""
+        H.log.warning("Upload: Immich antwortet %s: %s", e.code, schwaerzen(detail))
         if e.code in (401, 403):
             raise HTTPException(502, "Der Immich-Schluessel fuer Uploads hat nicht genug Rechte")
         raise HTTPException(502, f"Immich hat das Foto abgelehnt ({e.code})")
-    except (urllib.error.URLError, TimeoutError, OSError):
-        raise HTTPException(502, "Immich ist gerade nicht erreichbar")
+    except (urllib.error.URLError, TimeoutError, OSError) as e:
+        H.log.warning("Upload: Verbindung zu Immich fehlgeschlagen: %s %s", type(e).__name__, schwaerzen(str(e)))
+        raise HTTPException(502, f"Immich ist gerade nicht erreichbar ({type(e).__name__})")
+    except (ValueError, KeyError) as e:
+        H.log.warning("Upload: unerwartete Antwort von Immich: %s %s", type(e).__name__, schwaerzen(str(e)))
+        raise HTTPException(502, "Immich hat unerwartet geantwortet")
     asset = antwort["id"]
     try:
         immich_aufruf("PUT", f"/albums/{upload_album_id()}/assets", {"ids": [asset]}, schluessel=UPLOAD_KEY)
