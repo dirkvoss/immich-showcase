@@ -40,7 +40,7 @@ def test_braucht_anmeldung_und_csrf(app_laden):
 def test_fotos_werden_angenommen(app_laden, monkeypatch, daten):
     w, c = aktiv(app_laden)
     gesehen = []
-    monkeypatch.setattr(w, "upload_zu_immich", lambda d, typ, name, ms: gesehen.append((typ, name, ms)) or {"ok": True, "id": "x", "neu": True})
+    monkeypatch.setattr(w, "upload_zu_immich", lambda d, typ, name, ms, key=None: gesehen.append((typ, name, ms)) or {"ok": True, "id": "x", "neu": True})
     r = c.put("/api/hochladen", content=daten, headers={**H, "X-Dateiname": "Urlaub%20%C3%9Cberraschung.JPG", "X-Datum": "1700000000000"})
     assert r.status_code == 200 and r.json()["ok"] is True
     typ, name, ms = gesehen[0]
@@ -64,7 +64,7 @@ def test_zu_grosse_datei(app_laden, monkeypatch):
 def test_gefaehrliche_dateinamen_werden_bereinigt(app_laden, monkeypatch):
     w, c = aktiv(app_laden)
     namen = []
-    monkeypatch.setattr(w, "upload_zu_immich", lambda d, typ, name, ms: namen.append(name) or {"ok": True, "id": "x", "neu": True})
+    monkeypatch.setattr(w, "upload_zu_immich", lambda d, typ, name, ms, key=None: namen.append(name) or {"ok": True, "id": "x", "neu": True})
     c.put("/api/hochladen", content=JPEG, headers={**H, "X-Dateiname": "..%2F..%2Fetc%2Fpasswd"})
     c.put("/api/hochladen", content=JPEG, headers={**H, "X-Dateiname": '%22%3Bx%0D%0A.jpg'})
     assert namen[0] == "passwd.jpg"

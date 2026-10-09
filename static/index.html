@@ -47,6 +47,16 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 250px); }
 button, select, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
 .versteckt { display: none !important; }
+/* Erste Schritte */
+.startkarte { margin: 12px 0 4px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+.startkopf { display: flex; align-items: center; gap: 10px; } .startkopf b { flex: 1; } .startkopf .zaehler { color: var(--muted); font-size: 13px; }
+.startkarte ol { list-style: none; margin: 8px 0 0; padding: 0; }
+.startkarte li { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid var(--line); }
+.startkarte li .kreis { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--line); flex: none; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
+.startkarte li.fertig .kreis { background: var(--ok, #3ecf8e); border-color: var(--ok, #3ecf8e); color: #0b1a10; }
+.startkarte li.fertig .text { color: var(--muted); text-decoration: line-through; }
+.startkarte li .text { flex: 1; } .startkarte li button { white-space: nowrap; }
+
 /* Status "Alles in Ordnung?" und Rundgang */
 .gs { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
 .gs .pkt { width: 12px; height: 12px; border-radius: 50%; margin-top: 5px; flex: none; background: #6b7280; }
@@ -489,6 +499,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
   <div id="pinBlock">
     <p>Bitte PIN eingeben</p>
     <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" aria-label="PIN, 6 Ziffern">
+    <p id="faceIdZeile" class="versteckt" style="margin-top:12px"><button type="button" class="btn klein" id="faceIdBtn">🔓 Mit Face ID anmelden</button></p>
   </div>
   <div id="loginFehler" class="fehler" role="alert"></div>
   <p id="loginServer" class="versteckt" style="margin-top:14px"><button type="button" class="btn klein" id="loginServerBtn">Mit einem anderen Server verbinden</button></p>
@@ -526,6 +537,10 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
   </header>
 
   <main>
+    <section id="startKarte" class="startkarte versteckt" aria-label="Erste Schritte">
+      <div class="startkopf"><b>🚀 Erste Schritte</b><span class="zaehler" id="startZaehler"></span><button type="button" id="startZu" class="btn klein">Ausblenden</button></div>
+      <ol id="startListe"></ol>
+    </section>
     <section id="neuesteTab">
       <div class="filter">
         <select id="fPerson" aria-label="Person"><option value="">Alle Personen</option></select>
@@ -595,6 +610,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
     <div class="tvknoepfe" style="justify-content:flex-start"><button class="btn" id="geraetNeu" type="button">＋ Gerät hinzufügen</button></div>
     <h3>Gerät koppeln</h3>
     <p class="tipp">Zeigt ein Fernseher oder Tablet einen Code? Gib ihn hier ein und wähle, welches Gerät es sein soll.</p>
+    <div class="tvknoepfe versteckt" id="koppelKameraZeile" style="justify-content:flex-start"><button class="btn" id="koppelKamera" type="button">📷 QR-Code am Gerät scannen</button></div>
     <label class="tvfeld"><span>Code</span> <input id="koppelCode" maxlength="6" autocomplete="off" autocapitalize="characters" aria-label="Code"></label>
     <label class="tvfeld"><span>Gerät</span> <select id="koppelZiel" aria-label="Gerät"></select></label>
     <div class="tvknoepfe" style="justify-content:flex-start"><button class="btn primaer" id="koppelBtn" type="button">Koppeln</button></div>
@@ -960,7 +976,9 @@ async function zeigeLogin() {
   const mitImmich = art !== "pin", mitPin = art !== "immich";
   $("#immichForm").classList.toggle("versteckt", !mitImmich); $("#pinBlock").classList.toggle("versteckt", !mitPin);
   $("#pinOder").classList.toggle("versteckt", !(mitImmich && mitPin));
-  $("#loginServer").classList.toggle("versteckt", !/ShowcaseApp/.test(navigator.userAgent));        // nur in der iPhone-App: Weg zurueck zu den Server-Einstellungen
+  const imApp = /ShowcaseApp/.test(navigator.userAgent);
+  $("#faceIdZeile").classList.toggle("versteckt", !(imApp && mitPin)); if (imApp && mitPin) pinAnApp("pinHolen");           // gemerkte PIN per Face ID (falls eingeschaltet)
+  $("#loginServer").classList.toggle("versteckt", !imApp);        // nur in der iPhone-App: Weg zurueck zu den Server-Einstellungen
   (mitImmich ? $("#mail") : $("#pin")).focus();
 }
 $("#loginServerBtn").addEventListener("click", () => { try { window.webkit.messageHandlers.showcase.postMessage({ aktion: "einstellungen" }); } catch (e) {} });
@@ -980,9 +998,13 @@ $("#immichForm").addEventListener("submit", async e => {
 $("#pin").addEventListener("input", async e => {
   const v = e.target.value.replace(/\D/g, "").slice(0, 6); e.target.value = v;
   if (v.length < 6) { $("#loginFehler").textContent = ""; return; }
-  try { await api("login", { method: "POST", body: JSON.stringify({ pin: v }) }); start(); }
+  try { await api("login", { method: "POST", body: JSON.stringify({ pin: v }) }); pinAnApp("pinMerken", v); start(); }
   catch (err) { $("#loginFehler").textContent = err.message; e.target.value = ""; }
 });
+// iPhone-App: die PIN (nur wenn "Mit Face ID anmelden" in den App-Einstellungen eingeschaltet ist) sicher im Schluesselbund merken und per Face ID wieder holen
+function pinAnApp(aktion, pin) { try { window.webkit.messageHandlers.showcase.postMessage(pin ? { aktion, pin } : { aktion }); } catch (e) {} }
+window.rwPinErgebnis = pin => { if (/^\d{6}$/.test(pin || "")) { $("#pin").value = pin; $("#pin").dispatchEvent(new Event("input")); } };
+$("#faceIdBtn").addEventListener("click", () => pinAnApp("pinHolen"));
 
 // ---------------------------------------------------------------- Raster
 function datumText(tag) {
@@ -2130,6 +2152,16 @@ $("#gfFullyTest").addEventListener("click", async () => {
   catch (e) { erg.textContent = "✗ " + e.message; erg.style.color = "var(--danger, #f87171)"; }
 });
 $("#geraeteZu").addEventListener("click", () => { $("#geraeteDialog").classList.add("versteckt"); clearInterval(geraeteTimer); });
+
+// QR-Code des Fernsehers/Tablets mit der Kamera der iPhone-App scannen: Code uebernehmen und (bei nur einem Geraet) gleich koppeln
+if (/ShowcaseApp/.test(navigator.userAgent)) $("#koppelKameraZeile").classList.remove("versteckt");
+$("#koppelKamera").addEventListener("click", () => { try { window.webkit.messageHandlers.showcase.postMessage({ aktion: "qrScannen" }); } catch (e) {} });
+window.rwQrErgebnis = text => {
+  const m = /koppeln=([A-Za-z0-9]{6})\b/.exec(text || "") || /^([A-Za-z0-9]{6})$/.exec((text || "").trim());
+  if (!m) { toast(RW_T("Das ist kein Kopplungs-QR-Code. Er steht auf dem Bildschirm des Fernsehers oder Tablets."), true); return; }
+  $("#koppelCode").value = m[1].toUpperCase();
+  if ($("#koppelZiel").options.length === 1) $("#koppelBtn").click(); else toast(RW_T("Code übernommen – jetzt das Gerät wählen und koppeln."));
+};
 $("#koppelBtn").addEventListener("click", async () => {
   const code = $("#koppelCode").value.trim().toUpperCase(), ziel = $("#koppelZiel").value;
   if (code.length !== 6) { toast(RW_T("Bitte den 6-stelligen Code eingeben."), true); return; }
@@ -2235,6 +2267,38 @@ let tourVersuche = 0;
   if ($("#appAnsicht").classList.contains("versteckt") || !konfig || konfig.modus === undefined) { setTimeout(tourPruefen, 4000); return; }
   tourStart(false);
 })();
+
+// ---------------------------------------------------------------- "Erste Schritte" (verschwindet, wenn alles erledigt ist oder man es ausblendet)
+function startZuGemerkt() { try { return localStorage.getItem("rwStartZu") === "1"; } catch (e) { return false; } }
+async function startPruefen() {
+  if (startZuGemerkt() || $("#appAnsicht").classList.contains("versteckt") || !konfig || konfig.modus === undefined || document.visibilityState !== "visible") return;
+  let shows = [], geraete = [];
+  try { shows = (await api("shows")).shows || []; } catch (e) { return; }
+  try { geraete = (await api("geraete")).geraete || []; } catch (e) {}
+  const imApp = /ShowcaseApp/.test(navigator.userAgent) || (window.matchMedia && matchMedia("(display-mode: standalone)").matches);
+  let handyGemerkt = false; try { handyGemerkt = localStorage.getItem("rwHandy") === "1"; } catch (e) {}
+  const punkte = [
+    { t: "Immich verbinden", ok: true },
+    { t: "Handy verbinden (iPhone-App oder zum Home-Bildschirm hinzufügen)", ok: imApp || handyGemerkt, knopf: "QR-Code zeigen", tun: () => { try { localStorage.setItem("rwHandy", "1"); } catch (e) {} einstOeffnen(); } },
+    { t: "Rahmen oder Fernseher koppeln", ok: geraete.some(g => g.zuletzt_vor_s != null || g.online), knopf: "Geräte", tun: () => geraeteOeffnen("") },
+    { t: "Die erste Show senden: Fotos antippen, unten „Auf den Rahmen“", ok: shows.length > 0, knopf: "Fotos ansehen", tun: () => { wechsle("neueste"); scrollTo({ top: 0, behavior: "smooth" }); } },
+  ];
+  const fertig = punkte.filter(p => p.ok).length;
+  if (fertig === punkte.length) { $("#startKarte").classList.add("versteckt"); try { localStorage.setItem("rwStartZu", "1"); } catch (e) {} return; }
+  $("#startZaehler").textContent = `${fertig} / ${punkte.length}`;
+  const ol = $("#startListe"); ol.innerHTML = "";
+  for (const p of punkte) {
+    const li = document.createElement("li"); li.className = p.ok ? "fertig" : "";
+    const k = document.createElement("span"); k.className = "kreis"; k.textContent = p.ok ? "✓" : "";
+    const t = document.createElement("span"); t.className = "text"; t.textContent = RW_T(p.t);
+    li.append(k, t);
+    if (!p.ok && p.knopf) { const b = document.createElement("button"); b.type = "button"; b.className = "btn klein"; b.textContent = RW_T(p.knopf); b.addEventListener("click", p.tun); li.append(b); }
+    ol.append(li);
+  }
+  $("#startKarte").classList.remove("versteckt");
+}
+$("#startZu").addEventListener("click", () => { $("#startKarte").classList.add("versteckt"); try { localStorage.setItem("rwStartZu", "1"); } catch (e) {} });
+setTimeout(startPruefen, 3500); setInterval(startPruefen, 60000);
 $("#demoEnde").addEventListener("click", () => { try { window.webkit.messageHandlers.showcase.postMessage({ aktion: "demoBeenden" }); } catch (e) {} });
 // Zustand des Rahmens aktuell halten: auch Siri, Teilen, Widget und andere Handys aendern ihn von aussen.
 function statusAuffrischen(alles) {

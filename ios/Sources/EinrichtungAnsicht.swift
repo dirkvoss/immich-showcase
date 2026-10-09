@@ -7,9 +7,11 @@ struct EinrichtungAnsicht: View {
     @State private var fehler: String?
     @State private var scannerOffen = false
     @State private var suche: Suche = .bereit
+    @State private var gefundene: [GefundenerServer] = []
+    @State private var bonjour = BonjourSuche()
     @State private var anderesNetz = ""
     @State private var netzHinweis: String?
-    enum Suche: Equatable { case bereit, sucht([GefundenerServer]), fertig([GefundenerServer]) }
+    enum Suche: Equatable { case bereit, sucht, fertig }
     private let gold = Color(red: 0.88, green: 0.70, blue: 0.35)
 
     var body: some View {
@@ -66,37 +68,48 @@ struct EinrichtungAnsicht: View {
         .sheet(isPresented: $scannerOffen) {
             QRScanner { text in
                 scannerOffen = false
-                if let u = Adresse.ausQRText(text) { eingabe = u.absoluteString; verbinden() } else { fehler = "Dieser QR-Code enthält keine Server-Adresse." }
+                if let u = Adresse.ausQRText(text) { eingabe = u.absoluteString; verbinden() } else { fehler = L("Dieser QR-Code enthält keine Server-Adresse.") }
             }.ignoresSafeArea()
         }
     }
 
     @ViewBuilder private var serverSuche: some View {
         VStack(alignment: .leading, spacing: 10) {
-            switch suche {
-            case .bereit:
+            if !gefundene.isEmpty {
+                treffer(gefundene, laeuft: suche != .fertig)
+            } else if suche != .fertig {
                 HStack(spacing: 10) { ProgressView(); Text("Suche Server im WLAN …").foregroundStyle(.secondary) }
-            case .sucht(let liste):
-                if liste.isEmpty { HStack(spacing: 10) { ProgressView(); Text("Suche Server im WLAN …").foregroundStyle(.secondary) } }
-                else { treffer(liste, laeuft: true) }
-            case .fertig(let liste) where liste.isEmpty:
+            } else {
                 Text("Im WLAN wurde kein Server gefunden. Tippe die Adresse ein oder scanne den QR-Code.").font(.footnote).foregroundStyle(.secondary)
                 Button("Erneut suchen") { starteSuche() }.font(.footnote)
-            case .fertig(let liste):
-                treffer(liste, laeuft: false)
             }
-            if case .fertig = suche { anderesNetzSuchen }
+            if suche == .fertig { anderesNetzSuchen }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .task { if suche == .bereit { starteSuche() } }
+        .onDisappear { bonjour.stop() }
     }
 
     @ViewBuilder private func treffer(_ liste: [GefundenerServer], laeuft: Bool) -> some View {
-        HStack(spacing: 8) { Text("Gefunden im WLAN").font(.footnote).foregroundStyle(.secondary); if laeuft { ProgressView().controlSize(.mini) } }
+        let einziger = liste.count == 1 && !laeuft                       // genau ein Server und die Suche ist durch: mit einem Tipp verbinden
+        HStack(spacing: 8) {
+            Text(einziger ? "Dein Server wurde gefunden" : "Gefunden im WLAN").font(.footnote).foregroundStyle(einziger ? gold : .secondary)
+            if laeuft { ProgressView().controlSize(.mini) }
+        }
         ForEach(liste) { s in
             Button { eingabe = s.url.absoluteString; verbinden() } label: {
-                HStack { VStack(alignment: .leading) { Text(s.name).fontWeight(.semibold); Text(s.anzeigeAdresse).font(.footnote).foregroundStyle(.secondary); if let a = s.anmeldungText { Text(a).font(.caption).foregroundStyle(.secondary) } }; Spacer(); Image(systemName: "chevron.right").foregroundStyle(.secondary) }
-                    .padding(12).background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text(s.name).fontWeight(.semibold)
+                        Text(s.anzeigeAdresse).font(.footnote).foregroundStyle(.secondary)
+                        if let a = s.anmeldungText { Text(a).font(.caption).foregroundStyle(.secondary) }
+                    }
+                    Spacer()
+                    if einziger { Text("Verbinden").font(.subheadline.weight(.semibold)).foregroundStyle(.black).padding(.horizontal, 14).padding(.vertical, 8).background(gold, in: Capsule()) }
+                    else { Image(systemName: "chevron.right").foregroundStyle(.secondary) }
+                }
+                .padding(12).background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(einziger ? gold : .clear, lineWidth: 1.5))
             }.buttonStyle(.plain).disabled(prueft)
         }
     }
@@ -110,7 +123,7 @@ struct EinrichtungAnsicht: View {
                         .padding(10).background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
                     Button("Suchen") {
                         if let p = ServerSuche.praefix(aus: anderesNetz) { netzHinweis = nil; starteSuche(weitere: [p]) }
-                        else { netzHinweis = "Bitte ein privates Netz angeben, z. B. 192.168.2 oder 172.16.5." }
+                        else { netzHinweis = L("Bitte ein privates Netz angeben, z. B. 192.168.2 oder 172.16.5.") }
                     }.buttonStyle(.bordered).tint(gold)
                 }
                 if let netzHinweis { Text(netzHinweis).font(.footnote).foregroundStyle(.red) }
@@ -137,19 +150,27 @@ struct EinrichtungAnsicht: View {
         }
     }
 
+    private func trefferHinzu(_ s: GefundenerServer) {
+        if !gefundene.contains(where: { $0.url == s.url }) { gefundene.append(s); gefundene.sort { $0.anzeigeAdresse.localizedStandardCompare($1.anzeigeAdresse) == .orderedAscending } }
+    }
+
     private func starteSuche(weitere: [String] = []) {
-        suche = .sucht([])
-        Task {
-            let alle = await ServerSuche.suchen(weitere: weitere) { treffer in
-                Task { @MainActor in if case .sucht(let l) = suche { suche = .sucht(l + [treffer]) } }
+        suche = .sucht
+        if weitere.isEmpty {
+            gefundene = []
+            bonjour.start { url in                                          // Server, die sich per Bonjour melden (auch aus anderen Netzen, wenn der Router weiterleitet)
+                Task { if let s = await ServerSuche.bestaetige(url) { await MainActor.run { trefferHinzu(s) } } }
             }
-            suche = .fertig(alle)
+        }
+        Task {
+            _ = await ServerSuche.suchen(weitere: weitere) { s in Task { @MainActor in trefferHinzu(s) } }
+            suche = .fertig
         }
     }
 
     private func verbinden() {
         let kandidaten = Adresse.kandidaten(eingabe)
-        guard !kandidaten.isEmpty else { fehler = "Bitte eine Adresse wie 192.168.1.20:8090 eingeben."; return }
+        guard !kandidaten.isEmpty else { fehler = L("Bitte eine Adresse wie 192.168.1.20:8090 eingeben."); return }
         fehler = nil; prueft = true
         Task {
             var letzter: AppModell.Fehler = .nichtErreichbar

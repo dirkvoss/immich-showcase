@@ -1,0 +1,1491 @@
+{
+  "sourceLanguage": "de",
+  "version": "1.0",
+  "strings": {
+    "Showcase Immich": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Showcase Immich"
+          }
+        }
+      }
+    },
+    "Verbinde die App mit deinem Immich-Showcase-Server.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connect the app to your Immich Showcase server."
+          }
+        }
+      }
+    },
+    "Wichtig vorab": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Important first"
+          }
+        }
+      }
+    },
+    "Diese App verbindet sich **nicht direkt mit Immich**. Sie braucht einen eigenen **Immich-Showcase-Server**, den du selbst betreibst (neben deinem Immich, z. B. im Heimnetz).": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This app does **not connect to Immich directly**. It needs your own **Immich Showcase server**, which you run yourself (next to your Immich, e.g. at home)."
+          }
+        }
+      }
+    },
+    "Ohne diesen Server kann die App nichts anzeigen. Anleitung und Installation findest du auf GitHub.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Without this server the app can't show anything. You'll find the guide and installation on GitHub."
+          }
+        }
+      }
+    },
+    "Immich Showcase auf GitHub": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Immich Showcase on GitHub"
+          }
+        }
+      }
+    },
+    "Adresse des Servers": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Server address"
+          }
+        }
+      }
+    },
+    "Verbinden": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connect"
+          }
+        }
+      }
+    },
+    "Demo ausprobieren (ohne Server)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try the demo (no server needed)"
+          }
+        }
+      }
+    },
+    "QR-Code scannen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan QR code"
+          }
+        }
+      }
+    },
+    "So kommst du an den QR-Code": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How to get the QR code"
+          }
+        }
+      }
+    },
+    "Öffne die Showcase-Seite deines Servers am Computer oder in einem Browser, zum Beispiel unter der Adresse, die du auch hier eintippen würdest (192.168.1.20:8090).": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open your server's Showcase page on a computer or in a browser, for example at the address you would type in here (192.168.1.20:8090)."
+          }
+        }
+      }
+    },
+    "Tippe oben rechts auf das **Konto-Symbol** (Person) und wähle **Einstellungen**.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap the **account icon** (person) at the top right and choose **Settings**."
+          }
+        }
+      }
+    },
+    "Ganz unten steht **„iPhone-App verbinden“** mit einem QR-Code.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At the very bottom you'll find **“Connect iPhone app”** with a QR code."
+          }
+        }
+      }
+    },
+    "Tippe hier auf **QR-Code scannen** und halte die Kamera auf diesen Code. Fertig.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap **Scan QR code** here and point the camera at that code. Done."
+          }
+        }
+      }
+    },
+    "Den Code findest du auch am Ende der Einrichtung des Servers (Seite „/setup/“). Er enthält nur die Adresse, keine PIN und kein Passwort.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You'll also find the code at the end of the server setup (page “/setup/”). It only contains the address, no PIN and no password."
+          }
+        }
+      }
+    },
+    "Dieser QR-Code enthält keine Server-Adresse.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This QR code doesn't contain a server address."
+          }
+        }
+      }
+    },
+    "Suche Server im WLAN …": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Looking for servers on Wi-Fi …"
+          }
+        }
+      }
+    },
+    "Im WLAN wurde kein Server gefunden. Tippe die Adresse ein oder scanne den QR-Code.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No server found on Wi-Fi. Type the address or scan the QR code."
+          }
+        }
+      }
+    },
+    "Erneut suchen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search again"
+          }
+        }
+      }
+    },
+    "Dein Server wurde gefunden": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your server was found"
+          }
+        }
+      }
+    },
+    "Gefunden im WLAN": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Found on Wi-Fi"
+          }
+        }
+      }
+    },
+    "Server in einem anderen Netz suchen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Look for a server in another network"
+          }
+        }
+      }
+    },
+    "Steht der Server in einem anderen Netz (z. B. einem eigenen Server-Netz), gib dessen Anfang an, zum Beispiel 192.168.2": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "If the server is in another network (e.g. its own server network), enter the beginning of its address, for example 192.168.2"
+          }
+        }
+      }
+    },
+    "Suchen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search"
+          }
+        }
+      }
+    },
+    "Bitte ein privates Netz angeben, z. B. 192.168.2 oder 172.16.5.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please enter a private network, e.g. 192.168.2 or 172.16.5."
+          }
+        }
+      }
+    },
+    "Zuletzt verbunden": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last connected"
+          }
+        }
+      }
+    },
+    "Bitte eine Adresse wie 192.168.1.20:8090 eingeben.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please enter an address like 192.168.1.20:8090."
+          }
+        }
+      }
+    },
+    "Server": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Server"
+          }
+        }
+      }
+    },
+    "Demo-Modus: Beispielfotos, es wird nichts gesendet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demo mode: sample photos, nothing is sent."
+          }
+        }
+      }
+    },
+    "Demo beenden und eigenen Server verbinden": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End demo and connect your own server"
+          }
+        }
+      }
+    },
+    "Demo beenden (zurück zu deinem Server)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End demo (back to your server)"
+          }
+        }
+      }
+    },
+    "nicht verbunden": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "not connected"
+          }
+        }
+      }
+    },
+    "Server ändern": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change server"
+          }
+        }
+      }
+    },
+    "Verbindung prüfen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check connection"
+          }
+        }
+      }
+    },
+    "Demo ansehen (Beispielfotos, ohne Server)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View demo (sample photos, no server)"
+          }
+        }
+      }
+    },
+    "Sicherheit": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Security"
+          }
+        }
+      }
+    },
+    "Mit Face ID sperren": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lock with Face ID"
+          }
+        }
+      }
+    },
+    "Mit Face ID anmelden (PIN merken)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in with Face ID (remember PIN)"
+          }
+        }
+      }
+    },
+    "Die PIN wird beim nächsten Anmelden im geschützten Schlüsselbund gemerkt und danach per Face ID eingesetzt.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The PIN is remembered in the protected keychain the next time you sign in and then entered with Face ID."
+          }
+        }
+      }
+    },
+    "Hilfe": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Help"
+          }
+        }
+      }
+    },
+    "Hilfe anzeigen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show help"
+          }
+        }
+      }
+    },
+    "Alles in Ordnung? (Status)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All good? (status)"
+          }
+        }
+      }
+    },
+    "Anleitung auf GitHub": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guide on GitHub"
+          }
+        }
+      }
+    },
+    "Die App zeigt deinen eigenen Immich-Showcase-Server. Sie verbindet sich nicht direkt mit Immich.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The app shows your own Immich Showcase server. It doesn't connect to Immich directly."
+          }
+        }
+      }
+    },
+    "Über": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About"
+          }
+        }
+      }
+    },
+    "Entwickelt von": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Created by"
+          }
+        }
+      }
+    },
+    "Version": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version"
+          }
+        }
+      }
+    },
+    "Projekt auf GitHub": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Project on GitHub"
+          }
+        }
+      }
+    },
+    "Unabhängiges Projekt, nicht mit dem Immich-Projekt verbunden.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Independent project, not affiliated with the Immich project."
+          }
+        }
+      }
+    },
+    "App-Einstellungen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App settings"
+          }
+        }
+      }
+    },
+    "Fertig": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        }
+      }
+    },
+    "Auf diesem Gerät ist weder Face ID noch ein Code eingerichtet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neither Face ID nor a passcode is set up on this device."
+          }
+        }
+      }
+    },
+    "Sperre einschalten": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on lock"
+          }
+        }
+      }
+    },
+    "Die Sperre wurde nicht eingeschaltet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The lock was not turned on."
+          }
+        }
+      }
+    },
+    "Showcase Immich entsperren": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock Showcase Immich"
+          }
+        }
+      }
+    },
+    "Showcase Immich ist gesperrt": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Showcase Immich is locked"
+          }
+        }
+      }
+    },
+    "Entsperren": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock"
+          }
+        }
+      }
+    },
+    "Showcase Immich anmelden": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in to Showcase Immich"
+          }
+        }
+      }
+    },
+    "Keine Verbindung zum Server": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No connection to the server"
+          }
+        }
+      }
+    },
+    "Erneut versuchen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try again"
+          }
+        }
+      }
+    },
+    "Abbrechen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        }
+      }
+    },
+    "Der Server unter %@ antwortet nicht.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The server at %@ is not responding."
+          }
+        }
+      }
+    },
+    "Der Server ist nicht erreichbar. Prüfe die Adresse und ob du im richtigen Netz bist.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The server can't be reached. Check the address and whether you are on the right network."
+          }
+        }
+      }
+    },
+    "Unter dieser Adresse antwortet kein Immich Showcase.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Immich Showcase answers at this address."
+          }
+        }
+      }
+    },
+    "Die Verbindung ist fehlgeschlagen: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The connection failed: %@"
+          }
+        }
+      }
+    },
+    "Anmeldung mit PIN (im Heimnetz oft ohne)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign-in with PIN (often not needed at home)"
+          }
+        }
+      }
+    },
+    "Anmeldung mit Immich-Konto": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign-in with Immich account"
+          }
+        }
+      }
+    },
+    "Anmeldung mit PIN oder Immich-Konto": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign-in with PIN or Immich account"
+          }
+        }
+      }
+    },
+    "Die App ist noch mit keinem Server verbunden. Öffne Showcase Immich einmal und gib die Adresse ein.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The app isn't connected to a server yet. Open Showcase Immich once and enter the address."
+          }
+        }
+      }
+    },
+    "Der Server ist nicht erreichbar. Bist du im richtigen Netz?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The server can't be reached. Are you on the right network?"
+          }
+        }
+      }
+    },
+    "Bitte öffne Showcase Immich einmal und melde dich mit der PIN an.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please open Showcase Immich once and sign in with the PIN."
+          }
+        }
+      }
+    },
+    "Der Server meldet einen Fehler (%lld).": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The server reports an error (%lld)."
+          }
+        }
+      }
+    },
+    "Der Rahmen zeigt wieder das normale Programm.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The frame shows its normal programme again."
+          }
+        }
+      }
+    },
+    "Zurück zur vorherigen Show.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to the previous show."
+          }
+        }
+      }
+    },
+    "Die Show läuft gleich auf dem Rahmen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The show will start on the frame shortly."
+          }
+        }
+      }
+    },
+    "Dazu habe ich keine Fotos gefunden.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I found no photos for that."
+          }
+        }
+      }
+    },
+    "Der Server hat das Foto nicht angenommen (%lld).": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The server did not accept the photo (%lld)."
+          }
+        }
+      }
+    },
+    "Bilderrahmen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Picture frame"
+          }
+        }
+      }
+    },
+    "Netzwerk": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Network"
+          }
+        }
+      }
+    },
+    "Das iPhone hat gerade kein Netz.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The iPhone has no network right now."
+          }
+        }
+      }
+    },
+    "WLAN oder Mobilfunk einschalten (Flugmodus aus?).": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on Wi-Fi or mobile data (airplane mode off?)."
+          }
+        }
+      }
+    },
+    "Mit einem WLAN verbunden.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected to a Wi-Fi network."
+          }
+        }
+      }
+    },
+    "Nur Mobilfunk, kein WLAN.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mobile data only, no Wi-Fi."
+          }
+        }
+      }
+    },
+    "Steht der Server im Heimnetz, schalte das Heim-WLAN oder den VPN ein.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "If the server is on your home network, turn on your home Wi-Fi or the VPN."
+          }
+        }
+      }
+    },
+    "Netzwerk vorhanden.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Network available."
+          }
+        }
+      }
+    },
+    "Das iPhone ist nicht mit dem Netz verbunden.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The iPhone is not connected to the network."
+          }
+        }
+      }
+    },
+    "WLAN oder Mobilfunk einschalten.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on Wi-Fi or mobile data."
+          }
+        }
+      }
+    },
+    "Der Name dieser Adresse wird nicht gefunden.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The name of this address can't be found."
+          }
+        }
+      }
+    },
+    "Adresse prüfen. Unterwegs funktionieren Adressen aus dem Heimnetz nur mit VPN.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check the address. When away from home, home-network addresses only work with a VPN."
+          }
+        }
+      }
+    },
+    "Der Server antwortet nicht.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The server is not responding."
+          }
+        }
+      }
+    },
+    "Läuft der Server? Bist du im Heimnetz (oder per VPN)? Ein Neustart des Servers hilft oft.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Is the server running? Are you on the home network (or on VPN)? Restarting the server often helps."
+          }
+        }
+      }
+    },
+    "Die sichere Verbindung (HTTPS) schlägt fehl.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The secure connection (HTTPS) fails."
+          }
+        }
+      }
+    },
+    "Stimmt die Adresse (https oder http)? Ist das Zertifikat des Servers gültig?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Is the address right (https or http)? Is the server's certificate valid?"
+          }
+        }
+      }
+    },
+    "Diese Adresse erlaubt iOS nur mit https.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS only allows this address with https."
+          }
+        }
+      }
+    },
+    "Adresse mit https:// eingeben oder eine Adresse aus dem Heimnetz (IP) nutzen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter the address with https:// or use a home-network address (IP)."
+          }
+        }
+      }
+    },
+    "Die Verbindung ist fehlgeschlagen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The connection failed."
+          }
+        }
+      }
+    },
+    "Server und Netz prüfen. (Code %lld)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check the server and network. (Code %lld)"
+          }
+        }
+      }
+    },
+    "Der Server verlangt eine Anmeldung.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The server requires a sign-in."
+          }
+        }
+      }
+    },
+    "In der App die PIN oder das Immich-Konto eingeben.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter the PIN or Immich account in the app."
+          }
+        }
+      }
+    },
+    "Der Zugriff ist von hier gesperrt.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Access is blocked from here."
+          }
+        }
+      }
+    },
+    "Der Server ist vermutlich nur im Heimnetz erreichbar. VPN einschalten oder im Heim-WLAN sein.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The server is probably only reachable on the home network. Turn on the VPN or be on your home Wi-Fi."
+          }
+        }
+      }
+    },
+    "Unter dieser Adresse gibt es keinen Showcase-Server.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "There is no Showcase server at this address."
+          }
+        }
+      }
+    },
+    "Adresse und Port prüfen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check the address and port."
+          }
+        }
+      }
+    },
+    "Der Server (oder der Proxy davor) meldet einen Fehler (%lld).": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The server (or the proxy in front of it) reports an error (%lld)."
+          }
+        }
+      }
+    },
+    "Läuft der Showcase-Container? Docker-Protokoll ansehen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Is the Showcase container running? Look at the Docker log."
+          }
+        }
+      }
+    },
+    "Der Server antwortet mit Fehler %lld.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The server answers with error %lld."
+          }
+        }
+      }
+    },
+    "Docker-Protokoll des Servers ansehen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Look at the server's Docker log."
+          }
+        }
+      }
+    },
+    "Anmeldung": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign-in"
+          }
+        }
+      }
+    },
+    "Immich": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Immich"
+          }
+        }
+      }
+    },
+    "Übersprungen, weil der Server nicht erreichbar ist.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skipped because the server can't be reached."
+          }
+        }
+      }
+    },
+    "Übersprungen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skipped."
+          }
+        }
+      }
+    },
+    "Noch nicht angemeldet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not signed in yet."
+          }
+        }
+      }
+    },
+    "Wird nach der Anmeldung geprüft.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Will be checked after signing in."
+          }
+        }
+      }
+    },
+    "Angemeldet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signed in."
+          }
+        }
+      }
+    },
+    "Der Status ist nicht abrufbar.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The status can't be retrieved."
+          }
+        }
+      }
+    },
+    "Alles in Ordnung.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All good."
+          }
+        }
+      }
+    },
+    "%@ antwortet (%lld ms), Version %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ answers (%lld ms), version %@."
+          }
+        }
+      }
+    },
+    "Erneut prüfen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check again"
+          }
+        }
+      }
+    },
+    "Fotos auf den Rahmen zeigen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show photos on the frame"
+          }
+        }
+      }
+    },
+    "Sucht Fotos in Immich (zum Beispiel „Sommer 2022 am Strand“) und zeigt sie auf dem Bilderrahmen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Searches photos in Immich (for example “Summer 2022 at the beach”) and shows them on the picture frame."
+          }
+        }
+      }
+    },
+    "Was soll gezeigt werden?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What should be shown?"
+          }
+        }
+      }
+    },
+    "Was soll ich auf dem Rahmen zeigen?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What should I show on the frame?"
+          }
+        }
+      }
+    },
+    "Rahmen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frame"
+          }
+        }
+      }
+    },
+    "Leer lassen für den Standard-Rahmen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave empty for the default frame."
+          }
+        }
+      }
+    },
+    "Show auf dem Rahmen beenden": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End the show on the frame"
+          }
+        }
+      }
+    },
+    "Zur vorherigen Show zurück": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to the previous show"
+          }
+        }
+      }
+    },
+    "Der Rahmen springt zur Show zurück, die vor der aktuellen lief.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The frame goes back to the show that ran before the current one."
+          }
+        }
+      }
+    },
+    "Fotos zeigen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show photos"
+          }
+        }
+      }
+    },
+    "Show beenden": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End show"
+          }
+        }
+      }
+    },
+    "Zurück": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        }
+      }
+    },
+    "Bilderrahmen (Demo)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Picture frame (demo)"
+          }
+        }
+      }
+    },
+    "Zeige ${suche} auf ${rahmen}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show ${suche} on ${rahmen}"
+          }
+        }
+      }
+    },
+    "Show beenden auf ${rahmen}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End show on ${rahmen}"
+          }
+        }
+      }
+    },
+    "Zurück auf ${rahmen}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back on ${rahmen}"
+          }
+        }
+      }
+    }
+  }
+}

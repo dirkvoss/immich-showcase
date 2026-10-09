@@ -45,6 +45,7 @@
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_http._tcp</string>
+		<string>_showcase._tcp</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Die Kamera wird nur zum Scannen des QR-Codes deines Servers genutzt.</string>

@@ -1,6 +1,23 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.17.0]
+### Neu – Einrichtung so einfach wie möglich
+- **Ein Befehl zum Installieren:** `curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/install.sh | bash` lädt alles selbst, erkennt ein auf demselben Rechner laufendes Immich (Docker-Netz, Machine-Learning-Dienst) und startet Immich Showcase. Am Ende steht ein fertiger Einrichtungs-Link mit QR-Code. Optionen: `--with-immich`, `--port`, `--bonjour`, `--no-open`, `--version`.
+- **Einrichtungsassistent in 3 Schritten** (`/setup/`): Immich wird automatisch gefunden (sonst Adresse eintragen), Anmeldung mit dem Immich-Konto (legt einen eigenen Schlüssel ohne Lösch-Rechte an, das Passwort wird nicht gespeichert), dann die Frage „Wer soll Immich Showcase benutzen dürfen?“ in klarer Sprache (gemeinsame PIN, optional ohne PIN im Heimnetz, oder Immich-Konten). Am Ende: PIN, QR-Code für die iPhone-App und die Adresse für Tablets und Fernseher.
+- **„Erste Schritte“** auf der Startseite hakt ab, was erledigt ist (Immich verbinden, Handy verbinden, Rahmen koppeln, erste Show senden).
+- **Rahmen und Fernseher per Code oder QR-Code koppeln** (Code am Gerät, in der App eingeben oder mit der Kamera scannen); der Assistent „Gerät hinzufügen“ führt durch alle Schritte.
+- **„Alles in Ordnung?“** prüft die Verbindung und meldet in Klartext, was zu tun ist; ein Hinweis auf neue Versionen ist enthalten.
+- **Eigene Fotos senden pro Person:** Jede Person lädt mit ihrem eigenen Konto hoch (Upload-Schlüssel je Person).
+- **Server im Netz ankündigen (Bonjour):** `docker-compose.bonjour.yml` bzw. `install.sh --bonjour`; die iPhone-App findet den Server im WLAN von selbst.
+- **Vorlagen für NAS und Portainer:** `examples/unraid`, `synology`, `truenas`, `portainer`, `watchtower` (automatische Updates).
+- **Illustrierte Anleitungen** mit Bildern und Text in einem Dokument (HTML/PDF): `docs/anleitung.md` (Erste Schritte) und `docs/anleitung-externer-rechner.md` (Immich Showcase auf einem anderen Rechner als Immich, z. B. Raspberry Pi).
+- **iPhone-App:** Server im WLAN per Bonjour finden, Verbindung prüfen mit klaren Fehlermeldungen, QR-Kopplung von Tablets und Fernsehern, PIN mit Face ID, englische Oberfläche (Texte als String-Kataloge).
+### Geändert
+- Es gibt keine Beispielgeräte „LG TV“ und „Shield“ mehr in einer frischen Installation (`.env.example`, `docker-compose.yml`); Geräte legt man in der App an. Bestehende Installationen behalten ihre Geräte.
+### Behoben
+- „Alles in Ordnung?“ meldete „Motivsuche nicht erreichbar“, obwohl ohne Datenbankzugang (z. B. wenn Immich Showcase auf einem anderen Rechner läuft) die Motivsuche über Immich selbst läuft und der Machine-Learning-Dienst nicht gebraucht wird. Die Prüfung läuft jetzt nur noch mit Datenbankzugang.
+
 ## [2.16.0]
 ### Neu
 - **Rahmen an einem anderen Ort (Eltern, Ferienhaus):** Ein Tablet außerhalb des Heimnetzes bekommt beim Koppeln (Code am Rahmen, in der App „Gerät koppeln“) einen **eigenen Zugang**, der nur die Rahmen-Seiten öffnet (nicht die App, nicht die Fotoübersicht, nicht die Home-Assistant-Schnittstellen) und nur für dieses Gerät gilt. Er wird bei jeder Nutzung erneuert und läuft praktisch nie ab; je Gerät widerrufbar (⚙ → *Wartung und Zugang von außen* → *Zugang widerrufen*), ohne die PIN zu ändern. Anleitung: README, Abschnitt „Rahmen an einem anderen Ort“.

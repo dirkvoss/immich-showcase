@@ -529,7 +529,19 @@
   "Unter „Hilfe“ steht alles Wichtige. Im Konto-Menü zeigt „Alles in Ordnung?“, ob Immich und die Rahmen laufen.": "« Aide » contient l’essentiel. Dans le menu du compte, « Tout va bien ? » montre si Immich et les cadres fonctionnent.",
   "Überspringen": "Passer",
   "Los geht’s": "C’est parti",
-  "🎓 Rundgang noch einmal ansehen": "🎓 Revoir la visite guidée"
+  "🎓 Rundgang noch einmal ansehen": "🎓 Revoir la visite guidée",
+  "🚀 Erste Schritte": "🚀 Premiers pas",
+  "Ausblenden": "Masquer",
+  "Immich verbinden": "Connecter Immich",
+  "Handy verbinden (iPhone-App oder zum Home-Bildschirm hinzufügen)": "Connecter le téléphone (app iPhone ou ajouter à l’écran d’accueil)",
+  "QR-Code zeigen": "Afficher le code QR",
+  "Rahmen oder Fernseher koppeln": "Appairer un cadre ou une télé",
+  "Die erste Show senden: Fotos antippen, unten „Auf den Rahmen“": "Envoyer le premier diaporama : touchez des photos puis « Sur le cadre » en bas",
+  "Fotos ansehen": "Voir les photos",
+  "📷 QR-Code am Gerät scannen": "📷 Scanner le code QR de l’appareil",
+  "Das ist kein Kopplungs-QR-Code. Er steht auf dem Bildschirm des Fernsehers oder Tablets.": "Ce n’est pas un code QR d’appairage. Il s’affiche sur l’écran de la télé ou de la tablette.",
+  "Code übernommen – jetzt das Gerät wählen und koppeln.": "Code repris – choisissez maintenant l’appareil et appairez.",
+  "🔓 Mit Face ID anmelden": "🔓 Se connecter avec Face ID"
  },
  "muster": [
   [

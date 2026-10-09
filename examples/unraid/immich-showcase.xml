@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!-- Unraid-Vorlage fuer Immich Showcase. Installation: Docker-Tab -> "Container hinzufuegen" -> unten "Vorlage" ... oder die Datei nach
+     /boot/config/plugins/dockerMan/templates-user/ kopieren, dann erscheint sie unter "Vorlage". Zeigt Immich auf dem Fernseher und auf Tablets als Bilderrahmen. -->
+<Container version="2">
+  <Name>immich-showcase</Name>
+  <Repository>ghcr.io/dirkvoss/immich-showcase:latest</Repository>
+  <Registry>https://github.com/dirkvoss/immich-showcase/pkgs/container/immich-showcase</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/dirkvoss/immich-showcase/issues</Support>
+  <Project>https://github.com/dirkvoss/immich-showcase</Project>
+  <Overview>Zeigt deine Immich-Fotos auf dem Fernseher und auf Tablets (Bilderrahmen) und laesst die ganze Familie per Handy Shows schicken. Nach dem Start oeffnest du WebUI und folgst dem Einrichtungsassistenten (3 Schritte; den Einrichtungs-Code zeigt das Protokoll des Containers). Dazu passt die iPhone-App "Showcase Immich".</Overview>
+  <Category>MediaApp:Photos Tools:</Category>
+  <WebUI>http://[IP]:[PORT:8090]/</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/examples/unraid/immich-showcase.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/static/icon-512.png</Icon>
+  <ExtraParams>--user 99:100 --read-only --tmpfs /tmp --cap-drop ALL --security-opt no-new-privileges:true --memory 768m --label com.centurylinklabs.watchtower.enable=true</ExtraParams>
+  <PostArgs/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires>Immich muss laufen. Der Einrichtungsassistent fragt nach der Adresse von Immich (z. B. http://IP-von-Unraid:2283) und legt den noetigen Schluessel selbst an.</Requires>
+  <Config Name="Web-Oberflaeche (Port)" Target="8090" Default="8090" Mode="tcp" Description="Port der Oberflaeche. Fernseher und Handys oeffnen http://IP-von-Unraid:8090" Type="Port" Display="always" Required="true" Mask="false">8090</Config>
+  <Config Name="Daten" Target="/data" Default="/mnt/user/appdata/immich-showcase" Mode="rw" Description="PIN, Einstellungen, Shows, Geraete (muss dem Benutzer 99:100 gehoeren)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/immich-showcase</Config>
+  <Config Name="Zeitzone" Target="TZ" Default="Europe/Berlin" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false">Europe/Berlin</Config>
+  <Config Name="Immich-Adresse (optional)" Target="RAHMEN_IMMICH_URL" Default="" Mode="" Description="Leer lassen: der Assistent fragt danach" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="Immich-Schluessel (optional)" Target="RAHMEN_IMMICH_KEY" Default="" Mode="" Description="Leer lassen: der Assistent legt ihn an" Type="Variable" Display="advanced" Required="false" Mask="true"/>
+  <Config Name="Name der Oberflaeche" Target="RAHMEN_WEB_NAME" Default="" Mode="" Description="" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+</Container>

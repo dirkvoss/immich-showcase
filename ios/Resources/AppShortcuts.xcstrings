@@ -1,0 +1,61 @@
+{
+  "sourceLanguage": "de",
+  "version": "1.0",
+  "strings": {
+    "Zeige Fotos auf dem Rahmen mit ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show photos on the frame with ${applicationName}"
+          }
+        }
+      }
+    },
+    "Fotos auf den Rahmen mit ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photos on the frame with ${applicationName}"
+          }
+        }
+      }
+    },
+    "Beende die Show mit ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End the show with ${applicationName}"
+          }
+        }
+      }
+    },
+    "Rahmen wieder normal mit ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frame back to normal with ${applicationName}"
+          }
+        }
+      }
+    },
+    "Zurück zur vorherigen Show mit ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back to the previous show with ${applicationName}"
+          }
+        }
+      }
+    }
+  }
+}

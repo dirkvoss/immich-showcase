@@ -8,9 +8,9 @@ struct GefundenerServer: Identifiable, Hashable {
     var id: URL { url }
     var anmeldungText: String? {
         switch anmeldung {
-        case "pin": return "Anmeldung mit PIN (im Heimnetz oft ohne)"
-        case "immich": return "Anmeldung mit Immich-Konto"
-        case "beide": return "Anmeldung mit PIN oder Immich-Konto"
+        case "pin": return L("Anmeldung mit PIN (im Heimnetz oft ohne)")
+        case "immich": return L("Anmeldung mit Immich-Konto")
+        case "beide": return L("Anmeldung mit PIN oder Immich-Konto")
         default: return nil
         }
     }
@@ -77,8 +77,14 @@ enum ServerSuche {
         praefixe.flatMap { p in (1...254).flatMap { h in ports.compactMap { URL(string: "http://\(p)\(h)\($0 == 80 ? "" : ":\($0)")") } } }
     }
 
-    private static func pruefe(_ url: URL, sitzung: URLSession) async -> GefundenerServer? {
-        var r = URLRequest(url: url.appendingPathComponent("api/config")); r.timeoutInterval = 1.2
+    /// Prueft eine einzelne Adresse (z. B. aus Bonjour): antwortet dort wirklich ein Showcase-Server?
+    static func bestaetige(_ url: URL) async -> GefundenerServer? {
+        let k = URLSessionConfiguration.ephemeral; k.timeoutIntervalForRequest = 3; k.urlCache = nil
+        return await pruefe(url, sitzung: URLSession(configuration: k), zeit: 3)
+    }
+
+    private static func pruefe(_ url: URL, sitzung: URLSession, zeit: TimeInterval = 1.2) async -> GefundenerServer? {
+        var r = URLRequest(url: url.appendingPathComponent("api/config")); r.timeoutInterval = zeit
         guard let (d, a) = try? await sitzung.data(for: r), (a as? HTTPURLResponse)?.statusCode == 200, let info = showcaseInfo(d) else { return nil }
         var basis = URLComponents(url: a.url ?? url, resolvingAgainstBaseURL: false)                  // nach einer Weiterleitung (z. B. auf https) gilt die Endadresse
         basis?.path = ""; basis?.query = nil

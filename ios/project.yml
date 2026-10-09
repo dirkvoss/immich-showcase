@@ -7,6 +7,7 @@ name: ShowcaseImmich
 options:
   bundleIdPrefix: com.dirk-voss
   developmentLanguage: de
+  knownRegions: [de, en, Base]
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
@@ -70,7 +71,7 @@ targets:
         NSCameraUsageDescription: "Die Kamera wird nur zum Scannen des QR-Codes deines Servers genutzt."
         NSFaceIDUsageDescription: "Face ID schützt die App, wenn du das in den App-Einstellungen eingeschaltet hast."
         NSLocalNetworkUsageDescription: "Die App verbindet sich mit deinem Immich-Showcase-Server im Heimnetz."
-        NSBonjourServices: ["_http._tcp"]
+        NSBonjourServices: ["_http._tcp", "_showcase._tcp"]
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
           NSAllowsArbitraryLoadsInWebContent: true

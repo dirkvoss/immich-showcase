@@ -8,6 +8,8 @@ struct WebAnsicht: View {
     var demo = false
     @State private var fehler: String?
     @State private var ladeNummer = 0
+    @State private var pruefenOffen = false
+    @State private var scannerOffen = false
 
     var body: some View {
         ZStack {
@@ -20,10 +22,16 @@ struct WebAnsicht: View {
                     Text("Keine Verbindung zum Server").font(.headline)
                     Text(fehler).font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center).padding(.horizontal, 32)
                     Button("Erneut versuchen") { self.fehler = nil; ladeNummer += 1 }.buttonStyle(.borderedProminent).tint(Color(red: 0.88, green: 0.70, blue: 0.35))
+                    Button("Verbindung prüfen") { pruefenOffen = true }
                     Button("Server ändern") { modell.einstellungenOffen = true }
                 }
             }
         }
+        .sheet(isPresented: $pruefenOffen) { VerbindungspruefungAnsicht(server: server) }
+        .sheet(isPresented: $scannerOffen) {
+            QRScanner { text in scannerOffen = false; NotificationCenter.default.post(name: .showcaseQrErgebnis, object: text) }.ignoresSafeArea()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .showcaseQrScannen)) { _ in if QRScanner.verfuegbar { scannerOffen = true } else { NotificationCenter.default.post(name: .showcaseQrErgebnis, object: "") } }
     }
 }
 
@@ -80,6 +88,12 @@ struct WebKitAnsicht: UIViewRepresentable {
             NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
                 self?.web?.evaluateJavaScript("window.rwAktualisieren && window.rwAktualisieren()")
             }
+            NotificationCenter.default.addObserver(forName: .showcaseQrErgebnis, object: nil, queue: .main) { [weak self] n in
+                let text = (n.object as? String) ?? ""
+                let json = (try? JSONSerialization.data(withJSONObject: [text], options: []))
+                    .flatMap { String(data: $0, encoding: .utf8) }.map { String($0.dropFirst().dropLast()) } ?? "\"\""
+                self?.web?.evaluateJavaScript("window.rwQrErgebnis && window.rwQrErgebnis(\(json))")
+            }
             NotificationCenter.default.addObserver(forName: .showcaseGesundheit, object: nil, queue: .main) { [weak self] _ in
                 self?.web?.evaluateJavaScript("window.rwGesundheitOeffnen && window.rwGesundheitOeffnen()")
             }
@@ -110,7 +124,7 @@ struct WebKitAnsicht: UIViewRepresentable {
         private func melden(_ error: Error, _ webView: WKWebView) {
             webView.scrollView.refreshControl?.endRefreshing()
             if (error as? URLError)?.code == .cancelled { return }
-            eltern.fehler("Der Server unter \(eltern.server.absoluteString) antwortet nicht.")
+            eltern.fehler(L("Der Server unter \(eltern.server.absoluteString) antwortet nicht."))
         }
 
         // Neue Fenster (target=_blank) im selben Fenster öffnen bzw. nach außen reichen
@@ -120,7 +134,7 @@ struct WebKitAnsicht: UIViewRepresentable {
         }
         func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
             let a = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-            a.addAction(UIAlertAction(title: "Abbrechen", style: .cancel) { _ in completionHandler(false) })
+            a.addAction(UIAlertAction(title: L("Abbrechen"), style: .cancel) { _ in completionHandler(false) })
             a.addAction(UIAlertAction(title: "OK", style: .default) { _ in completionHandler(true) })
             UIApplication.shared.keyFenster?.rootViewController?.topmost.present(a, animated: true)
         }
@@ -135,6 +149,14 @@ struct WebKitAnsicht: UIViewRepresentable {
             guard let d = m.body as? [String: Any], let aktion = d["aktion"] as? String else { return }
             if aktion == "einstellungen" { DispatchQueue.main.async { self.eltern.einstellungen() } }
             if aktion == "demoBeenden" { DispatchQueue.main.async { self.eltern.demoBeenden() } }
+            if aktion == "pinMerken", UserDefaults.standard.bool(forKey: "pinMitFaceID"), let pin = d["pin"] as? String, let host = eltern.server.host { PinSpeicher.speichern(pin, fuer: host) }
+            if aktion == "pinHolen", UserDefaults.standard.bool(forKey: "pinMitFaceID"), let host = eltern.server.host {
+                Task { @MainActor in
+                    guard PinSpeicher.vorhanden(fuer: host), let pin = await PinSpeicher.holen(fuer: host, grund: L("Showcase Immich anmelden")) else { return }
+                    self.web?.evaluateJavaScript("window.rwPinErgebnis && window.rwPinErgebnis('\(pin)')", completionHandler: nil)
+                }
+            }
+            if aktion == "qrScannen" { DispatchQueue.main.async { NotificationCenter.default.post(name: .showcaseQrScannen, object: nil) } }
         }
     }
 }

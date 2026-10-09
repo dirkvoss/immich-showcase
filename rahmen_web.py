@@ -69,7 +69,7 @@ def _liste(name, default=""):
 
 # Alles Installationsspezifische kommt aus Umgebungsvariablen (siehe .env.example); die Vorgaben sind bewusst sicher:
 # ohne Angabe gibt es kein "vertrautes Netz" und keinen vertrauten Proxy - dann braucht jeder die PIN.
-APP_NAME = os.environ.get("RAHMEN_WEB_NAME", "Immich Showcase")
+APP_NAME = os.environ.get("RAHMEN_WEB_NAME", "").strip() or "Immich Showcase"
 VERSION = os.environ.get("SHOWCASE_VERSION", "dev")                       # beim Bauen des Images gesetzt
 # Wofuer die Installation gedacht ist: rahmen (nur Bilderrahmen), tv (nur Fernseher) oder beides. Steuert, welche Knoepfe die App zeigt.
 # Anmeldung: pin (gemeinsame PIN, Vorgabe), immich (Immich-Konto: E-Mail + Passwort, jeder sieht nur seine Fotos) oder beide
@@ -80,7 +80,8 @@ BENUTZER_FILE = os.environ.get("RAHMEN_WEB_BENUTZER_FILE", "/var/lib/bilderrahme
 UID_CTX = contextvars.ContextVar("rahmen_uid", default=None)
 KEY_NAME = "Immich Showcase"
 KEY_RECHTE = ["asset.read", "asset.view", "asset.statistics", "timeline.read", "person.read", "album.create", "album.read", "album.update",
-              "album.delete", "albumAsset.create", "albumAsset.delete", "map.read", "user.read"]       # keine Foto-Loeschrechte; user.read = eigenes Profil (Name)
+              "album.delete", "albumAsset.create", "albumAsset.delete", "map.read", "user.read",
+              "asset.upload"]       # keine Foto-Loeschrechte; user.read = eigenes Profil (Name); asset.upload = Fotos vom Handy ins EIGENE Immich-Konto senden
 MODUS = os.environ.get("RAHMEN_WEB_MODUS", "beides").strip().lower()
 if MODUS not in ("rahmen", "tv", "beides"):
     MODUS = "beides"
@@ -562,13 +563,22 @@ def login_immich(request: Request, response: Response, daten: dict):
     try:
         b = benutzer_lesen().get(uid) or {}
         schluessel = b.get("key")
-        if schluessel:                                             # gespeicherter Schluessel noch gueltig?
+        alter_schluessel = None
+        if schluessel:                                             # gespeicherter Schluessel noch gueltig und mit dem Recht zum Hochladen?
             try:
-                immich_aufruf("GET", "/api-keys/me", schluessel=schluessel)
+                me = immich_aufruf("GET", "/api-keys/me", schluessel=schluessel) or {}
+                rechte = me.get("permissions") or []
+                if "all" not in rechte and "asset.upload" not in rechte:
+                    alter_schluessel, schluessel = me.get("id"), None          # aelterer Schluessel ohne Upload-Recht: durch einen neuen ersetzen
             except urllib.error.HTTPError:
                 schluessel = None
         if not schluessel:
             schluessel = immich_aufruf("POST", "/api-keys", {"name": KEY_NAME, "permissions": KEY_RECHTE}, token)["secret"]
+            if alter_schluessel:                                   # den ersetzten Schluessel in Immich entfernen (aufraeumen)
+                try:
+                    immich_aufruf("DELETE", f"/api-keys/{alter_schluessel}", token=token)
+                except Exception:  # noqa: BLE001
+                    pass
         with AUTH_LOCK:
             alle = benutzer_lesen()
             alle[uid] = {"name": antwort.get("name") or email, "email": email, "key": schluessel, "zuletzt": jetzt}
@@ -599,7 +609,7 @@ def logout(response: Response, _=Depends(csrf)):
 def konfig(ziel: str = ""):
     """Oeffentliche Darstellung der Installation (kein Geheimnis): Name, Beispiele fuer die Suche, Adresse der Fernseher-Seite. Mit ?ziel= gelten die Einstellungen dieses Geraets."""
     z = ziel if ziel in GERAETE else None
-    return {"name": APP_NAME, "version": VERSION, "modus": MODUS, "auth": AUTH, "musik_upload": MUSIK_UPLOAD, "hochladen": bool(UPLOAD_KEY), "hochladen_mb": UPLOAD_MAX_MB, "konfiguriert": konfiguriert(), "tv_url": tv_url(), "beispiele": BEISPIELE, "beispiele_en": BEISPIELE_EN,
+    return {"name": APP_NAME, "version": VERSION, "modus": MODUS, "auth": AUTH, "musik_upload": MUSIK_UPLOAD, "hochladen": bool(UPLOAD_KEY) or AUTH != "pin", "hochladen_mb": UPLOAD_MAX_MB, "konfiguriert": konfiguriert(), "tv_url": tv_url(), "beispiele": BEISPIELE, "beispiele_en": BEISPIELE_EN,
             "ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT and k not in RAHMEN_ZIELE},
             "rahmen": list(RAHMEN_ZIELE), "rahmen_namen": dict(RAHMEN_ZIELE), "rahmen_sek": gwert(z, "sek", std_sek()), "rahmen_fuellung": gwert(z, "fuellung", std_fuellung_rahmen()), "tv_fuellung": gwert(z, "fuellung", std_fuellung_tv()),
             "rahmen_anzeige": gwert(z, "anzeige", std_anzeige()), "rahmen_nacht": rahmen_nacht(z), "rahmen_zusatz": zusatz_liste(), "koppeln": True,
@@ -621,8 +631,8 @@ def setup_code_erzeugen():
         return
     SETUP_CODE["wert"] = "%06d" % secrets.randbelow(10 ** 6)
     H.log.warning("=" * 66)
-    H.log.warning(" Immich Showcase ist noch nicht eingerichtet. Oeffne  http://<server>:8090/setup/")
-    H.log.warning(" und gib diesen Einrichtungs-Code ein: %s", SETUP_CODE["wert"])
+    H.log.warning(" Immich Showcase ist noch nicht eingerichtet. Oeffne  http://<server>:8090/setup/?code=%s", SETUP_CODE["wert"])
+    H.log.warning(" oder oeffne  http://<server>:8090/setup/  und gib diesen Einrichtungs-Code ein: %s", SETUP_CODE["wert"])
     H.log.warning("=" * 66)
 
 
@@ -660,6 +670,45 @@ def immich_basis(url):
     if not re.match(r"^https?://[^\s/@]+(:\d+)?(/.*)?$", url):
         raise HTTPException(400, "Bitte eine Adresse wie http://192.168.1.10:2283 eingeben")
     return url if url.endswith("/api") else url + "/api"
+
+
+IMMICH_KANDIDATEN = ("http://immich_server:2283", "http://immich-server:2283", "http://immich:2283", "http://host.docker.internal:2283", "http://172.17.0.1:2283")
+
+
+def immich_erkennen(extra=None):
+    """Sucht Immich unter den ueblichen Adressen (nur eine feste Liste, keine Eingabe von aussen). Rueckgabe: (Adresse mit /api, Version) oder (None, None)."""
+    kandidaten = ([extra] if extra else []) + list(IMMICH_KANDIDATEN)
+    for k in kandidaten:
+        basis = k.rstrip("/") + ("" if k.rstrip("/").endswith("/api") else "/api")
+        try:
+            with urllib.request.urlopen(basis + "/server/version", timeout=2) as r:
+                v = json.loads(r.read())
+            return basis, f"{v['major']}.{v['minor']}.{v['patch']}"
+        except Exception:  # noqa: BLE001
+            continue
+    return None, None
+
+
+def heimnetz_von(request: Request):
+    """Das /24-Netz des Geraets, mit dem gerade eingerichtet wird - nur bei direktem Zugriff aus einem privaten Netz (nicht ueber einen Proxy)."""
+    if any(request.headers.get(h) for h in ("x-forwarded-for", "x-real-ip", "forwarded")):
+        return None
+    try:
+        ip = ipaddress.ip_address(client_ip(request))
+    except ValueError:
+        return None
+    if ip.version != 4 or not any(ip in ipaddress.ip_network(n) for n in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16")):
+        return None
+    return str(ipaddress.ip_network(f"{ip}/24", strict=False))
+
+
+@app.get("/api/setup/vorschlag")
+def setup_vorschlag(request: Request):
+    """Fuer den Einrichtungsassistenten: Wo laeuft Immich, und welches Heimnetz hat das Geraet, das gerade einrichtet? (nur solange nicht eingerichtet)"""
+    if konfiguriert():
+        raise HTTPException(404, "nicht gefunden")
+    adresse, version = zwischenspeicher("immich-vorschlag", 20, lambda: immich_erkennen(os.environ.get("RAHMEN_IMMICH_URL", "").strip() or None))
+    return {"immich": adresse, "version": version, "heimnetz": heimnetz_von(request), "code_noetig": True}
 
 
 @app.post("/api/setup/pruefen")
@@ -708,9 +757,10 @@ def setup_speichern(request: Request, daten: dict, _=Depends(csrf)):
                 immich_aufruf("POST", "/auth/logout", {}, token, basis=basis)
             except Exception:  # noqa: BLE001
                 pass
+    zugang = "immich" if str(daten.get("zugang") or "").strip().lower() == "immich" or (not daten.get("zugang") and AUTH == "immich") else "pin"
     pin = str(daten.get("pin") or "").strip()
     erzeugt = None
-    if AUTH != "immich":
+    if zugang != "immich":
         if not pin:
             pin = erzeugt = "%06d" % secrets.randbelow(10 ** 6)
         if not re.fullmatch(r"\d{6}", pin):
@@ -721,13 +771,19 @@ def setup_speichern(request: Request, daten: dict, _=Depends(csrf)):
         os.close(fd)
     einst = lies_json(EINSTELLUNGEN_FILE, {})
     einst.update({"RAHMEN_IMMICH_URL": basis, "RAHMEN_IMMICH_KEY": schluessel})
+    if angelegt:                                                               # den Schluessel haben wir selbst mit Upload-Recht angelegt: Fotos vom Handy senden geht gleich
+        einst["RAHMEN_IMMICH_UPLOAD_KEY"] = schluessel
+    einst["RAHMEN_WEB_AUTH"] = zugang
+    heimnetz = heimnetz_von(request) if daten.get("heimnetz") and zugang == "pin" else None
+    if heimnetz:                                                               # "Im Heimnetz ohne PIN": das Netz des Geraets, mit dem eingerichtet wird (vom Server ermittelt, nicht vom Browser vorgegeben)
+        einst["RAHMEN_WEB_LAN"] = heimnetz
     name = str(daten.get("name") or "").strip()[:40]
     if name:
         einst["RAHMEN_WEB_NAME"] = name
     schreibe_json(EINSTELLUNGEN_FILE, einst)
     H.log.warning("Einrichtung abgeschlossen (Konto %s); Dienst startet neu", konto or "?")
     threading.Timer(1.5, neu_starten).start()
-    return {"ok": True, "konto": konto, **({"pin": erzeugt} if erzeugt else {})}
+    return {"ok": True, "konto": konto, "zugang": zugang, "heimnetz": heimnetz, **({"pin": erzeugt} if erzeugt else {})}
 
 
 @app.middleware("http")
@@ -794,6 +850,33 @@ def diagnose(_=Depends(anmeldung)):
     }
 
 
+# --------------------------------------------------------------------------- Update-Hinweis (freiwillig)
+UPDATE_PRUEFEN = os.environ.get("RAHMEN_WEB_UPDATE_PRUEFEN", "1").strip().lower() not in ("0", "nein", "false", "aus", "no")
+UPDATE_QUELLE = "https://api.github.com/repos/dirkvoss/immich-showcase/tags?per_page=30"
+
+
+def versionsnummer(text):
+    """'v2.17.1' -> (2, 17, 1); alles andere (z. B. 'dev') -> None."""
+    m = re.fullmatch(r"v?(\d+)\.(\d+)\.(\d+)", str(text or "").strip())
+    return tuple(int(x) for x in m.groups()) if m else None
+
+
+def neueste_version():
+    """Hoechste Versionsnummer aus den GitHub-Tags (alle 6 Stunden hoechstens eine Anfrage). None, wenn nicht pruefbar oder abgeschaltet."""
+    if not UPDATE_PRUEFEN:
+        return None
+
+    def holen():
+        try:
+            req = urllib.request.Request(UPDATE_QUELLE, headers={"Accept": "application/vnd.github+json", "User-Agent": "immich-showcase"})
+            with urllib.request.urlopen(req, timeout=6) as r:
+                nummern = [versionsnummer(t.get("name")) for t in json.loads(r.read())]
+            return max([n for n in nummern if n], default=None)
+        except Exception:  # noqa: BLE001 - nicht pruefbar ist kein Fehler
+            return None
+    return zwischenspeicher("neueste-version", 6 * 3600, holen)
+
+
 # --------------------------------------------------------------------------- Status: "Alles in Ordnung?"
 
 def gesundheit_pruefungen():
@@ -815,13 +898,18 @@ def gesundheit_pruefungen():
             "" if n else "Hat das Immich-Konto, zu dem der Schlüssel gehört, Fotos? Wurden sie schon verarbeitet?")
     except Exception as e:  # noqa: BLE001
         add("fotos", "Fotos und Schlüssel", "fehler", "Der Immich-Schlüssel wird abgelehnt oder die Suche schlägt fehl.", "Neuen Schlüssel in Immich anlegen (Rechte laut Anleitung) und in den Einstellungen eintragen. " + schwaerzen(str(e))[:80])
-    try:
-        ml = H.ml_url().rsplit("/", 1)[0] + "/ping"
-        urllib.request.urlopen(ml, timeout=4).read()
-        add("ml", "Bildsuche (Motive)", "ok", "Die Bildsuche („Strand“, „Hund“ …) ist verfügbar.")
-    except Exception:  # noqa: BLE001
-        add("ml", "Bildsuche (Motive)", "warnung", "Die Motivsuche ist gerade nicht erreichbar.", "Suchen nach Person, Zeit und Ort geht weiter. Läuft der Immich-Dienst „machine-learning“?")
-    if UPLOAD_KEY:
+    if not DB_AKTIV:                       # ohne Datenbankzugang laeuft die Motivsuche ueber Immich selbst - der ML-Dienst wird hier nicht gebraucht
+        add("ml", "Bildsuche (Motive)", "ok", "Die Bildsuche („Strand“, „Hund“ …) läuft über Immich.")
+    else:
+        try:
+            ml = H.ml_url().rsplit("/", 1)[0] + "/ping"
+            urllib.request.urlopen(ml, timeout=4).read()
+            add("ml", "Bildsuche (Motive)", "ok", "Die Bildsuche („Strand“, „Hund“ …) ist verfügbar.")
+        except Exception:  # noqa: BLE001
+            add("ml", "Bildsuche (Motive)", "warnung", "Die Motivsuche ist gerade nicht erreichbar.", "Suchen nach Person, Zeit und Ort geht weiter. Läuft der Immich-Dienst „machine-learning“?")
+    if AUTH != "pin":
+        add("upload", "Eigene Fotos senden", "ok", "Jede Person lädt in ihr eigenes Immich-Konto hoch (Album „" + UPLOAD_ALBUM + "“).")
+    elif UPLOAD_KEY:
         try:
             immich_aufruf("GET", "/albums", schluessel=UPLOAD_KEY)
             add("upload", "Eigene Fotos senden", "ok", f"Bereit (Album „{UPLOAD_ALBUM}“).")
@@ -861,7 +949,13 @@ def gesundheit_pruefungen():
     except OSError:
         pass
     sek = int(jetzt - WACHE["start"])
-    add("version", "Showcase", "info", f"Version {VERSION}, läuft seit " + (f"{sek // 86400} Tagen" if sek >= 172800 else f"{sek // 3600} Stunden" if sek >= 7200 else f"{max(sek // 60, 1)} Minuten") + ".")
+    laufzeit = f"{sek // 86400} Tagen" if sek >= 172800 else f"{sek // 3600} Stunden" if sek >= 7200 else f"{max(sek // 60, 1)} Minuten"
+    aktuell, neu = versionsnummer(VERSION), neueste_version()
+    if aktuell and neu and neu > aktuell:
+        add("version", "Showcase", "warnung", f"Version {VERSION}, läuft seit {laufzeit}. Es gibt eine neuere Version: {'.'.join(map(str, neu))}.",
+            "Aktualisieren: im Ordner mit der docker-compose.yml „docker compose pull“ und „docker compose up -d“ (Daten und Einstellungen bleiben erhalten). Wer Watchtower benutzt, bekommt das Update von selbst.")
+    else:
+        add("version", "Showcase", "info", f"Version {VERSION}, läuft seit {laufzeit}." + (" Das ist die neueste Version." if aktuell and neu and neu == aktuell else ""))
     return liste
 
 
@@ -1615,8 +1709,8 @@ def tv_datei(datei: str):
 # Der Fernseher oeffnet /tv/?ziel=lg und fragt alle 2 s nach Befehlen. Die App schickt "start" (Fotos) oder
 # "steuer" (pause/weiter/vor/zurueck/stopp). Kein Video, kein AirPlay, laeuft in jedem Browser.
 
-# Fernseher/Geraete: RAHMEN_WEB_TV_ZIELE="lg=LG TV,shield=Shield" (Kennung=Anzeigename); "test" ist ein verstecktes Entwicklungsziel
-TV_ZIELE = {k.strip(): v.strip() for k, _, v in (z.partition("=") for z in _liste("RAHMEN_WEB_TV_ZIELE", "lg=LG TV,shield=Shield")) if k.strip() and v.strip()}
+# Fernseher/Geraete: RAHMEN_WEB_TV_ZIELE="lg=LG TV,shield=Shield" (Kennung=Anzeigename; ohne Vorgabe - Geraete legt man in der App an); "test" ist ein verstecktes Entwicklungsziel
+TV_ZIELE = {k.strip(): v.strip() for k, _, v in (z.partition("=") for z in _liste("RAHMEN_WEB_TV_ZIELE", "")) if k.strip() and v.strip()}
 TV_ZIELE.update(RAHMEN_ZIELE)
 TV_ZIELE["test"] = "Test (nur Entwicklung)"
 TV_VERSTECKT = {"test"}          # Ziele, die in der App nicht erscheinen (Automatiktests laufen auf /tv/?ziel=test statt auf dem echten Fernseher)
@@ -3537,14 +3631,25 @@ def upload_multipart(felder, dateiname, typ, daten):
 UPLOAD_ALBUM_LOCK = threading.Lock()
 
 
-def upload_album_id():
+def upload_schluessel():
+    """Mit welchem Immich-Schluessel hochgeladen wird: bei Anmeldung mit dem Immich-Konto der EIGENE Schluessel der Person (die Fotos landen in ihrem Konto),
+    sonst der gemeinsame Upload-Schluessel (RAHMEN_IMMICH_UPLOAD_KEY) oder keiner."""
+    uid = UID_CTX.get()
+    if uid:
+        return (benutzer_lesen().get(uid) or {}).get("key") or ""
+    return UPLOAD_KEY
+
+
+def upload_album_id(key=None):
     """Das Upload-Album (wird beim ersten Mal angelegt). Gibt es mehrere gleichnamige, gilt das mit den meisten Fotos (bei Gleichstand das aelteste)."""
+    key = key or upload_schluessel()
+
     def holen():
         with UPLOAD_ALBUM_LOCK:
-            passend = [a for a in immich_aufruf("GET", "/albums", schluessel=UPLOAD_KEY) or [] if a.get("albumName") == UPLOAD_ALBUM]
+            passend = [a for a in immich_aufruf("GET", "/albums", schluessel=key) or [] if a.get("albumName") == UPLOAD_ALBUM]
             if passend:
                 return sorted(passend, key=lambda a: (-(a.get("assetCount") or 0), a.get("createdAt") or ""))[0]["id"]
-            return immich_aufruf("POST", "/albums", {"albumName": UPLOAD_ALBUM, "description": "Von der Showcase-App hochgeladene Fotos"}, schluessel=UPLOAD_KEY)["id"]
+            return immich_aufruf("POST", "/albums", {"albumName": UPLOAD_ALBUM, "description": "Von der Showcase-App hochgeladene Fotos"}, schluessel=key)["id"]
     return zwischenspeicher("upload-album", 600, holen)
 
 
@@ -3563,13 +3668,14 @@ def upload_senden(pfad, body, kopf):
         verbindung.close()
 
 
-def upload_zu_immich(daten, typ, name, datum_ms):
+def upload_zu_immich(daten, typ, name, datum_ms, key=None):
+    key = key or upload_schluessel()
     wann = datetime.datetime.fromtimestamp((datum_ms or time.time() * 1000) / 1000, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
     sha = hashlib.sha1(daten).hexdigest()
     body, ctype = upload_multipart({"deviceAssetId": "showcase-" + sha, "deviceId": "immich-showcase", "fileCreatedAt": wann, "fileModifiedAt": wann, "isFavorite": "false"},
                                    name, typ, daten)
     try:
-        status, antwort = upload_senden("/assets", body, {"x-api-key": UPLOAD_KEY, "Content-Type": ctype, "Content-Length": str(len(body)), "Accept": "application/json", "x-immich-checksum": sha})
+        status, antwort = upload_senden("/assets", body, {"x-api-key": key, "Content-Type": ctype, "Content-Length": str(len(body)), "Accept": "application/json", "x-immich-checksum": sha})
     except (OSError, http.client.HTTPException) as e:
         H.log.warning("Upload: Verbindung zu Immich fehlgeschlagen (%s, %d KB, %s): %s %s", name, len(daten) // 1024, typ, type(e).__name__, schwaerzen(str(e)))
         raise HTTPException(502, f"Immich ist gerade nicht erreichbar ({type(e).__name__})")
@@ -3577,6 +3683,8 @@ def upload_zu_immich(daten, typ, name, datum_ms):
         detail = antwort[:300].decode("utf-8", "replace")
         H.log.warning("Upload: Immich antwortet %s (%s, %d KB, %s): %s", status, name, len(daten) // 1024, typ, schwaerzen(detail))
         if status in (401, 403):
+            if UID_CTX.get():
+                raise HTTPException(502, "Dein Immich-Schlüssel darf nicht hochladen. Melde dich einmal ab und mit E-Mail und Passwort neu an, dann bekommt er das Recht.")
             raise HTTPException(502, "Der Immich-Schluessel fuer Uploads hat nicht genug Rechte")
         raise HTTPException(502, f"Immich hat das Foto abgelehnt ({status})")
     try:
@@ -3587,7 +3695,7 @@ def upload_zu_immich(daten, typ, name, datum_ms):
         raise HTTPException(502, "Immich hat unerwartet geantwortet")
     asset = antwort["id"]
     try:
-        immich_aufruf("PUT", f"/albums/{upload_album_id()}/assets", {"ids": [asset]}, schluessel=UPLOAD_KEY)
+        immich_aufruf("PUT", f"/albums/{upload_album_id(key)}/assets", {"ids": [asset]}, schluessel=key)
     except (urllib.error.URLError, OSError, KeyError):
         H.log.warning("Upload: Foto %s liegt in Immich, konnte aber nicht ins Album %s", asset, UPLOAD_ALBUM)
     for _ in range(30):                                       # warten, bis die Vorschau da ist, damit der Rahmen das Foto gleich zeigen kann
@@ -3602,7 +3710,8 @@ def upload_zu_immich(daten, typ, name, datum_ms):
 @app.put("/api/hochladen")
 async def hochladen(request: Request, _=Depends(anmeldung), __=Depends(csrf)):
     """Ein Foto vom Handy: roher Inhalt im Body, Name in 'X-Dateiname' (URL-kodiert), Aufnahmezeit in 'X-Datum' (ms). Landet in Immich im Upload-Album."""
-    if not UPLOAD_KEY:
+    schluessel = upload_schluessel()
+    if not schluessel:
         raise HTTPException(403, "Hochladen ist nicht eingerichtet")
     jetzt_ = time.time()
     with UPLOAD_LOCK:
@@ -3636,7 +3745,7 @@ async def hochladen(request: Request, _=Depends(anmeldung), __=Depends(csrf)):
         datum = 0
     if not 0 < datum < (time.time() + 86400) * 1000:
         datum = 0
-    ergebnis = await run_in_threadpool(upload_zu_immich, daten, typ, name, datum)
+    ergebnis = await run_in_threadpool(upload_zu_immich, daten, typ, name, datum, schluessel)
     H.log.info("Upload: %s (%d KB) -> %s%s", name, groesse // 1024, ergebnis["id"], "" if ergebnis["neu"] else " (schon vorhanden)")
     return ergebnis
 

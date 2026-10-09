@@ -529,7 +529,19 @@
   "Unter „Hilfe“ steht alles Wichtige. Im Konto-Menü zeigt „Alles in Ordnung?“, ob Immich und die Rahmen laufen.": "En «Ayuda» está todo lo importante. En el menú de la cuenta, «¿Todo en orden?» muestra si Immich y los marcos funcionan.",
   "Überspringen": "Omitir",
   "Los geht’s": "¡Vamos!",
-  "🎓 Rundgang noch einmal ansehen": "🎓 Ver el recorrido otra vez"
+  "🎓 Rundgang noch einmal ansehen": "🎓 Ver el recorrido otra vez",
+  "🚀 Erste Schritte": "🚀 Primeros pasos",
+  "Ausblenden": "Ocultar",
+  "Immich verbinden": "Conectar Immich",
+  "Handy verbinden (iPhone-App oder zum Home-Bildschirm hinzufügen)": "Conectar el móvil (app para iPhone o añadir a la pantalla de inicio)",
+  "QR-Code zeigen": "Mostrar código QR",
+  "Rahmen oder Fernseher koppeln": "Emparejar un marco o una tele",
+  "Die erste Show senden: Fotos antippen, unten „Auf den Rahmen“": "Enviar la primera presentación: toca fotos y abajo «Al marco»",
+  "Fotos ansehen": "Ver fotos",
+  "📷 QR-Code am Gerät scannen": "📷 Escanear el código QR del dispositivo",
+  "Das ist kein Kopplungs-QR-Code. Er steht auf dem Bildschirm des Fernsehers oder Tablets.": "Ese no es un código QR de emparejamiento. Aparece en la pantalla de la tele o la tableta.",
+  "Code übernommen – jetzt das Gerät wählen und koppeln.": "Código tomado: ahora elige el dispositivo y empareja.",
+  "🔓 Mit Face ID anmelden": "🔓 Iniciar sesión con Face ID"
  },
  "muster": [
   [

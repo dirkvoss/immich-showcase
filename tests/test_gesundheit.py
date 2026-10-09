@@ -64,10 +64,22 @@ def test_immich_down_ist_fehler_mit_hinweis(app_laden, monkeypatch):
 def test_ml_aus_ist_nur_warnung(app_laden, monkeypatch):
     w, client, _ = app_laden(**LAN)
     vorbereiten(w, monkeypatch, ml_ok=False)
+    monkeypatch.setattr(w, "DB_AKTIV", True)                   # nur mit Datenbankzugang wird der ML-Dienst ueberhaupt gebraucht
     for z in ("serbien", "flur"):
         w.TV[z]["hb"] = time.time()
     gesamt, p = eintraege(client("192.168.1.50"))
     assert p["ml"]["status"] == "warnung" and gesamt == "warnung"
+
+
+def test_ohne_datenbankzugang_ist_fehlender_ml_dienst_kein_problem(app_laden, monkeypatch):
+    """Showcase auf einem anderen Rechner als Immich: die Motivsuche laeuft ueber Immich, der ML-Dienst ist nicht erreichbar und wird nicht gebraucht."""
+    w, client, _ = app_laden(**LAN)
+    vorbereiten(w, monkeypatch, ml_ok=False)
+    monkeypatch.setattr(w, "DB_AKTIV", False)
+    for z in ("serbien", "flur"):
+        w.TV[z]["hb"] = time.time()
+    gesamt, p = eintraege(client("192.168.1.50"))
+    assert p["ml"]["status"] == "ok" and gesamt == "ok", p
 
 
 def test_geraet_offline_und_alarmzeit(app_laden, monkeypatch):
@@ -106,3 +118,53 @@ def test_wenig_speicher(app_laden, monkeypatch):
         w.TV[z]["hb"] = time.time()
     gesamt, p = eintraege(client("192.168.1.50"))
     assert p["speicher"]["status"] == "fehler" and gesamt == "fehler"
+
+
+def test_update_hinweis_bei_neuerer_version(app_laden, monkeypatch):
+    w, client, _ = app_laden(**LAN)
+    vorbereiten(w, monkeypatch)
+    monkeypatch.setattr(w, "VERSION", "2.15.0")
+    monkeypatch.setattr(w, "neueste_version", lambda: (2, 17, 1))
+    for z in ("serbien", "flur"):
+        w.TV[z]["hb"] = time.time()
+    gesamt, p = eintraege(client("192.168.1.50"))
+    assert p["version"]["status"] == "warnung" and "2.17.1" in p["version"]["text"] and "docker compose pull" in p["version"]["hinweis"]
+    assert gesamt == "warnung"
+
+
+def test_aktuelle_version_und_dev_machen_keine_warnung(app_laden, monkeypatch):
+    w, client, _ = app_laden(**LAN)
+    vorbereiten(w, monkeypatch)
+    for z in ("serbien", "flur"):
+        w.TV[z]["hb"] = time.time()
+    monkeypatch.setattr(w, "VERSION", "2.17.1")
+    monkeypatch.setattr(w, "neueste_version", lambda: (2, 17, 1))
+    gesamt, p = eintraege(client("192.168.1.50"))
+    assert p["version"]["status"] == "info" and "neueste Version" in p["version"]["text"] and gesamt == "ok"
+    w.CACHE.clear()
+    monkeypatch.setattr(w, "VERSION", "dev")
+    assert eintraege(client("192.168.1.50"))[1]["version"]["status"] == "info"
+
+
+def test_versionsnummer_und_abschalten(app_laden, monkeypatch):
+    w, client, _ = app_laden(**LAN)
+    assert w.versionsnummer("v2.17.1") == (2, 17, 1) and w.versionsnummer("2.5.0") == (2, 5, 0)
+    assert w.versionsnummer("dev") is None and w.versionsnummer("2.5") is None
+    monkeypatch.setattr(w, "UPDATE_PRUEFEN", False)
+    assert w.neueste_version() is None
+
+
+def test_github_antwort_wird_ausgewertet(app_laden, monkeypatch):
+    w, client, _ = app_laden(**LAN)
+
+    class Antwort:
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+        def read(self): return b'[{"name":"v2.16.0"},{"name":"v2.17.1"},{"name":"nightly"},{"name":"v2.9.0"}]'
+
+    monkeypatch.setattr(w.urllib.request, "urlopen", lambda *a, **k: Antwort())
+    w.CACHE.clear()
+    assert w.neueste_version() == (2, 17, 1)
+    monkeypatch.setattr(w.urllib.request, "urlopen", lambda *a, **k: (_ for _ in ()).throw(OSError("offline")))
+    w.CACHE.clear()
+    assert w.neueste_version() is None                                         # nicht pruefbar: kein Fehler, kein Hinweis

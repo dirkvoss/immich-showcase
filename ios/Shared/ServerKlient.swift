@@ -12,9 +12,9 @@ struct ServerKlient {
         case keinServer, nichtErreichbar, anmeldungNoetig, server(String)
         var errorDescription: String? {
             switch self {
-            case .keinServer: return "Die App ist noch mit keinem Server verbunden. Öffne Showcase Immich einmal und gib die Adresse ein."
-            case .nichtErreichbar: return "Der Server ist nicht erreichbar. Bist du im richtigen Netz?"
-            case .anmeldungNoetig: return "Bitte öffne Showcase Immich einmal und melde dich mit der PIN an."
+            case .keinServer: return L("Die App ist noch mit keinem Server verbunden. Öffne Showcase Immich einmal und gib die Adresse ein.")
+            case .nichtErreichbar: return L("Der Server ist nicht erreichbar. Bist du im richtigen Netz?")
+            case .anmeldungNoetig: return L("Bitte öffne Showcase Immich einmal und melde dich mit der PIN an.")
             case .server(let t): return t
             }
         }
@@ -61,7 +61,7 @@ struct ServerKlient {
         let status = (antwort as? HTTPURLResponse)?.statusCode ?? 0
         let json = (try? JSONSerialization.jsonObject(with: daten)) as? [String: Any] ?? [:]
         if status == 401 { throw KlientFehler.anmeldungNoetig }
-        if !(200..<300).contains(status) { throw KlientFehler.server((json["nachricht"] as? String) ?? "Der Server meldet einen Fehler (\(status)).") }
+        if !(200..<300).contains(status) { throw KlientFehler.server((json["nachricht"] as? String) ?? L("Der Server meldet einen Fehler (\(status)).")) }
         return json
     }
 
@@ -81,7 +81,7 @@ struct ServerKlient {
         let liste = (r["rahmen"] as? [[String: Any]]) ?? []
         let id = (r["ziel"] as? String) ?? rahmen
         let eintrag = liste.first { ($0["id"] as? String) == id } ?? liste.first
-        return Stand(rahmenName: (eintrag?["name"] as? String) ?? "Bilderrahmen", laeuft: r["laeuft"] as? String,
+        return Stand(rahmenName: (eintrag?["name"] as? String) ?? L("Bilderrahmen"), laeuft: r["laeuft"] as? String,
                      anzahl: r["anzahl"] as? Int, zurueck: r["zurueck"] as? String, online: eintrag?["online"] as? Bool)
     }
 
@@ -95,11 +95,11 @@ struct ServerKlient {
     private func ziel(_ rahmen: String?) -> [String: Any] { rahmen.map { ["ziel": $0] } ?? [:] }
 
     func normal(rahmen: String?) async throws -> String {
-        (try await aufruf(anfrage("POST", "normal", koerper: ziel(rahmen))))["nachricht"] as? String ?? "Der Rahmen zeigt wieder das normale Programm."
+        (try await aufruf(anfrage("POST", "normal", koerper: ziel(rahmen))))["nachricht"] as? String ?? L("Der Rahmen zeigt wieder das normale Programm.")
     }
 
     func zurueck(rahmen: String?) async throws -> String {
-        (try await aufruf(anfrage("POST", "zurueck", koerper: ziel(rahmen))))["nachricht"] as? String ?? "Zurück zur vorherigen Show."
+        (try await aufruf(anfrage("POST", "zurueck", koerper: ziel(rahmen))))["nachricht"] as? String ?? L("Zurück zur vorherigen Show.")
     }
 
     /// Schickt Fotos (IDs aus Immich) als Show auf den Rahmen.
@@ -110,7 +110,7 @@ struct ServerKlient {
         k["ids"] = ids
         k["speichern"] = false
         let a = try await aufruf(anfrage("POST", "anzeigen", koerper: k))
-        return (a["nachricht"] as? String) ?? "Die Show läuft gleich auf dem Rahmen."
+        return (a["nachricht"] as? String) ?? L("Die Show läuft gleich auf dem Rahmen.")
     }
 
     /// Sucht Fotos (wie die Suche in der Web-App: „Sommer 2022 am Strand“) und schickt sie als Show auf den Rahmen.
@@ -119,7 +119,7 @@ struct ServerKlient {
         let s = try await aufruf(anfrage("GET", "suche", abfrage: [URLQueryItem(name: "text", value: text), URLQueryItem(name: "lang", value: "de")]))
         let fotos = (s["fotos"] as? [[String: Any]]) ?? []
         let ids = fotos.filter { $0["v"] == nil }.compactMap { $0["id"] as? String }
-        guard !ids.isEmpty else { throw KlientFehler.server((s["nachricht"] as? String) ?? "Dazu habe ich keine Fotos gefunden.") }
+        guard !ids.isEmpty else { throw KlientFehler.server((s["nachricht"] as? String) ?? L("Dazu habe ich keine Fotos gefunden.")) }
         return try await anzeigen(name: text, ids: ids, rahmen: rahmen)
     }
 
@@ -135,7 +135,7 @@ struct ServerKlient {
         let status = (antwort as? HTTPURLResponse)?.statusCode ?? 0
         let json = (try? JSONSerialization.jsonObject(with: antwortDaten)) as? [String: Any] ?? [:]
         if status == 401 { throw KlientFehler.anmeldungNoetig }
-        guard (200..<300).contains(status), let id = json["id"] as? String else { throw KlientFehler.server((json["nachricht"] as? String) ?? "Der Server hat das Foto nicht angenommen (\(status)).") }
+        guard (200..<300).contains(status), let id = json["id"] as? String else { throw KlientFehler.server((json["nachricht"] as? String) ?? L("Der Server hat das Foto nicht angenommen (\(status)).")) }
         return id
     }
 }

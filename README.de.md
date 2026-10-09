@@ -46,28 +46,33 @@ Mit Wetter und Terminen oben rechts, Gerätekopplung per Code/QR am Fernseher un
 - Für den Bilderrahmen ein **Tablet** (oder ein anderes Gerät mit Browser). Für den Fernseher einen Fernseher mit Webbrowser.
 
 ## Installation (ca. 5 Minuten)
-Abkürzung: `./install.sh` (oder `./install.sh --with-immich`, wenn du noch kein Immich hast) erledigt die folgenden Schritte für dich.
+
+> 📖 **Mit Bildern, Schritt für Schritt:** [Erste Schritte – illustrierte Anleitung](docs/anleitung.md) · [Immich Showcase auf einem anderen Rechner (z. B. Raspberry Pi)](docs/anleitung-externer-rechner.md)
+
+**Ein Befehl** auf dem Rechner mit Docker (Linux, NAS, Mini-PC; Raspberry Pi geht auch):
 
 ```bash
-git clone https://github.com/dirkvoss/immich-showcase.git
-cd immich-showcase
-cp .env.example .env
-docker compose up -d
-docker compose logs showcase       # zeigt einen einmaligen Einrichtungs-Code
+curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/install.sh | bash
 ```
 
-Öffne `http://<server>:8090` im Browser. Der **Einrichtungsassistent** führt dich durch:
+Das Programm
+- lädt Immich Showcase nach `~/immich-showcase`,
+- **erkennt Immich**, wenn es auf demselben Rechner in Docker läuft, und bindet die App an dessen Docker-Netz an (keine Datei zu bearbeiten),
+- startet alles und zeigt am Ende einen **fertigen Einrichtungs-Link** (mit QR-Code, wenn `qrencode` installiert ist), den du im Browser öffnest.
 
-1. **Einrichtungs-Code** aus dem Protokoll eingeben (damit niemand sonst in deinem Netz die Einrichtung übernehmen kann),
-2. die **Adresse deines Immich** eingeben (zum Beispiel `http://192.168.1.10:2283`),
-3. mit deinem **Immich-Konto** (E-Mail + Passwort) anmelden. Immich Showcase legt einen eigenen API-Schlüssel an, **ohne Löschrechte** – dein Passwort wird nicht gespeichert,
-4. eine **PIN** wählen.
+Der **Einrichtungsassistent** hat drei kurze Schritte:
+1. **Immich verbinden:** Immich wird meist von selbst gefunden. Sonst die Adresse eintragen (z. B. `http://192.168.1.10:2283`).
+2. **Anmelden** mit deinem Immich-Konto (E-Mail + Passwort). Immich Showcase legt einen eigenen API-Schlüssel an, **ohne Löschrechte**; dein Passwort wird nicht gespeichert.
+3. **Wer darf zugreifen?** **Gemeinsame PIN** (empfohlen; im Heimnetz auf Wunsch ohne Eingabe) oder **Immich-Konten** (jede Person sieht nur ihre eigenen Fotos).
 
-Danach startet die App von selbst neu. Auf dem iPhone: Teilen → „Zum Home-Bildschirm“.
+Am Ende zeigt die Seite einen **QR-Code für die iPhone-App** und die Adresse für Fernseher und Tablets. Danach in der App unter „Geräte“ den Code eingeben, der am Fernseher oder Tablet erscheint. Eine „Erste Schritte“-Liste in der Oberfläche begleitet dich, bis alles läuft.
 
-**Immich läuft im Docker auf demselben Rechner?** Entweder die IP-Adresse des Rechners wie oben nehmen, oder die App in Immichs Docker-Netzwerk hängen: in `.env` `COMPOSE_FILE=docker-compose.yml:docker-compose.immich-network.yml` und `SHOWCASE_IMMICH_NETWORK=immich_default` (Name per `docker network ls`) setzen und `http://immich_server:2283` als Adresse verwenden.
-
-**Lieber ohne Assistent?** `RAHMEN_IMMICH_URL` und `RAHMEN_IMMICH_KEY` in die `.env` eintragen. Werte aus der `.env` haben immer Vorrang vor dem Assistenten.
+Weitere Wege:
+- **Noch kein Immich?** `./install.sh --with-immich` startet Immich **und** Immich Showcase zusammen.
+- **Anderer Port:** `./install.sh --port 80` (dann genügt am Fernseher die reine IP-Adresse).
+- **Per Hand** (ohne Skript): `cp .env.example .env`, `docker compose up -d`, `docker compose logs showcase` zeigt den Einrichtungs-Code, dann `http://<server>:8090/setup/` öffnen. Lieber ohne Assistent? `RAHMEN_IMMICH_URL` und `RAHMEN_IMMICH_KEY` in die `.env` eintragen; Werte aus der `.env` haben immer Vorrang.
+- **NAS und Heimserver mit Oberfläche:** Fertige Anleitungen für **Synology** (Container Manager), **Unraid** (Vorlage), **TrueNAS** und **Portainer** liegen in `examples/`.
+- Auf dem iPhone ohne App: Teilen → „Zum Home-Bildschirm“. Mit App: „Showcase Immich“ im App Store bzw. über TestFlight; sie **findet den Server im WLAN selbst**.
 
 ## Was kann als Bilderrahmen dienen?
 Jedes Gerät mit einem **Webbrowser**, das eine Adresse öffnen kann. **Ein Kiosk-Modus oder Zusatz-Apps wie Fully Kiosk sind nicht nötig** – der Browser genügt. Die Seite bittet den Browser, den Bildschirm wach zu halten; wo das nicht klappt, stellst du die Auto-Sperre des Geräts auf „Nie“. Ein Kiosk-Modus (Vollbild, nichts anderes erreichbar) ist nur ein Komfort, den du bei Bedarf dazunehmen kannst.
@@ -133,6 +138,18 @@ Der Weg über die `.env`:
 ## Rahmenprogramm nach Person
 `person=<name>` bei den Quellen: `RAHMEN_WEB_RAHMEN_QUELLEN=person=Anna Muster:60, person=oma:20, *:20` zeigt Fotos dieser Person (Name wie in Immich oder ein Spitzname aus `RAHMEN_WEB_ALIASE`; `Anna+Ben` = beide zusammen). Ein unbekannter Name wird übersprungen, die anderen Quellen laufen weiter.
 
+## Server per Bonjour anmelden (iPhone-App findet ihn selbst)
+Die iPhone-App sucht Server im eigenen WLAN (/24) und über bekannte Namen. Zusätzlich kann sich der Server **per Bonjour (mDNS)** anmelden, dann erscheint er in der App auch dann, wenn er in einem anderen Netz steht (der Router muss Bonjour weiterleiten, bei UniFi die Einstellung „mDNS“).
+- Einschalten: `./install.sh --bonjour`, oder in `.env` `COMPOSE_FILE=docker-compose.yml:docker-compose.bonjour.yml` eintragen und `docker compose up -d`.
+- Dahinter läuft ein kleiner zusätzlicher Container (`bonjour.py`) im **Host-Netzwerk**, weil Bonjour-Meldungen aus dem normalen Docker-Netz nicht ins Heimnetz kommen. Er meldet nur Name, Port und Anmeldeart (`_showcase._tcp`), keine Daten.
+- **Nur Docker unter Linux.** Unter Docker Desktop (Mac/Windows) gibt es kein Host-Netzwerk zum LAN; dort bleibt die Suche im eigenen Netz.
+
+## Eigene Fotos vom Handy senden („📤 Meine Fotos“)
+Fotos aus der Mediathek des Handys werden an den Server geschickt, dort in **Immich** im Album „Showcase-Uploads“ abgelegt und zur Auswahl gelegt – so lassen sie sich mit Fotos aus Immich mischen und auf den Rahmen schicken. Die Fotos sind danach dauerhaft in Immich (der Schlüssel hat kein Löschrecht).
+- **Anmeldung mit PIN:** ein gemeinsamer Immich-Schlüssel mit Upload-Recht (`RAHMEN_IMMICH_UPLOAD_KEY`, Rechte siehe `.env.example`). Der Einrichtungsassistent trägt ihn ein, wenn er den Schlüssel selbst anlegt.
+- **Anmeldung mit dem Immich-Konto** (`RAHMEN_WEB_AUTH=immich`): **jede Person lädt in ihr eigenes Konto** hoch, mit ihrem eigenen Schlüssel und ihrem eigenen Album. Ältere Schlüssel ohne Upload-Recht werden beim nächsten Anmelden mit E-Mail und Passwort automatisch ersetzt.
+- Nur Fotos (JPEG, PNG, HEIC, WebP), höchstens 40 MB je Foto.
+
 ## Rahmen an einem anderen Ort (Eltern, Ferienhaus)
 Ein Tablet außerhalb deines Heimnetzes holt sich Programm und Fotos über das Internet von deinem Server und lässt sich wie jeder andere Rahmen aus der App beschicken.
 1. **Server von außen erreichbar machen:** Der Server braucht eine Adresse mit HTTPS, die das Tablet erreicht (zum Beispiel über einen Reverse-Proxy). Beschränke sie, wenn möglich, auf das, was die Rahmen-Seite braucht: `/tv/`, `/api/tv/`, `/api/vorschau/`, `/api/rahmen/`, `/api/bildinfo/`, `/api/koppeln/`, `/api/version`, `/api/config`, `/api/login` (nur für PIN-Geräte) und die Dateien `/i18n.js`, `/i18n/`, `/fonts/`, `/qrcode.js`, `/icon-512.png`; die App selbst muss nicht von außen erreichbar sein.
@@ -171,7 +188,9 @@ Es wird keine mitgeliefert (Lizenzen). Zwei Wege:
 - **In der App:** `RAHMEN_WEB_MUSIK_UPLOAD=1` setzen, dann erscheint im Fenster „Auf den Fernseher“ der Eintrag „Eigene Musik hinzufügen …“.
 
 ## Aktualisieren
-`docker compose pull && docker compose up -d` – oder `deploy/deploy.sh <version>` (Sicherung, Prüfungen, automatischer Rückweg; siehe [RELEASING.md](RELEASING.md)).
+Im Ordner mit der `docker-compose.yml`: `docker compose pull && docker compose up -d`. Daten und Einstellungen bleiben erhalten (oder `deploy/deploy.sh <version>` mit Sicherung, Prüfungen und automatischem Rückweg, siehe [RELEASING.md](RELEASING.md)). Die Statusseite („Alles in Ordnung?“ im Konto-Menü) **weist auf neuere Versionen hin** (sie fragt dafür höchstens alle 6 Stunden bei GitHub nach; abschaltbar mit `RAHMEN_WEB_UPDATE_PRUEFEN=0`).
+
+**Automatisch:** Mit [Watchtower](examples/watchtower/docker-compose.yml) aktualisiert sich Immich Showcase jede Nacht von selbst (der Container trägt schon das nötige Label).
 
 ## Wenn etwas nicht klappt
 | Beobachtung | Lösung |

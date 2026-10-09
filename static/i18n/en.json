@@ -529,7 +529,19 @@
   "Unter „Hilfe“ steht alles Wichtige. Im Konto-Menü zeigt „Alles in Ordnung?“, ob Immich und die Rahmen laufen.": "“Help” has everything important. In the account menu “All good?” shows whether Immich and the frames are running.",
   "Überspringen": "Skip",
   "Los geht’s": "Let’s go",
-  "🎓 Rundgang noch einmal ansehen": "🎓 Watch the tour again"
+  "🎓 Rundgang noch einmal ansehen": "🎓 Watch the tour again",
+  "🚀 Erste Schritte": "🚀 First steps",
+  "Ausblenden": "Hide",
+  "Immich verbinden": "Connect Immich",
+  "Handy verbinden (iPhone-App oder zum Home-Bildschirm hinzufügen)": "Connect your phone (iPhone app or add to home screen)",
+  "QR-Code zeigen": "Show QR code",
+  "Rahmen oder Fernseher koppeln": "Pair a frame or TV",
+  "Die erste Show senden: Fotos antippen, unten „Auf den Rahmen“": "Send the first show: tap photos, then “To the frame” at the bottom",
+  "Fotos ansehen": "View photos",
+  "📷 QR-Code am Gerät scannen": "📷 Scan the QR code on the device",
+  "Das ist kein Kopplungs-QR-Code. Er steht auf dem Bildschirm des Fernsehers oder Tablets.": "That is not a pairing QR code. It is shown on the TV or tablet screen.",
+  "Code übernommen – jetzt das Gerät wählen und koppeln.": "Code taken over – now choose the device and pair.",
+  "🔓 Mit Face ID anmelden": "🔓 Sign in with Face ID"
  },
  "muster": [
   [

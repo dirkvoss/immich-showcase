@@ -15,6 +15,8 @@ services:
     image: ghcr.io/dirkvoss/immich-showcase:${SHOWCASE_VERSION:-latest}
     container_name: ${SHOWCASE_CONTAINER:-showcase}
     restart: unless-stopped
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"        # fuer automatische Updates mit Watchtower (examples/watchtower)
     # Laeuft ohne Root, mit schreibgeschuetztem Dateisystem und ohne Zusatzrechte. Bei einem Ordner statt Volume als Datenverzeichnis
     # SHOWCASE_UID/SHOWCASE_GID auf den Besitzer des Ordners setzen.
     user: "${SHOWCASE_UID:-10001}:${SHOWCASE_GID:-10001}"
@@ -37,18 +39,18 @@ services:
       RAHMEN_FACETTEN: ${RAHMEN_FACETTEN:-}
       RAHMEN_MOTIV_OHNE_DB: ${RAHMEN_MOTIV_OHNE_DB:-60}
       # --- Zugang ---
-      RAHMEN_WEB_AUTH: ${RAHMEN_WEB_AUTH:-pin}
+      RAHMEN_WEB_AUTH: ${RAHMEN_WEB_AUTH:-}                       # leer = PIN (oder das, was der Einrichtungsassistent gespeichert hat)
       RAHMEN_WEB_LAN: ${RAHMEN_WEB_LAN:-}
       RAHMEN_WEB_PROXIES: ${RAHMEN_WEB_PROXIES:-}
       # --- Darstellung / Einsatzzweck ---
-      RAHMEN_WEB_NAME: ${RAHMEN_WEB_NAME:-Immich Showcase}
+      RAHMEN_WEB_NAME: ${RAHMEN_WEB_NAME:-}
       RAHMEN_WEB_MODUS: ${RAHMEN_WEB_MODUS:-beides}
       RAHMEN_WEB_BEISPIELE: ${RAHMEN_WEB_BEISPIELE:-Sommer 2022; Geburtstag; Strand}
       RAHMEN_WEB_BEISPIELE_EN: ${RAHMEN_WEB_BEISPIELE_EN:-Summer 2022; Birthday; Beach}
       RAHMEN_WEB_ALIASE: ${RAHMEN_WEB_ALIASE:-}
       # --- Fernseher ---
       RAHMEN_WEB_TV_URL: ${RAHMEN_WEB_TV_URL:-}
-      RAHMEN_WEB_TV_ZIELE: ${RAHMEN_WEB_TV_ZIELE:-lg=LG TV,shield=Shield}
+      RAHMEN_WEB_TV_ZIELE: ${RAHMEN_WEB_TV_ZIELE:-}
       RAHMEN_WEB_VIDEO_CACHE_MB: ${RAHMEN_WEB_VIDEO_CACHE_MB:-3000}
       RAHMEN_WEB_MUSIK_UPLOAD: ${RAHMEN_WEB_MUSIK_UPLOAD:-0}
       RAHMEN_WEB_MUSIK_MAX_MB: ${RAHMEN_WEB_MUSIK_MAX_MB:-100}

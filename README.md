@@ -46,28 +46,33 @@ With weather and appointments at the top right, device pairing by code/QR on the
 - For the picture frame: a **tablet** (or any device with a browser). For the TV: a TV with a web browser.
 
 ## Installation (about 5 minutes)
-Shortcut: `./install.sh` (or `./install.sh --with-immich` if you have no Immich yet) does the steps below for you.
+
+> 📖 **With screenshots, step by step:** [Getting started – illustrated guide](docs/anleitung.md) · [Showcase on a different machine than Immich, e.g. Raspberry Pi](docs/anleitung-externer-rechner.md) (both German)
+
+**One command** on the machine that runs Docker (Linux, NAS, mini PC; a Raspberry Pi works too):
 
 ```bash
-git clone https://github.com/dirkvoss/immich-showcase.git
-cd immich-showcase
-cp .env.example .env
-docker compose up -d
-docker compose logs showcase       # shows a one-time setup code
+curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/install.sh | bash
 ```
 
-Open `http://<server>:8090` in a browser. The **setup wizard** guides you:
+The script
+- downloads Immich Showcase to `~/immich-showcase`,
+- **detects Immich** if it runs on the same machine in Docker and attaches the app to its Docker network (no file to edit),
+- starts everything and prints a **ready-made setup link** at the end (with a QR code if `qrencode` is installed) that you open in the browser.
 
-1. enter the **setup code** from the log (so nobody else on your network can take over the setup),
-2. enter the **address of your Immich** (for example `http://192.168.1.10:2283`),
-3. sign in with your **Immich account** (email + password). Immich Showcase creates its own API key *without delete permissions* – your password is not stored,
-4. choose a **PIN**.
+The **setup wizard** has three short steps:
+1. **Connect Immich:** Immich is usually found automatically. Otherwise enter its address (e.g. `http://192.168.1.10:2283`).
+2. **Sign in** with your Immich account (email + password). Immich Showcase creates its own API key **without delete rights**; your password is not stored.
+3. **Who may use it?** **Shared PIN** (recommended; at home optionally without typing it) or **Immich accounts** (everyone only sees their own photos).
 
-The app restarts by itself. On an iPhone: Share → "Add to Home Screen".
+At the end the page shows a **QR code for the iPhone app** and the address for TVs and tablets. Then enter the code shown on the TV or tablet in the app under "Devices". A "First steps" list in the interface guides you until everything works.
 
-**Immich runs in Docker on the same machine?** Either use the machine's IP address as above, or join Immich's Docker network: put `COMPOSE_FILE=docker-compose.yml:docker-compose.immich-network.yml` and `SHOWCASE_IMMICH_NETWORK=immich_default` (see `docker network ls`) in `.env`, and use `http://immich_server:2283` as the address.
-
-**Prefer no wizard?** Put `RAHMEN_IMMICH_URL` and `RAHMEN_IMMICH_KEY` into `.env`. Values in `.env` always win over the wizard.
+More ways:
+- **No Immich yet?** `./install.sh --with-immich` starts Immich **and** Immich Showcase together.
+- **Different port:** `./install.sh --port 80` (then the TV only needs the plain IP address).
+- **By hand** (no script): `cp .env.example .env`, `docker compose up -d`, `docker compose logs showcase` shows the setup code, then open `http://<server>:8090/setup/`. Prefer no wizard? Put `RAHMEN_IMMICH_URL` and `RAHMEN_IMMICH_KEY` into `.env`; values from `.env` always win.
+- **NAS and home servers with a UI:** ready-made guides for **Synology** (Container Manager), **Unraid** (template), **TrueNAS** and **Portainer** are in `examples/`.
+- On the iPhone without the app: Share → "Add to Home Screen". With the app: "Showcase Immich" from the App Store or TestFlight; it **finds the server on your Wi-Fi by itself**.
 
 ## What can be used as a picture frame?
 Any device with a **web browser** that can open an address. **A kiosk mode or add-on apps such as Fully Kiosk are not required** – the browser is enough. The page asks the browser to keep the screen awake; where that does not work, set the device's auto-lock to "Never". A kiosk mode (full screen, nothing else reachable) is only a convenience you can add if you like.
@@ -132,6 +137,18 @@ Use `http://<server>:8090/tv/` **without** `?ziel=…` to pair the device by cod
 
 ## Frame programme by person
 Add `person=<name>` to the sources: `RAHMEN_WEB_RAHMEN_QUELLEN=person=Anna Muster:60, person=grandma:20, *:20` shows photos of that person (name as in Immich, or a nickname from `RAHMEN_WEB_ALIASE`; `Anna+Ben` = both together). An unknown name is skipped, the other sources continue.
+
+## Announce the server via Bonjour (the iPhone app finds it by itself)
+The iPhone app searches your own Wi-Fi network (/24) and well-known names. In addition the server can announce itself **via Bonjour (mDNS)**; then it also shows up in the app when it sits in a different network (the router must forward Bonjour, on UniFi the "mDNS" setting).
+- Enable: `./install.sh --bonjour`, or put `COMPOSE_FILE=docker-compose.yml:docker-compose.bonjour.yml` into `.env` and run `docker compose up -d`.
+- A small extra container (`bonjour.py`) runs in the **host network** for this, because Bonjour messages do not leave the normal Docker network. It only announces name, port and sign-in mode (`_showcase._tcp`), no data.
+- **Docker on Linux only.** Docker Desktop (Mac/Windows) has no host network to the LAN; there the search in your own network remains.
+
+## Send your own photos from the phone ("📤 My photos")
+Photos from the phone's library are sent to the server, stored in **Immich** in the album "Showcase-Uploads" and added to the selection – so they can be mixed with Immich photos and sent to the frame. They stay in Immich afterwards (the key has no delete right).
+- **PIN sign-in:** one shared Immich key with the upload right (`RAHMEN_IMMICH_UPLOAD_KEY`, rights see `.env.example`). The setup wizard stores it when it creates the key itself.
+- **Immich-account sign-in** (`RAHMEN_WEB_AUTH=immich`): **everyone uploads to their own account**, with their own key and their own album. Older keys without the upload right are replaced automatically the next time someone signs in with email and password.
+- Photos only (JPEG, PNG, HEIC, WebP), at most 40 MB each.
 
 ## A frame somewhere else (parents, holiday home)
 A tablet outside your home network fetches its programme and photos from your server over the internet and can be sent shows from the app like any other frame.

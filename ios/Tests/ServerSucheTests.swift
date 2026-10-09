@@ -48,4 +48,32 @@ final class ServerSucheTests: XCTestCase {
         XCTAssertEqual(GefundenerServer(url: URL(string: "http://x")!, name: "S", anmeldung: "immich").anmeldungText, "Anmeldung mit Immich-Konto")
         XCTAssertNil(GefundenerServer(url: URL(string: "http://x")!, name: "S").anmeldungText)
     }
+
+    func testBonjourUrl() {
+        XCTAssertEqual(BonjourSuche.url(host: "192.168.1.20", port: 8090)?.absoluteString, "http://192.168.1.20:8090")
+        XCTAssertEqual(BonjourSuche.url(host: "192.168.1.20", port: 80)?.absoluteString, "http://192.168.1.20")
+        XCTAssertEqual(BonjourSuche.url(host: "192.168.1.20%en0", port: 8090)?.absoluteString, "http://192.168.1.20:8090")
+        XCTAssertNil(BonjourSuche.url(host: "fe80::1", port: 8090))                     // IPv6 lassen wir weg
+        XCTAssertNil(BonjourSuche.url(host: "", port: 8090))
+    }
+
+    func testVerbindungspruefungDeutetFehlerVerstaendlich() {
+        XCTAssertTrue(Verbindungspruefung.deute(.timedOut).0.contains("antwortet nicht"))
+        XCTAssertTrue(Verbindungspruefung.deute(.cannotFindHost).1.contains("VPN"))
+        XCTAssertTrue(Verbindungspruefung.deute(.notConnectedToInternet).0.contains("nicht mit dem Netz"))
+        XCTAssertTrue(Verbindungspruefung.deuteStatus(403).1.contains("Heimnetz"))
+        XCTAssertTrue(Verbindungspruefung.deuteStatus(502).0.contains("502"))
+        XCTAssertEqual(Verbindungspruefung.netzSchritt(erfuellt: false, wlan: false, mobil: false).stand, .fehler)
+        XCTAssertEqual(Verbindungspruefung.netzSchritt(erfuellt: true, wlan: true, mobil: false).stand, .ok)
+        XCTAssertEqual(Verbindungspruefung.netzSchritt(erfuellt: true, wlan: false, mobil: true).stand, .warnung)
+    }
+
+    func testPinSpeicher() throws {
+        XCTAssertFalse(PinSpeicher.speichern("abc", fuer: "test.example"))                 // nur 6 Ziffern
+        let ok = PinSpeicher.speichern("123456", fuer: "test.example")
+        try XCTSkipUnless(ok, "Kein Schlüsselbund mit Gerätecode im Testlauf")
+        XCTAssertTrue(PinSpeicher.vorhanden(fuer: "test.example"))
+        PinSpeicher.loeschen(fuer: "test.example")
+        XCTAssertFalse(PinSpeicher.vorhanden(fuer: "test.example"))
+    }
 }

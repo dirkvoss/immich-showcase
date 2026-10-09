@@ -318,3 +318,8 @@ def test_diagnose_ohne_geheimnisse(app_laden):
 def test_diagnose_braucht_anmeldung(app_laden):
     w, client, _ = app_laden()
     assert client("10.0.0.5").get("/api/diagnose").status_code == 401
+
+
+def test_frische_installation_legt_keine_beispielgeraete_an(app_laden):
+    w, client, _ = app_laden(RAHMEN_WEB_LAN="192.168.1.0/24")
+    assert "lg" not in w.TV_ZIELE and "shield" not in w.TV_ZIELE

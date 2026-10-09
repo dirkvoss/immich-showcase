@@ -7,6 +7,7 @@ final class AppModell: ObservableObject {
     @AppStorage("faceIDAktiv") var faceIDAktiv = false
     @AppStorage("demoAktiv") var demoAktiv = false
     @AppStorage("letzterServer") var letzterServer = ""
+    @AppStorage("pinMitFaceID") var pinMitFaceID = false
 
     @Published var server: URL?
     @Published var gesperrt = false
@@ -25,6 +26,7 @@ final class AppModell: ObservableObject {
 
     func serverSetzen(_ url: URL?) {
         demoAktiv = false
+        if let alt = server?.host, alt != url?.host { PinSpeicher.loeschen(fuer: alt) }          // gemerkte PIN gehoert zum alten Server
         server = url
         if let url { letzterServer = url.absoluteString }
         gespeichert = url?.absoluteString ?? ""
@@ -55,9 +57,9 @@ final class AppModell: ObservableObject {
     enum Fehler: Error { case nichtErreichbar, keinShowcase, verbindung(String)
         var text: String {
             switch self {
-            case .nichtErreichbar: return "Der Server ist nicht erreichbar. Prüfe die Adresse und ob du im richtigen Netz bist."
-            case .keinShowcase: return "Unter dieser Adresse antwortet kein Immich Showcase."
-            case .verbindung(let d): return "Die Verbindung ist fehlgeschlagen: \(d)"
+            case .nichtErreichbar: return L("Der Server ist nicht erreichbar. Prüfe die Adresse und ob du im richtigen Netz bist.")
+            case .keinShowcase: return L("Unter dieser Adresse antwortet kein Immich Showcase.")
+            case .verbindung(let d): return L("Die Verbindung ist fehlgeschlagen: \(d)")
             }
         }
     }
@@ -66,7 +68,7 @@ final class AppModell: ObservableObject {
         let kontext = LAContext()
         var err: NSError?
         guard kontext.canEvaluatePolicy(.deviceOwnerAuthentication, error: &err) else { gesperrt = false; return }
-        kontext.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: "Showcase Immich entsperren") { ok, _ in
+        kontext.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: L("Showcase Immich entsperren")) { ok, _ in
             Task { @MainActor in if ok { self.gesperrt = false } }
         }
     }

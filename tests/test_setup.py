@@ -45,6 +45,7 @@ def test_komplette_einrichtung_mit_immich_konto(app_laden, monkeypatch, tmp_path
     assert r.status_code == 200 and r.json()["ok"] is True and "pin" not in r.json()          # PIN selbst gewaehlt: nicht zurueckgeben
     einst = json.load(open(tmp_path / "einst.json"))
     assert einst["RAHMEN_IMMICH_URL"] == "http://immich.lan:2283/api" and einst["RAHMEN_IMMICH_KEY"].startswith("key-") and einst["RAHMEN_WEB_NAME"] == "Familienbilder"
+    assert einst["RAHMEN_IMMICH_UPLOAD_KEY"] == einst["RAHMEN_IMMICH_KEY"]                       # selbst angelegter Schluessel darf hochladen: "Meine Fotos" geht gleich
     assert oct((tmp_path / "einst.json").stat().st_mode & 0o777) == "0o600"
     assert anm.abgemeldet                                                                       # Immich-Sitzung beendet
     assert w.pin_pruefen("246810") and not w.pin_pruefen("000000")
@@ -57,6 +58,7 @@ def test_einrichtung_mit_zufaelliger_pin_und_eigenem_schluessel(app_laden, monke
     r = c.post("/api/setup/speichern", json={"code": w.SETUP_CODE["wert"], "url": "http://immich.lan:2283/api", "schluessel": "eigener-key"}, headers=H).json()
     assert r["ok"] and len(r["pin"]) == 6 and w.pin_pruefen(r["pin"])
     assert json.load(open(tmp_path / "einst.json"))["RAHMEN_IMMICH_KEY"] == "eigener-key"
+    assert "RAHMEN_IMMICH_UPLOAD_KEY" not in json.load(open(tmp_path / "einst.json"))              # fremder Schluessel: Upload nur, wenn er es ausdruecklich einrichtet
 
 
 def test_falsche_zugangsdaten_werden_gemeldet_und_nichts_gespeichert(app_laden, monkeypatch, tmp_path):
@@ -117,3 +119,75 @@ def test_keine_waisen_schluessel_wenn_die_pruefung_scheitert(app_laden, monkeypa
     assert r.status_code == 400
     assert anm.geloescht == ["/api-keys/id-aaaa"]            # angelegter Schluessel wieder entfernt
     assert anm.abgemeldet and not (tmp_path / "einst.json").exists()
+
+
+# --------------------------------------------------------------------------- Einfache Einrichtung: Immich erkennen, Zugang waehlen
+
+def test_vorschlag_findet_immich_und_nennt_das_heimnetz(app_laden, monkeypatch, tmp_path):
+    w, client, anm, _ = unkonfiguriert(app_laden, monkeypatch, tmp_path)
+    monkeypatch.setattr(w, "immich_erkennen", lambda extra=None: ("http://immich_server:2283/api", "3.2.4"))
+    r = client("192.168.1.9").get("/api/setup/vorschlag").json()
+    assert r["immich"] == "http://immich_server:2283/api" and r["version"] == "3.2.4"
+    assert r["heimnetz"] == "192.168.1.0/24"
+    assert client("203.0.113.9").get("/api/setup/vorschlag").json()["heimnetz"] is None            # nicht aus einem privaten Netz: kein Vorschlag
+
+
+def test_vorschlag_bei_proxy_kein_heimnetz(app_laden, monkeypatch, tmp_path):
+    w, client, anm, _ = unkonfiguriert(app_laden, monkeypatch, tmp_path)
+    monkeypatch.setattr(w, "immich_erkennen", lambda extra=None: (None, None))
+    r = client("192.168.1.9").get("/api/setup/vorschlag", headers={"X-Forwarded-For": "8.8.8.8"}).json()
+    assert r["immich"] is None and r["heimnetz"] is None                                              # ueber einen Proxy waere die Adresse des Proxys irrefuehrend
+
+
+def test_vorschlag_nur_vor_der_einrichtung(app_laden):
+    w, client, _ = app_laden()
+    assert client("192.168.1.9").get("/api/setup/vorschlag").status_code == 404
+
+
+def test_immich_erkennen_probiert_feste_liste(monkeypatch):
+    import importlib, rahmen_web as w  # noqa: E401
+    besucht = []
+
+    class Antwort:
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+        def read(self): return b'{"major": 3, "minor": 3, "patch": 1}'
+
+    def oeffnen(url, timeout=0):
+        besucht.append(url)
+        if "immich-server" not in url:
+            raise OSError("nein")
+        return Antwort()
+
+    monkeypatch.setattr(w.urllib.request, "urlopen", oeffnen)
+    assert w.immich_erkennen() == ("http://immich-server:2283/api", "3.3.1")
+    assert besucht[0] == "http://immich_server:2283/api/server/version"
+
+
+def test_einrichtung_mit_pin_und_heimnetz(app_laden, monkeypatch, tmp_path):
+    w, client, anm, neustarts = unkonfiguriert(app_laden, monkeypatch, tmp_path)
+    c = client("192.168.1.9")
+    r = c.post("/api/setup/speichern", json={"code": w.SETUP_CODE["wert"], "url": "http://immich.lan:2283", "email": "anna@example.org", "passwort": "anna-passwort",
+                                             "zugang": "pin", "heimnetz": True}, headers=H).json()
+    assert r["ok"] and r["zugang"] == "pin" and r["heimnetz"] == "192.168.1.0/24" and len(r["pin"]) == 6
+    einst = json.load(open(tmp_path / "einst.json"))
+    assert einst["RAHMEN_WEB_AUTH"] == "pin" and einst["RAHMEN_WEB_LAN"] == "192.168.1.0/24"
+
+
+def test_einrichtung_heimnetz_wird_vom_server_bestimmt_nicht_vom_browser(app_laden, monkeypatch, tmp_path):
+    w, client, anm, _ = unkonfiguriert(app_laden, monkeypatch, tmp_path)
+    c = client("203.0.113.9")                                                                        # von aussen: nie als Heimnetz eintragen
+    r = c.post("/api/setup/speichern", json={"code": w.SETUP_CODE["wert"], "url": "http://immich.lan:2283", "email": "anna@example.org", "passwort": "anna-passwort",
+                                             "zugang": "pin", "heimnetz": True, "lan": "0.0.0.0/0"}, headers=H).json()
+    assert r["ok"] and r["heimnetz"] is None
+    assert "RAHMEN_WEB_LAN" not in json.load(open(tmp_path / "einst.json"))
+
+
+def test_einrichtung_mit_immich_konten(app_laden, monkeypatch, tmp_path):
+    w, client, anm, _ = unkonfiguriert(app_laden, monkeypatch, tmp_path)
+    c = client("192.168.1.9")
+    r = c.post("/api/setup/speichern", json={"code": w.SETUP_CODE["wert"], "url": "http://immich.lan:2283", "email": "anna@example.org", "passwort": "anna-passwort",
+                                             "zugang": "immich", "heimnetz": True}, headers=H).json()
+    assert r["ok"] and r["zugang"] == "immich" and "pin" not in r and r["heimnetz"] is None           # bei Immich-Konten kein PIN und kein "ohne Anmeldung"
+    einst = json.load(open(tmp_path / "einst.json"))
+    assert einst["RAHMEN_WEB_AUTH"] == "immich" and "RAHMEN_WEB_LAN" not in einst

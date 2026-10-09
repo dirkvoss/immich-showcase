@@ -1,0 +1,26 @@
+# Optional: Immich Showcase per Bonjour im Netz anmelden, damit die iPhone-App den Server im WLAN selbst findet.
+# Aktivieren:  COMPOSE_FILE=docker-compose.yml:docker-compose.bonjour.yml  in .env eintragen (oder ./install.sh --bonjour), dann  docker compose up -d
+# Nur mit Docker unter Linux (Host-Netzwerk). Unter Docker Desktop (Mac/Windows) gibt es kein Host-Netzwerk zum LAN - dort bleibt die Suche ueber das Netz.
+# Zwischen verschiedenen Netzen/VLANs muss der Router mDNS weiterleiten (UniFi: Einstellung "mDNS"), sonst findet die App nur Server im eigenen Netz.
+services:
+  bonjour:
+    image: ghcr.io/dirkvoss/immich-showcase:${SHOWCASE_VERSION:-latest}
+    container_name: ${SHOWCASE_CONTAINER:-showcase}-bonjour
+    restart: unless-stopped
+    network_mode: host
+    user: "${SHOWCASE_UID:-10001}:${SHOWCASE_GID:-10001}"
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 64m
+    pids_limit: 32
+    entrypoint: ["python", "/app/bonjour.py"]
+    environment:
+      TZ: ${TZ:-Europe/Berlin}
+      SHOWCASE_PORT: ${SHOWCASE_PORT:-8090}
+      SHOWCASE_VERSION: ${SHOWCASE_VERSION:-}
+      RAHMEN_WEB_NAME: ${RAHMEN_WEB_NAME:-Immich Showcase}
+      RAHMEN_WEB_AUTH: ${RAHMEN_WEB_AUTH:-pin}
+      SHOWCASE_MDNS_NAME: ${SHOWCASE_MDNS_NAME:-showcase}       # kurze Adresse im Heimnetz: http://showcase.local:${SHOWCASE_PORT:-8090}
+    depends_on: [showcase]
