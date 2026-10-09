@@ -474,7 +474,10 @@
   "Link und QR-Code (zum Scannen mit dem Tablet)": "Link en QR-code (om met de tablet te scannen)",
   "📱 App-Einstellungen": "📱 App-instellingen",
   "iPhone-App verbinden": "iPhone-app verbinden",
-  "In der App „Showcase Immich“ den QR-Code scannen – sie trägt die Adresse dieses Servers selbst ein.": "Scan de QR-code in de app ‘Showcase Immich’ – ze vult het adres van deze server zelf in."
+  "In der App „Showcase Immich“ den QR-Code scannen – sie trägt die Adresse dieses Servers selbst ein.": "Scan de QR-code in de app ‘Showcase Immich’ – ze vult het adres van deze server zelf in.",
+  "Eigene Fotos senden": "Eigen foto's sturen",
+  "Fotos von diesem Gerät auswählen und auf den Rahmen schicken": "Kies foto's van dit apparaat en stuur ze naar de lijst",
+  "Meine Fotos": "Mijn foto's"
  },
  "muster": [
   [

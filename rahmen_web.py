@@ -52,6 +52,7 @@ sys.path.insert(0, os.environ.get("RAHMEN_HELFER_DIR", "/opt/bilderrahmen"))
 import rahmen_helfer as H  # noqa: E402
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response  # noqa: E402
+from fastapi.concurrency import run_in_threadpool  # noqa: E402
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, StreamingResponse  # noqa: E402
 from fastapi.staticfiles import StaticFiles  # noqa: E402
 
@@ -547,7 +548,7 @@ def logout(response: Response, _=Depends(csrf)):
 def konfig(ziel: str = ""):
     """Oeffentliche Darstellung der Installation (kein Geheimnis): Name, Beispiele fuer die Suche, Adresse der Fernseher-Seite. Mit ?ziel= gelten die Einstellungen dieses Geraets."""
     z = ziel if ziel in GERAETE else None
-    return {"name": APP_NAME, "version": VERSION, "modus": MODUS, "auth": AUTH, "musik_upload": MUSIK_UPLOAD, "konfiguriert": konfiguriert(), "tv_url": tv_url(), "beispiele": BEISPIELE, "beispiele_en": BEISPIELE_EN,
+    return {"name": APP_NAME, "version": VERSION, "modus": MODUS, "auth": AUTH, "musik_upload": MUSIK_UPLOAD, "hochladen": bool(UPLOAD_KEY), "hochladen_mb": UPLOAD_MAX_MB, "konfiguriert": konfiguriert(), "tv_url": tv_url(), "beispiele": BEISPIELE, "beispiele_en": BEISPIELE_EN,
             "ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT and k not in RAHMEN_ZIELE},
             "rahmen": list(RAHMEN_ZIELE), "rahmen_namen": dict(RAHMEN_ZIELE), "rahmen_sek": gwert(z, "sek", std_sek()), "rahmen_fuellung": gwert(z, "fuellung", std_fuellung_rahmen()), "tv_fuellung": gwert(z, "fuellung", std_fuellung_tv()),
             "rahmen_anzeige": gwert(z, "anzeige", std_anzeige()), "rahmen_nacht": rahmen_nacht(z), "rahmen_zusatz": zusatz_liste(), "koppeln": True,
@@ -707,7 +708,7 @@ for _n in ("uvicorn.error", "rahmen-helfer"):
 
 def schwaerzen(text):
     """Entfernt alles, was wie ein Geheimnis aussieht (konfigurierte Schluessel, lange Zeichenketten, Adressen mit Zugangsdaten)."""
-    for k in ("RAHMEN_IMMICH_KEY", "RAHMEN_DB_DSN", "RAHMEN_WEB_PUSHOVER_API_KEY", "RAHMEN_WEB_PUSHOVER_USER_KEY", "SHOWCASE_PIN"):
+    for k in ("RAHMEN_IMMICH_KEY", "RAHMEN_IMMICH_UPLOAD_KEY", "RAHMEN_DB_DSN", "RAHMEN_WEB_PUSHOVER_API_KEY", "RAHMEN_WEB_PUSHOVER_USER_KEY", "SHOWCASE_PIN"):
         v = os.environ.get(k, "")
         if len(v) >= 4:
             text = text.replace(v, "***")
@@ -1645,6 +1646,28 @@ aktiv_laden()
 # info.json je Ordner ("name", "stuecke": [{"datei","titel","urheber","lizenz"}]) ueberschreibt das. Wird als Wiedergabeliste abgespielt.
 MUSIK_DIR = os.environ.get("RAHMEN_WEB_MUSIK_DIR", "/data/musik")
 MUSIK_UPLOAD = os.environ.get("RAHMEN_WEB_MUSIK_UPLOAD", "").strip().lower() in ("1", "true", "ja", "yes", "an")
+
+# Fotos vom Handy hochladen (nur mit eigenem Immich-Schluessel, der "asset.upload" darf): landen in einem eigenen Album
+def _upload_schluessel():
+    k = os.environ.get("RAHMEN_IMMICH_UPLOAD_KEY", "").strip()
+    pfad = os.environ.get("RAHMEN_IMMICH_UPLOAD_KEY_FILE", "").strip()
+    if not k and pfad:
+        try:
+            k = open(pfad).read().strip()
+        except OSError:
+            k = ""
+    return k
+
+
+UPLOAD_KEY = _upload_schluessel()
+if UPLOAD_KEY:
+    os.environ.setdefault("RAHMEN_IMMICH_UPLOAD_KEY", UPLOAD_KEY)          # damit schwaerzen() ihn kennt, auch wenn er aus einer Datei kommt
+UPLOAD_ALBUM = (os.environ.get("RAHMEN_WEB_UPLOAD_ALBUM", "Showcase-Uploads").strip() or "Showcase-Uploads")[:80]
+UPLOAD_MAX_MB = max(1, min(int(os.environ.get("RAHMEN_WEB_UPLOAD_MAX_MB", "40")), 200))
+UPLOAD_PRO_STUNDE = 300
+UPLOAD_ZEITEN = collections.deque()
+UPLOAD_LOCK = threading.Lock()
+UPLOAD_TYPEN = {"image/jpeg": ".jpg", "image/png": ".png", "image/heic": ".heic", "image/heif": ".heif", "image/webp": ".webp"}
 MUSIK_MAX_MB = max(1, int(os.environ.get("RAHMEN_WEB_MUSIK_MAX_MB", "100")))              # je Datei
 MUSIK_GESAMT_MB = max(1, int(os.environ.get("RAHMEN_WEB_MUSIK_GESAMT_MB", "2000")))       # ganze Sammlung
 MUSIK_TYPEN = {".mp3": "audio/mpeg", ".ogg": "audio/ogg", ".m4a": "audio/mp4"}            # was Fernseher-Browser abspielen koennen
@@ -3308,6 +3331,112 @@ async def kein_cache(request: Request, call_next):
     if not request.url.path.startswith("/api/"):
         antwort.headers["Cache-Control"] = "no-cache"      # Oberflaeche immer gegenpruefen (ETag), nie veraltet aus dem Browser-Cache
     return antwort
+
+
+# --------------------------------------------------------------------------- Fotos vom Handy hochladen
+
+def upload_typ_erkennen(daten):
+    """Erkennt Bildformat an den ersten Bytes (der Header des Browsers wird nicht geglaubt). Nur Fotos, keine Videos."""
+    if daten[:3] == b"\xff\xd8\xff":
+        return "image/jpeg"
+    if daten[:8] == b"\x89PNG\r\n\x1a\n":
+        return "image/png"
+    if daten[:4] == b"RIFF" and daten[8:12] == b"WEBP":
+        return "image/webp"
+    if daten[4:8] == b"ftyp" and daten[8:12] in (b"heic", b"heix", b"hevc", b"hevx", b"mif1", b"msf1", b"heim", b"heis"):
+        return "image/heic"
+    return None
+
+
+def upload_multipart(felder, dateiname, typ, daten):
+    grenze = "----showcase" + uuid.uuid4().hex
+    teile = []
+    for k, v in felder.items():
+        teile.append(f'--{grenze}\r\nContent-Disposition: form-data; name="{k}"\r\n\r\n{v}\r\n'.encode())
+    teile.append(f'--{grenze}\r\nContent-Disposition: form-data; name="assetData"; filename="{dateiname}"\r\nContent-Type: {typ}\r\n\r\n'.encode())
+    teile += [daten, f"\r\n--{grenze}--\r\n".encode()]
+    return b"".join(teile), "multipart/form-data; boundary=" + grenze
+
+
+def upload_album_id():
+    """Das Upload-Album (wird beim ersten Mal angelegt)."""
+    def holen():
+        for a in immich_aufruf("GET", "/albums", schluessel=UPLOAD_KEY) or []:
+            if a.get("albumName") == UPLOAD_ALBUM and a.get("ownerId") not in ("", None):
+                return a["id"]
+        return immich_aufruf("POST", "/albums", {"albumName": UPLOAD_ALBUM, "description": "Von der Showcase-App hochgeladene Fotos"}, schluessel=UPLOAD_KEY)["id"]
+    return zwischenspeicher("upload-album", 600, holen)
+
+
+def upload_zu_immich(daten, typ, name, datum_ms):
+    wann = datetime.datetime.fromtimestamp((datum_ms or time.time() * 1000) / 1000, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    sha = hashlib.sha1(daten).hexdigest()
+    body, ctype = upload_multipart({"deviceAssetId": "showcase-" + sha, "deviceId": "immich-showcase", "fileCreatedAt": wann, "fileModifiedAt": wann, "isFavorite": "false"},
+                                   name, typ, daten)
+    req = urllib.request.Request(H.IMMICH + "/assets", method="POST", data=body, headers={"x-api-key": UPLOAD_KEY, "Content-Type": ctype, "Accept": "application/json", "x-immich-checksum": sha})
+    try:
+        with urllib.request.urlopen(req, timeout=120) as r:
+            antwort = json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        if e.code in (401, 403):
+            raise HTTPException(502, "Der Immich-Schluessel fuer Uploads hat nicht genug Rechte")
+        raise HTTPException(502, f"Immich hat das Foto abgelehnt ({e.code})")
+    except (urllib.error.URLError, TimeoutError, OSError):
+        raise HTTPException(502, "Immich ist gerade nicht erreichbar")
+    asset = antwort["id"]
+    try:
+        immich_aufruf("PUT", f"/albums/{upload_album_id()}/assets", {"ids": [asset]}, schluessel=UPLOAD_KEY)
+    except (urllib.error.URLError, OSError, KeyError):
+        H.log.warning("Upload: Foto %s liegt in Immich, konnte aber nicht ins Album %s", asset, UPLOAD_ALBUM)
+    for _ in range(30):                                       # warten, bis die Vorschau da ist, damit der Rahmen das Foto gleich zeigen kann
+        try:
+            immich_roh(f"/assets/{asset}/thumbnail?size=preview", timeout=15)
+            break
+        except (urllib.error.URLError, OSError):
+            time.sleep(1)
+    return {"ok": True, "id": asset, "neu": antwort.get("status") == "created"}
+
+
+@app.put("/api/hochladen")
+async def hochladen(request: Request, _=Depends(anmeldung), __=Depends(csrf)):
+    """Ein Foto vom Handy: roher Inhalt im Body, Name in 'X-Dateiname' (URL-kodiert), Aufnahmezeit in 'X-Datum' (ms). Landet in Immich im Upload-Album."""
+    if not UPLOAD_KEY:
+        raise HTTPException(403, "Hochladen ist nicht eingerichtet")
+    jetzt_ = time.time()
+    with UPLOAD_LOCK:
+        while UPLOAD_ZEITEN and UPLOAD_ZEITEN[0] < jetzt_ - 3600:
+            UPLOAD_ZEITEN.popleft()
+        if len(UPLOAD_ZEITEN) >= UPLOAD_PRO_STUNDE:
+            raise HTTPException(429, "Zu viele Uploads in der letzten Stunde")
+        UPLOAD_ZEITEN.append(jetzt_)
+    limit = UPLOAD_MAX_MB * 1024 * 1024
+    try:
+        if int(request.headers.get("content-length") or 0) > limit:
+            raise HTTPException(413, f"Das Foto ist groesser als {UPLOAD_MAX_MB} MB")
+    except ValueError:
+        raise HTTPException(400, "Ungueltige Laengenangabe")
+    teile, groesse = [], 0
+    async for stueck in request.stream():
+        groesse += len(stueck)
+        if groesse > limit:
+            raise HTTPException(413, f"Das Foto ist groesser als {UPLOAD_MAX_MB} MB")
+        teile.append(stueck)
+    daten = b"".join(teile)
+    typ = upload_typ_erkennen(daten)
+    if not typ:
+        raise HTTPException(415, "Nur Fotos (JPEG, PNG, HEIC, WebP) koennen hochgeladen werden")
+    roh = urllib.parse.unquote(request.headers.get("x-dateiname", ""))
+    name = re.sub(r"[^\w .()&+'-]", "_", os.path.splitext(os.path.basename(roh))[0], flags=re.UNICODE).strip(" .")[:80] or "Foto"
+    name += UPLOAD_TYPEN[typ]
+    try:
+        datum = int(request.headers.get("x-datum") or 0)
+    except ValueError:
+        datum = 0
+    if not 0 < datum < (time.time() + 86400) * 1000:
+        datum = 0
+    ergebnis = await run_in_threadpool(upload_zu_immich, daten, typ, name, datum)
+    H.log.info("Upload: %s (%d KB) -> %s%s", name, groesse // 1024, ergebnis["id"], "" if ergebnis["neu"] else " (schon vorhanden)")
+    return ergebnis
 
 
 if os.path.isdir(STATIC_DIR):

@@ -184,7 +184,9 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
 #hilfeDialog { z-index: 96; }
 .hilfe { margin: 6px 0 10px; padding-left: 20px; } .hilfe li { margin: 4px 0; }
 #hilfeDialog h3 { margin: 14px 0 2px; font-size: 15px; }
-.benutzer #hilfeBtn, .benutzer #geraeteBtn { color: var(--muted); }
+.benutzer #hilfeBtn, .benutzer #geraeteBtn, .benutzer #hochladenBtn { color: var(--muted); }
+.benutzer #hochladenBtn { font-size: 20px; color: var(--text); }       /* auch auf dem Handy sichtbar (dort nur das Symbol) */
+.benutzer #hochladenBtn .ik-text { display: none; }
 .geraet { display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin: 8px 0; border: 1px solid var(--line, rgba(255,255,255,.12)); border-radius: 12px; }
 .geraet .punkt { width: 12px; height: 12px; border-radius: 50%; background: #6b7280; flex: none; }
 .geraet.online .punkt { background: #3ecf8e; }
@@ -300,6 +302,8 @@ header { background: var(--bg); padding: calc(env(safe-area-inset-top) + 8px) 16
 @media (min-width: 700px) {
   .benutzer .ik { font-size: 14px; font-weight: 600; width: auto; padding: 0 12px; gap: 6px; }
   .benutzer .ik .ic { width: 18px; height: 18px; }
+  .benutzer #hochladenBtn { font-size: 14px; }
+  .benutzer #hochladenBtn .ik-text { display: inline; }
 }
 
 /* Rahmen-Status: schmale Leiste, kein Kleingedrucktes ueber der Ueberschrift */
@@ -480,7 +484,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
     <div class="kopf">
       <h1><button type="button" class="kopf-home" id="kopfHome" aria-label="Immich Showcase – zur Startseite"><span class="logo" id="logo" aria-hidden="true"><img alt="" src="/icon-192.png"></span><span class="kopf-name">Immich Showcase</span></button></h1>
       <button class="btn klein versteckt" id="undoKopf" title="Letzte Änderung an der Auswahl rückgängig machen" aria-label="Rückgängig"><span aria-hidden="true">↶</span><span class="undo-text"> Rückgängig</span></button>
-      <div class="benutzer" id="benutzer"><button type="button" id="geraeteBtn" class="ik" aria-label="Geräte" title="Geräte">📡 Geräte</button><button type="button" id="hilfeBtn" class="ik" aria-label="Hilfe" title="Hilfe">❓ Hilfe</button><details class="konto" id="konto"><summary aria-label="Konto" title="Konto"><svg class="ic" aria-hidden="true"><use href="#i-konto"/></svg></summary><div class="konto-menu"><button type="button" id="einstBtn">⚙ Einstellungen</button><button type="button" id="appEinstBtn" class="versteckt">📱 App-Einstellungen</button><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><span class="versionskurz" data-version-kurz></span></div></details></div>
+      <div class="benutzer" id="benutzer"><button type="button" id="hochladenBtn" class="ik versteckt" aria-label="Eigene Fotos senden" title="Fotos von diesem Gerät auswählen und auf den Rahmen schicken"><span aria-hidden="true">📤</span><span class="ik-text">Meine Fotos</span></button><input type="file" id="hochladenDatei" accept="image/jpeg,image/png,image/heic,image/heif,image/webp,image/*" multiple hidden><button type="button" id="geraeteBtn" class="ik" aria-label="Geräte" title="Geräte">📡 Geräte</button><button type="button" id="hilfeBtn" class="ik" aria-label="Hilfe" title="Hilfe">❓ Hilfe</button><details class="konto" id="konto"><summary aria-label="Konto" title="Konto"><svg class="ic" aria-hidden="true"><use href="#i-konto"/></svg></summary><div class="konto-menu"><button type="button" id="einstBtn">⚙ Einstellungen</button><button type="button" id="appEinstBtn" class="versteckt">📱 App-Einstellungen</button><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><span class="versionskurz" data-version-kurz></span></div></details></div>
       <div class="laeuft nur-rahmen" id="laeuft" aria-live="polite">
         <select id="rahmenWahl" class="reihe-sel versteckt" aria-label="Rahmen wählen"></select>
         <div class="laeuft-text">
@@ -1167,6 +1171,39 @@ $("#senden").addEventListener("click", async () => {
   } catch (e) { fehler(e); }
   b.textContent = "Auf den Rahmen"; b.disabled = auswahl.size === 0;
 });
+
+// ---------------------------------------------------------------- Eigene Fotos vom Geraet senden (landen im Upload-Album von Immich)
+$("#hochladenBtn").addEventListener("click", () => $("#hochladenDatei").click());
+$("#hochladenDatei").addEventListener("change", async e => {
+  const dateien = [...e.target.files]; e.target.value = "";
+  if (!dateien.length) return;
+  const maxMb = konfig.hochladen_mb || 40, knopf = $("#hochladenBtn"), alt = knopf.innerHTML;
+  const ids = []; let fehlerAnzahl = 0, letzterFehler = "";
+  knopf.disabled = true;
+  for (let i = 0; i < dateien.length; i++) {
+    const f = dateien[i];
+    knopf.textContent = `${i + 1}/${dateien.length}`;
+    toast(`Foto ${i + 1} von ${dateien.length} wird gesendet …`);
+    if (f.size > maxMb * 1024 * 1024) { fehlerAnzahl++; letzterFehler = `„${f.name}“ ist größer als ${maxMb} MB.`; continue; }
+    try {
+      const r = await fetch("/api/hochladen", { method: "PUT", credentials: "same-origin", body: f,
+        headers: { "X-Rahmen": "1", "Content-Type": "application/octet-stream", "X-Dateiname": encodeURIComponent(f.name || "Foto"), "X-Datum": String(f.lastModified || 0) } });
+      let d = null; try { d = await r.json(); } catch (x) {}
+      if (r.status === 401) { zeigeLogin(); throw new Error("PIN erforderlich"); }
+      if (!r.ok) throw new Error((d && d.nachricht) || "Fehler " + r.status);
+      ids.push({ id: d.id, tag: f.lastModified ? new Date(f.lastModified).toISOString().slice(0, 10) : "" });
+    } catch (x) { fehlerAnzahl++; letzterFehler = x.message || String(x); }
+  }
+  knopf.disabled = false; knopf.innerHTML = alt;
+  if (!ids.length) { toast(letzterFehler || "Es konnte kein Foto gesendet werden.", true); return; }
+  // Die hochgeladenen Fotos kommen zur Auswahl - so lassen sie sich mit Fotos aus Immich mischen; dann unten "Auf den Rahmen".
+  const vorher = auswahl.size, hinweis = fehlerAnzahl ? ` ${fehlerAnzahl} nicht gesendet: ${letzterFehler}` : "";
+  merke();
+  ids.forEach(f => auswahl.set(f.id, { tag: f.tag, fav: false }));
+  if (!$("#showName").value.trim()) $("#showName").value = "Meine Fotos " + new Date().toLocaleDateString(RW_LOCALE, { day: "numeric", month: "long" });
+  aktualisiere();
+  toast(`${ids.length} Foto${ids.length === 1 ? "" : "s"} ${vorher ? "zur Auswahl hinzugefügt" : "bereit"} – weitere Fotos aus Immich dazuwählen oder unten „Auf den Rahmen“ antippen.` + hinweis, fehlerAnzahl > 0);
+});
 $("#normalBtn").addEventListener("click", async () => {
   if (!confirm("Der Rahmen soll wieder das normale Programm zeigen?")) return;
   try { const r = await api("normal", { method: "POST", body: JSON.stringify({ ziel: rahmenAktuell() }) }); toast(r.nachricht); statusLaden(); } catch (e) { fehler(e); }
@@ -1574,6 +1611,7 @@ async function konfigLaden() {
       $("#sucheText").placeholder = RW_T("z. B.") + " " + bsp.slice(0, 2).join(", ");
       $("#sucheBsp").textContent = q[0] + bsp[0] + q[1];
     }
+    $("#hochladenBtn").classList.toggle("versteckt", !konfig.hochladen);
     rahmenAuswahlBauen(); rahmenWahlBauen(); if (rahmenIds().length) statusLaden();
     if (konfig.tv_url) $("#tvTippAdr").innerHTML = `Am Fernseher einmal im Browser <b>${esc(konfig.tv_url)}</b> öffnen` + (konfig.ziele.shield ? ` (${esc(konfig.ziele.shield)}: <b>${esc(konfig.tv_url)}/s</b>)` : "");
   } catch (e) { document.body.classList.remove("modus-laden"); }
