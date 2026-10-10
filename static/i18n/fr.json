@@ -596,7 +596,10 @@
   "Wetter und Termine (Standard)": "Météo et rendez-vous (par défaut)",
   "Gelten für Rahmen, die unter ⚙ keinen eigenen Ort bzw. Kalender-Link haben. Die Anordnung, den Wetter-Ort, den Kalender-Link und die Handys stellst du für jeden Rahmen einzeln unter ⚙ ein. Für das Wetter wird nur der Ortsname an open-meteo.com geschickt.": "S'appliquent aux cadres sans lieu ni lien de calendrier propre sous ⚙. La disposition, le lieu de la météo, le lien et les téléphones se règlent pour chaque cadre sous ⚙. Pour la météo, seul le nom du lieu est envoyé à open-meteo.com.",
   "In der iPhone-App unter „App-Einstellungen“ → „Meine Termine auf dem Rahmen zeigen“ gibt jede Person ihre Termine frei. Hier siehst du, wer das tut, und kannst ein Handy entfernen. Auf welchem Rahmen die Termine eines Handys erscheinen, legst du beim Rahmen unter ⚙ fest (neue Handys erscheinen zunächst auf keinem).": "Dans l'app iPhone, sous « Réglages de l'app » → « Afficher mes rendez-vous sur le cadre », chaque personne partage ses rendez-vous. Ici tu vois qui le fait et peux retirer un téléphone. Sur quel cadre apparaissent les rendez-vous d'un téléphone se règle au cadre sous ⚙ (les nouveaux téléphones n'apparaissent d'abord sur aucun cadre).",
-  "Uhrzeit der Aufnahme mitanzeigen": "Afficher aussi l'heure de la photo"
+  "Uhrzeit der Aufnahme mitanzeigen": "Afficher aussi l'heure de la photo",
+  "Datumsformat": "Format de la date",
+  "Datum ausgeschrieben (4. Dezember 2025)": "Date en toutes lettres (4 décembre 2025)",
+  "Datum kurz (04.12.2025)": "Date courte (04/12/2025)"
  },
  "muster": [
   [

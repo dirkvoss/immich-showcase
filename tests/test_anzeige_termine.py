@@ -324,3 +324,14 @@ def test_update_uebernimmt_bekannte_handys_fuer_bestehende_rahmen(app_laden):
     w.TELEFON["cccccccc-0003"] = {"name": "Neu", "aktualisiert": "2026-10-10T09:00:00", "termine": []}
     w.handys_freigaben_migrieren()                                                                        # zweiter Lauf aendert nichts
     assert w.GERAETE["flur"]["termin_quellen"] == [QUELLE]
+
+
+def test_datumsformat_des_aufnahmedatums():
+    assert ANZ.zusammen()["fotodatum"]["format"] == "lang"
+    assert ANZ.pruefen({"fotodatum": {"format": "kurz"}}) == {"fotodatum": {"format": "kurz"}}
+    assert ANZ.pruefen({"uhr": {"format": "kurz"}}) == {}                                    # nur beim Foto-Datum
+    try:
+        ANZ.pruefen({"fotodatum": {"format": "komisch"}})
+        raise AssertionError("nicht abgelehnt")
+    except ValueError:
+        pass

@@ -596,7 +596,10 @@
   "Wetter und Termine (Standard)": "Weer en afspraken (standaard)",
   "Gelten für Rahmen, die unter ⚙ keinen eigenen Ort bzw. Kalender-Link haben. Die Anordnung, den Wetter-Ort, den Kalender-Link und die Handys stellst du für jeden Rahmen einzeln unter ⚙ ein. Für das Wetter wird nur der Ortsname an open-meteo.com geschickt.": "Gelden voor lijsten die onder ⚙ geen eigen plaats of agendalink hebben. De indeling, weerlocatie, agendalink en telefoons stel je per lijst onder ⚙ in. Voor het weer wordt alleen de plaatsnaam naar open-meteo.com gestuurd.",
   "In der iPhone-App unter „App-Einstellungen“ → „Meine Termine auf dem Rahmen zeigen“ gibt jede Person ihre Termine frei. Hier siehst du, wer das tut, und kannst ein Handy entfernen. Auf welchem Rahmen die Termine eines Handys erscheinen, legst du beim Rahmen unter ⚙ fest (neue Handys erscheinen zunächst auf keinem).": "In de iPhone-app onder “App-instellingen” → “Mijn afspraken op de lijst tonen” deelt iedereen zijn afspraken. Hier zie je wie dat doet en kun je een telefoon verwijderen. Op welke lijst de afspraken van een telefoon verschijnen, stel je bij de lijst onder ⚙ in (nieuwe telefoons verschijnen eerst op geen enkele lijst).",
-  "Uhrzeit der Aufnahme mitanzeigen": "Ook de tijd van de foto tonen"
+  "Uhrzeit der Aufnahme mitanzeigen": "Ook de tijd van de foto tonen",
+  "Datumsformat": "Datumnotatie",
+  "Datum ausgeschrieben (4. Dezember 2025)": "Datum voluit (4 december 2025)",
+  "Datum kurz (04.12.2025)": "Datum kort (04-12-2025)"
  },
  "muster": [
   [

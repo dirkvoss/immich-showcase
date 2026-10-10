@@ -1,7 +1,7 @@
 """Einblendungen am Rahmen: Uhrzeit, Datum, Foto-Datum, Foto-Ort, Wetter, Termine - jedes einzeln ein-/ausschaltbar, frei positionierbar und skalierbar.
 
 Ein Element hat: an (sichtbar), farbe (#rrggbb, leer = Standard), schrift (serif/sans/mono, leer = Standard), x/y (0-100, Prozent der Flaeche; 0/0 = oben links, 100/100 = unten rechts, das Element liegt dabei immer
-innerhalb des Bildschirms), gr (Groesse in Prozent) bei "fotodatum" zeit (Aufnahmezeit zusaetzlich zeigen) und bei "termine" person (Kuerzel der Person davor).
+innerhalb des Bildschirms), gr (Groesse in Prozent) bei "fotodatum" zeit (Aufnahmezeit zusaetzlich zeigen) und format (lang/kurz) und bei "termine" person (Kuerzel der Person davor).
 Die Werte setzen sich schichtweise zusammen: Standard <- alte Einstellung "anzeige" (allgemein, dann am Geraet) <- allgemeines Layout <- Layout des Geraets.
 """
 import re
@@ -10,7 +10,7 @@ ELEMENTE = ("uhr", "heute", "fotodatum", "fotoort", "wetter", "termine", "geburt
 STANDARD = {
     "uhr": {"an": True, "x": 0, "y": 100, "gr": 100, "farbe": "", "schrift": ""},
     "heute": {"an": False, "x": 0, "y": 90, "gr": 100, "farbe": "", "schrift": ""},
-    "fotodatum": {"an": False, "x": 100, "y": 100, "gr": 100, "farbe": "", "schrift": "", "zeit": False},
+    "fotodatum": {"an": False, "x": 100, "y": 100, "gr": 100, "farbe": "", "schrift": "", "zeit": False, "format": "lang"},
     "fotoort": {"an": False, "x": 100, "y": 92, "gr": 100, "farbe": "", "schrift": ""},
     "wetter": {"an": True, "x": 100, "y": 0, "gr": 100, "farbe": "", "schrift": ""},
     "termine": {"an": True, "x": 100, "y": 14, "gr": 100, "farbe": "", "schrift": "", "person": True},
@@ -19,7 +19,8 @@ STANDARD = {
 }
 GR_MIN, GR_MAX = 40, 300
 SCHRIFTEN = ("", "serif", "sans", "mono")                 # "" = Standard des Elements
-NUR_BEI = {"zeit": "fotodatum", "person": "termine"}      # Ein-/Aus-Felder, die nur bestimmte Elemente haben
+NUR_BEI = {"zeit": "fotodatum", "person": "termine", "format": "fotodatum"}      # Felder, die nur bestimmte Elemente haben
+DATUMSFORMATE = ("lang", "kurz")                          # lang: 4. Dezember 2025, kurz: 04.12.2025
 
 
 def aus_anzeige(anzeige):
@@ -57,6 +58,10 @@ def pruefen(daten):
             if not isinstance(w["farbe"], str) or not re.fullmatch(r"|#[0-9a-fA-F]{6}", w["farbe"]):
                 raise ValueError(f"{name}: Farbe bitte als #rrggbb angeben")
             e["farbe"] = w["farbe"].lower()
+        if "format" in w and NUR_BEI["format"] == name:
+            if w["format"] not in DATUMSFORMATE:
+                raise ValueError(f"{name}: unbekanntes Datumsformat")
+            e["format"] = w["format"]
         if "schrift" in w:
             if w["schrift"] not in SCHRIFTEN:
                 raise ValueError(f"{name}: unbekannte Schrift")

@@ -288,7 +288,7 @@ body.zuschnitt .bild { object-fit: cover; }
       if (st !== 200 || !d) { fotoTexteLeeren(); return; }
       var dt = d.datum ? new Date(d.datum + "T12:00:00") : null, datum = "", ort = lay.fotoort.an ? (d.ort || "") : "";
       if (lay.fotodatum.an) {
-        if (dt && !isNaN(dt.getTime())) { try { datum = dt.toLocaleDateString(window.RW_LOCALE || "de-DE", { day: "numeric", month: "long", year: "numeric" }); } catch (e) { datum = d.datum; } }
+        if (dt && !isNaN(dt.getTime())) { try { datum = dt.toLocaleDateString(window.RW_LOCALE || "de-DE", lay.fotodatum.format === "kurz" ? { day: "2-digit", month: "2-digit", year: "numeric" } : { day: "numeric", month: "long", year: "numeric" }); } catch (e) { datum = d.datum; } }
         if (lay.fotodatum.zeit && d.zeit) datum = datum ? datum + " \u00b7 " + d.zeit : d.zeit;
       }
       EL.fotodatum.textContent = datum; EL.fotodatum.className = "el" + (datum ? " an" : "");

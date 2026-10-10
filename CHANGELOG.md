@@ -1,6 +1,10 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.19.3]
+### Neu
+- **Datumsformat beim Foto-Aufnahmedatum:** Auswahl zwischen **ausgeschrieben** („4. Dezember 2025“) und **kurz** („04.12.2025“), je Rahmen im Editor („Datumsformat“ beim Element „Foto: Aufnahmedatum“). Standard bleibt ausgeschrieben.
+
 ## [2.19.2]
 ### Geändert
 - Beim Element „Foto: Aufnahmedatum“ steht der Schalter **„Uhrzeit der Aufnahme mitanzeigen“** jetzt als eigene, gut sichtbare Zeile direkt unter dem Titel (vorher klein und grau darunter). Die Vorschau zeigt sofort „… · 14:30“.

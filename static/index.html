@@ -264,6 +264,7 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
 .led-zeile .led-zusatz label { display: flex; align-items: center; gap: 6px; }
 .led-zeile .led-schalter { flex: 1 1 100%; display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; padding: 4px 0; }
 .led-zeile .led-schalter input { width: 20px; height: 20px; accent-color: var(--accent); }
+.led-zeile .led-schalter select { flex: 1; min-width: 0; font-weight: 400; }
 .led-zeile input[type=color] { width: 36px; height: 30px; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: transparent; }
 .led-chip.titel { background: rgba(0,0,0,.55); padding: .1em .45em; border-radius: 6px; }
 .led-aus .led-zeile select, .led-aus .led-zeile input[type=range] { opacity: .45; }
@@ -1954,7 +1955,7 @@ function ledBeispiel(n, w) {
   switch (n) {
     case "uhr": return uhr;
     case "heute": return fmt(jetzt, { weekday: "long", day: "numeric", month: "long" });
-    case "fotodatum": return fmt(new Date(2025, 11, 4), { day: "numeric", month: "long", year: "numeric" }) + (w.zeit ? " · 14:30" : "");
+    case "fotodatum": return fmt(new Date(2025, 11, 4), w.format === "kurz" ? { day: "2-digit", month: "2-digit", year: "numeric" } : { day: "numeric", month: "long", year: "numeric" }) + (w.zeit ? " · 14:30" : "");
     case "fotoort": return RW_T("Rom, Italien");
     case "wetter": return "☀️ 14°";
     case "geburtstag": return "🎂 " + RW_T("Omas Geburtstag");
@@ -1982,6 +1983,7 @@ function layoutEditor(mount, start, standard) {
     z.an.checked = !!v.an; z.gr.value = v.gr; z.lage.value = lage(v); z.zeile.classList.toggle("led-aus", !v.an);
     z.farbe.value = v.farbe || "#ffffff"; z.schrift.value = v.schrift || ""; z.farbeWeg.style.visibility = v.farbe ? "visible" : "hidden";
     if (z.zeit) z.zeit.checked = !!v.zeit;
+    if (z.format) z.format.value = v.format === "kurz" ? "kurz" : "lang";
     if (z.person) z.person.checked = v.person !== false;
   }
   const alle = () => LED_ELEMENTE.forEach(e => zeichne(e[0]));
@@ -2009,6 +2011,10 @@ function layoutEditor(mount, start, standard) {
     }
     if (n === "fotodatum") {
       const zl = document.createElement("label"); zl.className = "led-schalter"; const zc = document.createElement("input"); zc.type = "checkbox"; zl.append(zc, document.createTextNode(RW_T("Uhrzeit der Aufnahme mitanzeigen"))); zeile.insertBefore(zl, extra); z.zeit = zc;
+      const fz = document.createElement("label"); fz.className = "led-schalter"; const fs = document.createElement("select"); fs.setAttribute("aria-label", RW_T("Datumsformat"));
+      for (const [k, t] of [["lang", "Datum ausgeschrieben (4. Dezember 2025)"], ["kurz", "Datum kurz (04.12.2025)"]]) { const o = document.createElement("option"); o.value = k; o.textContent = RW_T(t); fs.append(o); }
+      fz.append(document.createTextNode(RW_T("Datumsformat") + " "), fs); zeile.insertBefore(fz, extra); z.format = fs;
+      fs.addEventListener("change", () => { w[n].format = fs.value; zeichne(n); });
       zc.addEventListener("change", () => { w[n].zeit = zc.checked; zeichne(n); });
     }
     liste.append(zeile);
