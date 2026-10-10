@@ -1,4 +1,4 @@
-# Immich Showcase – komplette Installation per Docker Compose.
+# Frameside – komplette Installation per Docker Compose.
 #
 #   1.  cp .env.example .env      und mindestens RAHMEN_IMMICH_URL + RAHMEN_IMMICH_KEY eintragen
 #   2.  docker compose up -d
@@ -12,7 +12,7 @@ name: showcase
 
 services:
   showcase:
-    image: ghcr.io/dirkvoss/immich-showcase:${SHOWCASE_VERSION:-latest}
+    image: ghcr.io/dirkvoss/frameside:${SHOWCASE_VERSION:-latest}
     container_name: ${SHOWCASE_CONTAINER:-showcase}
     restart: unless-stopped
     labels:

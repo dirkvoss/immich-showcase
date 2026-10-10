@@ -16,9 +16,9 @@ def test_nur_echte_lan_adressen():
 
 
 def test_sauberer_name():
-    assert bonjour.sauberer_name("Immich Showcase (Entwicklung)") == "Immich Showcase (Entwicklung)"
+    assert bonjour.sauberer_name("Frameside (Entwicklung)") == "Frameside (Entwicklung)"
     assert bonjour.sauberer_name("a.b\nc") == "a b c"
-    assert bonjour.sauberer_name("") == "Immich Showcase"
+    assert bonjour.sauberer_name("") == "Frameside"
     assert len(bonjour.sauberer_name("x" * 200)) == 60
 
 

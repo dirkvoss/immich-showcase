@@ -1,5 +1,5 @@
 FROM python:3.13-slim
-LABEL org.opencontainers.image.source="https://github.com/dirkvoss/immich-showcase" org.opencontainers.image.licenses="AGPL-3.0-or-later" org.opencontainers.image.title="Immich Showcase"
+LABEL org.opencontainers.image.source="https://github.com/dirkvoss/frameside" org.opencontainers.image.licenses="AGPL-3.0-or-later" org.opencontainers.image.title="Frameside"
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 RAHMEN_HELFER_DIR=/app \
     RAHMEN_WEB_PIN_FILE=/data/pin RAHMEN_WEB_SECRET_FILE=/data/secret RAHMEN_WEB_AUTH_STATE=/data/auth.json \
     RAHMEN_WEB_SHOWS_FILE=/data/shows.json RAHMEN_WEB_BENUTZER_FILE=/data/benutzer.json RAHMEN_WEB_PUSHOVER_FILE=/data/pushover \

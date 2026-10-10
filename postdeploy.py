@@ -68,7 +68,7 @@ def pruefungen(p, version=None, mit_immich=True):
     p.pruefe("Anmeldestatus", st == 200 and isinstance(me, dict) and "angemeldet" in me and me.get("auth") in ("pin", "immich", "beide"), f"Anmeldung: {me.get('auth')}" if me else "", f"HTTP {st}")
 
     # --- Oberflaeche und Dateien
-    for pfad, merkmal in (("/", b"Immich Showcase"), ("/tv/", b"Immich Showcase"), ("/i18n.js", b"RW_LANG"), ("/sw.js", b"fetch"), ("/manifest.webmanifest", b"icons")):
+    for pfad, merkmal in (("/", b"Frameside"), ("/tv/", b"Frameside"), ("/i18n.js", b"RW_LANG"), ("/sw.js", b"fetch"), ("/manifest.webmanifest", b"icons")):
         st, _, body = p.hole(pfad, mit_token=False)
         p.pruefe(f"Datei {pfad}", st == 200 and merkmal in body, "", f"HTTP {st}")
     st, en = p.json("/i18n/en.json", mit_token=False)

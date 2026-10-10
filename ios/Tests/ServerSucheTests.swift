@@ -16,7 +16,7 @@ final class ServerSucheTests: XCTestCase {
     }
 
     func testShowcaseErkennung() {
-        XCTAssertEqual(ServerSuche.showcaseName(Data(#"{"name":"Immich Showcase","version":"2.14.3","modus":"beides"}"#.utf8)), "Immich Showcase")
+        XCTAssertEqual(ServerSuche.showcaseName(Data(#"{"name":"Frameside","version":"2.14.3","modus":"beides"}"#.utf8)), "Frameside")
         XCTAssertNil(ServerSuche.showcaseName(Data(#"{"name":"Fremdgeraet"}"#.utf8)))
         XCTAssertNil(ServerSuche.showcaseName(Data("<html>".utf8)))
     }

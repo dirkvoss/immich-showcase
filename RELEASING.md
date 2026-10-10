@@ -17,7 +17,7 @@
 Weitere Aufrufe: `deploy.sh --rollback` (zurück zur vorherigen Version), `deploy.sh --status`.
 
 ## Einmalige Einrichtung auf dem Server
-- `docker-compose.yml` nach `docker-compose.example.yml`, mit `image: ghcr.io/<konto>/immich-showcase:${SHOWCASE_VERSION}`.
+- `docker-compose.yml` nach `docker-compose.example.yml`, mit `image: ghcr.io/<konto>/frameside:${SHOWCASE_VERSION}`.
 - Heißt der Dienst in deiner Compose-Datei nicht `showcase`: in `deploy.conf` `SHOWCASE_SERVICE=<name>` setzen.
 - Ist das Repository (und damit das Image) privat: einmal anmelden – Token mit dem Recht *read:packages*, **nicht** im Chat oder in Dateien im Repository ablegen:
   ```
@@ -36,4 +36,4 @@ Der Selbsttest-Zugang von `postdeploy.py` gilt nur von der Loopback-Adresse im C
 `pip install -r requirements-dev.txt && python -m pytest`. Sie prüfen die Suchsprache (de/en), die Übersetzungsdatei, Zugang/PIN/Sperre, Filter, Fernseher, den Rahmen-Player, die Betriebsarten und das Deploy-Skript selbst (mit vorgetäuschtem Docker) – ohne Netzwerk und ohne echtes Immich.
 
 ## Entwicklungsinstanz
-`dev/`: ein eigenes Test-Immich (`dev/seed_immich.py` füllt es mit erfundenen Fotos, Personen und zwei Konten) plus Immich Showcase aus dem Arbeitsverzeichnis (`dev/docker-compose.dev.yml`). `DEV_EXEC="ssh root@dev-rechner" dev/push.sh` überträgt den Stand und baut neu. Echte Fotos gehören nicht auf die Entwicklungsinstanz.
+`dev/`: ein eigenes Test-Immich (`dev/seed_immich.py` füllt es mit erfundenen Fotos, Personen und zwei Konten) plus Frameside aus dem Arbeitsverzeichnis (`dev/docker-compose.dev.yml`). `DEV_EXEC="ssh root@dev-rechner" dev/push.sh` überträgt den Stand und baut neu. Echte Fotos gehören nicht auf die Entwicklungsinstanz.

@@ -12,12 +12,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Immich Showcase">
+<meta name="apple-mobile-web-app-title" content="Frameside">
 <meta name="format-detection" content="telephone=no">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
-<title>Immich Showcase</title>
+<title>Frameside</title>
 <style>
 @font-face { font-family: "Cormorant Garamond"; font-weight: 600; font-style: normal; font-display: swap; src: url(/fonts/cormorant-600.woff2) format("woff2"); }
 :root {
@@ -84,7 +84,7 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bo
 #undoKopf .undo-text { display: none; font-size: 14px; }
 @media (min-width: 520px) { #undoKopf .undo-text { display: inline; } }
 .kopf h1 { min-width: 0; }
-.kopf-name { overflow: hidden; overflow-wrap: anywhere; line-height: 1.02; }          /* langer Name (Immich Showcase) bricht um statt abgeschnitten zu werden */
+.kopf-name { overflow: hidden; overflow-wrap: anywhere; line-height: 1.02; }          /* langer Name (Frameside) bricht um statt abgeschnitten zu werden */
 @media (max-width: 520px) { .kopf h1 { font-size: 28px; } }
 .kopf-home { display: flex; align-items: center; gap: 10px; padding: 0; margin: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; min-height: 60px; border-radius: 12px; }
 .kopf-home:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
@@ -510,7 +510,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
 
 <div id="loginAnsicht" class="login versteckt">
   <img class="login-logo" src="/icon-512.png" alt="">
-  <h1>Immich Showcase</h1>
+  <h1>Frameside</h1>
   <p class="untertitel">Dein Blick in die Fotos</p>
   <form id="immichForm" class="versteckt">
     <p class="tipp" style="margin:0 0 6px">Melde dich mit deinem Immich-Konto an – dieselbe E-Mail und dasselbe Passwort wie in Immich.</p>
@@ -538,7 +538,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
 <div id="appAnsicht" class="versteckt">
   <header>
     <div class="kopf">
-      <h1><button type="button" class="kopf-home" id="kopfHome" aria-label="Immich Showcase – zur Startseite"><span class="logo" id="logo" aria-hidden="true"><img alt="" src="/icon-192.png"></span><span class="kopf-name">Immich Showcase</span></button></h1>
+      <h1><button type="button" class="kopf-home" id="kopfHome" aria-label="Frameside – zur Startseite"><span class="logo" id="logo" aria-hidden="true"><img alt="" src="/icon-192.png"></span><span class="kopf-name">Frameside</span></button></h1>
       <button class="btn klein versteckt" id="undoKopf" title="Letzte Änderung an der Auswahl rückgängig machen" aria-label="Rückgängig"><span aria-hidden="true">↶</span><span class="undo-text"> Rückgängig</span></button>
       <div class="benutzer" id="benutzer"><button type="button" id="hochladenBtn" class="ik versteckt" aria-label="Eigene Fotos senden" title="Fotos von diesem Gerät auswählen und auf den Rahmen schicken"><span aria-hidden="true">📤</span><span class="ik-text">Meine Fotos</span></button><input type="file" id="hochladenDatei" accept="image/jpeg,image/png,image/webp" multiple hidden><button type="button" id="geraeteBtn" class="ik" aria-label="Geräte" title="Geräte"><span aria-hidden="true">📡</span><span class="ik-text">Geräte</span></button><button type="button" id="hilfeBtn" class="ik" aria-label="Hilfe" title="Hilfe"><span aria-hidden="true">❓</span><span class="ik-text">Hilfe</span></button><details class="konto" id="konto"><summary aria-label="Konto" title="Konto"><svg class="ic" aria-hidden="true"><use href="#i-konto"/></svg></summary><div class="konto-menu"><button type="button" id="gesundBtn">✅ Alles in Ordnung?</button><button type="button" id="einstBtn">⚙ Einstellungen</button><button type="button" id="appEinstBtn" class="versteckt">📱 App-Einstellungen</button><span id="benutzerName" class="versteckt"></span><button type="button" id="abmelden" class="versteckt">Abmelden</button><span class="versionskurz" data-version-kurz></span></div></details></div>
       <div class="laeuft nur-rahmen" id="laeuft" aria-live="polite">
@@ -676,7 +676,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
       <div id="eAliase"></div>
       <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="eAliasNeu" type="button">＋ Spitzname</button></div>
       <h3>iPhone-App verbinden</h3>
-      <p class="tipp">In der App „Showcase Immich“ den QR-Code scannen – sie trägt die Adresse dieses Servers selbst ein.</p>
+      <p class="tipp">In der App „Frameside“ den QR-Code scannen – sie trägt die Adresse dieses Servers selbst ein.</p>
       <div id="eAppQr" style="width:180px;max-width:60%;margin:6px auto;background:#fff;padding:10px;border-radius:12px"></div>
       <p class="tipp" id="eAppAdresse" style="text-align:center"></p>
       <h3>Adresse der Fernseher-Seite</h3>
@@ -689,12 +689,20 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
 <div id="assiDialog" class="tvdialog versteckt" role="dialog" aria-modal="true" aria-labelledby="assiTitel">
   <div class="tvkarte">
     <h2 id="assiTitel">Gerät hinzufügen</h2>
+    <div id="assiFinden" class="gf">
+      <p class="tipp">Öffne am Fernseher oder Tablet im Browser diese Adresse. Das Gerät erscheint dann hier von selbst:</p>
+      <div class="assi-adr"><code id="assiFindAdresse"></code></div>
+      <div id="assiWartend"></div>
+      <p class="assi-status" id="assiFindStatus">Suche nach Geräten …</p>
+    </div>
+    <details class="gfdetails" id="assiHandarbeit"><summary>Gerät von Hand hinzufügen</summary>
     <div id="assiSchritt1" class="gf">
-      <div class="tvfeld"><span>Art</span>
-        <select id="assiArt" aria-label="Art"><option value="rahmen">Bilderrahmen</option><option value="tv">Fernseher</option></select></div>
+      <p class="tipp">Was für ein Gerät ist das? Davon hängt ab, welche Einstellungen es bekommt.</p>
+      <div class="tvfeld stapel"><span>Art</span>
+        <select id="assiArt" aria-label="Art"><option value="tv">Fernseher (Smart-TV oder TV-Stick mit Browser)</option><option value="rahmen">Bilderrahmen (Tablet, Raspberry Pi oder Bildschirm mit Dauerprogramm)</option></select></div>
       <label class="tvfeld"><span>Name</span> <input id="assiName" type="text" maxlength="60" autocomplete="off" aria-label="Name" placeholder="Flur"></label>
       <div class="tvknoepfe"><button class="btn" id="assiAbbrechen" type="button">Abbrechen</button><button class="btn primaer" id="assiWeiter" type="button">Weiter</button></div>
-    </div>
+    </div></details>
     <div id="assiSchritt2" class="versteckt" style="display:flex;flex-direction:column">
       <div id="assiTvTeil" class="versteckt" style="order:0">
         <p class="tipp">Gib im Browser des Fernsehers diese kurze Adresse ein:</p>
@@ -735,8 +743,8 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
   <div class="tvkarte">
     <h2 id="geraetTitel">Gerät einstellen</h2>
     <div class="gf">
-      <div class="tvfeld versteckt" id="gfArtZeile"><span>Art</span>
-        <select id="gfArt" aria-label="Art"><option value="rahmen">Bilderrahmen</option><option value="tv">Fernseher</option></select></div>
+      <div class="tvfeld stapel" id="gfArtZeile"><span>Art (falsch angelegt? hier ändern)</span>
+        <select id="gfArt" aria-label="Art"><option value="tv">Fernseher (Smart-TV oder TV-Stick mit Browser)</option><option value="rahmen">Bilderrahmen (Tablet, Raspberry Pi oder Bildschirm mit Dauerprogramm)</option></select></div>
       <details class="gfdetails versteckt" id="gfDirekt">
         <summary>Für Fortgeschrittene: per ADB direkt am Fernseher öffnen</summary>
         <label class="tvfeld"><span>Adresse des Fernsehers</span> <input id="gfAdb" type="text" autocomplete="off" aria-label="Adresse des Fernsehers" placeholder="192.168.1.30"></label>
@@ -749,7 +757,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
       <label class="tvfeld"><span>Hintergrund</span> <select id="gfFuellung" aria-label="Hintergrund"><option value="">Standard</option><option value="unscharf">Unscharf</option><option value="zuschnitt">Zuschnitt</option><option value="balken">Schwarze Balken</option></select></label>
       <div class="nur-gf-rahmen">
         <div class="gf">
-          <label class="tvfeld"><span>Sekunden pro Foto</span> <input id="gfSek" type="number" min="3" max="120" inputmode="numeric" aria-label="Sekunden pro Foto"></label>
+          <label class="tvfeld nur-gf-dauer"><span>Sekunden pro Foto</span> <input id="gfSek" type="number" min="3" max="120" inputmode="numeric" aria-label="Sekunden pro Foto"></label>
           <div id="gfNotizBlock" class="versteckt">
             <h3>Notiz an diesen Rahmen</h3>
             <p class="tipp">Ein kurzer Text, der für eine Weile am Rahmen erscheint, zum Beispiel „Heute Abend Pizza“.</p>
@@ -778,9 +786,9 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
           <p class="tipp">Was eingeblendet wird und wo. Jeder Rahmen hat seine eigene Anordnung.</p>
           <label class="tvfeld"><span>Sanfter Zoom bei jedem Foto</span> <input type="checkbox" id="gfBewegung" style="flex:none"></label>
           <label class="tvfeld"><span>Zwei Hochkant-Fotos nebeneinander</span> <input type="checkbox" id="gfPaare" style="flex:none"></label>
-          <label class="tvfeld"><span>Erinnerungen („An diesem Tag“) im Dauerprogramm</span> <select id="gfErinnerungen" aria-label="Erinnerungen"><option value="">Aus</option><option value="selten">Selten</option><option value="oft">Öfter</option><option value="sehr">Oft</option></select></label>
-          <label class="tvfeld"><span>Favoriten (⭐ in Immich) öfter zeigen</span> <select id="gfFavoriten" aria-label="Favoriten"><option value="">Aus</option><option value="selten">Selten</option><option value="oft">Öfter</option><option value="sehr">Oft</option></select></label>
-          <label class="tvfeld"><span>Am Geburtstag Fotos der Person zeigen</span> <input type="checkbox" id="gfGeburtstagsfotos" style="flex:none"></label>
+          <label class="tvfeld nur-gf-dauer"><span>Erinnerungen („An diesem Tag“) im Dauerprogramm</span> <select id="gfErinnerungen" aria-label="Erinnerungen"><option value="">Aus</option><option value="selten">Selten</option><option value="oft">Öfter</option><option value="sehr">Oft</option></select></label>
+          <label class="tvfeld nur-gf-dauer"><span>Favoriten (⭐ in Immich) öfter zeigen</span> <select id="gfFavoriten" aria-label="Favoriten"><option value="">Aus</option><option value="selten">Selten</option><option value="oft">Öfter</option><option value="sehr">Oft</option></select></label>
+          <label class="tvfeld nur-gf-dauer"><span>Am Geburtstag Fotos der Person zeigen</span> <input type="checkbox" id="gfGeburtstagsfotos" style="flex:none"></label>
           <div id="gfLayout"></div>
           <label class="tvfeld versteckt" id="gfUebernehmenZeile"><span>Anordnung übernehmen von</span> <select id="gfUebernehmen" aria-label="Anordnung übernehmen von"><option value="">–</option></select></label>
           <h3>Wetter und Termine auf diesem Rahmen</h3>
@@ -794,7 +802,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
           <div class="tvknoepfe versteckt" id="gfKalWegZeile" style="justify-content:flex-start;margin-top:0"><button class="btn klein gefahr" id="gfKalWeg" type="button">Kalender-Link dieses Rahmens entfernen</button></div>
           <label class="tvfeld"><span>Nachtruhe nach Sonnenstand (Sonnenuntergang bis -aufgang, braucht den Wetter-Ort)</span> <input type="checkbox" id="gfNachtSonne" style="flex:none"></label>
           <div class="tvfeld" id="gfNachtZeiten"><span>Nachtruhe (Bildschirm aus)</span><span class="reihe"><input id="gfNachtVon" type="time" aria-label="von"> – <input id="gfNachtBis" type="time" aria-label="bis"></span></div>
-          <h3>Dauerprogramm</h3>
+          <div class="nur-gf-dauer"><h3>Dauerprogramm</h3>
           <p class="tipp">Was der Rahmen zeigt, wenn niemand etwas schickt. Ohne Eintrag gilt die allgemeine Einstellung der Installation.</p>
           <div id="gfQuellen"></div>
           <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfQuelleNeu" type="button">＋ Quelle</button></div>
@@ -802,10 +810,11 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
           <p class="tipp">Zu bestimmten Tagen und Uhrzeiten zeigt der Rahmen andere Quellen als das Dauerprogramm oben.</p>
           <div id="gfPlan"></div>
           <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="gfPlanNeu" type="button">＋ Zeitfenster</button></div>
+          </div>
           <details id="gfWartung" class="gfdetails versteckt">
             <summary>Wartung und Zugang von außen</summary>
-            <label class="tvfeld"><span>Meldung aufs Handy, wenn der Rahmen länger nicht erreichbar ist (Minuten, 0 = nie)</span> <input id="gfAlarm" type="number" min="0" max="1440" inputmode="numeric" aria-label="Meldung nach Minuten"></label>
-            <p class="tipp">Leer lassen = allgemeine Einstellung. Für einen Rahmen an einem anderen Ort ist ein größerer Wert sinnvoll, damit kurze Störungen nicht gleich melden.</p>
+            <label class="tvfeld nur-gf-dauer"><span>Meldung aufs Handy, wenn der Rahmen länger nicht erreichbar ist (Minuten, 0 = nie)</span> <input id="gfAlarm" type="number" min="0" max="1440" inputmode="numeric" aria-label="Meldung nach Minuten"></label>
+            <p class="tipp nur-gf-dauer">Leer lassen = allgemeine Einstellung. Für einen Rahmen an einem anderen Ort ist ein größerer Wert sinnvoll, damit kurze Störungen nicht gleich melden.</p>
             <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0;flex-wrap:wrap">
               <button class="btn klein" id="gfNeuladen" type="button">↻ Seite neu laden</button>
               <button class="btn klein" id="gfNeustart" type="button">⟳ Anzeige neu starten (Fully)</button>
@@ -814,7 +823,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
             <p class="tipp">Steht der Rahmen außerhalb deines Heimnetzes, bekommt er beim Koppeln (Code am Rahmen, in der App unter „Gerät koppeln“) einen eigenen Zugang, der nur die Rahmen-Seiten öffnet. „Zugang widerrufen“ sperrt ihn, ohne die PIN zu ändern; danach muss der Rahmen neu gekoppelt werden.</p>
             <p class="tipp versteckt" id="gfWartungErg" role="status"></p>
           </details>
-          <details id="gfTablet" class="gfdetails">
+          <details id="gfTablet" class="gfdetails nur-gf-dauer">
             <summary>Tablet-Steuerung (optional)</summary>
             <p class="tipp"><b>Du brauchst nichts zu installieren:</b> Der Rahmen läuft in jedem normalen Browser. Fully Kiosk ist nur ein optionales Extra (ca. 8 €), damit sich der Bildschirm nachts wirklich ausschaltet und der Akkustand gemeldet wird.</p>
             <p class="tipp">Ohne diese Steuerung läuft der Rahmen einfach rund um die Uhr; die Fotos kommen auch so an.</p>
@@ -876,10 +885,10 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
     <h3>Etwas funktioniert nicht?</h3>
     <p class="tipp">Das Support-Paket enthält Version, Einstellungen und das Protokoll – ohne Passwörter, PIN oder Schlüssel. Es hilft bei einem Fehlerbericht.</p>
     <div class="tvknoepfe" style="justify-content:flex-start"><button class="btn" id="diagnoseBtn" type="button">⬇ Support-Paket herunterladen</button></div>
-    <div class="tvknoepfe" style="justify-content:flex-start"><a class="btn" id="problemLink" target="_blank" rel="noopener" href="https://github.com/dirkvoss/immich-showcase/issues/new?template=fehler.yml">🐞 Problem melden</a><a class="btn" id="wunschLink" target="_blank" rel="noopener" href="https://github.com/dirkvoss/immich-showcase/issues/new?template=wunsch.yml">💡 Wunsch oder Idee</a></div>
+    <div class="tvknoepfe" style="justify-content:flex-start"><a class="btn" id="problemLink" target="_blank" rel="noopener" href="https://github.com/dirkvoss/frameside/issues/new?template=fehler.yml">🐞 Problem melden</a><a class="btn" id="wunschLink" target="_blank" rel="noopener" href="https://github.com/dirkvoss/frameside/issues/new?template=wunsch.yml">💡 Wunsch oder Idee</a></div>
     <p class="tipp">Die Meldung öffnet sich auf GitHub (Konto nötig). Bitte das Support-Paket oben anhängen.</p>
-    <h3>Über Immich Showcase</h3>
-    <p class="tipp"><span id="hilfeUrheber"></span> · <a href="https://github.com/dirkvoss/immich-showcase" target="_blank" rel="noopener">GitHub</a><br>Unabhängiges Projekt, nicht mit dem Immich-Projekt verbunden.</p>
+    <h3>Über Frameside</h3>
+    <p class="tipp"><span id="hilfeUrheber"></span> · <a href="https://github.com/dirkvoss/frameside" target="_blank" rel="noopener">GitHub</a><br>Unabhängiges Projekt, nicht mit dem Immich-Projekt verbunden.</p>
     <p class="tipp" id="hilfeVersion"></p>
     <div class="tvknoepfe"><button class="btn" id="hilfeZu" type="button">Schließen</button></div>
   </div>
@@ -935,6 +944,7 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
       <p id="tvInfo0" class="tvtext"></p>
       <div id="tvZiele" class="tvziele" role="radiogroup" aria-label="Fernseher"></div>
       <label class="tvfeld">Zeit pro Foto <select id="tvSek0"><option value="3">3 Sekunden</option><option value="5" selected>5 Sekunden</option><option value="8">8 Sekunden</option><option value="12">12 Sekunden</option><option value="20">20 Sekunden</option><option value="30">30 Sekunden</option></select></label>
+      <label class="tvfeld"><span>Einfache Diashow (nur Fotos, ohne Uhr, Wetter und Termine)</span> <input type="checkbox" id="tvSchlicht" style="flex:none"></label>
       <label class="tvfeld">Reihenfolge <select id="tvReihe"><option value="alt" selected>Zeitlich: ältestes zuerst</option><option value="neu">Zeitlich: neuestes zuerst</option><option value="zufall">Zufällig</option></select></label>
       <label class="tvfeld" id="tvVideoZeile">🎬 Videos höchstens <select id="tvMaxV"><option value="20">20 Sekunden</option><option value="60" selected>60 Sekunden</option><option value="180">3 Minuten</option></select></label>
       <label class="tvfeld">🎵 Hintergrundmusik <select id="tvMusik0"><option value="">Keine</option></select></label>
@@ -1043,7 +1053,7 @@ async function zeigeLogin() {
   $("#appAnsicht").classList.add("versteckt"); $("#loginAnsicht").classList.remove("versteckt"); $("#pin").value = "";
   let art = "pin"; try {
     const c = await (await fetch("/api/config", { cache: "no-store" })).json(); art = c.auth || "pin";
-    document.querySelectorAll("[data-version]").forEach(e => { e.textContent = `${c.name || "Immich Showcase"} · ${RW_T("Version")} ${c.version || ""} · ${RW_T("Entwickelt von")} Dirk Voß`; });
+    document.querySelectorAll("[data-version]").forEach(e => { e.textContent = `${c.name || "Frameside"} · ${RW_T("Version")} ${c.version || ""} · ${RW_T("Entwickelt von")} Dirk Voß`; });
   } catch (e) {}
   const mitImmich = art !== "pin", mitPin = art !== "immich";
   $("#immichForm").classList.toggle("versteckt", !mitImmich); $("#pinBlock").classList.toggle("versteckt", !mitPin);
@@ -1576,7 +1586,7 @@ $("#tvLos").addEventListener("click", async () => {
   tv.ziel = wahl.value; try { localStorage.setItem("rwTvZiel", tv.ziel); localStorage.setItem("rwTvMusik", $("#tvMusik0").value); localStorage.setItem("rwTvLaut", $("#tvLaut0").value); } catch (e) {}
   const b = $("#tvLos"); b.disabled = true;
   try {
-    const r = await api("tv/senden", { method: "POST", body: JSON.stringify({ ziel: tv.ziel, ids: tv.quelle.fotos.map(f => f.id), name: tv.quelle.name, sekunden: +$("#tvSek0").value, reihenfolge: $("#tvReihe").value, musik: $("#tvMusik0").value, laut: +$("#tvLaut0").value,
+    const r = await api("tv/senden", { method: "POST", body: JSON.stringify({ ziel: tv.ziel, ids: tv.quelle.fotos.map(f => f.id), name: tv.quelle.name, sekunden: +$("#tvSek0").value, reihenfolge: $("#tvReihe").value, schlicht: $("#tvSchlicht").checked, musik: $("#tvMusik0").value, laut: +$("#tvLaut0").value,
       videos: tv.quelle.fotos.filter(f => f.v).map(f => f.id), maxv: +$("#tvMaxV").value }) });
     $("#tvMusikFern").value = $("#tvMusik0").value; tvTitelLaden($("#tvMusik0").value);
     tv.pause = false; $("#tvPause").textContent = "⏸";
@@ -1766,7 +1776,7 @@ $("#zurueckBtn").addEventListener("click", async () => {
   b.disabled = false;
 });
 
-let konfig = { name: "Immich Showcase", tv_url: "", beispiele: [], ziele: {} };
+let konfig = { name: "Frameside", tv_url: "", beispiele: [], ziele: {} };
 const BEISPIELE_SPRACHE = { es: ["Verano 2022", "Cumpleaños", "Playa"], fr: ["Été 2022", "Anniversaire", "Plage"], nl: ["Zomer 2022", "Verjaardag", "Strand"] };
 function beispielListe() {
   if (RW_LANG === "de") return konfig.beispiele || [];
@@ -1777,7 +1787,7 @@ async function konfigLaden() {
   try {
     konfig = await (await fetch("/api/config", { cache: "no-store" })).json();
     document.body.classList.remove("modus-laden"); document.body.classList.add("modus-" + (konfig.modus || "beides"));
-    document.querySelectorAll("[data-version]").forEach(e => { e.textContent = `${konfig.name || "Immich Showcase"} · ${RW_T("Version")} ${konfig.version || ""} · ${RW_T("Entwickelt von")} Dirk Voß`; });
+    document.querySelectorAll("[data-version]").forEach(e => { e.textContent = `${konfig.name || "Frameside"} · ${RW_T("Version")} ${konfig.version || ""} · ${RW_T("Entwickelt von")} Dirk Voß`; });
     document.querySelectorAll("[data-version-kurz]").forEach(e => { e.textContent = /^\d/.test(konfig.version || "") ? "v" + konfig.version : (konfig.version || ""); });
     const bsp = beispielListe(), q = RW_LANG === "de" ? ["„", "“"] : (RW_LANG === "es" || RW_LANG === "fr") ? ["«", "»"] : ["“", "”"];
     if (bsp.length) {
@@ -1800,10 +1810,10 @@ $("#hilfeBtn").addEventListener("click", () => {
   const b = beispielListe(), q = RW_LANG === "de" ? ["„", "“"] : (RW_LANG === "es" || RW_LANG === "fr") ? ["«", "»"] : ["“", "”"];
   $("#sprache").value = RW_LANG;
   if (b.length) $("#hilfeBeispiele").textContent = RW_T("Personen, Zeit, Orte und Motive lassen sich kombinieren, z. B.") + " " + b.slice(0, 3).map(x => q[0] + x + q[1]).join(", ") + ".";
-  $("#hilfeVersion").textContent = `${konfig.name || "Immich Showcase"} ${konfig.version || ""}`;
+  $("#hilfeVersion").textContent = `${konfig.name || "Frameside"} ${konfig.version || ""}`;
   $("#hilfeUrheber").textContent = `${RW_T("Entwickelt von")} Dirk Voß`;
   window.rwHilfeOeffnen = () => $("#hilfeBtn").click();
-  $("#problemLink").href = "https://github.com/dirkvoss/immich-showcase/issues/new?template=fehler.yml&version=" + encodeURIComponent(konfig.version || "");
+  $("#problemLink").href = "https://github.com/dirkvoss/frameside/issues/new?template=fehler.yml&version=" + encodeURIComponent(konfig.version || "");
   $("#hilfeDialog").classList.remove("versteckt");
 });
 $("#sprache").addEventListener("change", e => { location.href = location.pathname + "?lang=" + e.target.value; });
@@ -1908,7 +1918,7 @@ function quellenSchreiben(box) {
   }
   return teile.join(", ");
 }
-function gfArtAnpassen() { document.querySelector(".nur-gf-rahmen").classList.toggle("versteckt", $("#gfArt").value !== "rahmen"); }
+function gfArtAnpassen() { const r = $("#gfArt").value === "rahmen"; for (const e of document.querySelectorAll(".nur-gf-dauer")) e.classList.toggle("versteckt", !r); }      // Anzeige-Einstellungen gelten fuer beide Arten, das Dauerprogramm nur fuer Rahmen
 $("#gfArt").addEventListener("change", gfArtAnpassen);
 $("#gfQuelleNeu").addEventListener("click", () => $("#gfQuellen").append(quelleZeile()));
 
@@ -2184,20 +2194,20 @@ async function geraetDialogOeffnen(id) {
   try {
     const v = await api("verwaltung");
     if (id) g = v.geraete.find(x => x.id === id) || g;
-    $("#gfSek").placeholder = String(v.standard.sek); std = v.standard.layout; gfStandard = std; handys = v.telefone || []; gfAlle = v.geraete.filter(x => x.art === "rahmen" && x.id !== id);
+    $("#gfSek").placeholder = String(v.standard.sek); std = v.standard.layout; gfStandard = std; handys = v.telefone || []; gfAlle = v.geraete.filter(x => x.id !== id);
   } catch (e) { fehler(e); return; }
   gfArt = g.art; $("#geraetTitel").textContent = RW_T(id ? "Gerät einstellen" : "Gerät hinzufügen");
-  $("#gfArtZeile").classList.toggle("versteckt", !!id); $("#gfArt").value = g.art; gfArtAnpassen();
+  $("#gfArtZeile").classList.remove("versteckt"); $("#gfArt").value = g.art; gfArtAnpassen();
   $("#gfName").value = g.name; $("#gfFuellung").value = g.fuellung || "";
-  $("#gfAlarm").value = g.alarm_min == null ? "" : g.alarm_min; $("#gfWartung").classList.toggle("versteckt", !id || g.art !== "rahmen"); $("#gfWartungErg").classList.add("versteckt");
+  $("#gfAlarm").value = g.alarm_min == null ? "" : g.alarm_min; $("#gfWartung").classList.toggle("versteckt", !id); $("#gfWartungErg").classList.add("versteckt");
   $("#gfSek").value = g.sek || ""; gfLed = layoutEditor($("#gfLayout"), g.layout || std, std);
   $("#gfBewegung").checked = !!g.bewegung; $("#gfPaare").checked = !!g.paare; $("#gfErinnerungen").value = g.erinnerungen || ""; $("#gfFavoriten").value = g.favoriten || ""; $("#gfGeburtstagsfotos").checked = g.geburtstagsfotos !== false;
-  $("#gfGaesteBlock").classList.toggle("versteckt", !id || g.art !== "rahmen" || !(konfig && konfig.hochladen));
-  if (id && g.art === "rahmen" && konfig && konfig.hochladen) { try { await gaesteZeigen(await api("gaeste/" + encodeURIComponent(id))); } catch (e) {} }
-  $("#gfGrussBlock").classList.toggle("versteckt", !id || g.art !== "rahmen"); $("#gfGrussErg").classList.add("versteckt"); $("#gfGrussText").value = ""; $("#gfGrussDatei").textContent = ""; $("#gfGrussDateiWahl").value = "";
+  $("#gfGaesteBlock").classList.toggle("versteckt", !id || !(konfig && konfig.hochladen));
+  if (id && konfig && konfig.hochladen) { try { await gaesteZeigen(await api("gaeste/" + encodeURIComponent(id))); } catch (e) {} }
+  $("#gfGrussBlock").classList.toggle("versteckt", !id); $("#gfGrussErg").classList.add("versteckt"); $("#gfGrussText").value = ""; $("#gfGrussDatei").textContent = ""; $("#gfGrussDateiWahl").value = "";
   try { $("#gfGrussVon").value = localStorage.getItem("rwAbsender") || ""; } catch (x) {}
-  $("#gfNotizBlock").classList.toggle("versteckt", !id || g.art !== "rahmen"); $("#gfNotiz").value = ""; $("#gfNotizErg").classList.add("versteckt");
-  if (id && g.art === "rahmen") { try { const n = await api("notizen/" + encodeURIComponent(id)); $("#gfNotiz").value = n.text || ""; } catch (e) {} }
+  $("#gfNotizBlock").classList.toggle("versteckt", !id); $("#gfNotiz").value = ""; $("#gfNotizErg").classList.add("versteckt");
+  if (id) { try { const n = await api("notizen/" + encodeURIComponent(id)); $("#gfNotiz").value = n.text || ""; } catch (e) {} }
   gfWetter = g.wetter || null; gfOrtZeigen(); $("#gfOrtSuche").value = ""; $("#gfOrtTreffer").innerHTML = "";
   $("#gfKal").value = ""; gfKalLoeschen = false; $("#gfKal").placeholder = g.kalender_gesetzt ? RW_T("gesetzt – zum Ändern neuen Link einfügen") : "https://…"; $("#gfKalWegZeile").classList.toggle("versteckt", !g.kalender_gesetzt);
   const sel = $("#gfUebernehmen"); sel.innerHTML = ""; const o0 = document.createElement("option"); o0.value = ""; o0.textContent = "–"; sel.append(o0);
@@ -2327,27 +2337,61 @@ function assiLink() {
   $("#assiLocalhost").classList.toggle("versteckt", !/^(localhost|127\.|\[?::1\]?$|0\.0\.0\.0)/.test(host));
   $("#assiBasisZeile").classList.toggle("versteckt", basis === tvBasis() && !!konfig.tv_url);
 }
-function assiVerbinden(id, art) {
+function assiVerbinden(id, art, fertig) {
   assiId = id; const istTv = art === "tv";
   $("#assiTvTeil").classList.toggle("versteckt", !istTv); $("#assiLinkTeil").open = !istTv;
   $("#assiTvTeil").style.order = "0"; $("#assiCode").style.order = istTv ? "1" : "3"; $("#assiLinkTeil").style.order = istTv ? "4" : "1";
   $("#assiCodeText").classList.toggle("versteckt", istTv); $("#assiCodeFeld").value = ""; $("#assiCodeErg").classList.add("versteckt");
-  $("#assiTitel").textContent = RW_T("Gerät verbinden"); $("#assiSchritt1").classList.add("versteckt"); $("#assiSchritt2").classList.remove("versteckt");
+  clearInterval(assiSuche); $("#assiFinden").classList.add("versteckt"); $("#assiHandarbeit").classList.add("versteckt");
+  $("#assiTitel").textContent = RW_T("Gerät verbinden"); $("#assiSchritt2").classList.remove("versteckt");
   $("#assiBasis").value = tvBasis(); assiLink();
   const st = $("#assiStatus"); st.textContent = RW_T("Warte auf das Gerät …"); st.classList.remove("ok");
+  for (const x of ["#assiTvTeil", "#assiCode", "#assiLinkTeil", "#assiDirekt"]) { const el = $(x); if (el) { if (fertig) el.classList.add("versteckt"); else if (x !== "#assiTvTeil") el.classList.remove("versteckt"); } }
+  if (fertig) { st.textContent = RW_T("✓ Verbunden"); st.classList.add("ok"); }
   $("#assiDialog").classList.remove("versteckt"); clearInterval(assiTimer);
   const pruefen = async () => {
     try { const d = await api("geraete"), g = d.geraete.find(x => x.id === id); if (g && g.online) { st.textContent = RW_T("✓ Verbunden"); st.classList.add("ok"); clearInterval(assiTimer); } } catch (e) {}
   };
   assiTimer = setInterval(pruefen, 2500); pruefen();
 }
-function assiOeffnen() {
-  $("#assiTitel").textContent = RW_T("Gerät hinzufügen"); $("#assiSchritt1").classList.remove("versteckt"); $("#assiSchritt2").classList.add("versteckt");
-  $("#assiName").value = ""; $("#assiArt").value = "rahmen"; $("#assiDialog").classList.remove("versteckt"); $("#assiName").focus();
+let assiSuche = 0;
+function assiWartendZeichnen(liste) {
+  const box = $("#assiWartend"); box.textContent = "";
+  for (const g of liste) {
+    const k = document.createElement("div"); k.className = "gf"; k.style.cssText = "border:1px solid var(--rand,#8884);border-radius:12px;padding:10px;margin:8px 0";
+    const t = document.createElement("strong"); t.textContent = (g.art === "tv" ? "📺 " : "🖼 ") + RW_T(g.geraet) + " " + RW_T("gefunden"); k.appendChild(t);
+    const n = document.createElement("input"); n.type = "text"; n.maxLength = 60; n.placeholder = RW_T("Name, z. B. Wohnzimmer"); n.setAttribute("aria-label", RW_T("Name")); n.style.cssText = "width:100%;margin:6px 0";
+    const a = document.createElement("select"); a.setAttribute("aria-label", RW_T("Art")); a.style.cssText = "width:100%;margin:0 0 6px";
+    for (const [w, bez] of [["tv", "Fernseher"], ["rahmen", "Bilderrahmen / Tablet"]]) { const o = document.createElement("option"); o.value = w; o.textContent = RW_T(bez); a.appendChild(o); }
+    a.value = g.art;
+    const b = document.createElement("button"); b.className = "btn primaer"; b.type = "button"; b.textContent = RW_T("Verbinden");
+    b.addEventListener("click", async () => {
+      const name = n.value.trim(); if (!name) { toast(RW_T("Bitte einen Namen eingeben."), true); n.focus(); return; }
+      b.disabled = true;
+      try { const r = await api("koppeln/neues-geraet", { method: "POST", body: JSON.stringify({ code: g.code, name, art: a.value }) }); await konfigLaden(); assiVerbinden(r.id, a.value, true); }
+      catch (e) { fehler(e); b.disabled = false; }
+    });
+    k.append(n, a, b); box.appendChild(k);
+  }
 }
-function assiSchliessen() { clearInterval(assiTimer); $("#assiDialog").classList.add("versteckt"); geraeteNeuLesen(); }
+async function assiSuchen() {
+  if ($("#assiSchritt1").closest("#assiDialog").classList.contains("versteckt") || $("#assiFinden").classList.contains("versteckt")) return;
+  if (document.activeElement && $("#assiWartend").contains(document.activeElement) && document.activeElement.tagName === "INPUT") return;      // nicht beim Tippen neu zeichnen
+  try {
+    const d = await api("koppeln/wartend"), vorher = Array.from($("#assiWartend").querySelectorAll("strong")).length;
+    if (d.geraete.length !== vorher) assiWartendZeichnen(d.geraete);
+    $("#assiFindStatus").textContent = d.geraete.length ? "" : RW_T("Suche nach Geräten …");
+  } catch (e) {}
+}
+function assiOeffnen() {
+  $("#assiTitel").textContent = RW_T("Gerät hinzufügen"); $("#assiFinden").classList.remove("versteckt"); $("#assiHandarbeit").classList.remove("versteckt"); $("#assiHandarbeit").open = false; $("#assiSchritt2").classList.add("versteckt");
+  $("#assiFindAdresse").textContent = tvBasis().replace(/^https?:\/\//, "");
+  $("#assiName").value = ""; $("#assiArt").value = "rahmen"; $("#assiWartend").textContent = ""; $("#assiDialog").classList.remove("versteckt");
+  clearInterval(assiSuche); assiSuche = setInterval(assiSuchen, 2500); assiSuchen();
+}
+function assiSchliessen() { clearInterval(assiTimer); clearInterval(assiSuche); $("#assiDialog").classList.add("versteckt"); geraeteNeuLesen(); }
 $("#geraetNeu").addEventListener("click", assiOeffnen);
-$("#assiAbbrechen").addEventListener("click", () => { $("#assiDialog").classList.add("versteckt"); });
+$("#assiAbbrechen").addEventListener("click", () => { clearInterval(assiSuche); $("#assiDialog").classList.add("versteckt"); });
 $("#assiZu").addEventListener("click", assiSchliessen);
 $("#assiEinst").addEventListener("click", () => { const id = assiId; assiSchliessen(); geraetDialogOeffnen(id); });
 $("#assiBasis").addEventListener("input", assiLink);
@@ -2414,12 +2458,14 @@ $("#gfSpeichern").addEventListener("click", async () => {
   const istRahmen = $("#gfArt").value === "rahmen";
   const name = $("#gfName").value.trim(); if (!name) { toast(RW_T("Bitte einen Namen eingeben."), true); $("#gfName").focus(); return; }
   const von = $("#gfNachtVon").value, bis = $("#gfNachtBis").value;
-  if (istRahmen && !!von !== !!bis) { toast(RW_T("Nachtruhe: bitte „von“ und „bis“ ausfüllen oder beide leer lassen."), true); return; }
+  if (!!von !== !!bis) { toast(RW_T("Nachtruhe: bitte „von“ und „bis“ ausfüllen oder beide leer lassen."), true); return; }
   const daten = { name, fuellung: $("#gfFuellung").value };
   if (gfId) daten.adb_host = $("#gfAdb").value.trim();
-  if (!gfId) daten.art = $("#gfArt").value;
-  if (istRahmen) {
-    Object.assign(daten, { sek: $("#gfSek").value, layout: gfLed ? gfLed.lesen() : undefined, wetter: gfWetter, bewegung: $("#gfBewegung").checked, paare: $("#gfPaare").checked, erinnerungen: $("#gfErinnerungen").value, favoriten: $("#gfFavoriten").value, geburtstagsfotos: $("#gfGeburtstagsfotos").checked, termin_quellen: [...$$("#gfHandys input:checked")].map(c => c.value), nacht: $("#gfNachtSonne").checked ? "sonne" : (von && bis ? von + "-" + bis : ""),
+  daten.art = $("#gfArt").value;
+  {
+    Object.assign(daten, { layout: gfLed ? gfLed.lesen() : undefined, wetter: gfWetter, bewegung: $("#gfBewegung").checked, paare: $("#gfPaare").checked, termin_quellen: [...$$("#gfHandys input:checked")].map(c => c.value), nacht: $("#gfNachtSonne").checked ? "sonne" : (von && bis ? von + "-" + bis : ""),
+    });
+    if (istRahmen) Object.assign(daten, { sek: $("#gfSek").value, erinnerungen: $("#gfErinnerungen").value, favoriten: $("#gfFavoriten").value, geburtstagsfotos: $("#gfGeburtstagsfotos").checked,
       quellen: quellenSchreiben(), zeitplan: planSchreiben(), fully_host: $("#gfFullyHost").value.trim(), alarm_min: $("#gfAlarm").value });
     if ($("#gfFullyPw").value) daten.fully_pw = $("#gfFullyPw").value;
     if ($("#gfKal").value.trim()) daten.kalender_url = $("#gfKal").value.trim(); else if (gfKalLoeschen) daten.kalender_url = null;
@@ -2535,11 +2581,11 @@ setTimeout(gesundKurz, 4000); setInterval(gesundKurz, 120000);
 // ---------------------------------------------------------------- Willkommens-Rundgang (einmal je Gerat)
 function tourSchritte() {
   const imApp = /ShowcaseApp/.test(navigator.userAgent), demo = !!(konfig && konfig.demo);
-  const l = [{ i: "🖼️", t: "Willkommen bei Immich Showcase", x: demo ? "Du siehst gerade die Demo mit erfundenen Beispielfotos. Alles lässt sich ausprobieren, es wird nichts gesendet." : "Zeige deine Immich-Fotos auf dem Bilderrahmen oder dem Fernseher – und alle in der Familie können es vom Handy aus." },
+  const l = [{ i: "🖼️", t: "Willkommen bei Frameside", x: demo ? "Du siehst gerade die Demo mit erfundenen Beispielfotos. Alles lässt sich ausprobieren, es wird nichts gesendet." : "Zeige deine Immich-Fotos auf dem Bilderrahmen oder dem Fernseher – und alle in der Familie können es vom Handy aus." },
     { i: "🔎", t: "Fotos finden", x: "Unter „Neueste“ blätterst du, unter „Suchen“ schreibst du ganze Sätze, zum Beispiel „Sommer 2022 am Strand“. Mit den Filtern grenzt du nach Person, Jahr und Land ein." },
     { i: "✅", t: "Auswählen und senden", x: "Tippe Fotos an, gib der Auswahl einen Namen und tippe unten auf „Auf den Rahmen“. Die Show läuft sofort; „Zurück“ bringt die vorherige wieder." }];
   if (konfig && konfig.hochladen) l.push({ i: "📤", t: "Eigene Fotos senden", x: "Mit „Meine Fotos“ schickst du Fotos von diesem Gerät. Sie werden in Immich gespeichert und lassen sich mit anderen Fotos mischen." });
-  if (imApp && !demo) l.push({ i: "📱", t: "In der iPhone-App", x: "Teile Fotos aus der Fotos-App direkt an den Rahmen, nutze Siri („Zeige Fotos auf dem Rahmen mit Showcase Immich“) und das Widget „Bilderrahmen“." });
+  if (imApp && !demo) l.push({ i: "📱", t: "In der iPhone-App", x: "Teile Fotos aus der Fotos-App direkt an den Rahmen, nutze Siri („Zeige Fotos auf dem Rahmen mit Frameside“) und das Widget „Bilderrahmen“." });
   l.push({ i: "❓", t: "Hilfe und Status", x: "Unter „Hilfe“ steht alles Wichtige. Im Konto-Menü zeigt „Alles in Ordnung?“, ob Immich und die Rahmen laufen." });
   return l;
 }

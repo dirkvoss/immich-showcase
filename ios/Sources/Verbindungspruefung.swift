@@ -81,7 +81,7 @@ enum Verbindungspruefung {
         guard status == 200, cfg["modus"] != nil else { let (t, h) = deuteStatus(status); setze(Pruefschritt(id: "server", titel: L("Server"), stand: .fehler, text: t, hinweis: h))
             for id in ["anmeldung", "immich"] { setze(Pruefschritt(id: id, titel: id == "immich" ? L("Immich") : L("Anmeldung"), stand: .warnung, text: L("Übersprungen."))) }
             return }
-        setze(Pruefschritt(id: "server", titel: L("Server"), stand: .ok, text: L("\(cfg["name"] as? String ?? "Immich Showcase") antwortet (\(Int(ms)) ms), Version \(cfg["version"] as? String ?? "?").")))
+        setze(Pruefschritt(id: "server", titel: L("Server"), stand: .ok, text: L("\(cfg["name"] as? String ?? "Frameside") antwortet (\(Int(ms)) ms), Version \(cfg["version"] as? String ?? "?").")))
         let me = await anfrage(server, "me", cookie: cookie)
         guard (me.1["angemeldet"] as? Bool) == true else {
             setze(Pruefschritt(id: "anmeldung", titel: L("Anmeldung"), stand: .warnung, text: L("Noch nicht angemeldet."), hinweis: L("In der App die PIN oder das Immich-Konto eingeben.")))

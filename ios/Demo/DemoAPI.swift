@@ -51,7 +51,7 @@ final class DemoAPI {
     private func fehler(_ code: Int, _ text: String) -> Antwort { var a = json(["nachricht": text]); a.status = code; return a }
 
     func konfig() -> [String: Any] {
-        ["name": "Immich Showcase (Demo)", "version": version, "modus": "rahmen", "auth": "pin", "musik_upload": false, "hochladen": false, "hochladen_mb": 40,
+        ["name": "Frameside (Demo)", "version": version, "modus": "rahmen", "auth": "pin", "musik_upload": false, "hochladen": false, "hochladen_mb": 40,
          "konfiguriert": true, "tv_url": "", "beispiele": ["Sommer 2022 am Strand", "Anna Beispiel in Sardinien", "Alpen 2023"],
          "beispiele_en": ["Summer 2022 at the beach", "Anna in Sardinia", "Alps 2023"], "ziele": [String: String](),
          "rahmen": ["rahmen"], "rahmen_namen": ["rahmen": Self.rahmenName], "rahmen_sek": 8, "rahmen_fuellung": "unscharf", "tv_fuellung": "balken",

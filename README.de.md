@@ -1,15 +1,15 @@
-# Immich Showcase
+# Frameside
 
-<p align="center"><img src="static/icon-192.png" width="96" alt="Symbol von Immich Showcase"></p>
+<p align="center"><img src="static/icon-192.png" width="96" alt="Symbol von Frameside"></p>
 
 **Zeige deine [Immich](https://immich.app)-Fotos auf dem Fernseher und im Bilderrahmen – und lass die ganze Familie das vom Handy aus tun.**
 Suche in ganzen Sätzen („Oma und Anna Weihnachten 2019 am Strand“), tippe die Fotos an, gib der Show einen Namen und schick sie an den Fernseher im Wohnzimmer oder den Bilderrahmen im Flur. Mit Hintergrundmusik, Videos und einem Dauerprogramm, wenn gerade niemand etwas ausgewählt hat.
 
 🇬🇧 [English instructions](README.md)
 
-> Immich Showcase ist ein unabhängiges Community-Projekt und steht in keiner Verbindung zum Immich-Projekt oder dessen Betreibern. „Immich“ ist der Name der Software, mit der es zusammenarbeitet.
+> Frameside ist ein unabhängiges Community-Projekt und steht in keiner Verbindung zum Immich-Projekt oder dessen Betreibern. „Immich“ ist der Name der Software, mit der es zusammenarbeitet.
 
-<p align="center"><img src="docs/demo.gif" width="720" alt="Immich Showcase Ablauf"><br><sub><em>(Ablauf aus den Screenshots darunter; alle Fotos sind erfundene Beispiele.)</em></sub></p>
+<p align="center"><img src="docs/demo.gif" width="720" alt="Frameside Ablauf"><br><sub><em>(Ablauf aus den Screenshots darunter; alle Fotos sind erfundene Beispiele.)</em></sub></p>
 
 | Anmelden | Neueste Fotos | Auswahl | Auf den Fernseher |
 |---|---|---|---|
@@ -47,32 +47,32 @@ Mit Wetter und Terminen oben rechts, Gerätekopplung per Code/QR am Fernseher un
 
 ## Installation (ca. 5 Minuten)
 
-> 📖 **Mit Bildern, Schritt für Schritt:** [Erste Schritte – illustrierte Anleitung](docs/anleitung.md) · [Immich Showcase auf einem anderen Rechner (z. B. Raspberry Pi)](docs/anleitung-externer-rechner.md)
+> 📖 **Mit Bildern, Schritt für Schritt:** [Erste Schritte – illustrierte Anleitung](docs/anleitung.md) · [Frameside auf einem anderen Rechner (z. B. Raspberry Pi)](docs/anleitung-externer-rechner.md)
 
 **Ein Befehl** auf dem Rechner mit Docker (Linux, NAS, Mini-PC; Raspberry Pi geht auch):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/dirkvoss/frameside/main/install.sh | bash
 ```
 
 Das Programm
-- lädt Immich Showcase nach `~/immich-showcase`,
+- lädt Frameside nach `~/immich-showcase`,
 - **erkennt Immich**, wenn es auf demselben Rechner in Docker läuft, und bindet die App an dessen Docker-Netz an (keine Datei zu bearbeiten),
 - startet alles und zeigt am Ende einen **fertigen Einrichtungs-Link** (mit QR-Code, wenn `qrencode` installiert ist), den du im Browser öffnest.
 
 Der **Einrichtungsassistent** hat drei kurze Schritte:
 1. **Immich verbinden:** Immich wird meist von selbst gefunden. Sonst die Adresse eintragen (z. B. `http://192.168.1.10:2283`).
-2. **Anmelden** mit deinem Immich-Konto (E-Mail + Passwort). Immich Showcase legt einen eigenen API-Schlüssel an, **ohne Löschrechte**; dein Passwort wird nicht gespeichert.
+2. **Anmelden** mit deinem Immich-Konto (E-Mail + Passwort). Frameside legt einen eigenen API-Schlüssel an, **ohne Löschrechte**; dein Passwort wird nicht gespeichert.
 3. **Wer darf zugreifen?** **Gemeinsame PIN** (empfohlen; im Heimnetz auf Wunsch ohne Eingabe) oder **Immich-Konten** (jede Person sieht nur ihre eigenen Fotos).
 
 Am Ende zeigt die Seite einen **QR-Code für die iPhone-App** und die Adresse für Fernseher und Tablets. Danach in der App unter „Geräte“ den Code eingeben, der am Fernseher oder Tablet erscheint. Eine „Erste Schritte“-Liste in der Oberfläche begleitet dich, bis alles läuft.
 
 Weitere Wege:
-- **Noch kein Immich?** `./install.sh --with-immich` startet Immich **und** Immich Showcase zusammen.
+- **Noch kein Immich?** `./install.sh --with-immich` startet Immich **und** Frameside zusammen.
 - **Anderer Port:** `./install.sh --port 80` (dann genügt am Fernseher die reine IP-Adresse).
 - **Per Hand** (ohne Skript): `cp .env.example .env`, `docker compose up -d`, `docker compose logs showcase` zeigt den Einrichtungs-Code, dann `http://<server>:8090/setup/` öffnen. Lieber ohne Assistent? `RAHMEN_IMMICH_URL` und `RAHMEN_IMMICH_KEY` in die `.env` eintragen; Werte aus der `.env` haben immer Vorrang.
 - **NAS und Heimserver mit Oberfläche:** Fertige Anleitungen für **Synology** (Container Manager), **Unraid** (Vorlage), **TrueNAS** und **Portainer** liegen in `examples/`.
-- Auf dem iPhone ohne App: Teilen → „Zum Home-Bildschirm“. Mit App: „Showcase Immich“ im App Store bzw. über TestFlight; sie **findet den Server im WLAN selbst**.
+- Auf dem iPhone ohne App: Teilen → „Zum Home-Bildschirm“. Mit App: „Frameside“ im App Store bzw. über TestFlight; sie **findet den Server im WLAN selbst**.
 
 ## Was kann als Bilderrahmen dienen?
 Jedes Gerät mit einem **Webbrowser**, das eine Adresse öffnen kann. **Ein Kiosk-Modus oder Zusatz-Apps wie Fully Kiosk sind nicht nötig** – der Browser genügt. Die Seite bittet den Browser, den Bildschirm wach zu halten; wo das nicht klappt, stellst du die Auto-Sperre des Geräts auf „Nie“. Ein Kiosk-Modus (Vollbild, nichts anderes erreichbar) ist nur ein Komfort, den du bei Bedarf dazunehmen kannst.
@@ -91,12 +91,12 @@ Die Adresse `http://<server>:8090/tv/` **ohne** `?ziel=…` öffnen, um das Ger�
 
 ### Raspberry Pi als Server in einem Befehl
 Auf dem Pi (Raspberry Pi OS **Lite, 64-Bit**, im Raspberry Pi Imager Name, WLAN und SSH einstellen) per SSH:
-`curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/examples/raspberry-pi/install-pi.sh | bash -s -- --hostname showcase`
-Das Skript installiert Docker und Immich Showcase, meldet den Server im Netz an (die iPhone-App findet ihn selbst, im Heimnetz auch `http://showcase.local:8090`) und zeigt den Einrichtungs-Link. Läuft Immich auf einem anderen Rechner, trägst du dessen Adresse im Assistenten ein, siehe [die Anleitung dazu](docs/anleitung-externer-rechner.md).
+`curl -fsSL https://raw.githubusercontent.com/dirkvoss/frameside/main/examples/raspberry-pi/install-pi.sh | bash -s -- --hostname showcase`
+Das Skript installiert Docker und Frameside, meldet den Server im Netz an (die iPhone-App findet ihn selbst, im Heimnetz auch `http://showcase.local:8090`) und zeigt den Einrichtungs-Link. Läuft Immich auf einem anderen Rechner, trägst du dessen Adresse im Assistenten ein, siehe [die Anleitung dazu](docs/anleitung-externer-rechner.md).
 
 ### Raspberry Pi als Bilderrahmen-Anzeige in 5 Minuten
 1. **Raspberry Pi OS mit Desktop** aufspielen (Raspberry Pi Imager), dort WLAN/SSH einrichten, starten und automatisch am Desktop anmelden lassen.
-2. Auf dem Pi im Terminal: `curl -O https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/examples/raspberry-pi/setup-kiosk.sh && chmod +x setup-kiosk.sh && ./setup-kiosk.sh http://<server>:8090/tv/`
+2. Auf dem Pi im Terminal: `curl -O https://raw.githubusercontent.com/dirkvoss/frameside/main/examples/raspberry-pi/setup-kiosk.sh && chmod +x setup-kiosk.sh && ./setup-kiosk.sh http://<server>:8090/tv/`
 3. `sudo reboot`. Der Pi startet im Vollbild und zeigt den Kopplungs-Code. Entfernen: `./setup-kiosk.sh --entfernen`.
 
 *Das Raspberry-Pi-Skript ist für Raspberry Pi OS (Bookworm) geschrieben, aber nicht auf jedem Pi-Modell getestet – Rückmeldungen sind willkommen.*
@@ -175,7 +175,7 @@ Mit `RAHMEN_WEB_RAHMEN_NACHT=22:00-06:30` wird der Rahmen schwarz. Fully Kiosk k
 Fertige Sensoren, Knöpfe und Beispiele stehen in [`examples/home-assistant/immich_showcase.yaml`](examples/home-assistant/immich_showcase.yaml): Zustand jedes Fernsehers/Rahmens (offline / bereit / spielt / Dauerprogramm), ein Online-Sensor und Befehle (Pause, weiter, Stopp, gespeicherte Show starten, Bildschirm an/aus) als `rest_command`. Die Adresse von Home Assistant muss in `RAHMEN_WEB_LAN` stehen. API: `GET /api/ha/status`, `POST /api/ha/steuer|show|bildschirm` (Header `X-Rahmen: 1`).
 
 ## Installationshilfe
-`./install.sh` startet Immich Showcase und zeigt Adresse und Einrichtungs-Code. **Noch kein Immich?** `./install.sh --with-immich` startet **Immich und Immich Showcase zusammen** (siehe `examples/immich-stack/`).
+`./install.sh` startet Frameside und zeigt Adresse und Einrichtungs-Code. **Noch kein Immich?** `./install.sh --with-immich` startet **Immich und Frameside zusammen** (siehe `examples/immich-stack/`).
 
 ## Alltag
 1. App am Handy öffnen und anmelden (PIN, oder dein Immich-Konto bei `RAHMEN_WEB_AUTH=immich`).
@@ -198,7 +198,7 @@ Es wird keine mitgeliefert (Lizenzen). Zwei Wege:
 ## Aktualisieren
 Im Ordner mit der `docker-compose.yml`: `docker compose pull && docker compose up -d`. Daten und Einstellungen bleiben erhalten (oder `deploy/deploy.sh <version>` mit Sicherung, Prüfungen und automatischem Rückweg, siehe [RELEASING.md](RELEASING.md)). Die Statusseite („Alles in Ordnung?“ im Konto-Menü) **weist auf neuere Versionen hin** (sie fragt dafür höchstens alle 6 Stunden bei GitHub nach; abschaltbar mit `RAHMEN_WEB_UPDATE_PRUEFEN=0`).
 
-**Automatisch:** Mit [Watchtower](examples/watchtower/docker-compose.yml) aktualisiert sich Immich Showcase jede Nacht von selbst (der Container trägt schon das nötige Label).
+**Automatisch:** Mit [Watchtower](examples/watchtower/docker-compose.yml) aktualisiert sich Frameside jede Nacht von selbst (der Container trägt schon das nötige Label).
 
 ## Wenn etwas nicht klappt
 | Beobachtung | Lösung |
@@ -212,8 +212,8 @@ Im Ordner mit der `docker-compose.yml`: `docker compose pull && docker compose u
 
 ## Problem melden oder etwas vorschlagen
 - In der App: **Hilfe → 🐞 Problem melden** (öffnet GitHub mit eingetragener Version) – bitte das **Support-Paket** aus demselben Fenster anhängen (Diagnose ohne Passwörter, PIN oder Schlüssel).
-- Wünsche und Ideen: **Hilfe → 💡 Wunsch oder Idee** oder der [Issue-Tracker](https://github.com/dirkvoss/immich-showcase/issues).
-- Fragen und Hilfe bei der Einrichtung: [Diskussionen](https://github.com/dirkvoss/immich-showcase/discussions) – Deutsch und Englisch sind beide in Ordnung.
+- Wünsche und Ideen: **Hilfe → 💡 Wunsch oder Idee** oder der [Issue-Tracker](https://github.com/dirkvoss/frameside/issues).
+- Fragen und Hilfe bei der Einrichtung: [Diskussionen](https://github.com/dirkvoss/frameside/discussions) – Deutsch und Englisch sind beide in Ordnung.
 
 ## Einstellungen
 Alles Installationsspezifische steht in der `.env` – jede Einstellung ist in [.env.example](.env.example) erklärt. Deine eigene `.env` ist nie Teil des Repositorys.

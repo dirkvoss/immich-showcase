@@ -1,30 +1,30 @@
-# Immich Showcase auf einem anderen Rechner als Immich (z. B. Raspberry Pi)
+# Frameside auf einem anderen Rechner als Immich (z. B. Raspberry Pi)
 
-Immich muss nicht auf demselben Rechner laufen wie Immich Showcase. Typisch ist: **Immich** läuft auf einem NAS oder Server, **Immich Showcase** auf einem kleinen, sparsamen Rechner, zum Beispiel einem **Raspberry Pi**, der dauerhaft im Heimnetz hängt (und optional gleich als Bilderrahmen am Fernseher dient).
+Immich muss nicht auf demselben Rechner laufen wie Frameside. Typisch ist: **Immich** läuft auf einem NAS oder Server, **Frameside** auf einem kleinen, sparsamen Rechner, zum Beispiel einem **Raspberry Pi**, der dauerhaft im Heimnetz hängt (und optional gleich als Bilderrahmen am Fernseher dient).
 
 Diese Anleitung zeigt den Weg Schritt für Schritt mit Bildern. Die Grundlagen (Rahmen koppeln, erste Show senden, iPhone-App) stehen in der [Anleitung „Erste Schritte“](anleitung.md). Hier geht es um das, was bei **zwei getrennten Rechnern** anders ist.
 
 ```
    Handy / Tablet / Fernseher            Raspberry Pi                    NAS / Server
    ┌──────────────────────┐   WLAN   ┌───────────────────┐  Heimnetz  ┌───────────────┐
-   │  Browser oder App    │ ───────▶ │ Immich Showcase   │ ─────────▶ │    Immich     │
+   │  Browser oder App    │ ───────▶ │ Frameside   │ ─────────▶ │    Immich     │
    └──────────────────────┘          │ (Port 8090)       │            │ (Port 2283)   │
                                      └───────────────────┘            └───────────────┘
 ```
 
 **Du brauchst:**
 
-- einen Rechner für Immich Showcase mit **Docker** (Raspberry Pi 4 oder 5 mit 64-Bit-Raspberry-Pi-OS empfohlen, die Images gibt es auch für arm64),
+- einen Rechner für Frameside mit **Docker** (Raspberry Pi 4 oder 5 mit 64-Bit-Raspberry-Pi-OS empfohlen, die Images gibt es auch für arm64),
 - ein laufendes **Immich**, das vom Pi aus über das Netz erreichbar ist,
 - ein Immich-Konto (E-Mail und Passwort).
 
-> **Ehrlicher Hinweis:** Diesen Ablauf habe ich auf zwei getrennten Rechnern im Heimnetz getestet (Debian mit Docker, Immich auf dem einen, Immich Showcase auf dem anderen). Auf echter Raspberry-Pi-Hardware habe ich ihn noch nicht ausprobiert. Rückmeldungen sind willkommen.
+> **Ehrlicher Hinweis:** Diesen Ablauf habe ich auf zwei getrennten Rechnern im Heimnetz getestet (Debian mit Docker, Immich auf dem einen, Frameside auf dem anderen). Auf echter Raspberry-Pi-Hardware habe ich ihn noch nicht ausprobiert. Rückmeldungen sind willkommen.
 
 ---
 
 ## 1. Vorbereitung auf dem Raspberry Pi
 
-1. **Raspberry Pi OS (64-Bit)** mit dem Raspberry Pi Imager aufspielen, dort WLAN/LAN und SSH einrichten. Eine **SSD** ist robuster als eine SD-Karte, aber nicht Pflicht: Immich Showcase speichert keine Fotos, nur seine Einstellungen.
+1. **Raspberry Pi OS (64-Bit)** mit dem Raspberry Pi Imager aufspielen, dort WLAN/LAN und SSH einrichten. Eine **SSD** ist robuster als eine SD-Karte, aber nicht Pflicht: Frameside speichert keine Fotos, nur seine Einstellungen.
 2. Per SSH anmelden und **Docker** installieren (zwei Befehle, danach einmal ab- und wieder anmelden):
 
 ```bash
@@ -34,15 +34,15 @@ sudo usermod -aG docker $USER
 
 3. Prüfe, ob der Pi **Immich erreicht**. Im Browser eines Rechners im selben Netz öffnest du Immich so, wie du es immer tust, z. B. `http://192.168.1.20:2283`. Genau diese Adresse brauchst du gleich im Assistenten. Tipp: Gib dem Immich-Rechner eine feste IP-Adresse, damit sich die Adresse nicht ändert.
 
-> **Abkürzung für den Raspberry Pi:** Statt der Schritte 1 und 2 genügt auf einem frisch aufgespielten Pi (Raspberry Pi OS Lite, 64-Bit) ein einziger Befehl, der Docker und Immich Showcase installiert und den Server im Netz anmeldet:
-> `curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/examples/raspberry-pi/install-pi.sh | bash -s -- --hostname showcase`
+> **Abkürzung für den Raspberry Pi:** Statt der Schritte 1 und 2 genügt auf einem frisch aufgespielten Pi (Raspberry Pi OS Lite, 64-Bit) ein einziger Befehl, der Docker und Frameside installiert und den Server im Netz anmeldet:
+> `curl -fsSL https://raw.githubusercontent.com/dirkvoss/frameside/main/examples/raspberry-pi/install-pi.sh | bash -s -- --hostname showcase`
 
 ## 2. Installieren (1 Befehl)
 
 Auf dem Pi:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/dirkvoss/frameside/main/install.sh | bash
 ```
 
 Das Skript meldet, dass es **auf diesem Rechner kein Immich gefunden** hat. Das ist hier richtig und kein Fehler: Die Adresse gibst du gleich im Assistenten an. Am Ende steht der **Einrichtungs-Link** mit QR-Code.
@@ -81,7 +81,7 @@ Ein **Fehler beim „Weiter“** heißt fast immer: Der Pi erreicht Immich nicht
 
 ### Schritt 2 – Immich-Konto
 
-Melde dich einmal mit deinem Immich-Konto an. Immich Showcase legt dafür **einen eigenen Schlüssel ohne Lösch-Rechte** an. Das Passwort wird nicht gespeichert.
+Melde dich einmal mit deinem Immich-Konto an. Frameside legt dafür **einen eigenen Schlüssel ohne Lösch-Rechte** an. Das Passwort wird nicht gespeichert.
 
 ![Assistent: Anmeldung am Immich-Konto](anleitung/externer-rechner-4-konto.png)
 
@@ -115,7 +115,7 @@ Unter dem Konto-Symbol → **„Alles in Ordnung?“** siehst du, ob die Verbind
 | **Motivsuche** („am Strand“) | Funktioniert über Immich selbst und liefert die besten 60 Treffer. Die exakte Prüfung mit direktem Datenbankzugang (`RAHMEN_DB_DSN`) ist optional und bei getrennten Rechnern aufwendiger. Suchen nach Person, Zeit und Ort funktioniert vollständig. |
 | **Eigene Fotos hochladen** | Geht wie gewohnt, die Fotos landen im Album „Showcase-Uploads“ in Immich. |
 | **Ausfall** | Ist der Pi aus, zeigen die Rahmen nichts Neues. Ist der Immich-Rechner aus, meldet „Alles in Ordnung?“ den Fehler mit einem Hinweis. |
-| **Updates** | Der Pi und Immich werden getrennt aktualisiert. Für Immich Showcase: `docker compose pull && docker compose up -d` im Ordner `~/immich-showcase`. |
+| **Updates** | Der Pi und Immich werden getrennt aktualisiert. Für Frameside: `docker compose pull && docker compose up -d` im Ordner `~/immich-showcase`. |
 
 ## Der Pi als Bilderrahmen am Fernseher (optional)
 

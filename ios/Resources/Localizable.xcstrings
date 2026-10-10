@@ -2,24 +2,24 @@
   "sourceLanguage": "de",
   "version": "1.0",
   "strings": {
-    "Showcase Immich": {
+    "Frameside": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Showcase Immich"
+            "value": "Frameside"
           }
         }
       }
     },
-    "Verbinde die App mit deinem Immich-Showcase-Server.": {
+    "Verbinde die App mit deinem Frameside-Server.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Connect the app to your Immich Showcase server."
+            "value": "Connect the app to your Frameside server."
           }
         }
       }
@@ -35,13 +35,13 @@
         }
       }
     },
-    "Diese App verbindet sich **nicht direkt mit Immich**. Sie braucht einen eigenen **Immich-Showcase-Server**, den du selbst betreibst (neben deinem Immich, z. B. im Heimnetz).": {
+    "Diese App verbindet sich **nicht direkt mit Immich**. Sie braucht einen eigenen **Frameside-Server**, den du selbst betreibst (neben deinem Immich, z. B. im Heimnetz).": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This app does **not connect to Immich directly**. It needs your own **Immich Showcase server**, which you run yourself (next to your Immich, e.g. at home)."
+            "value": "This app does **not connect to Immich directly**. It needs your own **Frameside server**, which you run yourself (next to your Immich, e.g. at home)."
           }
         }
       }
@@ -57,13 +57,13 @@
         }
       }
     },
-    "Immich Showcase auf GitHub": {
+    "Frameside auf GitHub": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Immich Showcase on GitHub"
+            "value": "Frameside on GitHub"
           }
         }
       }
@@ -486,13 +486,13 @@
         }
       }
     },
-    "Die App zeigt deinen eigenen Immich-Showcase-Server. Sie verbindet sich nicht direkt mit Immich.": {
+    "Die App zeigt deinen eigenen Frameside-Server. Sie verbindet sich nicht direkt mit Immich.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The app shows your own Immich Showcase server. It doesn't connect to Immich directly."
+            "value": "The app shows your own Frameside server. It doesn't connect to Immich directly."
           }
         }
       }
@@ -607,24 +607,24 @@
         }
       }
     },
-    "Showcase Immich entsperren": {
+    "Frameside entsperren": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Unlock Showcase Immich"
+            "value": "Unlock Frameside"
           }
         }
       }
     },
-    "Showcase Immich ist gesperrt": {
+    "Frameside ist gesperrt": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Showcase Immich is locked"
+            "value": "Frameside is locked"
           }
         }
       }
@@ -640,13 +640,13 @@
         }
       }
     },
-    "Showcase Immich anmelden": {
+    "Frameside anmelden": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sign in to Showcase Immich"
+            "value": "Sign in to Frameside"
           }
         }
       }
@@ -706,13 +706,13 @@
         }
       }
     },
-    "Unter dieser Adresse antwortet kein Immich Showcase.": {
+    "Unter dieser Adresse antwortet kein Frameside.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "No Immich Showcase answers at this address."
+            "value": "No Frameside answers at this address."
           }
         }
       }
@@ -761,13 +761,13 @@
         }
       }
     },
-    "Die App ist noch mit keinem Server verbunden. Öffne Showcase Immich einmal und gib die Adresse ein.": {
+    "Die App ist noch mit keinem Server verbunden. Öffne Frameside einmal und gib die Adresse ein.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The app isn't connected to a server yet. Open Showcase Immich once and enter the address."
+            "value": "The app isn't connected to a server yet. Open Frameside once and enter the address."
           }
         }
       }
@@ -783,13 +783,13 @@
         }
       }
     },
-    "Bitte öffne Showcase Immich einmal und melde dich mit der PIN an.": {
+    "Bitte öffne Frameside einmal und melde dich mit der PIN an.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Please open Showcase Immich once and sign in with the PIN."
+            "value": "Please open Frameside once and sign in with the PIN."
           }
         }
       }
@@ -1487,13 +1487,13 @@
         }
       }
     },
-    "Der Zugriff auf den Kalender ist nicht erlaubt. Bitte erlaube ihn in den iOS-Einstellungen unter „Showcase Immich“ → „Kalender“.": {
+    "Der Zugriff auf den Kalender ist nicht erlaubt. Bitte erlaube ihn in den iOS-Einstellungen unter „Frameside“ → „Kalender“.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Access to the calendar is not allowed. Please allow it in the iOS Settings under “Showcase Immich” → “Calendars”."
+            "value": "Access to the calendar is not allowed. Please allow it in the iOS Settings under “Frameside” → “Calendars”."
           }
         }
       }

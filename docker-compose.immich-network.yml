@@ -1,4 +1,4 @@
-# Zusatz: Immich Showcase in das Docker-Netzwerk von Immich haengen, damit RAHMEN_IMMICH_URL=http://immich_server:2283/api funktioniert.
+# Zusatz: Frameside in das Docker-Netzwerk von Immich haengen, damit RAHMEN_IMMICH_URL=http://immich_server:2283/api funktioniert.
 # Den Namen des Netzwerks zeigt `docker network ls` (bei Immich meist <ordner>_default, z. B. immich_default).
 # Aktivieren: in .env  COMPOSE_FILE=docker-compose.yml:docker-compose.immich-network.yml  und  SHOWCASE_IMMICH_NETWORK=immich_default
 services:

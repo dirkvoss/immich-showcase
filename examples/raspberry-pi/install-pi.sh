@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Einen Raspberry Pi (oder jeden Debian-Rechner) mit EINEM Befehl zum Immich-Showcase-Server machen:
-# installiert Docker (falls noetig) und Immich Showcase, meldet den Server im Netz an (Bonjour: die iPhone-App findet ihn selbst)
+# Einen Raspberry Pi (oder jeden Debian-Rechner) mit EINEM Befehl zum Frameside-Server machen:
+# installiert Docker (falls noetig) und Frameside, meldet den Server im Netz an (Bonjour: die iPhone-App findet ihn selbst)
 # und zeigt am Ende den Link zur Einrichtung. Vorher auf der SD-Karte "Raspberry Pi OS Lite (64-Bit)" mit dem Raspberry Pi Imager aufspielen
 # (dort Name, WLAN und SSH einstellen).
 #
-#   curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/examples/raspberry-pi/install-pi.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/dirkvoss/frameside/main/examples/raspberry-pi/install-pi.sh | bash
 #
 # Optionen (bei curl | bash nach "bash -s --" angeben):
 #   --hostname NAME    Rechnername setzen, dann ist der Pi auch unter NAME.local erreichbar (z. B. showcase)
-#   --port N           Immich Showcase auf Port N statt 8090 (80 = nur die IP-Adresse am Fernseher genuegt)
+#   --port N           Frameside auf Port N statt 8090 (80 = nur die IP-Adresse am Fernseher genuegt)
 #   --ohne-bonjour     nicht im Netz anmelden
 #   --version X.Y.Z    eine bestimmte Version statt der neuesten
 # Hinweis: Das Skript ist auf einem Debian-12-System getestet, auf echter Raspberry-Pi-Hardware (arm64) noch nicht. Rueckmeldungen sind willkommen.
@@ -54,13 +54,13 @@ fi
 $SUDO systemctl enable --now docker >/dev/null 2>&1 || true
 if [[ "$BENUTZER" != "root" ]]; then $SUDO usermod -aG docker "$BENUTZER"; fi
 
-echo "== 3/4  Immich Showcase"
+echo "== 3/4  Frameside"
 OPT=(--no-open)
 [[ $BONJOUR == 1 ]] && OPT+=(--bonjour)
 [[ -n "$PORT" ]] && OPT+=(--port "$PORT")
 [[ -n "$VERSION" ]] && OPT+=(--version "$VERSION")
 INSTALLER="$(mktemp)"; trap 'rm -f "$INSTALLER"' EXIT
-curl -fsSL "https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/install.sh" -o "$INSTALLER"
+curl -fsSL "https://raw.githubusercontent.com/dirkvoss/frameside/main/install.sh" -o "$INSTALLER"
 chmod 755 "$INSTALLER"
 if [[ "$BENUTZER" == "root" ]]; then
   SHOWCASE_DIR="$HEIM/immich-showcase" bash "$INSTALLER" "${OPT[@]}"
@@ -72,7 +72,7 @@ fi
 
 echo
 echo "== 4/4  Fertig"
-echo "  Der Raspberry Pi laeuft jetzt als Immich-Showcase-Server. Den Einrichtungs-Link siehst du oben."
+echo "  Der Raspberry Pi laeuft jetzt als Frameside-Server. Den Einrichtungs-Link siehst du oben."
 echo "  Die iPhone-App findet den Server im WLAN von selbst."
 PORTTEIL=":${PORT:-8090}"; [[ "${PORT:-}" == "80" ]] && PORTTEIL=""
 [[ -n "$HOSTNAME_NEU" ]] && echo "  Im Heimnetz erreichbar unter:  http://$HOSTNAME_NEU.local$PORTTEIL"

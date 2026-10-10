@@ -82,7 +82,7 @@ def test_aelterer_schluessel_ohne_upload_recht_wird_beim_login_ersetzt(app_laden
 
     def alt(methode, pfad, daten=None, token=None, schluessel=None, basis=None):
         if pfad == "/api-keys/me" and schluessel == erster:
-            return {"id": "alte-id", "name": "Immich Showcase", "permissions": ["asset.read", "asset.view"]}
+            return {"id": "alte-id", "name": "Frameside", "permissions": ["asset.read", "asset.view"]}
         return orig(methode, pfad, daten, token, schluessel, basis)
 
     monkeypatch.setattr(w, "immich_aufruf", alt)

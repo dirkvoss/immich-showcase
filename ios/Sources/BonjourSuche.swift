@@ -2,7 +2,7 @@ import Foundation
 import Network
 import os
 
-/// Lauscht im Netz auf Immich-Showcase-Server, die sich per Bonjour (Diensttyp _showcase._tcp) anmelden (docker-compose.bonjour.yml).
+/// Lauscht im Netz auf Frameside-Server, die sich per Bonjour (Diensttyp _showcase._tcp) anmelden (docker-compose.bonjour.yml).
 /// Findet auch Server in anderen Netzen, wenn der Router Bonjour (mDNS) weiterleitet.
 final class BonjourSuche {
     private static let log = Logger(subsystem: "com.dirk-voss.showcase", category: "bonjour")

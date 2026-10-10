@@ -618,3 +618,94 @@ def test_gaeste_grenzen(app_laden, monkeypatch):
     w2, client2, _ = app_laden(**ZWEI)
     assert client2("192.168.1.50").post("/api/gaeste/flur", json={}, headers=H).status_code == 403
     assert ANZ.zusammen()["gaeste"]["an"]
+
+
+def test_adresse_fuer_gaeste_bekommt_ein_schema(app_laden):
+    w, client, app = gaeste_app(app_laden)
+    for roh, soll in (("tv.example.com", "https://tv.example.com"), ("https://tv.example.com/", "https://tv.example.com"), ("http://x.de", "http://x.de"),
+                      ("192.168.1.20:8090", "http://192.168.1.20:8090"), ("showcase.local", "http://showcase.local"), ("meinserver", "http://meinserver"), ("", ""), (None, "")):
+        assert w.basis_mit_schema(roh) == soll
+    app.put("/api/einstellungen", json={"tv_url": "tv.example.com"}, headers=H)
+    r = app.post("/api/gaeste/flur", json={}, headers=H).json()
+    assert r["basis"] == "https://tv.example.com" and app.get("/api/rahmen/zusatz?ziel=flur").json()["gaeste"]["basis"] == "https://tv.example.com"
+
+
+def test_art_eines_geraets_aendern(app_laden):
+    w, client, _ = app_laden(**ZWEI)
+    app = client("192.168.1.50")
+    r = app.post("/api/verwaltung/geraete", json={"art": "rahmen", "name": "Wohnzimmer"}, headers=H).json()      # versehentlich als Bilderrahmen angelegt
+    z = r["id"]
+    app.put(f"/api/verwaltung/geraete/{z}", json={"sek": 12, "erinnerungen": "oft", "bewegung": True}, headers=H)
+    assert z in w.RAHMEN_ZIELE
+    r = app.put(f"/api/verwaltung/geraete/{z}", json={"art": "tv"}, headers=H).json()
+    assert r["geraet"]["art"] == "tv" and z not in w.RAHMEN_ZIELE and z in w.TV_ZIELE
+    assert not w.GERAETE[z].get("sek") and not w.GERAETE[z].get("erinnerungen") and w.GERAETE[z]["bewegung"] and w.GERAETE[z]["name"] == "Wohnzimmer"      # Dauerprogramm faellt weg, Anzeige bleibt
+    r = app.put(f"/api/verwaltung/geraete/{z}", json={"art": "rahmen"}, headers=H).json()                    # und zurueck
+    assert r["geraet"]["art"] == "rahmen" and z in w.RAHMEN_ZIELE
+    assert app.put(f"/api/verwaltung/geraete/{z}", json={"art": "toaster"}, headers=H).status_code == 400
+    assert app.put(f"/api/verwaltung/geraete/{z}", json={"name": "Wohnzimmer 2"}, headers=H).json()["geraet"]["art"] == "rahmen"      # ohne art bleibt sie
+
+
+# ---------------------------------------------------------------- Geraete finden sich selbst (ohne Code-Eingabe)
+UAS = {
+    "LG-Fernseher": ("Mozilla/5.0 (Web0S; Linux/SmartTV) AppleWebKit/537.36 Chrome/79 Safari/537.36 WebAppManager", "tv"),
+    "Samsung-Fernseher": ("Mozilla/5.0 (SMART-TV; Linux; Tizen 6.5) AppleWebKit/537.36 Chrome/85 TV Safari/537.36", "tv"),
+    "Fire TV": ("Mozilla/5.0 (Linux; Android 9; AFTMM Build/PS7233) AppleWebKit/537.36 Silk/120 like Chrome/120 Safari/537.36", "tv"),
+    "Nvidia Shield": ("Mozilla/5.0 (Linux; Android 11; SHIELD Android TV) AppleWebKit/537.36 Chrome/120 Safari/537.36", "tv"),
+    "iPad": ("Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Safari/604.1", "rahmen"),
+    "Android-Tablet": ("Mozilla/5.0 (Linux; Android 12; SM-T500) AppleWebKit/537.36 Chrome/120 Safari/537.36", "rahmen"),
+    "Mac": ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/605.1.15", "rahmen"),
+    "Raspberry Pi": ("Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 Chrome/120 Safari/537.36", "rahmen"),
+    "Unbekanntes Gerät": ("", "rahmen"),
+}
+
+
+def test_geraeteart_aus_dem_browser_erkennen(app_laden):
+    w, client, _ = app_laden(**ZWEI)
+    for name, (ua, art) in UAS.items():
+        assert w.ua_beschreibung(ua) == (name, art), name
+
+
+def test_wartende_geraete_und_verbinden_mit_einem_tipp(app_laden):
+    w, client, app = gaeste_app(app_laden)
+    lg_ua = UAS["LG-Fernseher"][0]
+    tv = client("192.168.1.77")
+    code = tv.post("/api/koppeln/neu", headers={**H, "User-Agent": lg_ua}).json()["code"]
+    assert app.get("/api/koppeln/wartend").json()["geraete"] == [{"code": code, "geraet": "LG-Fernseher", "art": "tv", "vor_s": 0}] or app.get("/api/koppeln/wartend").json()["geraete"][0]["code"] == code
+    assert client("203.0.113.9").get("/api/koppeln/wartend").status_code == 401                         # nur angemeldet
+    assert app.post("/api/koppeln/neues-geraet", json={"code": "XXXXXX", "name": "Wohnzimmer"}, headers=H).status_code == 404
+    assert app.post("/api/koppeln/neues-geraet", json={"code": code, "name": "Wohnzimmer", "art": "toaster"}, headers=H).status_code == 400
+    r = app.post("/api/koppeln/neues-geraet", json={"code": code, "name": "Wohnzimmer"}, headers=H).json()      # Art kommt aus dem erkannten Geraet
+    assert r["ok"] and r["art"] == "tv" and r["id"] in w.TV_ZIELE and r["id"] not in w.RAHMEN_ZIELE and r["name"] == "Wohnzimmer"
+    assert app.get("/api/koppeln/wartend").json()["geraete"] == []                                          # nicht mehr wartend
+    st = tv.get(f"/api/koppeln/status?code={code}")                                                       # das Geraet bekommt seinen Zugang selbst
+    assert st.json()["ziel"] == r["id"] and "rw_geraet" in st.headers.get("set-cookie", "")
+    # Art ueberschreiben (z. B. ein Tablet, das als Fernseher erkannt wurde)
+    code2 = client("192.168.1.78").post("/api/koppeln/neu", headers={**H, "User-Agent": UAS["iPad"][0]}).json()["code"]
+    assert app.post("/api/koppeln/neues-geraet", json={"code": code2, "name": "Flur-Tablet", "art": "rahmen"}, headers=H).json()["art"] == "rahmen"
+
+
+def test_fernseher_hat_die_anzeige_einstellungen(app_laden):
+    w, client, _ = app_laden(**ZWEI)
+    app = client("192.168.1.50")
+    z = app.post("/api/verwaltung/geraete", json={"art": "tv", "name": "Wohnzimmer"}, headers=H).json()["id"]
+    r = app.put(f"/api/verwaltung/geraete/{z}", json={"layout": {"uhr": {"an": False}}, "bewegung": True, "paare": True, "nacht": "22:00-06:00", "sek": 5, "erinnerungen": "oft",
+                                                     "wetter": {"lat": 51.3, "lon": 6.8, "name": "Ratingen"}}, headers=H)
+    assert r.status_code == 200
+    g = w.GERAETE[z]
+    assert g["bewegung"] and g["paare"] and g["nacht"] == "22:00-06:00" and g["wetter"]["name"] == "Ratingen" and g["layout"]["uhr"]["an"] is False
+    assert "sek" not in g and "erinnerungen" not in g                                    # Dauerprogramm bleibt Sache der Rahmen
+    c = app.get(f"/api/config?ziel={z}").json()
+    assert c["rahmen_bewegung"] and c["rahmen_layout"]["uhr"]["an"] is False and c["rahmen_nacht"] == "22:00-06:00"
+    assert app.put(f"/api/notizen/{z}", json={"text": "Pizza", "stunden": 2}, headers=H).status_code == 200      # Notiz, Gruss, Gaeste auch am Fernseher
+
+
+def test_wartende_geraete_nur_der_neueste_code_je_geraet(app_laden):
+    w, client, app = gaeste_app(app_laden)
+    tv = client("192.168.1.77")
+    ua = {**H, "User-Agent": UAS["LG-Fernseher"][0]}
+    alt = tv.post("/api/koppeln/neu", headers=ua).json()["code"]
+    neu = tv.post("/api/koppeln/neu", headers=ua).json()["code"]                  # Seite am Fernseher neu geladen
+    anderer = client("192.168.1.78").post("/api/koppeln/neu", headers=ua).json()["code"]       # zweiter Fernseher
+    codes = {g["code"] for g in app.get("/api/koppeln/wartend").json()["geraete"]}
+    assert codes == {neu, anderer} and alt not in codes

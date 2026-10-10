@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Immich Showcase auf dem Server aktualisieren: Version aus der Registry holen, vorher sichern, umschalten, pruefen, bei Fehler zurueck.
+# Frameside auf dem Server aktualisieren: Version aus der Registry holen, vorher sichern, umschalten, pruefen, bei Fehler zurueck.
 #
 #   deploy.sh 1.2.3            auf Version 1.2.3 wechseln
 #   deploy.sh --rollback       zur vorherigen Version zurueck
@@ -7,7 +7,7 @@
 #   deploy.sh 1.2.3 --dry-run  nur pruefen (Image ziehen, nichts umschalten)
 #
 # Erwartet im Verzeichnis SHOWCASE_DIR (Vorgabe: Verzeichnis dieses Skripts/..): docker-compose.yml mit
-#   image: ghcr.io/<konto>/immich-showcase:${SHOWCASE_VERSION}
+#   image: ghcr.io/<konto>/frameside:${SHOWCASE_VERSION}
 # und eine Datei .env mit der Zeile SHOWCASE_VERSION=<version> (Compose liest sie selbst). Die Registry-Anmeldung
 # (docker login ghcr.io) muss einmal auf dem Server erfolgt sein, wenn das Image privat ist.
 set -euo pipefail
@@ -19,7 +19,7 @@ set -euo pipefail
 for _v in $(compgen -A variable | grep '^GUCKLOCH_' || true); do _n="SHOWCASE_${_v#GUCKLOCH_}"; [[ -n "${!_n:-}" ]] || printf -v "$_n" '%s' "${!_v}"; done
 
 DIR="${SHOWCASE_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
-IMAGE="${SHOWCASE_IMAGE:-ghcr.io/dirkvoss/immich-showcase}"
+IMAGE="${SHOWCASE_IMAGE:-ghcr.io/dirkvoss/frameside}"
 HEALTH="${SHOWCASE_HEALTH_URL:-http://127.0.0.1:8090}"
 DATA="${SHOWCASE_DATA_DIR:-$DIR/data}"
 BACKUPS="${SHOWCASE_BACKUP_DIR:-$DIR/backups}"
@@ -117,7 +117,7 @@ sichern "$ALT"
 echo "$ALT" > "$PREV"
 log "Umschalten ..."
 if umschalten "$NEU"; then
-  log "OK: Immich Showcase $NEU laeuft, antwortet und hat die Pruefungen bestanden"
+  log "OK: Frameside $NEU laeuft, antwortet und hat die Pruefungen bestanden"
   # Alte Images aufraeumen, die vorherige Version bleibt fuer den Rueckweg
   docker images --format '{{.Repository}}:{{.Tag}}' "$IMAGE" | grep -v -e ":$NEU\$" -e ":${ALT:-__}\$" | xargs -r docker rmi >/dev/null 2>&1 || true
   exit 0

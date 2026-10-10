@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Raspberry Pi als Bilderrahmen / Fernseher-Anzeige fuer Immich Showcase einrichten (Chromium im Kiosk-Modus, startet beim Einschalten).
+# Raspberry Pi als Bilderrahmen / Fernseher-Anzeige fuer Frameside einrichten (Chromium im Kiosk-Modus, startet beim Einschalten).
 # Fuer Raspberry Pi OS mit Desktop (Bookworm oder neuer). Als normaler Benutzer ausfuehren (nicht root); fuer die Installation fragt sudo nach dem Passwort.
 #
 #   ./setup-kiosk.sh http://192.168.1.20:8090/tv/?ziel=rahmen     fester Rahmen (Kennung wie in .env: RAHMEN_WEB_RAHMEN_ZIELE)
@@ -39,7 +39,7 @@ command -v raspi-config >/dev/null 2>&1 && sudo raspi-config nonint do_blanking 
 echo "== Starter schreiben: $STARTER"
 cat > "$STARTER" <<STARTER_EOF
 #!/usr/bin/env bash
-# Wartet, bis Immich Showcase erreichbar ist, und startet Chromium im Kiosk-Modus. Stuerzt der Browser ab, startet er neu.
+# Wartet, bis Frameside erreichbar ist, und startet Chromium im Kiosk-Modus. Stuerzt der Browser ab, startet er neu.
 exec 9>/tmp/immich-showcase-kiosk.lock; flock -n 9 || exit 0      # nur eine Instanz (falls zwei Autostart-Wege greifen)
 URL="$URL"
 HOST="\${URL#*://}"; HOST="\${HOST%%/*}"
@@ -58,7 +58,7 @@ mkdir -p "$(dirname "$DESKTOP")" "$(dirname "$LABWC")"
 cat > "$DESKTOP" <<DESKTOP_EOF
 [Desktop Entry]
 Type=Application
-Name=Immich Showcase Kiosk
+Name=Frameside Kiosk
 Exec=$STARTER
 X-GNOME-Autostart-enabled=true
 DESKTOP_EOF

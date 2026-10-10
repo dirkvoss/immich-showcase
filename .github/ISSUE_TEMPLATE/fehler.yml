@@ -12,7 +12,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Immich Showcase version
+      label: Frameside version
       description: "Shown at the top left of the app (for example v2.6.1) and at /api/config / Steht links oben in der App"
   - type: input
     id: immich

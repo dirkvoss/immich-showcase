@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Integrationstest gegen ein ECHTES Immich einer bestimmten Version: startet Immich (ohne ML), fuellt es mit erfundenen Fotos/Personen/Konten,
-# baut Immich Showcase, laesst es sich per API-Schluessel verbinden und fuehrt postdeploy.py + Zusatzpruefungen aus.
+# baut Frameside, laesst es sich per API-Schluessel verbinden und fuehrt postdeploy.py + Zusatzpruefungen aus.
 #   tests/integration_immich.sh [immich-version] [showcase-image]      z. B. v3.2.4
 # Braucht Docker, Python 3 mit Pillow, exiftool, ffmpeg, curl. Laeuft in GitHub Actions fuer mehrere Immich-Versionen.
 set -euo pipefail
@@ -16,7 +16,7 @@ fail() {
   echo "FEHL $*"
   echo "--- Container"; docker ps -a --filter "name=$P" --format '{{.Names}}: {{.Status}}' || true
   for c in $(docker ps -aq --filter "name=$P"); do docker inspect -f '{{.Name}} OOMKilled={{.State.OOMKilled}} ExitCode={{.State.ExitCode}}' "$c" || true; done
-  echo "--- Immich Showcase"; docker logs "${P}_showcase" 2>&1 | grep -v 'GET /api/me' | tail -25 || true
+  echo "--- Frameside"; docker logs "${P}_showcase" 2>&1 | grep -v 'GET /api/me' | tail -25 || true
   echo "--- Immich"; docker compose -p "$P" -f dev/docker-compose.immich.yml logs --tail 15 immich-server 2>&1 || true
   exit 1
 }
@@ -36,13 +36,13 @@ echo "== Testdaten einspielen"
 python3 dev/seed_immich.py --url "http://127.0.0.1:$PORT" --fotos 30 --sparsam --ausgabe "$W/zugang.json" | tail -1
 KEY="$(python3 -c "import json;print(json.load(open('$W/zugang.json'))['api_key'])")"
 
-echo "== Immich Showcase starten"
+echo "== Frameside starten"
 [[ $# -ge 2 ]] || docker build -q -t "$IMG" . >/dev/null
 docker run -d --name "${P}_showcase" --network "${P}_default" -p "127.0.0.1:$GPORT:8090" --read-only --tmpfs /tmp --cap-drop ALL \
   -e RAHMEN_IMMICH_URL="http://immich-server:2283/api" -e RAHMEN_IMMICH_KEY="$KEY" -e SHOWCASE_PIN=123456 \
   -e RAHMEN_WEB_RAHMEN_ZIELE=rahmen=Rahmen -e RAHMEN_WEB_AUTH=beide "$IMG" >/dev/null
 for _ in $(seq 1 40); do curl -fsS "http://127.0.0.1:$GPORT/api/config" >/dev/null 2>&1 && break; sleep 1; done
-curl -fsS "http://127.0.0.1:$GPORT/api/config" | grep -q '"konfiguriert":true' && ok "Immich Showcase laeuft gegen Immich $IMV" || fail "Immich Showcase startet nicht"
+curl -fsS "http://127.0.0.1:$GPORT/api/config" | grep -q '"konfiguriert":true' && ok "Frameside laeuft gegen Immich $IMV" || fail "Frameside startet nicht"
 
 echo "== Pruefungen (Immich verarbeitet die Fotos noch: bis zu 6 Minuten warten)"
 ende=$((SECONDS + 360)); ERG=1

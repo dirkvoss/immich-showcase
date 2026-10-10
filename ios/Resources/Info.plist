@@ -9,7 +9,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Showcase Immich</string>
+	<string>Frameside</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -17,7 +17,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Showcase Immich</string>
+	<string>Frameside</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -58,7 +58,7 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>Face ID schützt die App, wenn du das in den App-Einstellungen eingeschaltet hast.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Die App verbindet sich mit deinem Immich-Showcase-Server im Heimnetz.</string>
+	<string>Die App verbindet sich mit deinem Frameside-Server im Heimnetz.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

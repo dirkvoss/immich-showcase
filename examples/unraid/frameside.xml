@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
-<!-- Unraid-Vorlage fuer Immich Showcase. Installation: Docker-Tab -> "Container hinzufuegen" -> unten "Vorlage" ... oder die Datei nach
+<!-- Unraid-Vorlage fuer Frameside. Installation: Docker-Tab -> "Container hinzufuegen" -> unten "Vorlage" ... oder die Datei nach
      /boot/config/plugins/dockerMan/templates-user/ kopieren, dann erscheint sie unter "Vorlage". Zeigt Immich auf dem Fernseher und auf Tablets als Bilderrahmen. -->
 <Container version="2">
-  <Name>immich-showcase</Name>
-  <Repository>ghcr.io/dirkvoss/immich-showcase:latest</Repository>
-  <Registry>https://github.com/dirkvoss/immich-showcase/pkgs/container/immich-showcase</Registry>
+  <Name>frameside</Name>
+  <Repository>ghcr.io/dirkvoss/frameside:latest</Repository>
+  <Registry>https://github.com/dirkvoss/frameside/pkgs/container/frameside</Registry>
   <Network>bridge</Network>
   <MyIP/>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
-  <Support>https://github.com/dirkvoss/immich-showcase/issues</Support>
-  <Project>https://github.com/dirkvoss/immich-showcase</Project>
-  <Overview>Zeigt deine Immich-Fotos auf dem Fernseher und auf Tablets (Bilderrahmen) und laesst die ganze Familie per Handy Shows schicken. Nach dem Start oeffnest du WebUI und folgst dem Einrichtungsassistenten (3 Schritte; den Einrichtungs-Code zeigt das Protokoll des Containers). Dazu passt die iPhone-App "Showcase Immich".</Overview>
+  <Support>https://github.com/dirkvoss/frameside/issues</Support>
+  <Project>https://github.com/dirkvoss/frameside</Project>
+  <Overview>Zeigt deine Immich-Fotos auf dem Fernseher und auf Tablets (Bilderrahmen) und laesst die ganze Familie per Handy Shows schicken. Nach dem Start oeffnest du WebUI und folgst dem Einrichtungsassistenten (3 Schritte; den Einrichtungs-Code zeigt das Protokoll des Containers). Dazu passt die iPhone-App "Frameside".</Overview>
   <Category>MediaApp:Photos Tools:</Category>
   <WebUI>http://[IP]:[PORT:8090]/</WebUI>
-  <TemplateURL>https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/examples/unraid/immich-showcase.xml</TemplateURL>
-  <Icon>https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/static/icon-512.png</Icon>
+  <TemplateURL>https://raw.githubusercontent.com/dirkvoss/frameside/main/examples/unraid/frameside.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/dirkvoss/frameside/main/static/icon-512.png</Icon>
   <ExtraParams>--user 99:100 --read-only --tmpfs /tmp --cap-drop ALL --security-opt no-new-privileges:true --memory 768m --label com.centurylinklabs.watchtower.enable=true</ExtraParams>
   <PostArgs/>
   <DonateText/>

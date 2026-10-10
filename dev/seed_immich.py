@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fuellt eine FRISCHE Test-Immich-Instanz fuer die Immich-Showcase-Entwicklung: Administrator, Testbenutzer, API-Schluessel, ~70 erfundene
+"""Fuellt eine FRISCHE Test-Immich-Instanz fuer die Frameside-Entwicklung: Administrator, Testbenutzer, API-Schluessel, ~70 erfundene
 Fotos (Datum, GPS, Orte), 3 Videos, 3 Personen mit Gesichtern. Nichts davon ist echt. Nicht gegen eine echte Immich-Installation ausfuehren!
 
 Aufruf (auf dem Entwicklungsrechner, Immich unter http://localhost:2283):

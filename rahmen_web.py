@@ -72,7 +72,7 @@ def _liste(name, default=""):
 
 # Alles Installationsspezifische kommt aus Umgebungsvariablen (siehe .env.example); die Vorgaben sind bewusst sicher:
 # ohne Angabe gibt es kein "vertrautes Netz" und keinen vertrauten Proxy - dann braucht jeder die PIN.
-APP_NAME = os.environ.get("RAHMEN_WEB_NAME", "").strip() or "Immich Showcase"
+APP_NAME = os.environ.get("RAHMEN_WEB_NAME", "").strip() or "Frameside"
 VERSION = os.environ.get("SHOWCASE_VERSION", "dev")                       # beim Bauen des Images gesetzt
 # Wofuer die Installation gedacht ist: rahmen (nur Bilderrahmen), tv (nur Fernseher) oder beides. Steuert, welche Knoepfe die App zeigt.
 # Anmeldung: pin (gemeinsame PIN, Vorgabe), immich (Immich-Konto: E-Mail + Passwort, jeder sieht nur seine Fotos) oder beide
@@ -81,7 +81,7 @@ if AUTH not in ("pin", "immich", "beide"):
     AUTH = "pin"
 BENUTZER_FILE = os.environ.get("RAHMEN_WEB_BENUTZER_FILE", "/var/lib/bilderrahmen/rahmen_web_benutzer.json")
 UID_CTX = contextvars.ContextVar("rahmen_uid", default=None)
-KEY_NAME = "Immich Showcase"
+KEY_NAME = "Frameside"
 KEY_RECHTE = ["asset.read", "asset.view", "asset.statistics", "timeline.read", "person.read", "album.create", "album.read", "album.update",
               "album.delete", "albumAsset.create", "albumAsset.delete", "map.read", "user.read",
               "asset.upload"]       # keine Foto-Loeschrechte; user.read = eigenes Profil (Name); asset.upload = Fotos vom Handy ins EIGENE Immich-Konto senden
@@ -523,7 +523,7 @@ def login_schluessel(request: Request, response: Response, daten: dict):
 
 def login_immich(request: Request, response: Response, daten: dict):
     """Anmeldung mit dem Immich-Konto. Das Passwort wird nur an Immich weitergereicht; gespeichert wird ein eigener, widerrufbarer
-    API-Schluessel 'Immich Showcase' (ohne Loeschrechte) dieser Person. Die Immich-Sitzung wird sofort wieder beendet."""
+    API-Schluessel 'Frameside' (ohne Loeschrechte) dieser Person. Die Immich-Sitzung wird sofort wieder beendet."""
     ip = client_ip(request)
     email = str(daten.get("email", "")).strip().lower()[:200]
     passwort = str(daten.get("passwort", ""))[:200]
@@ -559,7 +559,7 @@ def login_immich(request: Request, response: Response, daten: dict):
             schreibe_json(AUTH_STATE, st)
         H.log.warning("Falsche Immich-Anmeldung von %s", ip)
         if alarm:
-            pushover("Immich Showcase: viele falsche Anmeldungen", f"{len(st['global'])} Fehlversuche in der letzten Stunde, zuletzt von {ip}", 1)
+            pushover("Frameside: viele falsche Anmeldungen", f"{len(st['global'])} Fehlversuche in der letzten Stunde, zuletzt von {ip}", 1)
         time.sleep(1)
         raise HTTPException(401, "E-Mail oder Passwort falsch")
     token, uid = antwort["accessToken"], antwort["userId"]
@@ -634,7 +634,7 @@ def setup_code_erzeugen():
         return
     SETUP_CODE["wert"] = "%06d" % secrets.randbelow(10 ** 6)
     H.log.warning("=" * 66)
-    H.log.warning(" Immich Showcase ist noch nicht eingerichtet. Oeffne  http://<server>:8090/setup/?code=%s", SETUP_CODE["wert"])
+    H.log.warning(" Frameside ist noch nicht eingerichtet. Oeffne  http://<server>:8090/setup/?code=%s", SETUP_CODE["wert"])
     H.log.warning(" oder oeffne  http://<server>:8090/setup/  und gib diesen Einrichtungs-Code ein: %s", SETUP_CODE["wert"])
     H.log.warning("=" * 66)
 
@@ -855,7 +855,7 @@ def diagnose(_=Depends(anmeldung)):
 
 # --------------------------------------------------------------------------- Update-Hinweis (freiwillig)
 UPDATE_PRUEFEN = os.environ.get("RAHMEN_WEB_UPDATE_PRUEFEN", "1").strip().lower() not in ("0", "nein", "false", "aus", "no")
-UPDATE_QUELLE = "https://api.github.com/repos/dirkvoss/immich-showcase/tags?per_page=30"
+UPDATE_QUELLE = "https://api.github.com/repos/dirkvoss/frameside/tags?per_page=30"
 
 
 def versionsnummer(text):
@@ -2645,7 +2645,7 @@ def rahmen_zusatz(ziel: str = "", g=Depends(geraet)):
 def notiz_setzen(z: str, daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
     """Kurze Nachricht an einen Rahmen ({"text": "...", "stunden": 1..168}); leerer Text entfernt sie."""
     global NOTIZEN
-    if z not in RAHMEN_ZIELE:
+    if z not in TV_ZIELE:
         raise HTTPException(404, "Rahmen nicht gefunden")
     text = " ".join(str(daten.get("text") or "").split())[:NOTIZ_MAX]
     neu = {k: v for k, v in NOTIZEN.items() if k != z}
@@ -2710,17 +2710,27 @@ def gaeste_fuer(z, jetzt=None):
     return None, None
 
 
+def basis_mit_schema(adresse):
+    """'tv.example.com' -> 'https://tv.example.com'; IP-Adressen, .local und Namen ohne Punkt -> 'http://...' (Heimnetz). Mit Schema bleibt es, wie es ist; leer -> ''."""
+    a = str(adresse or "").strip().rstrip("/")
+    if not a or re.match(r"^https?://", a, re.I):
+        return a
+    host = a.split("/")[0].split(":")[0]
+    privat = host.endswith(".local") or "." not in host or bool(re.fullmatch(r"\d{1,3}(\.\d{1,3}){3}", host))
+    return ("http://" if privat else "https://") + a
+
+
 def gaeste_zusatz(z):
     k, f = gaeste_fuer(z)
     if not k:
         return None
-    return {"pfad": "/gast/" + k, "basis": tv_url() or "", "anzahl": f.get("anzahl", 0), "ids": list(f.get("ids", []))[-30:], "bis": f["bis"]}
+    return {"pfad": "/gast/" + k, "basis": basis_mit_schema(tv_url()), "anzahl": f.get("anzahl", 0), "ids": list(f.get("ids", []))[-30:], "bis": f["bis"]}
 
 
 @app.post("/api/gaeste/{z}")
 def gaeste_starten(z: str, daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
     """Startet den Gaeste-Upload fuer einen Rahmen ('stunden' 1-72, Standard 8): ein QR-Code am Rahmen fuehrt zu einer Seite, auf der Gaeste Fotos hochladen."""
-    if z not in RAHMEN_ZIELE:
+    if z not in TV_ZIELE:
         raise HTTPException(404, "Rahmen nicht gefunden")
     if not upload_schluessel():
         raise HTTPException(403, "Hochladen ist nicht eingerichtet")
@@ -2734,7 +2744,7 @@ def gaeste_starten(z: str, daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
         kennung = secrets.token_urlsafe(12)
         neu[kennung] = {"ziel": z, "bis": (jetzt + datetime.timedelta(hours=stunden)).isoformat(timespec="seconds"), "anzahl": 0, "ids": []}
         gaeste_speichern(neu)
-    return {"ok": True, "pfad": "/gast/" + kennung, "bis": neu[kennung]["bis"], "basis": tv_url() or ""}
+    return {"ok": True, "pfad": "/gast/" + kennung, "bis": neu[kennung]["bis"], "basis": basis_mit_schema(tv_url())}
 
 
 @app.get("/api/gaeste/{z}")
@@ -2805,7 +2815,7 @@ def gruesse_speichern(neu):
 @app.put("/api/gruss/{z}")
 def gruss_setzen(z: str, daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
     """Gruss an einen Rahmen: Foto ('id' eines hochgeladenen Fotos, optional) und Text, fuer 'minuten' (Standard 120). Ohne Foto und Text wird er entfernt."""
-    if z not in RAHMEN_ZIELE:
+    if z not in TV_ZIELE:
         raise HTTPException(404, "Rahmen nicht gefunden")
     text = " ".join(str(daten.get("text") or "").split())[:NOTIZ_MAX]
     absender = " ".join(str(daten.get("absender") or "").split())[:40]
@@ -2999,6 +3009,9 @@ FUELLUNGEN = ("balken", "unscharf", "zuschnitt")
 NACHT_RE = re.compile(r"(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})")
 
 
+RAHMEN_NUR_FELDER = ("sek", "anzeige", "quellen", "zeitplan", "erinnerungen", "favoriten", "geburtstagsfotos", "alarm_min")      # Dauerprogramm; die Anzeige-Einstellungen gelten auch fuer Fernseher
+
+
 def geraet_ansicht(z, e):
     t = TV.get(z) or {}
     return {"layout": layout_fuer(z), "layout_eigen": bool(e.get("layout")), "bewegung": bool(e.get("bewegung")), "paare": bool(e.get("paare")), "erinnerungen": e.get("erinnerungen") or "", "favoriten": e.get("favoriten") or "", "geburtstagsfotos": e.get("geburtstagsfotos", True), "wetter": e.get("wetter") or None, "termin_quellen": e.get("termin_quellen") or [],
@@ -3026,8 +3039,9 @@ def geraet_felder(daten, art):
         if v and v not in FUELLUNGEN:
             raise HTTPException(400, "Unbekannte Hintergrund-Füllung")
         (setzen.__setitem__("fuellung", v) if v else weg.append("fuellung"))
-    if art == "rahmen":
-        if "sek" in daten:
+    if True:                                                    # Anzeige-Einstellungen gelten fuer Rahmen und Fernseher; nur das Dauerprogramm ist Sache der Rahmen
+        rahmen = art == "rahmen"
+        if rahmen and "sek" in daten:
             if daten["sek"] in (None, ""):
                 weg.append("sek")
             else:
@@ -3035,22 +3049,22 @@ def geraet_felder(daten, art):
                     setzen["sek"] = max(3, min(int(daten["sek"]), 120))
                 except (TypeError, ValueError):
                     raise HTTPException(400, "Sekunden pro Foto: bitte eine Zahl zwischen 3 und 120")
-        if "anzeige" in daten:
+        if rahmen and "anzeige" in daten:
             a = daten["anzeige"] if isinstance(daten["anzeige"], list) else []
             if any(x not in ("datum", "zeit", "ort") for x in a):
                 raise HTTPException(400, "Unbekannte Bildunterschrift")
             (setzen.__setitem__("anzeige", [x for x in ("datum", "zeit", "ort") if x in a]) if a else weg.append("anzeige"))
-        if "erinnerungen" in daten:
+        if rahmen and "erinnerungen" in daten:
             v = str(daten["erinnerungen"] or "")
             if v and v not in ERINNERUNG_STUFEN:
                 raise HTTPException(400, "Unbekannte Stufe für die Erinnerungen")
             (setzen.__setitem__("erinnerungen", v) if v else weg.append("erinnerungen"))
-        if "favoriten" in daten:
+        if rahmen and "favoriten" in daten:
             v = str(daten["favoriten"] or "")
             if v and v not in ERINNERUNG_STUFEN:
                 raise HTTPException(400, "Unbekannte Stufe für die Favoriten")
             (setzen.__setitem__("favoriten", v) if v else weg.append("favoriten"))
-        if "geburtstagsfotos" in daten:
+        if rahmen and "geburtstagsfotos" in daten:
             if not isinstance(daten["geburtstagsfotos"], bool):
                 raise HTTPException(400, "Bitte ein oder aus")
             (weg.append("geburtstagsfotos") if daten["geburtstagsfotos"] else setzen.__setitem__("geburtstagsfotos", False))      # Standard: an
@@ -3103,13 +3117,13 @@ def geraet_felder(daten, art):
                 setzen["nacht"] = v
             elif "nacht" not in setzen:
                 weg.append("nacht")
-        if "quellen" in daten:
+        if rahmen and "quellen" in daten:
             v = str(daten["quellen"] or "").strip()
             for tok in [x.strip() for x in v.split(",") if x.strip()]:
                 if not quelle_lesen(tok):
                     raise HTTPException(400, f"Unbekannte Quelle: {tok}")
             (setzen.__setitem__("quellen", v) if v else weg.append("quellen"))
-        if "alarm_min" in daten:
+        if rahmen and "alarm_min" in daten:
             if daten["alarm_min"] in (None, ""):
                 weg.append("alarm_min")
             else:
@@ -3117,7 +3131,7 @@ def geraet_felder(daten, art):
                     setzen["alarm_min"] = max(0, min(int(daten["alarm_min"]), 1440))
                 except (TypeError, ValueError):
                     raise HTTPException(400, "Meldung nach: bitte Minuten angeben (0 = nie, höchstens 1440)")
-        if "zeitplan" in daten:
+        if rahmen and "zeitplan" in daten:
             v = str(daten["zeitplan"] or "").strip()
             if v and len(zeitplan_lesen(v)) != len([x for x in v.split(";") if x.strip()]):
                 raise HTTPException(400, "Zeitplan nicht lesbar – Beispiel: Mo-Fr 18:00-22:00 = neu14:70, *:30; Sa,So 08:00-20:00 = *")
@@ -3207,7 +3221,15 @@ def geraet_aendern(z: str, daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
     with GERAETE_LOCK:
         if z not in GERAETE:
             raise HTTPException(404, "Gerät nicht gefunden")
-        setzen, weg = geraet_felder(daten, GERAETE[z]["art"])
+        neue_art = daten.get("art")
+        if neue_art not in (None, "rahmen", "tv"):
+            raise HTTPException(400, "Bitte Rahmen oder Fernseher wählen")
+        art_jetzt = neue_art or GERAETE[z]["art"]
+        setzen, weg = geraet_felder(daten, art_jetzt)
+        if art_jetzt != GERAETE[z]["art"]:                                       # falsch angelegt: Art aendern; Einstellungen der alten Art fallen weg
+            setzen["art"] = art_jetzt
+            if art_jetzt == "tv":
+                weg += [k for k in GERAETE[z] if k in RAHMEN_NUR_FELDER and k not in weg]
         verworfen = meldet_selbst(z) and (bool(setzen.get("fully_host")) or "fully_host" in GERAETE[z])
         if meldet_selbst(z):                                    # das Tablet steuert sich selbst -> Adresse und Passwort sind ueberfluessig (und aus dem DMZ-Netz oft gar nicht erreichbar)
             for k in ("fully_host", "fully_pw"):
@@ -3513,7 +3535,7 @@ def einstellungen_testen(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
             pushover_senden(titel, text, 0)
             return {"ok": True, "nachricht": "Monatsbrief (Vormonat) gesendet"}
         if was == "pushover":
-            pushover_senden("Immich Showcase", "Test: Benachrichtigungen funktionieren.", 0)
+            pushover_senden("Frameside", "Test: Benachrichtigungen funktionieren.", 0)
             return {"ok": True, "nachricht": "Test-Nachricht gesendet"}
     except Exception as e:  # noqa: BLE001
         raise HTTPException(502, f"Test fehlgeschlagen: {e}")
@@ -3580,6 +3602,22 @@ def koppel_aufraeumen(jetzt):
         del KOPPEL[c]
 
 
+def ua_beschreibung(ua):
+    """Aus dem Browser-Kennzeichen eines Geraets: (verstaendlicher Name, Art 'tv' oder 'rahmen'). Fuer die Liste wartender Geraete in der App."""
+    u = str(ua or "")
+    tv = (("LG", "LG-Fernseher", r"Web0S|webOS|NetCast"), ("Samsung", "Samsung-Fernseher", r"Tizen|SMART-TV|SmartTV"), ("Fire", "Fire TV", r"\bAFT[A-Z0-9]{1,4}\b"),
+          ("Sony", "Sony-Fernseher", r"BRAVIA"), ("Shield", "Nvidia Shield", r"SHIELD"), ("Chromecast", "Chromecast", r"CrKey"), ("Roku", "Roku", r"Roku"),
+          ("Vidaa", "Hisense-Fernseher", r"VIDAA|HbbTV"), ("Android TV", "Android-TV", r"Android TV|Android.{0,40}\bTV\b"))
+    for _k, name, muster in tv:
+        if re.search(muster, u, re.I):
+            return name, "tv"
+    for muster, name in ((r"iPad", "iPad"), (r"iPhone", "iPhone"), (r"Android", "Android-Tablet"), (r"CrOS", "Chromebook"), (r"Macintosh", "Mac"), (r"Windows", "Windows-PC"),
+                         (r"Raspbian|Raspberry|aarch64|armv", "Raspberry Pi"), (r"Linux|X11", "Linux-Rechner")):
+        if re.search(muster, u):
+            return name, "rahmen"
+    return "Unbekanntes Gerät", "rahmen"
+
+
 @app.post("/api/koppeln/neu")
 def koppeln_neu(request: Request, _=Depends(csrf)):
     """Ein noch nicht gekoppeltes Geraet (Fernseher/Tablet) holt sich einen Code, der am Handy eingegeben wird. Ohne Anmeldung, aber begrenzt."""
@@ -3589,7 +3627,8 @@ def koppeln_neu(request: Request, _=Depends(csrf)):
         if len(KOPPEL) >= 30 or sum(1 for v in KOPPEL.values() if v["ip"] == ip) >= 5:
             raise HTTPException(429, "Zu viele offene Codes - bitte kurz warten")
         code = "".join(secrets.choice(KOPPEL_ZEICHEN) for _ in range(6))
-        KOPPEL[code] = {"t": jetzt, "ziel": None, "ip": ip}
+        name, art = ua_beschreibung(request.headers.get("user-agent"))
+        KOPPEL[code] = {"t": jetzt, "ziel": None, "ip": ip, "geraet": name, "art": art}
     return {"code": code, "gueltig_s": KOPPEL_LEBEN}
 
 
@@ -3606,6 +3645,43 @@ def koppeln_status(request: Request, response: Response, code: str = ""):
                             samesite="strict", secure=request.headers.get("x-forwarded-proto") == "https")
         H.log.info("Geraete-Zugang ausgestellt fuer %s (von %s)", z, client_ip(request))
     return {"ziel": z, "name": TV_ZIELE.get(z) if z else None}
+
+
+@app.get("/api/koppeln/wartend")
+def koppeln_wartend(_=Depends(anmeldung)):
+    """Geraete (Fernseher, Tablets ...), die gerade ihren Kopplungs-Code zeigen und noch niemandem zugewiesen sind: die App bietet sie zum Verbinden an."""
+    jetzt = time.time()
+    with KOPPEL_LOCK:
+        koppel_aufraeumen(jetzt)
+        offen = sorted(((c, v) for c, v in KOPPEL.items() if not v["ziel"]), key=lambda x: -x[1]["t"])        # neueste zuerst
+    gesehen, liste = set(), []
+    for c, v in offen:
+        schluessel = (v.get("ip"), v.get("geraet"))                    # lädt ein Gerät seine Seite neu, bekommt es einen neuen Code: nur der neueste zählt
+        if schluessel in gesehen:
+            continue
+        gesehen.add(schluessel)
+        liste.append({"code": c, "geraet": v.get("geraet") or "Gerät", "art": v.get("art") or "rahmen", "vor_s": int(jetzt - v["t"])})
+    return {"geraete": liste}
+
+
+@app.post("/api/koppeln/neues-geraet")
+def koppeln_neues_geraet(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
+    """Legt fuer ein wartendes Geraet (Code) gleich ein neues Geraet an und verbindet es - ein Schritt ohne Code-Eingabe."""
+    code = str(daten.get("code", "")).strip().upper()
+    with KOPPEL_LOCK:
+        koppel_aufraeumen(time.time())
+        eintrag = KOPPEL.get(code)
+    if not eintrag:
+        raise HTTPException(404, "Das Gerät wartet nicht mehr - bitte die Adresse dort noch einmal öffnen")
+    art = str(daten.get("art") or eintrag.get("art") or "rahmen")
+    if art not in ("rahmen", "tv"):
+        raise HTTPException(400, "Bitte Rahmen oder Fernseher wählen")
+    neu = geraet_anlegen({"art": art, "name": daten.get("name")}, None, None)
+    with KOPPEL_LOCK:
+        if code not in KOPPEL:
+            raise HTTPException(404, "Das Gerät wartet nicht mehr - bitte die Adresse dort noch einmal öffnen")
+        KOPPEL[code]["ziel"] = neu["id"]
+    return {"ok": True, "id": neu["id"], "name": TV_ZIELE[neu["id"]], "art": art}
 
 
 @app.post("/api/koppeln")
@@ -3866,6 +3942,8 @@ def tv_senden(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
             d["shows"].insert(0, e)
             daten_schreiben(d)
     felder = {"ids": ids, "name": name, "sek": sek, "zufall": reihe == "zufall", "musik": musik, "laut": laut, "videos": videos, "maxv": maxv}
+    if daten.get("schlicht") is True:                  # "Einfache Diashow": nur Fotos, ohne Uhr, Wetter, Termine und andere Einblendungen
+        felder["schlicht"] = True
 
     def veroeffentlichen():
         player_ereignis(z, felder)
@@ -4247,7 +4325,7 @@ def upload_album_id(key=None):
             passend = [a for a in immich_aufruf("GET", "/albums", schluessel=key) or [] if a.get("albumName") == UPLOAD_ALBUM]
             if passend:
                 return sorted(passend, key=lambda a: (-(a.get("assetCount") or 0), a.get("createdAt") or ""))[0]["id"]
-            return immich_aufruf("POST", "/albums", {"albumName": UPLOAD_ALBUM, "description": "Von der Showcase-App hochgeladene Fotos"}, schluessel=key)["id"]
+            return immich_aufruf("POST", "/albums", {"albumName": UPLOAD_ALBUM, "description": "Von der Frameside-App hochgeladene Fotos"}, schluessel=key)["id"]
     return zwischenspeicher("upload-album", 600, holen)
 
 

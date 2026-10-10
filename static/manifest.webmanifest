@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "Immich Showcase",
-  "short_name": "Immich Showcase",
+  "name": "Frameside",
+  "short_name": "Frameside",
   "description": "Fotos aussuchen und auf Bilderrahmen oder Fernseher zeigen",
   "start_url": "/",
   "scope": "/",

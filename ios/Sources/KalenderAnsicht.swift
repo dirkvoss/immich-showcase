@@ -28,7 +28,7 @@ struct KalenderAbschnitt: View {
                 ColorPicker("Farbe am Rahmen", selection: Binding(get: { Color(hex: kalender.farbe) ?? .orange }, set: { kalender.farbe = $0.hexWert; kalender.nachAenderung() }), supportsOpacity: false)
             }
             if kalender.zugriffVerweigert {
-                Text("Der Zugriff auf den Kalender ist nicht erlaubt. Bitte erlaube ihn in den iOS-Einstellungen unter „Showcase Immich“ → „Kalender“.").font(.footnote).foregroundStyle(.red)
+                Text("Der Zugriff auf den Kalender ist nicht erlaubt. Bitte erlaube ihn in den iOS-Einstellungen unter „Frameside“ → „Kalender“.").font(.footnote).foregroundStyle(.red)
                 if let url = URL(string: UIApplication.openSettingsURLString) { Link("iOS-Einstellungen öffnen", destination: url) }
             }
             if let status = kalender.status { Text(status).font(.footnote).foregroundStyle(.secondary) }

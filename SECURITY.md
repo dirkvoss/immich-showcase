@@ -3,8 +3,8 @@
 ## Eine Lücke melden
 Bitte **nicht** öffentlich als Issue, sondern über die private Meldung von GitHub (Reiter *Security* → *Report a vulnerability*). Du bekommst eine Antwort innerhalb von sieben Tagen.
 
-## Was Immich Showcase darf (und was nicht)
-- **Keine Löschrechte:** Der Immich-Schlüssel braucht nur Lese-Rechte plus Alben-Verwaltung. Immich Showcase löscht nie Fotos. Beim Anmelden mit dem Immich-Konto legt es für jede Person einen eigenen, in Immich einsehbaren und widerrufbaren Schlüssel „Immich Showcase“ ohne Lösch-Rechte an. Das Passwort wird nur an Immich weitergereicht und nicht gespeichert; die Immich-Sitzung wird sofort wieder beendet.
+## Was Frameside darf (und was nicht)
+- **Keine Löschrechte:** Der Immich-Schlüssel braucht nur Lese-Rechte plus Alben-Verwaltung. Frameside löscht nie Fotos. Beim Anmelden mit dem Immich-Konto legt es für jede Person einen eigenen, in Immich einsehbaren und widerrufbaren Schlüssel „Frameside“ ohne Lösch-Rechte an. Das Passwort wird nur an Immich weitergereicht und nicht gespeichert; die Immich-Sitzung wird sofort wieder beendet.
 - **Zugang:** Ohne Angabe verlangt jede Anfrage eine PIN oder ein Konto. Ein vertrautes Netz (`RAHMEN_WEB_LAN`) gilt nur, wenn du es einträgst. Falsche PINs/Passwörter werden je Adresse und je E-Mail gesperrt (5 Versuche, 15 Minuten); schreibende Aufrufe brauchen einen eigenen Header.
 - **Container:** läuft ohne Root, mit schreibgeschütztem Dateisystem, ohne Linux-Capabilities und mit Speichergrenze.
 - **Geheimnisse:** PIN nur als scrypt-Hash, Sitzungs-Cookies signiert (90 Tage, `HttpOnly`, `SameSite=Strict`, `Secure` hinter HTTPS). Eigene Einstellungen und Schlüssel gehören in `.env` bzw. das Datenvolumen, nie ins Repository.

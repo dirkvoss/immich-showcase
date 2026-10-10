@@ -43,7 +43,7 @@ class Health(http.server.BaseHTTPRequestHandler):
         v = open(os.path.join(Health.fake, "laeuft")).read().strip() if os.path.exists(os.path.join(Health.fake, "laeuft")) else ""
         if not v:
             self.send_response(503); self.end_headers(); return
-        body = json.dumps({"name": "Immich Showcase", "version": v}).encode() if self.path == "/api/config" else b"{}"
+        body = json.dumps({"name": "Frameside", "version": v}).encode() if self.path == "/api/config" else b"{}"
         self.send_response(200); self.end_headers(); self.wfile.write(body)
 
     def log_message(self, *a):

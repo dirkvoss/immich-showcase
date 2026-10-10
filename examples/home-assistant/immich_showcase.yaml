@@ -1,8 +1,8 @@
-# Immich Showcase in Home Assistant: Zustand der Fernseher/Rahmen lesen und steuern.
+# Frameside in Home Assistant: Zustand der Fernseher/Rahmen lesen und steuern.
 # Als Package ablegen (config/packages/immich_showcase.yaml; in configuration.yaml: homeassistant: packages: !include_dir_named packages)
 # ODER die Abschnitte in die eigene Konfiguration uebernehmen. Ersetze SHOWCASE durch Adresse und Port, z. B. 192.168.1.20:8090.
 #
-# Voraussetzung: Die Adresse von Home Assistant muss bei Immich Showcase zum vertrauten Netz gehoeren (.env: RAHMEN_WEB_LAN=192.168.1.0/24).
+# Voraussetzung: Die Adresse von Home Assistant muss bei Frameside zum vertrauten Netz gehoeren (.env: RAHMEN_WEB_LAN=192.168.1.0/24).
 
 rest:
   - resource: http://SHOWCASE/api/ha/status

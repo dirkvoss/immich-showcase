@@ -85,7 +85,7 @@ final class DemoTests: XCTestCase {
     func testOberflaecheLiegtImPaket() {
         let a = DemoServer.datei("/")
         XCTAssertEqual(a.status, 200)
-        XCTAssertTrue(String(data: a.daten, encoding: .utf8)?.contains("Immich Showcase") ?? false)
+        XCTAssertTrue(String(data: a.daten, encoding: .utf8)?.contains("Frameside") ?? false)
         XCTAssertEqual(DemoServer.datei("/i18n/en.json").status, 200)
         XCTAssertEqual(DemoServer.datei("/../Info.plist").status, 400)
     }

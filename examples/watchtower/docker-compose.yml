@@ -1,5 +1,5 @@
-# Automatische Updates fuer Immich Showcase mit Watchtower. Aufrufen aus diesem Ordner:  docker compose up -d
-# Aktualisiert nur Container, die das Label com.centurylinklabs.watchtower.enable=true tragen (Immich Showcase hat es schon), jede Nacht um 04:00.
+# Automatische Updates fuer Frameside mit Watchtower. Aufrufen aus diesem Ordner:  docker compose up -d
+# Aktualisiert nur Container, die das Label com.centurylinklabs.watchtower.enable=true tragen (Frameside hat es schon), jede Nacht um 04:00.
 name: watchtower
 services:
   watchtower:

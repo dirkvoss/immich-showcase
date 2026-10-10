@@ -1,4 +1,4 @@
-# Erzeugt das Xcode-Projekt der iPhone-App "Showcase Immich".
+# Erzeugt das Xcode-Projekt der iPhone-App "Frameside".
 #
 # Das Projekt wird nicht eingecheckt, sondern aus dieser Datei erzeugt:
 #   cd ios && xcodegen generate
@@ -59,8 +59,8 @@ targets:
     info:
       path: Resources/Info.plist
       properties:
-        CFBundleDisplayName: Showcase Immich
-        CFBundleName: Showcase Immich
+        CFBundleDisplayName: Frameside
+        CFBundleName: Frameside
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UILaunchScreen: {}
@@ -70,7 +70,7 @@ targets:
         KeychainGruppe: "$(AppIdentifierPrefix)com.dirk-voss.showcase.geteilt"
         NSCameraUsageDescription: "Die Kamera wird nur zum Scannen des QR-Codes deines Servers genutzt."
         NSFaceIDUsageDescription: "Face ID schützt die App, wenn du das in den App-Einstellungen eingeschaltet hast."
-        NSLocalNetworkUsageDescription: "Die App verbindet sich mit deinem Immich-Showcase-Server im Heimnetz."
+        NSLocalNetworkUsageDescription: "Die App verbindet sich mit deinem Frameside-Server im Heimnetz."
         NSBonjourServices: ["_http._tcp", "_showcase._tcp"]
         NSCalendarsFullAccessUsageDescription: "Die App liest deine Termine nur, wenn du in den App-Einstellungen „Meine Termine auf dem Rahmen zeigen“ einschaltest."
         UIBackgroundModes: [fetch]
@@ -98,8 +98,8 @@ targets:
     info:
       path: ShareExtension/Info.plist
       properties:
-        CFBundleDisplayName: Showcase Immich
-        CFBundleName: Showcase Immich
+        CFBundleDisplayName: Frameside
+        CFBundleName: Frameside
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         KeychainGruppe: "$(AppIdentifierPrefix)com.dirk-voss.showcase.geteilt"

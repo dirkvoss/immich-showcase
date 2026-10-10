@@ -28,10 +28,10 @@ def test_fernseher_werden_umgeleitet(app_laden, ua):
 def test_normale_browser_bekommen_die_app(app_laden, ua):
     w, client, _ = app_laden()
     r = client().get("/", headers={"User-Agent": ua}, follow_redirects=False)
-    assert r.status_code == 200 and "Immich Showcase" in r.text
+    assert r.status_code == 200 and "Frameside" in r.text
 
 
 def test_ui_parameter_haelt_die_app_am_fernseher(app_laden):
     w, client, _ = app_laden()
     r = client().get("/?ui=1", headers={"User-Agent": TVS[0]}, follow_redirects=False)
-    assert r.status_code == 200 and "Immich Showcase" in r.text
+    assert r.status_code == 200 and "Frameside" in r.text

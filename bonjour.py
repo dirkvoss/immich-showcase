@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Meldet Immich Showcase per Bonjour/mDNS im Netz an (Diensttyp _showcase._tcp), damit die iPhone-App den Server im WLAN selbst findet.
+"""Meldet Frameside per Bonjour/mDNS im Netz an (Diensttyp _showcase._tcp), damit die iPhone-App den Server im WLAN selbst findet.
 
 Laeuft als eigener kleiner Container mit Host-Netzwerk (docker-compose.bonjour.yml), weil Bonjour-Meldungen (Multicast) aus dem normalen
 Docker-Netz nicht ins Heimnetz kommen. Nur auf Linux-Docker sinnvoll; zwischen VLANs braucht der Router einen mDNS-Weiterleiter.
@@ -44,7 +44,7 @@ def lan_adressen(adapter_liste=None):
 def sauberer_name(name):
     """Dienstname fuer Bonjour: ohne Steuerzeichen und Punkte, hoechstens 60 Zeichen."""
     n = re.sub(r"[\x00-\x1f.]", " ", str(name or "")).strip()[:60].strip()
-    return n or "Immich Showcase"
+    return n or "Frameside"
 
 
 def rechnername():
@@ -63,7 +63,7 @@ def dienst_info(name, port, adressen, version="", auth="pin", server=None):
 def main():
     from zeroconf import Zeroconf
     port = int(os.environ.get("SHOWCASE_PORT", "8090") or 8090)
-    name, version, auth = os.environ.get("RAHMEN_WEB_NAME", "Immich Showcase"), os.environ.get("SHOWCASE_VERSION", ""), os.environ.get("RAHMEN_WEB_AUTH", "pin")
+    name, version, auth = os.environ.get("RAHMEN_WEB_NAME", "Frameside"), os.environ.get("SHOWCASE_VERSION", ""), os.environ.get("RAHMEN_WEB_AUTH", "pin")
     adressen = lan_adressen()
     if not adressen:
         print("Keine Netzwerkadresse im Heimnetz gefunden - Bonjour-Dienst beendet.", file=sys.stderr)

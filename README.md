@@ -1,15 +1,15 @@
-# Immich Showcase
+# Frameside
 
-<p align="center"><img src="static/icon-192.png" width="96" alt="Immich Showcase icon"></p>
+<p align="center"><img src="static/icon-192.png" width="96" alt="Frameside icon"></p>
 
 **Show your [Immich](https://immich.app) photos on the TV and on a picture frame – and let the whole family do it from their phone.**
 Search in plain sentences ("Grandma and Anna, Christmas 2019, on the beach"), tap the photos you like, give the show a name and send it to the living-room TV or the picture frame in the hallway. Optional background music, videos, and a continuous slideshow when nobody has asked for anything.
 
 🇩🇪 [Deutsche Anleitung](README.de.md)
 
-> Immich Showcase is an independent community project. It is not affiliated with, endorsed by, or part of the Immich project. "Immich" is the name of the software it works with.
+> Frameside is an independent community project. It is not affiliated with, endorsed by, or part of the Immich project. "Immich" is the name of the software it works with.
 
-<p align="center"><img src="docs/demo.gif" width="720" alt="Immich Showcase walkthrough"><br><sub><em>(Walkthrough built from the screenshots below; all photos are invented samples.)</em></sub></p>
+<p align="center"><img src="docs/demo.gif" width="720" alt="Frameside walkthrough"><br><sub><em>(Walkthrough built from the screenshots below; all photos are invented samples.)</em></sub></p>
 
 | Sign in | Latest photos | Selection | Send to TV |
 |---|---|---|---|
@@ -52,27 +52,27 @@ With weather and appointments at the top right, device pairing by code/QR on the
 **One command** on the machine that runs Docker (Linux, NAS, mini PC; a Raspberry Pi works too):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/dirkvoss/frameside/main/install.sh | bash
 ```
 
 The script
-- downloads Immich Showcase to `~/immich-showcase`,
+- downloads Frameside to `~/immich-showcase`,
 - **detects Immich** if it runs on the same machine in Docker and attaches the app to its Docker network (no file to edit),
 - starts everything and prints a **ready-made setup link** at the end (with a QR code if `qrencode` is installed) that you open in the browser.
 
 The **setup wizard** has three short steps:
 1. **Connect Immich:** Immich is usually found automatically. Otherwise enter its address (e.g. `http://192.168.1.10:2283`).
-2. **Sign in** with your Immich account (email + password). Immich Showcase creates its own API key **without delete rights**; your password is not stored.
+2. **Sign in** with your Immich account (email + password). Frameside creates its own API key **without delete rights**; your password is not stored.
 3. **Who may use it?** **Shared PIN** (recommended; at home optionally without typing it) or **Immich accounts** (everyone only sees their own photos).
 
 At the end the page shows a **QR code for the iPhone app** and the address for TVs and tablets. Then enter the code shown on the TV or tablet in the app under "Devices". A "First steps" list in the interface guides you until everything works.
 
 More ways:
-- **No Immich yet?** `./install.sh --with-immich` starts Immich **and** Immich Showcase together.
+- **No Immich yet?** `./install.sh --with-immich` starts Immich **and** Frameside together.
 - **Different port:** `./install.sh --port 80` (then the TV only needs the plain IP address).
 - **By hand** (no script): `cp .env.example .env`, `docker compose up -d`, `docker compose logs showcase` shows the setup code, then open `http://<server>:8090/setup/`. Prefer no wizard? Put `RAHMEN_IMMICH_URL` and `RAHMEN_IMMICH_KEY` into `.env`; values from `.env` always win.
 - **NAS and home servers with a UI:** ready-made guides for **Synology** (Container Manager), **Unraid** (template), **TrueNAS** and **Portainer** are in `examples/`.
-- On the iPhone without the app: Share → "Add to Home Screen". With the app: "Showcase Immich" from the App Store or TestFlight; it **finds the server on your Wi-Fi by itself**.
+- On the iPhone without the app: Share → "Add to Home Screen". With the app: "Frameside" from the App Store or TestFlight; it **finds the server on your Wi-Fi by itself**.
 
 ## What can be used as a picture frame?
 Any device with a **web browser** that can open an address. **A kiosk mode or add-on apps such as Fully Kiosk are not required** – the browser is enough. The page asks the browser to keep the screen awake; where that does not work, set the device's auto-lock to "Never". A kiosk mode (full screen, nothing else reachable) is only a convenience you can add if you like.
@@ -91,12 +91,12 @@ Use `http://<server>:8090/tv/` **without** `?ziel=…` to pair the device by cod
 
 ### Raspberry Pi as a server in one command
 On the Pi (Raspberry Pi OS **Lite, 64-bit**, set name, Wi-Fi and SSH in the Raspberry Pi Imager) via SSH:
-`curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/examples/raspberry-pi/install-pi.sh | bash -s -- --hostname showcase`
-The script installs Docker and Immich Showcase, announces the server on the network (the iPhone app finds it by itself, on the home network also `http://showcase.local:8090`) and shows the setup link. If Immich runs on another machine, enter its address in the wizard (see the German guide for a separate machine).
+`curl -fsSL https://raw.githubusercontent.com/dirkvoss/frameside/main/examples/raspberry-pi/install-pi.sh | bash -s -- --hostname showcase`
+The script installs Docker and Frameside, announces the server on the network (the iPhone app finds it by itself, on the home network also `http://showcase.local:8090`) and shows the setup link. If Immich runs on another machine, enter its address in the wizard (see the German guide for a separate machine).
 
 ### Raspberry Pi as a picture-frame display in 5 minutes
 1. Flash **Raspberry Pi OS with desktop** (Raspberry Pi Imager), enable Wi-Fi/SSH there, boot, let it log in to the desktop automatically.
-2. On the Pi, in a terminal: `curl -O https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/examples/raspberry-pi/setup-kiosk.sh && chmod +x setup-kiosk.sh && ./setup-kiosk.sh http://<server>:8090/tv/`
+2. On the Pi, in a terminal: `curl -O https://raw.githubusercontent.com/dirkvoss/frameside/main/examples/raspberry-pi/setup-kiosk.sh && chmod +x setup-kiosk.sh && ./setup-kiosk.sh http://<server>:8090/tv/`
 3. `sudo reboot`. The Pi starts full screen and shows the pairing code. Remove again with `./setup-kiosk.sh --entfernen`.
 
 *The Raspberry Pi script was written for Raspberry Pi OS (Bookworm) but has not been tested on every Pi model – feedback is welcome.*
@@ -175,7 +175,7 @@ With `RAHMEN_WEB_RAHMEN_NACHT=22:00-06:30` the frame goes black. Fully Kiosk can
 Ready-made sensors, buttons and examples are in [`examples/home-assistant/immich_showcase.yaml`](examples/home-assistant/immich_showcase.yaml): state of every TV/frame (offline / ready / playing / continuous), an online sensor, and commands (pause, next, stop, start a saved show, screen on/off) as `rest_command`s. Home Assistant's address must be in `RAHMEN_WEB_LAN`. API: `GET /api/ha/status`, `POST /api/ha/steuer|show|bildschirm` (header `X-Rahmen: 1`).
 
 ## Quick install helper
-`./install.sh` starts Immich Showcase and prints the address and setup code. **No Immich yet?** `./install.sh --with-immich` starts **Immich and Immich Showcase together** (see `examples/immich-stack/`).
+`./install.sh` starts Frameside and prints the address and setup code. **No Immich yet?** `./install.sh --with-immich` starts **Immich and Frameside together** (see `examples/immich-stack/`).
 
 ## Daily use
 1. Open the app on your phone and sign in (PIN, or your Immich account if you set `RAHMEN_WEB_AUTH=immich`).
@@ -210,8 +210,8 @@ None is included (licences). Two ways:
 
 ## Report a problem or suggest something
 - In the app: **Help → 🐞 Report a problem** (opens GitHub with your version filled in) – please attach the **support package** from the same window (diagnostics without passwords, PIN or keys).
-- Wishes and ideas: **Help → 💡 Wish or idea**, or the [issue tracker](https://github.com/dirkvoss/immich-showcase/issues).
-- Questions and setup help: [Discussions](https://github.com/dirkvoss/immich-showcase/discussions) – German and English are both fine.
+- Wishes and ideas: **Help → 💡 Wish or idea**, or the [issue tracker](https://github.com/dirkvoss/frameside/issues).
+- Questions and setup help: [Discussions](https://github.com/dirkvoss/frameside/discussions) – German and English are both fine.
 
 ## Settings
 Everything installation-specific lives in `.env` – every setting is explained in [.env.example](.env.example). Your own `.env` is never part of the repository.

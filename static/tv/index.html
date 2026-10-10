@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script src="/i18n.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Immich Showcase TV</title>
+<title>Frameside TV</title>
 <style>
 @font-face { font-family: "Cormorant Garamond"; font-weight: 600; src: url(/fonts/cormorant-600.woff2) format("woff2"); }
 /* bewusst schlicht (ES5, einfaches CSS): laeuft auch im aelteren Browser von LG webOS / Android TV */
@@ -80,7 +80,7 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
 <div id="mitte">
   <div>
     <img id="mitteLogo" src="/icon-512.png" alt="" width="280" height="280">
-    <h1 id="mitteTitel">Immich Showcase</h1>
+    <h1 id="mitteTitel">Frameside</h1>
     <p id="mitteText">Verbinde …</p>
     <div id="uhr"></div>
     <div id="datum"></div>
@@ -94,7 +94,7 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
 <div id="punkt"></div>
 <div id="kopplung"><div class="innen">
   <h1 id="kopplungTitel">Gerät koppeln</h1>
-  <p id="kopplungText">Öffne am Handy Immich Showcase, tippe auf „Geräte“ und gib diesen Code ein:</p>
+  <p id="kopplungText">Öffne am Handy Frameside, tippe auf „Geräte“ und „＋ Gerät hinzufügen“. Dieses Gerät erscheint dort von selbst. Falls nicht, gib diesen Code ein:</p>
   <div id="kopplungCode">······</div>
   <div id="kopplungQr"></div>
   <p id="kopplungHinweis">Oder scanne den Code mit der Handykamera.</p>
@@ -102,6 +102,7 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
 <script src="/qrcode.js"></script>
 <script>
 (function () {                                  // Kennung des Geraets: aus der Adresse (?ziel=...), sonst aus dem Speicher; sonst Kopplung per Code
+  try { if (/[?&]neu=1/.test(location.search)) localStorage.removeItem("showcaseZiel"); } catch (e) {}      // "?neu=1": alte Kopplung vergessen, wieder den Code zeigen
   var m = location.search.match(/ziel=([a-z0-9]+)/), z = m ? m[1] : null;
   try { if (z) localStorage.setItem("showcaseZiel", z); else z = localStorage.getItem("showcaseZiel"); } catch (e) {}
   if (z) { window.RW_ZIEL = z; return; }
@@ -116,7 +117,7 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
   var el = function (id) { return document.getElementById(id); }, code = "", timer = 0;
   el("kopplung").style.display = "block";
   el("kopplungTitel").textContent = T("Gerät koppeln");
-  el("kopplungText").textContent = T("Öffne am Handy Immich Showcase, tippe auf „Geräte“ und gib diesen Code ein:");
+  el("kopplungText").textContent = T("Öffne am Handy Frameside, tippe auf „Geräte“ und „＋ Gerät hinzufügen“. Dieses Gerät erscheint dort von selbst. Falls nicht, gib diesen Code ein:");
   el("kopplungHinweis").textContent = T("Oder scanne den Code mit der Handykamera.");
   function neuerCode() {
     http("POST", "/api/koppeln/neu", function (st, d) {
@@ -146,16 +147,17 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
     if (st === 200 && d && d.alle_ziele && ziel !== "test" && !d.alle_ziele[ziel]) { try { localStorage.removeItem("showcaseZiel"); } catch (e) {} location.replace("/tv/"); return; }
     if (st === 200 && d && d.rahmen && d.rahmen.indexOf(ziel) >= 0) zusatzLaden();
     if (st === 200 && d && d.ziele) { for (var k in d.ziele) NAMEN[k] = d.ziele[k]; }
+    if (st === 200 && d && d.alle_ziele && d.alle_ziele[ziel] && ziel !== "test") { extras = true; layoutSetzen(d.rahmen_layout); nacht = d.rahmen_nacht || ""; ambientAnzeige(); }
     if (st === 200 && d && d.rahmen) { for (var r = 0; r < d.rahmen.length; r++) if (d.rahmen[r] === ziel) { rahmenModus = true; rahmenSek = d.rahmen_sek || 8; anzeige = d.rahmen_anzeige || []; layoutSetzen(d.rahmen_layout); ambientAnzeige(); nacht = d.rahmen_nacht || ""; if (!laeuft && !pinModus) startAmbient(); } }
     fuellung = (rahmenModus ? d.rahmen_fuellung : d.tv_fuellung) || "balken";
-    bewegung = rahmenModus && !!d.rahmen_bewegung; paare = rahmenModus && !!d.rahmen_paare;
+    bewegungWunsch = !!d.rahmen_bewegung; paareWunsch = !!d.rahmen_paare; bewegung = extras && bewegungWunsch; paare = extras && paareWunsch;
     document.body.className = (fuellung === "zuschnitt" ? "zuschnitt" : "") + (bewegung ? " bewegung" : "");
   });
   var seq = -1, liste = [], idx = 0, sek = 8, laeuft = false, pausiert = false, timer = 0, marke = 0, vorn = null, name = "", titelTimer = 0, pin = "";
   var bildA = document.getElementById("bildA"), bildB = document.getElementById("bildB");
   var mitte = document.getElementById("mitte"), mitteTitel = document.getElementById("mitteTitel"), mitteText = document.getElementById("mitteText");
   var punkt = document.getElementById("punkt"), pinpunkte = document.getElementById("pinpunkte");
-  var fuellung = "balken", anzeige = [], nacht = "", bgA = document.getElementById("bgA"), bgB = document.getElementById("bgB"), nachtEl = document.getElementById("nacht"), letzterWechsel = new Date().getTime(), letzterErfolg = new Date().getTime(), verbinde = true, pinModus = false, rahmenModus = false, rahmenSek = 8, ambient = false;
+  var fuellung = "balken", anzeige = [], nacht = "", bgA = document.getElementById("bgA"), bgB = document.getElementById("bgB"), nachtEl = document.getElementById("nacht"), letzterWechsel = new Date().getTime(), letzterErfolg = new Date().getTime(), verbinde = true, pinModus = false, rahmenModus = false, extras = false, schlicht = false, bewegungWunsch = false, paareWunsch = false, rahmenSek = 8, ambient = false;
   var vid = document.getElementById("vid"), videoSet = {}, maxv = 60, videoTimer = 0, musikPausiert = false, imVideo = false;
   var audio = null, musikKey = "", laut = 0.3, musikBlockiert = false, fade = 1.2;
 
@@ -188,8 +190,9 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
     if (n === "gaeste") return !!(zusatzDaten && zusatzDaten.gaeste);
     return true;
   }
+  function ex() { return extras && !schlicht; }                   // Einblendungen aktiv? (nicht bei der einfachen Diashow)
   function ambientAnzeige() {                                    // Einblendungen am Rahmen (Uhrzeit, Datum, Wetter, Termine, Geburtstage): immer, wenn eingeschaltet - auch waehrend einer Show
-    var an = rahmenModus;
+    var an = ex();
     for (var n in NUR_RUHEBILD) { var e = EL[n]; if (e) e.className = "el" + (an && lay && lay[n] && lay[n].an && hatInhalt(n) ? " an" : ""); }
   }
   function fotoTexteLeeren() { if (EL.fotodatum) EL.fotodatum.className = "el"; if (EL.fotoort) EL.fotoort.className = "el"; if (EL.erinnerung) EL.erinnerung.className = "el"; if (EL.gruss) EL.gruss.className = "el"; }
@@ -199,18 +202,18 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
     var g = zusatzDaten && zusatzDaten.gruss, key = g ? g.id + "|" + g.text : "";
     if (key !== grussKey) {
       grussKey = key; grussZaehler = 0;
-      if (g && g.id && liste.length && rahmenModus) liste.splice(idx + 1, 0, g.id);
+      if (g && g.id && liste.length && ex()) liste.splice(idx + 1, 0, g.id);
     }
   }
   function grussNachziehen() {                                    // nach einigen Fotos erneut zeigen, solange der Gruss gilt
     var g = zusatzDaten && zusatzDaten.gruss;
-    if (!g || !g.id || !liste.length || !rahmenModus) return;
+    if (!g || !g.id || !liste.length || !ex()) return;
     if (++grussZaehler % 8 === 0 && liste[(idx + 1) % liste.length] !== g.id) liste.splice(idx + 1, 0, g.id);
   }
   function grussAnzeigen(id) {
     var g = zusatzDaten && zusatzDaten.gruss, e = EL.gruss;
     if (!e) return;
-    if (!rahmenModus || !g || (g.id && g.id !== id) || !(g.text || g.absender)) { e.className = "el"; return; }
+    if (!ex() || !g || (g.id && g.id !== id) || !(g.text || g.absender)) { e.className = "el"; return; }
     e.textContent = "\uD83D\uDC8C " + (g.absender ? g.absender + (g.text ? ": " : "") : "") + g.text + (g.herz ? " \u2764\uFE0F" : "");
     e.className = "el an";
   }
@@ -233,7 +236,7 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
       catch (x) { e.textContent = url; }
     }
     for (i = 0; i < (g.ids || []).length; i++) {                  // neue Fotos der Gaeste als naechstes zeigen (beim Laden der Seite nur merken)
-      if (!gaesteBekannt[g.ids[i]]) { gaesteBekannt[g.ids[i]] = 1; if (!gaesteErst && liste.length && rahmenModus) liste.splice(idx + 1, 0, g.ids[i]); }
+      if (!gaesteBekannt[g.ids[i]]) { gaesteBekannt[g.ids[i]] = 1; if (!gaesteErst && liste.length && ex()) liste.splice(idx + 1, 0, g.ids[i]); }
     }
     gaesteErst = false;
   }
@@ -260,7 +263,7 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
     api("/api/config?ziel=" + encodeURIComponent(ziel || ""), function (st, c) {
       if (st !== 200 || !c) return;
       layoutSetzen(c.rahmen_layout); zusatzLaden(true); nacht = c.rahmen_nacht || ""; nachtPruefen();
-      bewegung = rahmenModus && !!c.rahmen_bewegung; paare = rahmenModus && !!c.rahmen_paare;
+      bewegungWunsch = !!c.rahmen_bewegung; paareWunsch = !!c.rahmen_paare; bewegung = ex() && bewegungWunsch; paare = ex() && paareWunsch;
       document.body.className = (fuellung === "zuschnitt" ? "zuschnitt" : "") + (bewegung ? " bewegung" : "");
       if (laeuft && liste.length) bildUnterschrift(liste[idx]);
     });
@@ -326,9 +329,9 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
   }
   function bereit() {
     musikStopp(); try { videoAus(); } catch (e) {}
-    laeuft = false; pausiert = false; clearTimeout(timer); marke++;
+    schlicht = false; laeuft = false; pausiert = false; clearTimeout(timer); marke++;
     bildA.className = "bild"; bildB.className = "bild"; vorn = null;
-    mitteTitel.textContent = "Immich Showcase";
+    mitteTitel.textContent = "Frameside";
     mitteText.textContent = (NAMEN[ziel] || window.RW_T("Fernseher")) + " · bereit. Wähle am Handy Fotos und tippe auf „Auf TV“. (Für Musik einmal die OK-Taste drücken.)";
     mitte.className = ""; titelAus(); ambient = false; ambientAnzeige(false); fotoTexteLeeren(); nachtEl.style.display = "none"; bgA.className = "bg"; bgB.className = "bg";
     if (rahmenModus && !pinModus) startAmbient();
@@ -347,7 +350,7 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
     });
   }
   function bildUnterschrift(id) {                                         // Foto-Datum und Foto-Ort (nur am Rahmen, je nach Layout)
-    if (!rahmenModus || !lay || !(lay.fotodatum.an || lay.fotoort.an || (lay.erinnerung && lay.erinnerung.an))) { fotoTexteLeeren(); return; }
+    if (!ex() || !lay || !(lay.fotodatum.an || lay.fotoort.an || (lay.erinnerung && lay.erinnerung.an))) { fotoTexteLeeren(); return; }
     api("/api/bildinfo/" + id + "?lang=" + (window.RW_LANG || "de"), function (st, d) {
       if (st !== 200 || !d) { fotoTexteLeeren(); return; }
       var dt = d.datum ? new Date(d.datum + "T12:00:00") : null, datum = "", ort = lay.fotoort.an ? (d.ort || "") : "";
@@ -370,12 +373,12 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
   }
   function nachtPruefen() {                                                // Nachtruhe: im Dauerprogramm schwarzer Schirm
     var an = false, m, h1, m1, h2, m2, jetzt, a, b;
-    if (nacht && rahmenModus) {                                              // gilt am Rahmen immer, auch waehrend einer Show
+    if (nacht && extras) {                                              // gilt am Rahmen immer, auch waehrend einer Show
       m = nacht.match(/^(\d+):(\d+)-(\d+):(\d+)$/);
       if (m) { h1 = +m[1]; m1 = +m[2]; h2 = +m[3]; m2 = +m[4]; var d = new Date(); jetzt = d.getHours() * 60 + d.getMinutes(); a = h1 * 60 + m1; b = h2 * 60 + m2; an = a <= b ? (jetzt >= a && jetzt < b) : (jetzt >= a || jetzt < b); }
     }
     nachtEl.style.display = an ? "block" : "none";
-    if (window.fully && nacht && rahmenModus && an !== nachtPruefen.aus) {          // in Fully: Bildschirm wirklich aus/an (nur beim Wechsel, damit Handeingriffe nicht ueberstimmt werden)
+    if (window.fully && nacht && extras && an !== nachtPruefen.aus) {          // in Fully: Bildschirm wirklich aus/an (nur beim Wechsel, damit Handeingriffe nicht ueberstimmt werden)
       nachtPruefen.aus = an;
       try { if (an) { if (window.fully.turnScreenOff) window.fully.turnScreenOff(true); } else if (window.fully.turnScreenOn) window.fully.turnScreenOn(); } catch (e) {}
     }
@@ -436,7 +439,7 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
     } catch (e) { cb(null, 0); }
   }
   function paarBauen(i, cb) {                                    // cb(url oder null, wie viele Fotos zusaetzlich verbraucht wurden)
-    if (!paare || !rahmenModus || !liste.length || videoSet[liste[i]]) { cb(null, 0); return; }
+    if (!paare || !ex() || !liste.length || videoSet[liste[i]]) { cb(null, 0); return; }
     bildLaden(quelle(i), function (a) {
       if (!a || a.naturalHeight <= a.naturalWidth) { cb(null, 0); return; }          // nur Hochkant-Fotos
       var j = 1;
@@ -496,6 +499,7 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
   function behandle(e) {
     if (!e) return;
     if (e.typ === "start") {
+      schlicht = !!e.schlicht; bewegung = ex() && !!bewegungWunsch; paare = ex() && !!paareWunsch; document.body.className = (fuellung === "zuschnitt" ? "zuschnitt" : "") + (bewegung ? " bewegung" : "");
       ambient = false; ambientAnzeige(false); nachtEl.style.display = "none";
       liste = e.zufall ? mischen(e.ids) : e.ids.slice(); sek = e.sek || 8; name = e.name || ""; idx = 0; laeuft = true; pausiert = false; fehler = 0;
       videoSet = {}; var vi; for (vi = 0; e.videos && vi < e.videos.length; vi++) videoSet[e.videos[vi]] = true; maxv = e.maxv || 60;
@@ -544,11 +548,12 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
     api("/api/tv/abfrage?ziel=" + ziel + "&seq=" + seq + meldung + fullyInfo(), function (st, d) {
       letzterStatus = st;
       if (st === 401) { zugangKopplung(); return; }
+      if (st === 400 && d && d.nachricht === "Unbekanntes Ziel") { try { localStorage.removeItem("showcaseZiel"); } catch (e) {} location.replace("/tv/"); return; }      // das Geraet wurde geloescht: vergessen und neu koppeln
       if (st === 200 && d) {
         verbunden(true); statusEl.textContent = ""; letzterErfolg = new Date().getTime();
         var i;
         if (d.befehl) { befehlAusfuehren(d.befehl); return; }
-        if (d.lv && rahmenModus) { if (lv && d.lv !== lv) konfigNeu(); lv = d.lv; }
+        if (d.lv && extras) { if (lv && d.lv !== lv) konfigNeu(); lv = d.lv; }
         for (i = 0; i < d.events.length; i++) behandle(d.events[i]);
         seq = d.seq;
         if (!laeuft && verbinde) { verbinde = false; bereit(); }
@@ -572,7 +577,7 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
     kopplungAktiv = true; pinModus = true;
     kopplungEl.style.display = "block";
     document.getElementById("kopplungTitel").textContent = "Zugang einrichten";
-    document.getElementById("kopplungText").textContent = "Öffne am Handy Immich Showcase, tippe auf „Geräte“ und gib diesen Code ein – mit einer Fernbedienung geht auch die 6-stellige PIN:";
+    document.getElementById("kopplungText").textContent = "Öffne am Handy Frameside, tippe auf „Geräte“ und gib diesen Code ein – mit einer Fernbedienung geht auch die 6-stellige PIN:";
     document.getElementById("kopplungHinweis").textContent = "Das Gerät merkt sich den Zugang und braucht ihn nur einmal.";
     neuerKopplungsCode();
   }
@@ -635,7 +640,7 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
     if (ambient && !pausiert && jetzt - letzterWechsel > (sek * 4 + 90) * 1000) location.reload();
     else if (jetzt - letzterErfolg > 10 * 60 * 1000 && letzterStatus !== 0) location.reload();      // NICHT bei fehlendem Netz (Status 0): dann laeuft das Dauerprogramm mit den geladenen Fotos weiter, ein Neuladen wuerde nur eine Fehlerseite zeigen
   }, 30000);
-  mitteTitel.textContent = "Immich Showcase";
+  mitteTitel.textContent = "Frameside";
   abfrage();
 })();
 </script>

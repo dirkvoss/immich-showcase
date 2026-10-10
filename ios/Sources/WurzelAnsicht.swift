@@ -34,7 +34,7 @@ struct SperrAnsicht: View {
             Color(red: 0.07, green: 0.08, blue: 0.11).ignoresSafeArea()
             VStack(spacing: 18) {
                 Image(systemName: "lock.fill").font(.system(size: 44)).foregroundStyle(.secondary)
-                Text("Showcase Immich ist gesperrt").font(.headline)
+                Text("Frameside ist gesperrt").font(.headline)
                 Button("Entsperren") { modell.entsperren() }.buttonStyle(.borderedProminent).tint(Color(red: 0.88, green: 0.70, blue: 0.35))
             }
         }

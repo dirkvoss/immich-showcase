@@ -41,13 +41,13 @@ struct EinstellungenAnsicht: View {
                 Section("Hilfe") {
                     Button("Hilfe anzeigen") { schliessen(); NotificationCenter.default.post(name: .showcaseHilfe, object: nil) }
                     Button("Alles in Ordnung? (Status)") { schliessen(); NotificationCenter.default.post(name: .showcaseGesundheit, object: nil) }
-                    Link("Anleitung auf GitHub", destination: URL(string: "https://github.com/dirkvoss/immich-showcase#readme")!)
-                    Text("Die App zeigt deinen eigenen Immich-Showcase-Server. Sie verbindet sich nicht direkt mit Immich.").font(.footnote).foregroundStyle(.secondary)
+                    Link("Anleitung auf GitHub", destination: URL(string: "https://github.com/dirkvoss/frameside#readme")!)
+                    Text("Die App zeigt deinen eigenen Frameside-Server. Sie verbindet sich nicht direkt mit Immich.").font(.footnote).foregroundStyle(.secondary)
                 }
                 Section("Über") {
                     LabeledContent("Entwickelt von", value: "Dirk Voß")
                     LabeledContent("Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "–")
-                    Link("Projekt auf GitHub", destination: URL(string: "https://github.com/dirkvoss/immich-showcase")!)
+                    Link("Projekt auf GitHub", destination: URL(string: "https://github.com/dirkvoss/frameside")!)
                     Text("Unabhängiges Projekt, nicht mit dem Immich-Projekt verbunden.").font(.footnote).foregroundStyle(.secondary)
                 }
             }

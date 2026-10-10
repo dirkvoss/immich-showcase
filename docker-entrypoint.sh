@@ -1,5 +1,5 @@
 #!/bin/sh
-# Start von Immich Showcase im Container: prueft die Pflichtangaben, richtet beim ersten Start die PIN ein und startet den Dienst.
+# Start von Frameside im Container: prueft die Pflichtangaben, richtet beim ersten Start die PIN ein und startet den Dienst.
 set -eu
 
 fehler() { echo "FEHLER: $*" >&2; exit 1; }
@@ -7,7 +7,7 @@ fehler() { echo "FEHLER: $*" >&2; exit 1; }
 # Pflichtangaben: entweder in .env (RAHMEN_IMMICH_URL + RAHMEN_IMMICH_KEY) oder spaeter per Einrichtungsassistent unter /setup/ (Code im Protokoll).
 if [ -z "${RAHMEN_IMMICH_URL:-}" ] || [ -z "${RAHMEN_IMMICH_KEY:-}" ]; then
   if [ ! -s "${RAHMEN_WEB_EINSTELLUNGEN:-/data/einstellungen.json}" ]; then
-    echo "Hinweis: RAHMEN_IMMICH_URL/RAHMEN_IMMICH_KEY nicht gesetzt - Immich Showcase startet im Einrichtungsmodus (http://<server>:8090/setup/)." >&2
+    echo "Hinweis: RAHMEN_IMMICH_URL/RAHMEN_IMMICH_KEY nicht gesetzt - Frameside startet im Einrichtungsmodus (http://<server>:8090/setup/)." >&2
     NICHT_EINGERICHTET=1
   fi
 fi

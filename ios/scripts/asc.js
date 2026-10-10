@@ -7,9 +7,9 @@ const fs = require('fs'), path = require('path'), crypto = require('crypto'), ht
 const BUNDLE_ID = 'com.dirk-voss.showcase', PROFIL_NAME = 'Showcase Immich App Store';
 // App und Erweiterungen: je App-ID ein eigenes App-Store-Profil
 const PROFILE = [
-  { bundle: BUNDLE_ID, name: PROFIL_NAME, titel: 'Showcase Immich' },
-  { bundle: BUNDLE_ID + '.teilen', name: 'Showcase Immich Teilen App Store', titel: 'Showcase Immich Teilen' },
-  { bundle: BUNDLE_ID + '.widget', name: 'Showcase Immich Widget App Store', titel: 'Showcase Immich Widget' },
+  { bundle: BUNDLE_ID, name: PROFIL_NAME, titel: 'Frameside' },
+  { bundle: BUNDLE_ID + '.teilen', name: 'Showcase Immich Teilen App Store', titel: 'Frameside Teilen' },
+  { bundle: BUNDLE_ID + '.widget', name: 'Showcase Immich Widget App Store', titel: 'Frameside Widget' },
 ];
 
 const env = {};

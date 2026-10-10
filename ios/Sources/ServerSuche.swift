@@ -17,7 +17,7 @@ struct GefundenerServer: Identifiable, Hashable {
     var anzeigeAdresse: String { (url.host ?? "") + (url.port.map { ":\($0)" } ?? "") }
 }
 
-/// Sucht Immich-Showcase-Server im eigenen WLAN (Netz /24 des iPhones, Ports 8090 und 80). Der Server braucht dafür nichts zu tun.
+/// Sucht Frameside-Server im eigenen WLAN (Netz /24 des iPhones, Ports 8090 und 80). Der Server braucht dafür nichts zu tun.
 enum ServerSuche {
     static let ports = [8090, 80]
     /// Namen, unter denen ein Server oft erreichbar ist (DNS/mDNS) – klappt auch über Netzgrenzen hinweg, wenn der Name bekannt ist.

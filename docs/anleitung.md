@@ -1,4 +1,4 @@
-# Erste Schritte mit Immich Showcase – Schritt für Schritt
+# Erste Schritte mit Frameside – Schritt für Schritt
 
 Diese Anleitung führt dich in etwa **10 Minuten** von „nichts“ bis zum ersten Foto auf dem Bilderrahmen. Alle Bilder stammen aus einer echten Installation auf einem frischen Rechner.
 
@@ -9,7 +9,7 @@ Diese Anleitung führt dich in etwa **10 Minuten** von „nichts“ bis zum erst
 - ein Tablet, einen Fernseher oder einen alten Bildschirm mit Browser als **Bilderrahmen**,
 - optional ein iPhone für die App.
 
-> Immich Showcase **ersetzt Immich nicht**. Es zeigt deine Immich-Fotos auf Rahmen und Fernsehern und lässt die ganze Familie vom Handy aus bestimmen, was dort läuft. Deine Fotos bleiben in Immich.
+> Frameside **ersetzt Immich nicht**. Es zeigt deine Immich-Fotos auf Rahmen und Fernsehern und lässt die ganze Familie vom Handy aus bestimmen, was dort läuft. Deine Fotos bleiben in Immich.
 
 ---
 
@@ -18,10 +18,10 @@ Diese Anleitung führt dich in etwa **10 Minuten** von „nichts“ bis zum erst
 Öffne ein Terminal auf dem Server und gib ein:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/dirkvoss/frameside/main/install.sh | bash
 ```
 
-Das Skript erkennt ein auf demselben Rechner laufendes Immich selbst, verbindet sich mit dessen Docker-Netz und startet Immich Showcase. Eine Datei bearbeiten musst du nicht.
+Das Skript erkennt ein auf demselben Rechner laufendes Immich selbst, verbindet sich mit dessen Docker-Netz und startet Frameside. Eine Datei bearbeiten musst du nicht.
 
 ![Ausgabe des Installationsskripts](anleitung/01-installieren.png)
 
@@ -46,7 +46,7 @@ Der Assistent hat Immich bereits gefunden. Die grüne Meldung zeigt Adresse und 
 
 ### Schritt 2 – Immich-Konto
 
-Melde dich einmal mit deinem Immich-Konto an. Immich Showcase legt damit **einen eigenen Schlüssel ohne Lösch-Rechte** an. Das Passwort wird **nicht gespeichert**.
+Melde dich einmal mit deinem Immich-Konto an. Frameside legt damit **einen eigenen Schlüssel ohne Lösch-Rechte** an. Das Passwort wird **nicht gespeichert**.
 
 ![Assistent: Anmeldung am Immich-Konto](anleitung/03-assistent-konto.png)
 
@@ -99,13 +99,13 @@ Tippe Fotos an (oder „Tag wählen“) und dann unten auf **Auf den Rahmen**. W
 
 ## 6. Alles in Ordnung? – Verbindung prüfen
 
-Unter dem Konto-Symbol → **„Alles in Ordnung?“** prüft Immich Showcase Immich, Fotos und Schlüssel, Bildsuche, Upload und jedes Gerät. Hat etwas ein Problem, steht in Klartext dabei, was zu tun ist.
+Unter dem Konto-Symbol → **„Alles in Ordnung?“** prüft Frameside die Verbindung zu Immich, die Fotos und Schlüssel, Bildsuche, Upload und jedes Gerät. Hat etwas ein Problem, steht in Klartext dabei, was zu tun ist.
 
 ![Status-Prüfung](anleitung/12-status.png)
 
 > Geräte, die sich „noch nie gemeldet“ haben, sind noch nicht gekoppelt. Sobald du sie koppelst (Abschnitt 4), wird der Punkt grün. Nicht mehr benötigte Geräte kannst du unter *Geräte* löschen.
 
-## 7. iPhone-App „Showcase Immich“ (optional)
+## 7. iPhone-App „Frameside“ (optional)
 
 Die App ist der bequemste Weg, Fotos zu senden, weil sie auch das Teilen-Menü, Siri-Kurzbefehle und ein Widget bietet.
 
@@ -136,7 +136,7 @@ Face ID kann in den App-Einstellungen als zusätzlicher Schutz eingeschaltet wer
 
 ## Aktualisieren
 
-Immich Showcase meldet selbst, wenn eine neue Version bereitsteht (in „Alles in Ordnung?“). Update:
+Frameside meldet selbst, wenn eine neue Version bereitsteht (in „Alles in Ordnung?“). Update:
 
 ```bash
 docker compose pull && docker compose up -d

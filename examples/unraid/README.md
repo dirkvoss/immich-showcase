@@ -1,7 +1,7 @@
-# Immich Showcase auf Unraid
+# Frameside auf Unraid
 
-1. Datei `immich-showcase.xml` nach `/boot/config/plugins/dockerMan/templates-user/` auf dem Unraid-Stick kopieren (oder im Docker-Tab „Container hinzufügen“ → Vorlage wählen, sobald sie dort liegt).
-2. Im Docker-Tab: **Container hinzufügen** → Vorlage **immich-showcase** → **Anwenden**.
+1. Datei `frameside.xml` nach `/boot/config/plugins/dockerMan/templates-user/` auf dem Unraid-Stick kopieren (oder im Docker-Tab „Container hinzufügen“ → Vorlage wählen, sobald sie dort liegt).
+2. Im Docker-Tab: **Container hinzufügen** → Vorlage **frameside** → **Anwenden**.
 3. Auf das Symbol klicken → **WebUI**: der Einrichtungsassistent öffnet sich. Den **Einrichtungs-Code** zeigt das Protokoll des Containers (Symbol → *Log*), oder einfach dem angezeigten Link folgen.
 4. Immich-Adresse im Assistenten: `http://<IP-von-Unraid>:2283`, dann E-Mail und Passwort deines Immich-Kontos.
 

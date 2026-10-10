@@ -12,9 +12,9 @@ struct ServerKlient {
         case keinServer, nichtErreichbar, anmeldungNoetig, server(String)
         var errorDescription: String? {
             switch self {
-            case .keinServer: return L("Die App ist noch mit keinem Server verbunden. Öffne Showcase Immich einmal und gib die Adresse ein.")
+            case .keinServer: return L("Die App ist noch mit keinem Server verbunden. Öffne Frameside einmal und gib die Adresse ein.")
             case .nichtErreichbar: return L("Der Server ist nicht erreichbar. Bist du im richtigen Netz?")
-            case .anmeldungNoetig: return L("Bitte öffne Showcase Immich einmal und melde dich mit der PIN an.")
+            case .anmeldungNoetig: return L("Bitte öffne Frameside einmal und melde dich mit der PIN an.")
             case .server(let t): return t
             }
         }

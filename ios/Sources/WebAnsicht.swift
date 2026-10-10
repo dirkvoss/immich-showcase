@@ -152,7 +152,7 @@ struct WebKitAnsicht: UIViewRepresentable {
             if aktion == "pinMerken", UserDefaults.standard.bool(forKey: "pinMitFaceID"), let pin = d["pin"] as? String, let host = eltern.server.host { PinSpeicher.speichern(pin, fuer: host) }
             if aktion == "pinHolen", UserDefaults.standard.bool(forKey: "pinMitFaceID"), let host = eltern.server.host {
                 Task { @MainActor in
-                    guard PinSpeicher.vorhanden(fuer: host), let pin = await PinSpeicher.holen(fuer: host, grund: L("Showcase Immich anmelden")) else { return }
+                    guard PinSpeicher.vorhanden(fuer: host), let pin = await PinSpeicher.holen(fuer: host, grund: L("Frameside anmelden")) else { return }
                     self.web?.evaluateJavaScript("window.rwPinErgebnis && window.rwPinErgebnis('\(pin)')", completionHandler: nil)
                 }
             }

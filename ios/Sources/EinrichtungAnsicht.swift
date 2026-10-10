@@ -18,15 +18,15 @@ struct EinrichtungAnsicht: View {
         ScrollView {
             VStack(spacing: 22) {
                 Image(systemName: "photo.on.rectangle.angled").font(.system(size: 54)).foregroundStyle(gold).padding(.top, 40)
-                Text("Showcase Immich").font(.system(size: 34, weight: .semibold, design: .serif))
-                Text("Verbinde die App mit deinem Immich-Showcase-Server.").foregroundStyle(.secondary).multilineTextAlignment(.center)
+                Text("Frameside").font(.system(size: 34, weight: .semibold, design: .serif))
+                Text("Verbinde die App mit deinem Frameside-Server.").foregroundStyle(.secondary).multilineTextAlignment(.center)
 
                 VStack(alignment: .leading, spacing: 8) {
                     Label("Wichtig vorab", systemImage: "info.circle.fill").font(.subheadline.weight(.semibold)).foregroundStyle(gold)
-                    Text("Diese App verbindet sich **nicht direkt mit Immich**. Sie braucht einen eigenen **Immich-Showcase-Server**, den du selbst betreibst (neben deinem Immich, z. B. im Heimnetz).")
+                    Text("Diese App verbindet sich **nicht direkt mit Immich**. Sie braucht einen eigenen **Frameside-Server**, den du selbst betreibst (neben deinem Immich, z. B. im Heimnetz).")
                     Text("Ohne diesen Server kann die App nichts anzeigen. Anleitung und Installation findest du auf GitHub.")
                         .foregroundStyle(.secondary)
-                    Link("Immich Showcase auf GitHub", destination: URL(string: "https://github.com/dirkvoss/immich-showcase")!).foregroundStyle(gold)
+                    Link("Frameside auf GitHub", destination: URL(string: "https://github.com/dirkvoss/frameside")!).foregroundStyle(gold)
                 }
                 .font(.footnote).frame(maxWidth: .infinity, alignment: .leading).padding(14)
                 .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))

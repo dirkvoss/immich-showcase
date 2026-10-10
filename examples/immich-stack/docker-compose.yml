@@ -1,8 +1,8 @@
-# Immich + Immich Showcase in EINEM Stack – fuer alle, die noch kein Immich haben (oder ein neues daneben ausprobieren wollen).
+# Immich + Frameside in EINEM Stack – fuer alle, die noch kein Immich haben (oder ein neues daneben ausprobieren wollen).
 #   1.  cp .env.example .env      (Passwort fuer die Datenbank setzen, Ordner fuer die Fotos waehlen)
 #   2.  docker compose up -d
 #   3.  http://<server>:2283  -> Immich einrichten (erstes Konto = Administrator), Fotos hochladen
-#   4.  http://<server>:8090  -> Immich Showcase einrichten (Code steht in:  docker compose logs showcase)
+#   4.  http://<server>:8090  -> Frameside einrichten (Code steht in:  docker compose logs showcase)
 #       Adresse von Immich im Assistenten: http://immich-server:2283
 # Immich-Teil nach der offiziellen Vorlage von Immich (https://immich.app/docs/install/docker-compose) mit getesteter Version; bei Updates
 # immer erst deren Hinweise lesen. Zum Sichern: den Foto-Ordner (UPLOAD_LOCATION) und die Datenbank (DB_DATA_LOCATION) kopieren.
@@ -45,7 +45,7 @@ services:
     restart: unless-stopped
 
   showcase:
-    image: ghcr.io/dirkvoss/immich-showcase:${SHOWCASE_VERSION:-latest}
+    image: ghcr.io/dirkvoss/frameside:${SHOWCASE_VERSION:-latest}
     container_name: showcase
     restart: unless-stopped
     user: "10001:10001"

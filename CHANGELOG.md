@@ -1,6 +1,19 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.23.0]
+### Neu
+- **Neuer Name: Frameside** (vorher „Immich Showcase“). Der Name „Immich“ gehört dem Immich-Projekt und soll nicht im Namen einer eigenständigen App stehen. Frameside ist ein eigenständiges Programm **für Immich**. Die technischen Namen bleiben unverändert, damit nichts bricht: GitHub-Repository `dirkvoss/immich-showcase`, Docker-Image `ghcr.io/dirkvoss/immich-showcase`, Umgebungsvariablen `RAHMEN_WEB_*`, Bonjour-Diensttyp `_showcase._tcp`, Album „Showcase-Uploads“. Neue Installationen zeigen den neuen Namen in der Oberfläche, im Fernseher-Titel, im Einrichtungsassistenten, in den Docs und in der iPhone-App. Wer in seiner `.env` `RAHMEN_WEB_NAME` gesetzt hat, behält seinen eigenen Namen.
+- **Geräte finden sich selbst:** „Gerät hinzufügen“ zeigt nur noch die kurze Adresse. Öffnest du sie am Fernseher, Tablet oder Raspberry Pi, erscheint das Gerät in der App von selbst („📺 LG-Fernseher gefunden“), du gibst einen Namen ein und tippst auf „Verbinden“. Kein Code, keine Vorab-Auswahl der Geräteart (sie wird am Browser erkannt und lässt sich ändern). Das Eintippen eines Codes bleibt als Ausweg.
+- **Fernseher haben jetzt dieselben Anzeige-Einstellungen wie Bilderrahmen:** Anordnung der Einblendungen (Uhr, Wetter, Termine, Geburtstage …), Wetter-Ort, Termine von Handys, Kalender-Link, Nachtruhe, sanfter Zoom, Hochkant-Paare sowie Notiz, Gruß mit Foto und Gäste-Upload. Nur das Dauerprogramm (Zufallsfotos im Leerlauf, Zeitplan, Erinnerungen, Favoriten) bleibt den Rahmen vorbehalten.
+- **Einfache Diashow:** Beim Senden an einen Fernseher schaltet „Einfache Diashow“ alle Einblendungen für diese Show aus – nur die Fotos, zum Beispiel für Besuch.
+### Geändert
+- **Geräteart verständlicher und nachträglich änderbar:** Beim Anlegen heißt die Auswahl jetzt „Fernseher (Smart-TV oder TV-Stick mit Browser)“ oder „Bilderrahmen (Tablet, Raspberry Pi oder Bildschirm mit Dauerprogramm)“, Fernseher steht oben. Wurde ein Gerät mit der falschen Art angelegt (ein Fernseher als Bilderrahmen hat viele Einstellungen, ein Fernseher wenige), lässt sich die Art unter ⚙ ändern; Einstellungen, die nur für Rahmen gelten, fallen dann weg.
+- **Gelöschtes Gerät:** Läuft ein Fernseher oder Tablet noch mit dem Namen eines gelöschten Geräts, vergisst die Seite ihn nach wenigen Sekunden selbst und zeigt den Code zum Neu-Koppeln (statt „keine Verbindung zum Server“).
+- **Fernseher/Tablet neu koppeln:** Ein Gerät, das schon einmal gekoppelt wurde, zeigt keinen Code mehr. Mit `?neu=1` hinter der Adresse (zum Beispiel `tv.example.com/tv/?neu=1`) vergisst es die alte Kopplung und zeigt wieder den Code.
+### Behoben
+- **Gäste-QR-Code mit Adresse ohne `https://`:** Steht als „Adresse für Tablets und Fernseher“ nur `tv.beispiel.de`, setzt der QR-Code und der Link für Gäste jetzt automatisch `https://` davor (bei IP-Adressen, `.local` und Namen ohne Punkt `http://`). Vorher konnten manche Handys den QR-Code nicht als Link öffnen.
+
 ## [2.22.0]
 ### Neu
 - **Raspberry Pi als Server in einem Befehl:** `examples/raspberry-pi/install-pi.sh` installiert auf einem frisch aufgespielten Raspberry Pi OS (Lite, 64-Bit) bzw. jedem Debian-Rechner Docker und Immich Showcase, meldet den Server im Netz an (Bonjour: die iPhone-App findet ihn selbst; mit `--hostname showcase` auch unter `showcase.local`) und zeigt den Einrichtungs-Link. Optionen: `--hostname`, `--port`, `--ohne-bonjour`, `--version`. Auf einem Debian-12-System getestet; auf echter Raspberry-Pi-Hardware (arm64) noch nicht.

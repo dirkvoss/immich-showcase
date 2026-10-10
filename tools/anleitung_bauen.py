@@ -16,7 +16,7 @@ import markdown
 
 WURZEL = Path(__file__).resolve().parent.parent
 DOCS = WURZEL / "docs"
-REPO = "https://github.com/dirkvoss/immich-showcase/tree/main/"
+REPO = "https://github.com/dirkvoss/frameside/tree/main/"
 
 CSS = """
 :root { color-scheme: light; }
@@ -45,7 +45,7 @@ def bild_einbetten(m):
     return f'{m.group(1)}data:image/png;base64,{daten}"'
 
 
-SEITEN = {"anleitung": "Immich Showcase – Erste Schritte", "anleitung-externer-rechner": "Immich Showcase – auf einem anderen Rechner als Immich"}
+SEITEN = {"anleitung": "Frameside – Erste Schritte", "anleitung-externer-rechner": "Frameside – auf einem anderen Rechner als Immich"}
 
 
 def bauen(name, titel, pdf=False):

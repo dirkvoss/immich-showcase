@@ -1,9 +1,9 @@
-# Immich Showcase auf einer Synology (Container Manager)
+# Frameside auf einer Synology (Container Manager)
 
 Voraussetzung: **Container Manager** (DSM 7.2 oder neuer; früher „Docker“) ist installiert. Immich läuft schon (oder du installierst es zuerst).
 
 1. In **File Station** einen Ordner anlegen, z. B. `docker/immich-showcase`.
-2. Die Datei `docker-compose.yml` aus diesem Projekt hineinlegen (Download: <https://github.com/dirkvoss/immich-showcase/raw/main/docker-compose.yml>). Eine `.env` ist nicht nötig.
+2. Die Datei `docker-compose.yml` aus diesem Projekt hineinlegen (Download: <https://github.com/dirkvoss/frameside/raw/main/docker-compose.yml>). Eine `.env` ist nicht nötig.
 3. **Container Manager → Projekt → Erstellen**
    - Projektname: `immich-showcase`
    - Pfad: der Ordner von eben

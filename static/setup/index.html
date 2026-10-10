@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
-<title>Immich Showcase – Einrichtung</title>
+<title>Frameside – Einrichtung</title>
 <style>
 @font-face { font-family: "Cormorant Garamond"; font-weight: 600; font-style: normal; font-display: swap; src: url(/fonts/cormorant-600.woff2) format("woff2"); }
 :root { --bg: #f6f4ef; --card: #fff; --text: #1e2430; --muted: #6b7280; --line: #e3dfd6; --accent: #b4532a; --accent-text: #fff; --ok: #2f7d4f; --danger: #b42318; }
@@ -54,13 +54,13 @@ h3 { margin: 14px 0 4px; }
 <body>
 <main>
   <img class="logo" src="/icon-512.png" alt="">
-  <h1>Immich Showcase</h1>
+  <h1>Frameside</h1>
   <p class="sub">Einrichtung</p>
   <div class="karte">
     <div class="schritte"><i id="p1" class="an"></i><i id="p2"></i><i id="p3"></i></div>
 
     <section id="s1">
-      <p>Willkommen! In drei kurzen Schritten verbindest du Immich Showcase mit deinem Immich.</p>
+      <p>Willkommen! In drei kurzen Schritten verbindest du Frameside mit deinem Immich.</p>
       <div id="gefunden" class="gefunden versteckt"><span class="haken">✓</span> <span id="gefundenText"></span></div>
       <div id="urlBlock">
         <label for="url">Adresse von Immich</label>
@@ -84,7 +84,7 @@ h3 { margin: 14px 0 4px; }
         <input id="mail" type="email" autocomplete="username" autocapitalize="none">
         <label for="pw">Passwort</label>
         <input id="pw" type="password" autocomplete="current-password">
-        <p class="tipp">Immich Showcase legt damit einmalig einen eigenen Schlüssel „Immich Showcase (Dienst)“ ohne Lösch-Rechte an. Das Passwort wird nicht gespeichert.</p>
+        <p class="tipp">Frameside legt damit einmalig einen eigenen Schlüssel „Frameside (Dienst)“ ohne Lösch-Rechte an. Das Passwort wird nicht gespeichert.</p>
       </div>
       <div id="keyBlock" class="versteckt">
         <label for="key">API-Schlüssel</label>
@@ -97,7 +97,7 @@ h3 { margin: 14px 0 4px; }
     </section>
 
     <section id="s3" class="versteckt">
-      <p><b>Wer soll Immich Showcase benutzen dürfen?</b></p>
+      <p><b>Wer soll Frameside benutzen dürfen?</b></p>
       <label class="karte2"><input type="radio" name="zugang" value="pin" checked>
         <span><b>Gemeinsame PIN</b> <em>(empfohlen)</em><br><small>Eine 6-stellige PIN für die Familie. Alle sehen dieselben Fotos (die des Immich-Kontos von eben).</small></span></label>
       <div id="heimnetzBlock" class="versteckt eingerueckt">
@@ -110,19 +110,19 @@ h3 { margin: 14px 0 4px; }
         <label for="pin">Eigene PIN (6 Ziffern, leer = zufällige PIN)</label>
         <input id="pin" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="zufällig">
         <label for="name">Name der App</label>
-        <input id="name" maxlength="40" placeholder="Immich Showcase">
+        <input id="name" maxlength="40" placeholder="Frameside">
       </details>
       <div class="meldung" id="m3" role="alert"></div>
       <div class="knoepfe"><button id="z3">Zurück</button><button class="primaer" id="w3">Einrichtung abschließen</button></div>
     </section>
 
     <section id="s4" class="versteckt">
-      <p><b>Geschafft.</b> Immich Showcase startet jetzt neu …</p>
+      <p><b>Geschafft.</b> Frameside startet jetzt neu …</p>
       <div id="pinBox" class="versteckt"><p>Deine PIN (bitte merken, sie wird nur jetzt angezeigt):</p><div class="pin" id="pinAnzeige"></div></div>
       <p class="tipp" id="warte">Einen Moment, die Seite öffnet sich gleich von selbst.</p>
       <div id="weiterBox" class="versteckt">
         <h3>Als Nächstes</h3>
-        <div class="punkt"><b>1. Handy:</b> iPhone-App „Showcase Immich“ öffnen und diesen QR-Code scannen.
+        <div class="punkt"><b>1. Handy:</b> iPhone-App „Frameside“ öffnen und diesen QR-Code scannen.
           <div id="appQr" style="width:170px;margin:10px auto;background:#fff;padding:8px;border-radius:10px"></div>
           <p class="tipp" id="appAdresse" style="text-align:center"></p></div>
         <div class="punkt"><b>2. Fernseher oder Tablet:</b> im Browser diese Adresse öffnen:
@@ -207,7 +207,7 @@ $("#w3").addEventListener("click", async () => {
         const c = await (await fetch("/api/config", { cache: "no-store" })).json();
         if (c.konfiguriert) {
           $("#warte").textContent = "Fertig – du kannst jetzt starten."; appQr();
-          const a = document.createElement("button"); a.className = "primaer"; a.textContent = "Immich Showcase öffnen"; a.style.marginTop = "14px"; a.onclick = () => location.href = "/";
+          const a = document.createElement("button"); a.className = "primaer"; a.textContent = "Frameside öffnen"; a.style.marginTop = "14px"; a.onclick = () => location.href = "/";
           $("#s4").appendChild(a); return;
         }
       } catch (e) {}

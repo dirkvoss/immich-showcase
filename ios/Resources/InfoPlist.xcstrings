@@ -42,13 +42,13 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die App verbindet sich mit deinem Immich-Showcase-Server im Heimnetz."
+            "value": "Die App verbindet sich mit deinem Frameside-Server im Heimnetz."
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The app connects to your Immich Showcase server on your home network."
+            "value": "The app connects to your Frameside server on your home network."
           }
         }
       }
@@ -59,13 +59,13 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Showcase Immich"
+            "value": "Frameside"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Showcase Immich"
+            "value": "Frameside"
           }
         }
       }

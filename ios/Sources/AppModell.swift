@@ -37,7 +37,7 @@ final class AppModell: ObservableObject {
         if let u = Adresse.ausVerbindungsLink(url) { serverSetzen(u) }
     }
 
-    /// Prüft, ob unter der Adresse ein Immich-Showcase-Server antwortet.
+    /// Prüft, ob unter der Adresse ein Frameside-Server antwortet.
     func pruefen(_ url: URL) async -> Result<String, Fehler> {
         var req = URLRequest(url: url.appendingPathComponent("api/config"))
         req.timeoutInterval = 8
@@ -58,7 +58,7 @@ final class AppModell: ObservableObject {
         var text: String {
             switch self {
             case .nichtErreichbar: return L("Der Server ist nicht erreichbar. Prüfe die Adresse und ob du im richtigen Netz bist.")
-            case .keinShowcase: return L("Unter dieser Adresse antwortet kein Immich Showcase.")
+            case .keinShowcase: return L("Unter dieser Adresse antwortet kein Frameside.")
             case .verbindung(let d): return L("Die Verbindung ist fehlgeschlagen: \(d)")
             }
         }
@@ -68,7 +68,7 @@ final class AppModell: ObservableObject {
         let kontext = LAContext()
         var err: NSError?
         guard kontext.canEvaluatePolicy(.deviceOwnerAuthentication, error: &err) else { gesperrt = false; return }
-        kontext.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: L("Showcase Immich entsperren")) { ok, _ in
+        kontext.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: L("Frameside entsperren")) { ok, _ in
             Task { @MainActor in if ok { self.gesperrt = false } }
         }
     }

@@ -1,4 +1,4 @@
-# Entwicklungsinstanz: baut Immich Showcase direkt aus dem Arbeitsverzeichnis und haengt sich an das Test-Immich (Netzwerk immich_default).
+# Entwicklungsinstanz: baut Frameside direkt aus dem Arbeitsverzeichnis und haengt sich an das Test-Immich (Netzwerk immich_default).
 name: showcase-dev
 services:
   showcase:

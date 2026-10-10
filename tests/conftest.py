@@ -150,7 +150,7 @@ class SchreinAnmeldung:
         if pfad == "/api-keys/me":
             if schluessel in self.widerrufen or (schluessel not in self.schluessel.values() and schluessel != "eigener-key"):
                 raise urllib.error.HTTPError("x", 401, "nein", {}, None)
-            return {"name": "Immich Showcase", "permissions": ["all"]}
+            return {"name": "Frameside", "permissions": ["all"]}
         if methode == "DELETE" and pfad.startswith("/api-keys/"):
             self.geloescht = getattr(self, "geloescht", []) + [pfad]
             return None

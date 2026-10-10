@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
-# Immich Showcase in einem Schritt starten.
+# Frameside in einem Schritt starten.
 #
 #   Direkt aus dem Netz (laedt alles nach ~/immich-showcase):
-#     curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/install.sh | bash
+#     curl -fsSL https://raw.githubusercontent.com/dirkvoss/frameside/main/install.sh | bash
 #   Aus dem heruntergeladenen Ordner:
-#     ./install.sh                 Immich laeuft schon (wird auf diesem Rechner automatisch erkannt): nur Immich Showcase starten
-#     ./install.sh --with-immich   noch kein Immich: Immich UND Immich Showcase zusammen starten
-#     ./install.sh --port 80       Immich Showcase auf Port 80 statt 8090 (dann genuegt am Fernseher die reine IP-Adresse)
+#     ./install.sh                 Immich laeuft schon (wird auf diesem Rechner automatisch erkannt): nur Frameside starten
+#     ./install.sh --with-immich   noch kein Immich: Immich UND Frameside zusammen starten
+#     ./install.sh --port 80       Frameside auf Port 80 statt 8090 (dann genuegt am Fernseher die reine IP-Adresse)
 #     ./install.sh --bonjour       zusaetzlich per Bonjour im Netz anmelden (die iPhone-App findet den Server selbst; nur Docker unter Linux)
 #     ./install.sh --no-open       den Browser nicht selbst oeffnen
 #     ./install.sh --vorbereiten   nur .env und Netzwerk vorbereiten, nichts starten (zum Pruefen)
 # Am Ende steht ein fertiger Einrichtungs-Link (mit QR-Code, falls `qrencode` installiert ist). Eine Datei bearbeiten muss man nicht.
 set -euo pipefail
 
-REPO="dirkvoss/immich-showcase"
+REPO="dirkvoss/frameside"
 ZIEL="${SHOWCASE_DIR:-$HOME/immich-showcase}"
 MIT_IMMICH=0; PORT=""; BONJOUR=0; OEFFNEN=1; NUR_VORBEREITEN=0; VERSION="${SHOWCASE_VERSION:-}"
 while [[ $# -gt 0 ]]; do
@@ -44,7 +44,7 @@ if [[ -n "$SKRIPT" && -f "$(dirname "$SKRIPT")/docker-compose.yml" ]]; then
 else
   command -v curl >/dev/null 2>&1 || { echo "curl fehlt."; exit 1; }
   if [[ ! -f "$ZIEL/docker-compose.yml" ]]; then
-    echo "Lade Immich Showcase nach $ZIEL ..."
+    echo "Lade Frameside nach $ZIEL ..."
     mkdir -p "$ZIEL"
     REF="heads/main"; [[ -n "$VERSION" && "$VERSION" != latest ]] && REF="tags/v${VERSION#v}"
     curl -fsSL "https://github.com/$REPO/archive/refs/$REF.tar.gz" | tar xz --strip-components=1 -C "$ZIEL"
@@ -73,7 +73,7 @@ if [[ $MIT_IMMICH == 1 ]] && ! grep -Eq '^DB_PASSWORD=.+' .env; then          # 
 fi
 [[ -n "$VERSION" && "$VERSION" != latest ]] && env_setzen SHOWCASE_VERSION "${VERSION#v}"
 
-# --- Immich auf diesem Rechner erkennen und Immich Showcase in dessen Docker-Netz haengen --------------------------------------------
+# --- Immich auf diesem Rechner erkennen und Frameside in dessen Docker-Netz haengen --------------------------------------------
 if [[ $MIT_IMMICH == 0 ]] && env_leer RAHMEN_IMMICH_URL; then
   IMMICH_NAME="$(docker ps --format '{{.Names}}	{{.Image}}' | awk -F'\t' 'tolower($2) ~ /immich-server/ || tolower($1) ~ /immich[-_]server/ {print $1; exit}' || true)"
   if [[ -n "$IMMICH_NAME" ]]; then
@@ -84,7 +84,7 @@ if [[ $MIT_IMMICH == 0 ]] && env_leer RAHMEN_IMMICH_URL; then
       compose_datei docker-compose.immich-network.yml
       env_setzen RAHMEN_IMMICH_URL "http://$IMMICH_NAME:2283/api"
       if env_leer RAHMEN_ML_URL && [[ -n "$ML_NAME" ]]; then env_setzen RAHMEN_ML_URL "http://$ML_NAME:3003/predict"; fi
-      echo "Immich erkannt: Container \"$IMMICH_NAME\" im Docker-Netz \"$NETZ\" – Immich Showcase wird dort angebunden."
+      echo "Immich erkannt: Container \"$IMMICH_NAME\" im Docker-Netz \"$NETZ\" – Frameside wird dort angebunden."
     fi
   else
     echo "Hinweis: Immich laeuft nicht auf diesem Rechner (oder nicht in Docker). Die Adresse gibst du gleich im Einrichtungsassistenten an."
@@ -116,19 +116,19 @@ if [[ $NUR_VORBEREITEN == 1 ]]; then echo "Vorbereitet (nichts gestartet). Weite
 
 # --- Starten ----------------------------------------------------------------------------------------------------------------------
 docker compose up -d
-echo -n "Warte auf Immich Showcase "
+echo -n "Warte auf Frameside "
 BEREIT=0
 for _ in $(seq 1 60); do
   if curl -fsS -m 2 "http://127.0.0.1:$PORT/api/config" >/dev/null 2>&1; then BEREIT=1; break; fi
   echo -n "."; sleep 2
 done
 echo
-[[ $BEREIT == 1 ]] || { echo "Immich Showcase antwortet noch nicht. Schau nach mit:  docker compose logs showcase"; exit 1; }
+[[ $BEREIT == 1 ]] || { echo "Frameside antwortet noch nicht. Schau nach mit:  docker compose logs showcase"; exit 1; }
 
 IP="${IP:-<server>}"
 KONFIGURIERT="$(curl -fsS -m 3 "http://127.0.0.1:$PORT/api/config" 2>/dev/null | grep -o '"konfiguriert": *true' || true)"
 if [[ -n "$KONFIGURIERT" ]]; then
-  echo; echo "Immich Showcase ist schon eingerichtet und laeuft:  http://$IP$PORTTEIL"
+  echo; echo "Frameside ist schon eingerichtet und laeuft:  http://$IP$PORTTEIL"
   exit 0
 fi
 CODE="$(docker compose logs showcase 2>&1 | grep -o 'Einrichtungs-Code ein: [0-9]*' | tail -1 | grep -o '[0-9]*$' || true)"
