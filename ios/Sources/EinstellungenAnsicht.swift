@@ -28,6 +28,7 @@ struct EinstellungenAnsicht: View {
                         Button("Demo ansehen (Beispielfotos, ohne Server)") { modell.demoStarten(); schliessen() }
                     }
                 }
+                if modell.server != nil && !modell.demoAktiv { KalenderAbschnitt() }
                 Section("Sicherheit") {
                     Toggle("Mit Face ID sperren", isOn: Binding(get: { modell.faceIDAktiv }, set: { an in faceID(an) }))
                     Toggle("Mit Face ID anmelden (PIN merken)", isOn: Binding(get: { modell.pinMitFaceID }, set: { an in

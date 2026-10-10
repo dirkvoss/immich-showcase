@@ -69,6 +69,23 @@
           }
         }
       }
+    },
+    "NSCalendarsFullAccessUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die App liest deine Termine nur, wenn du in den App-Einstellungen „Meine Termine auf dem Rahmen zeigen“ einschaltest."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The app only reads your appointments if you switch on “Show my appointments on the frame” in the app settings."
+          }
+        }
+      }
     }
   }
 }

@@ -72,6 +72,9 @@ targets:
         NSFaceIDUsageDescription: "Face ID schützt die App, wenn du das in den App-Einstellungen eingeschaltet hast."
         NSLocalNetworkUsageDescription: "Die App verbindet sich mit deinem Immich-Showcase-Server im Heimnetz."
         NSBonjourServices: ["_http._tcp", "_showcase._tcp"]
+        NSCalendarsFullAccessUsageDescription: "Die App liest deine Termine nur, wenn du in den App-Einstellungen „Meine Termine auf dem Rahmen zeigen“ einschaltest."
+        UIBackgroundModes: [fetch]
+        BGTaskSchedulerPermittedIdentifiers: ["com.dirk-voss.showcase.kalender"]
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
           NSAllowsArbitraryLoadsInWebContent: true

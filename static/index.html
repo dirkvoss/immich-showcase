@@ -247,6 +247,25 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
 #assiQr svg { display: block; width: 100%; height: auto; }
 .assi-status { text-align: center; font-weight: 600; margin: 10px 0; color: var(--muted); }
 .assi-status.ok { color: var(--ok, #3ecf8e); }
+/* Layout-Editor: Vorschau des Rahmens, Elemente per Ziehen verschieben */
+.led-flaeche { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); margin: 6px 0 10px; touch-action: none; background: linear-gradient(180deg, #2a4a7a 0%, #6d7f9d 55%, #b79b7a 100%); }
+.led-flaeche::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 38%; background: #24354d; clip-path: polygon(0 62%, 28% 18%, 46% 52%, 68% 8%, 100% 55%, 100% 100%, 0 100%); opacity: .85; pointer-events: none; }
+.led-ebene { position: absolute; left: 2.8%; right: 2.8%; top: 3.5%; bottom: 3.5%; z-index: 1; }
+.led-chip { position: absolute; z-index: 2; width: max-content; max-width: 60%; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.8); white-space: pre; padding: 0 .15em; border: 1px dashed rgba(255,255,255,.55); border-radius: 4px; background: rgba(0,0,0,.18); cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; line-height: 1.25; }
+.led-chip.zieht { cursor: grabbing; background: rgba(0,0,0,.4); border-style: solid; border-color: var(--accent); }
+.led-chip:focus-visible { outline: 2px solid var(--accent); }
+.led-chip.uhr { font-family: var(--serif); }
+.led-liste { display: flex; flex-direction: column; gap: 8px; }
+.led-zeile { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); }
+.led-zeile label.name { display: flex; align-items: center; gap: 8px; flex: 1 1 150px; min-width: 0; font-weight: 600; }
+.led-zeile select { min-height: 36px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); font: inherit; font-size: 14px; color: inherit; padding: 0 6px; max-width: 100%; }
+.led-zeile input[type=range] { flex: 1 1 110px; min-width: 90px; accent-color: var(--accent); }
+.led-zeile .led-zusatz { flex: 1 1 100%; font-size: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; color: var(--muted); }
+.led-zeile .led-zusatz label { display: flex; align-items: center; gap: 6px; }
+.led-zeile input[type=color] { width: 36px; height: 30px; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: transparent; }
+.led-chip.titel { background: rgba(0,0,0,.55); padding: .1em .45em; border-radius: 6px; }
+.led-aus .led-zeile select, .led-aus .led-zeile input[type=range] { opacity: .45; }
+.led-zurueck { margin-top: 8px; }
 .gfdetails { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--bg); }
 .gfdetails > summary { cursor: pointer; font: 600 18px/1.2 var(--serif); }
 .qzeile { display: flex; gap: 6px; align-items: center; min-width: 0; }
@@ -627,14 +646,19 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
       <label class="tvfeld"><span>Sekunden pro Foto</span> <input id="eSek" type="number" min="3" max="120" inputmode="numeric" aria-label="Sekunden pro Foto"></label>
       <label class="tvfeld"><span>Hintergrund (Rahmen)</span> <select id="eFuellungR" aria-label="Hintergrund (Rahmen)"><option value="">Standard</option><option value="unscharf">Unscharf</option><option value="zuschnitt">Zuschnitt</option><option value="balken">Schwarze Balken</option></select></label>
       <label class="tvfeld"><span>Hintergrund (Fernseher)</span> <select id="eFuellungT" aria-label="Hintergrund (Fernseher)"><option value="">Standard</option><option value="unscharf">Unscharf</option><option value="zuschnitt">Zuschnitt</option><option value="balken">Schwarze Balken</option></select></label>
-      <div class="tvfeld"><span>Bildunterschrift</span><span class="reihe"><label><input type="checkbox" id="eDatum"> Datum</label><label><input type="checkbox" id="eZeit"> Uhrzeit</label><label><input type="checkbox" id="eOrt"> Ort</label></span></div>
+      <h3>Anzeige auf dem Rahmen</h3>
+      <p class="tipp">Was am Rahmen eingeblendet wird und wo: Uhrzeit, heutiges Datum, Datum und Ort des Fotos, Wetter und Termine. Jedes Element lässt sich ein- und ausschalten, verschieben und in der Größe ändern. Für einzelne Rahmen gibt es unter ⚙ eine eigene Anordnung.</p>
+      <div id="eLayout"></div>
       <h3>Wetter und Termine</h3>
-      <p class="tipp">Erscheinen oben rechts am Rahmen. Für das Wetter wird nur der Ortsname an open-meteo.com geschickt.</p>
+      <p class="tipp">Erscheinen am Rahmen, wenn sie oben bei „Anzeige auf dem Rahmen“ eingeschaltet sind. Für das Wetter wird nur der Ortsname an open-meteo.com geschickt.</p>
       <div class="tvfeld"><span>Ort</span> <span id="eOrtName" style="flex:1;text-align:right"></span> <button class="btn klein versteckt" id="eOrtWeg" type="button">Entfernen</button></div>
       <label class="tvfeld"><span>Ort suchen</span> <input id="eOrtSuche" type="text" autocomplete="off" aria-label="Ort suchen" placeholder="Berlin"></label>
       <div id="eOrtTreffer"></div>
       <label class="tvfeld stapel"><span>Kalender-Link (iCal)</span> <input id="eKal" type="text" autocomplete="off" aria-label="Kalender-Link" placeholder="https://…"></label>
       <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="eWetterTest" type="button">Wetter testen</button><button class="btn klein" id="eKalTest" type="button">Kalender testen</button><button class="btn klein gefahr versteckt" id="eKalWeg" type="button">Kalender-Link entfernen</button></div>
+      <h3>Kalender von Handys</h3>
+      <p class="tipp">In der iPhone-App unter „App-Einstellungen“ → „Kalender auf dem Rahmen zeigen“ gibt jede Person ihre Termine frei. Hier siehst du, wer das tut, und kannst ein Handy wieder entfernen.</p>
+      <div id="eTelefone"></div>
       <h3>Benachrichtigungen aufs Handy (Pushover)</h3>
       <p class="tipp">Warnt zum Beispiel, wenn ein Rahmen offline ist oder der Akku fast leer ist. Den Zugang gibt es unter pushover.net.</p>
       <label class="tvfeld"><span>User-Key</span> <input id="ePoUser" type="password" autocomplete="off" aria-label="User-Key"></label>
@@ -720,7 +744,8 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
       <div class="nur-gf-rahmen">
         <div class="gf">
           <label class="tvfeld"><span>Sekunden pro Foto</span> <input id="gfSek" type="number" min="3" max="120" inputmode="numeric" aria-label="Sekunden pro Foto"></label>
-          <div class="tvfeld"><span>Bildunterschrift</span><span class="reihe"><label><input type="checkbox" id="gfDatum"> Datum</label><label><input type="checkbox" id="gfZeit"> Uhrzeit</label><label><input type="checkbox" id="gfOrt"> Ort</label></span></div>
+          <div class="tvfeld"><span>Einblendungen (Uhrzeit, Datum, Ort, Wetter, Termine)</span><span class="reihe"><label><input type="checkbox" id="gfLayoutEigen"> eigene Anordnung</label></span></div>
+          <div id="gfLayout" class="versteckt"></div>
           <div class="tvfeld"><span>Nachtruhe (Bildschirm aus)</span><span class="reihe"><input id="gfNachtVon" type="time" aria-label="von"> – <input id="gfNachtBis" type="time" aria-label="bis"></span></div>
           <h3>Dauerprogramm</h3>
           <p class="tipp">Was der Rahmen zeigt, wenn niemand etwas schickt. Ohne Eintrag gilt die allgemeine Einstellung der Installation.</p>
@@ -1902,19 +1927,137 @@ function tabletBereich(g) {                                // zwei Wege zur Tabl
 $("#gfOeffnen").addEventListener("click", () => seiteOeffnen(gfId, $("#gfAdb").value.trim(), tvBasis(), $("#gfOeffnenErg"), $("#gfOeffnen")));
 $("#gfFullyAn").addEventListener("click", () => { $("#gfFullyFelder").classList.remove("versteckt"); $("#gfFullyAnzeigen").classList.add("versteckt"); });
 $("#gfIpNehmen").addEventListener("click", e => { $("#gfFullyHost").value = e.currentTarget.dataset.ip; $("#gfIpZeile").classList.add("versteckt"); });
+// ---------------------------------------------------------------- Layout-Editor (Einblendungen am Rahmen)
+const LED_ELEMENTE = [                                          // [Name, Beschriftung, Schriftgroesse in px bei 100 % (wie am Rahmen)]
+  ["uhr", "Uhrzeit", 44], ["heute", "Heutiges Datum", 28], ["fotodatum", "Foto: Aufnahmedatum", 30], ["fotoort", "Foto: Ort", 30], ["wetter", "Wetter", 52], ["termine", "Termine", 26],
+  ["geburtstag", "Geburtstage", 32], ["titel", "Show-Titel", 30]];
+const LED_SCHRIFTEN = { serif: '"Cormorant Garamond", Georgia, serif', sans: "Arial, Helvetica, sans-serif", mono: 'Menlo, Consolas, "Courier New", monospace' };
+const LED_LAGEN = [["frei", "Frei (ziehen)"], ["0,0", "Oben links"], ["50,0", "Oben Mitte"], ["100,0", "Oben rechts"], ["0,50", "Mitte links"], ["50,50", "Mitte"],
+  ["100,50", "Mitte rechts"], ["0,100", "Unten links"], ["50,100", "Unten Mitte"], ["100,100", "Unten rechts"]];
+function ledBeispiel(n, w) {
+  const jetzt = new Date(), loc = window.RW_LOCALE || "de-DE";
+  const uhr = String(jetzt.getHours()).padStart(2, "0") + ":" + String(jetzt.getMinutes()).padStart(2, "0");
+  const fmt = (d, o) => { try { return d.toLocaleDateString(loc, o); } catch (e) { return d.toLocaleDateString(); } };
+  switch (n) {
+    case "uhr": return uhr;
+    case "heute": return fmt(jetzt, { weekday: "long", day: "numeric", month: "long" });
+    case "fotodatum": return fmt(new Date(2025, 11, 4), { day: "numeric", month: "long", year: "numeric" }) + (w.zeit ? " · 14:30" : "");
+    case "fotoort": return RW_T("Rom, Italien");
+    case "wetter": return "☀️ 14°";
+    case "geburtstag": return "🎂 " + RW_T("Omas Geburtstag");
+    case "titel": return RW_T("Sommerferien");
+    default: return "15:00 " + RW_T("Zahnarzt") + "\n18:30 " + RW_T("Training");
+  }
+}
+function layoutEditor(mount, start, standard) {
+  const w = JSON.parse(JSON.stringify(start)), chips = {}, zeilen = {};
+  mount.innerHTML = "";
+  const flaeche = document.createElement("div"); flaeche.className = "led-flaeche"; flaeche.setAttribute("role", "group"); flaeche.setAttribute("aria-label", RW_T("Vorschau des Rahmens"));
+  const ebene = document.createElement("div"); ebene.className = "led-ebene"; flaeche.append(ebene);
+  const tipp = document.createElement("p"); tipp.className = "tipp"; tipp.textContent = RW_T("Ziehe die Elemente in der Vorschau an die gewünschte Stelle (oder wähle unten eine Lage).");
+  const liste = document.createElement("div"); liste.className = "led-liste";
+  const zurueck = document.createElement("button"); zurueck.type = "button"; zurueck.className = "btn klein led-zurueck"; zurueck.textContent = RW_T("Zurücksetzen");
+  mount.append(flaeche, tipp, liste, zurueck);
+  const lage = v => { const k = Math.round(v.x) + "," + Math.round(v.y); return LED_LAGEN.some(l => l[0] === k) && Number.isInteger(v.x) && Number.isInteger(v.y) ? k : "frei"; };
+  function zeichne(n) {
+    const v = w[n], c = chips[n], z = zeilen[n];
+    c.style.left = v.x + "%"; c.style.top = v.y + "%"; c.style.transform = `translate(-${v.x}%,-${v.y}%)`;
+    c.style.fontSize = `calc(${LED_ELEMENTE.find(e => e[0] === n)[2]}px * var(--s, .3) * ${v.gr / 100})`;
+    c.style.textAlign = v.x >= 66 ? "right" : v.x <= 34 ? "left" : "center";
+    c.textContent = ledBeispiel(n, v); c.style.display = v.an ? "" : "none";
+    c.style.color = v.farbe || ""; c.style.fontFamily = LED_SCHRIFTEN[v.schrift] || "";
+    z.an.checked = !!v.an; z.gr.value = v.gr; z.lage.value = lage(v); z.zeile.classList.toggle("led-aus", !v.an);
+    z.farbe.value = v.farbe || "#ffffff"; z.schrift.value = v.schrift || ""; z.farbeWeg.style.visibility = v.farbe ? "visible" : "hidden";
+    if (z.zeit) z.zeit.checked = !!v.zeit;
+    if (z.person) z.person.checked = v.person !== false;
+  }
+  const alle = () => LED_ELEMENTE.forEach(e => zeichne(e[0]));
+  for (const [n, titel] of LED_ELEMENTE) {
+    const c = document.createElement("div"); c.className = "led-chip " + n; c.tabIndex = 0; c.setAttribute("role", "button"); c.setAttribute("aria-label", RW_T(titel));
+    ebene.append(c); chips[n] = c;
+    const zeile = document.createElement("div"); zeile.className = "led-zeile";
+    const lab = document.createElement("label"); lab.className = "name"; const an = document.createElement("input"); an.type = "checkbox"; lab.append(an, document.createTextNode(RW_T(titel)));
+    const sel = document.createElement("select"); sel.setAttribute("aria-label", RW_T("Lage")); for (const [k, t] of LED_LAGEN) { const o = document.createElement("option"); o.value = k; o.textContent = RW_T(t); sel.append(o); }
+    const gr = document.createElement("input"); gr.type = "range"; gr.min = 40; gr.max = 300; gr.step = 10; gr.setAttribute("aria-label", RW_T("Größe"));
+    zeile.append(lab, sel, gr);
+    const extra = document.createElement("div"); extra.className = "led-zusatz";
+    const fl = document.createElement("label"); const fi = document.createElement("input"); fi.type = "color"; fi.setAttribute("aria-label", RW_T("Farbe")); fl.append(document.createTextNode(RW_T("Farbe") + " "), fi);
+    const fw = document.createElement("button"); fw.type = "button"; fw.className = "btn klein"; fw.textContent = "✕"; fw.setAttribute("aria-label", RW_T("Farbe zurücksetzen")); fw.title = RW_T("Farbe zurücksetzen");
+    const sl = document.createElement("label"); const ss = document.createElement("select"); ss.setAttribute("aria-label", RW_T("Schrift"));
+    for (const [k, t] of [["", "Standard"], ["serif", "Serif"], ["sans", "Sans"], ["mono", "Mono"]]) { const o = document.createElement("option"); o.value = k; o.textContent = RW_T(t); ss.append(o); }
+    sl.append(document.createTextNode(RW_T("Schrift") + " "), ss); extra.append(fl, fw, sl); zeile.append(extra);
+    const z = { zeile, an, lage: sel, gr, farbe: fi, farbeWeg: fw, schrift: ss }; zeilen[n] = z;
+    fi.addEventListener("input", () => { w[n].farbe = fi.value; zeichne(n); });
+    fw.addEventListener("click", () => { w[n].farbe = ""; zeichne(n); });
+    ss.addEventListener("change", () => { w[n].schrift = ss.value; zeichne(n); });
+    if (n === "termine") {
+      const pl = document.createElement("label"); const pc = document.createElement("input"); pc.type = "checkbox"; pl.append(pc, document.createTextNode(" " + RW_T("Person anzeigen"))); extra.append(pl); z.person = pc;
+      pc.addEventListener("change", () => { w[n].person = pc.checked; zeichne(n); });
+    }
+    if (n === "fotodatum") {
+      const zl = document.createElement("label"); zl.className = "led-zusatz"; const zc = document.createElement("input"); zc.type = "checkbox"; zl.append(zc, document.createTextNode(RW_T("mit Aufnahmezeit"))); zeile.append(zl); z.zeit = zc;
+      zc.addEventListener("change", () => { w[n].zeit = zc.checked; zeichne(n); });
+    }
+    liste.append(zeile);
+    an.addEventListener("change", () => { w[n].an = an.checked; zeichne(n); });
+    gr.addEventListener("input", () => { w[n].gr = +gr.value; zeichne(n); });
+    sel.addEventListener("change", () => { if (sel.value !== "frei") { const [x, y] = sel.value.split(",").map(Number); w[n].x = x; w[n].y = y; } zeichne(n); });
+    // Ziehen (Maus und Finger)
+    let griff = null;
+    c.addEventListener("pointerdown", e => {
+      const r = ebene.getBoundingClientRect(), cr = c.getBoundingClientRect();
+      griff = { dx: e.clientX - cr.left, dy: e.clientY - cr.top, r }; c.setPointerCapture(e.pointerId); c.classList.add("zieht"); e.preventDefault();
+    });
+    c.addEventListener("pointermove", e => {
+      if (!griff) return;
+      const cr = c.getBoundingClientRect(), freiX = griff.r.width - cr.width, freiY = griff.r.height - cr.height;
+      const rund = v => (v < 3 ? 0 : v > 97 ? 100 : Math.abs(v - 50) < 3 ? 50 : Math.round(v));
+      if (freiX > 1) w[n].x = rund(Math.max(0, Math.min(100, (e.clientX - griff.dx - griff.r.left) / freiX * 100)));
+      if (freiY > 1) w[n].y = rund(Math.max(0, Math.min(100, (e.clientY - griff.dy - griff.r.top) / freiY * 100)));
+      zeichne(n);
+    });
+    const los = () => { griff = null; c.classList.remove("zieht"); };
+    c.addEventListener("pointerup", los); c.addEventListener("pointercancel", los);
+    c.addEventListener("keydown", e => {                          // Pfeiltasten: in 2-%-Schritten verschieben
+      const d = { ArrowLeft: [-2, 0], ArrowRight: [2, 0], ArrowUp: [0, -2], ArrowDown: [0, 2] }[e.key]; if (!d) return;
+      w[n].x = Math.max(0, Math.min(100, w[n].x + d[0])); w[n].y = Math.max(0, Math.min(100, w[n].y + d[1])); zeichne(n); e.preventDefault();
+    });
+  }
+  const mass = () => flaeche.style.setProperty("--s", Math.max(.1, flaeche.clientWidth / 1280));
+  if (window.ResizeObserver) new ResizeObserver(mass).observe(flaeche); else window.addEventListener("resize", mass);
+  mass(); alle();
+  zurueck.addEventListener("click", () => { const s = standard || {}; for (const e of LED_ELEMENTE) Object.assign(w[e[0]], JSON.parse(JSON.stringify(s[e[0]] || w[e[0]]))); alle(); });
+  return { lesen: () => JSON.parse(JSON.stringify(w)) };
+}
+let gfLed = null, eLed = null;
+$("#gfLayoutEigen").addEventListener("change", () => $("#gfLayout").classList.toggle("versteckt", !$("#gfLayoutEigen").checked));
+async function telefoneLaden() {                                // Kalender von Handys (iPhone-App) in den Einstellungen
+  const box = $("#eTelefone"); box.innerHTML = "";
+  let q = []; try { q = (await api("termine/telefon")).quellen; } catch (e) { return; }
+  if (!q.length) { const p = document.createElement("p"); p.className = "tipp"; p.textContent = RW_T("Noch kein Handy hat seinen Kalender freigegeben."); box.append(p); return; }
+  for (const h of q) {
+    const z = document.createElement("div"); z.className = "led-zeile";
+    const t = document.createElement("span"); t.style.flex = "1"; let wann = "";
+    try { wann = new Date(h.aktualisiert).toLocaleString(window.RW_LOCALE || "de-DE", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); } catch (e) {}
+    t.textContent = h.name + " · " + h.anzahl + " " + RW_T("Termine") + (wann ? " · " + wann : "");
+    const weg = document.createElement("button"); weg.type = "button"; weg.className = "btn klein gefahr"; weg.textContent = RW_T("Entfernen");
+    weg.addEventListener("click", async () => { try { await api("termine/telefon/" + encodeURIComponent(h.id), { method: "DELETE" }); await telefoneLaden(); } catch (e) { fehler(e); } });
+    z.append(t, weg); box.append(z);
+  }
+}
 async function geraetDialogOeffnen(id) {
-  gfId = id || null; gfArt = "rahmen";
+  gfId = id || null; gfArt = "rahmen"; let std = null;
   let g = { art: "rahmen", name: "", sek: "", fuellung: "", anzeige: [], nacht: "", quellen: "", zeitplan: "", fully_host: "", fully_pw_gesetzt: false };
   try {
     const v = await api("verwaltung");
     if (id) g = v.geraete.find(x => x.id === id) || g;
-    $("#gfSek").placeholder = String(v.standard.sek);
+    $("#gfSek").placeholder = String(v.standard.sek); std = v.standard.layout;
   } catch (e) { fehler(e); return; }
   gfArt = g.art; $("#geraetTitel").textContent = RW_T(id ? "Gerät einstellen" : "Gerät hinzufügen");
   $("#gfArtZeile").classList.toggle("versteckt", !!id); $("#gfArt").value = g.art; gfArtAnpassen();
   $("#gfName").value = g.name; $("#gfFuellung").value = g.fuellung || "";
   $("#gfAlarm").value = g.alarm_min == null ? "" : g.alarm_min; $("#gfWartung").classList.toggle("versteckt", !id || g.art !== "rahmen"); $("#gfWartungErg").classList.add("versteckt");
-  $("#gfSek").value = g.sek || ""; $("#gfDatum").checked = (g.anzeige || []).includes("datum"); $("#gfOrt").checked = (g.anzeige || []).includes("ort"); $("#gfZeit").checked = (g.anzeige || []).includes("zeit");
+  $("#gfSek").value = g.sek || ""; gfLed = layoutEditor($("#gfLayout"), g.layout || std, std); $("#gfLayoutEigen").checked = !!g.layout_eigen; $("#gfLayout").classList.toggle("versteckt", !g.layout_eigen);
   const [von, bis] = (g.nacht || "-").split("-"); $("#gfNachtVon").value = (von || "").padStart(5, "0"); $("#gfNachtBis").value = (bis || "").padStart(5, "0");
   if (!g.nacht) { $("#gfNachtVon").value = ""; $("#gfNachtBis").value = ""; }
   $("#gfQuellen").innerHTML = ""; for (const q of quellenLesen(g.quellen)) $("#gfQuellen").append(quelleZeile(q));
@@ -1941,8 +2084,7 @@ function einstFuellen(d) {
   einstDaten = d; einstWetter = d.wetter;
   $("#eSek").value = d.sek || ""; $("#eSek").placeholder = String(d.standard.sek);
   $("#eFuellungR").value = d.fuellung_rahmen || ""; $("#eFuellungT").value = d.fuellung_tv || "";
-  const an = d.anzeige.length ? d.anzeige : d.standard.anzeige;
-  $("#eDatum").checked = an.includes("datum"); $("#eZeit").checked = an.includes("zeit"); $("#eOrt").checked = an.includes("ort");
+  eLed = layoutEditor($("#eLayout"), d.layout, d.standard.layout);
   $("#eOrtName").textContent = d.wetter ? d.wetter.name || (d.wetter.lat + ", " + d.wetter.lon) : (d.wetter_env ? RW_T("über die Installation eingestellt") : RW_T("nicht eingestellt"));
   $("#eOrtWeg").classList.toggle("versteckt", !d.wetter); $("#eOrtSuche").value = ""; $("#eOrtTreffer").innerHTML = "";
   $("#eKal").value = ""; $("#eKal").placeholder = d.kalender_gesetzt ? RW_T("gesetzt – zum Ändern neuen Link einfügen") : d.kalender_env ? RW_T("über die Installation eingestellt") : "https://…";
@@ -1964,11 +2106,11 @@ function appQrZeigen() {                                    // QR mit der Adress
 async function einstOeffnen() {
   $("#konto").open = false;
   try { einstFuellen(await api("einstellungen")); } catch (e) { fehler(e); return; }
-  appQrZeigen(); $("#einstDialog").classList.remove("versteckt");
+  appQrZeigen(); $("#einstDialog").classList.remove("versteckt"); telefoneLaden();
 }
 function einstSammeln() {
   const k = { sek: $("#eSek").value, fuellung_rahmen: $("#eFuellungR").value, fuellung_tv: $("#eFuellungT").value, tv_url: $("#eTvUrl").value.trim(), alarm_min: $("#eAlarm").value,
-    anzeige: [$("#eDatum").checked && "datum", $("#eZeit").checked && "zeit", $("#eOrt").checked && "ort"].filter(Boolean), wetter: einstWetter,
+    layout: eLed ? eLed.lesen() : undefined, wetter: einstWetter,
     aliase: [...$$("#eAliase .qzeile")].map(z => { const i = z.querySelectorAll("input"); return { name: i[0].value.trim(), person: i[1].value.trim() }; }) };
   if ($("#eKal").value.trim()) k.kalender_url = $("#eKal").value.trim();
   if ($("#ePoUser").value.trim() || $("#ePoToken").value.trim()) k.pushover = { user: $("#ePoUser").value.trim(), token: $("#ePoToken").value.trim() };
@@ -2121,7 +2263,7 @@ $("#gfSpeichern").addEventListener("click", async () => {
   if (gfId) daten.adb_host = $("#gfAdb").value.trim();
   if (!gfId) daten.art = $("#gfArt").value;
   if (istRahmen) {
-    Object.assign(daten, { sek: $("#gfSek").value, anzeige: [$("#gfDatum").checked && "datum", $("#gfZeit").checked && "zeit", $("#gfOrt").checked && "ort"].filter(Boolean), nacht: von && bis ? von + "-" + bis : "",
+    Object.assign(daten, { sek: $("#gfSek").value, layout: $("#gfLayoutEigen").checked && gfLed ? gfLed.lesen() : null, nacht: von && bis ? von + "-" + bis : "",
       quellen: quellenSchreiben(), zeitplan: planSchreiben(), fully_host: $("#gfFullyHost").value.trim(), alarm_min: $("#gfAlarm").value });
     if ($("#gfFullyPw").value) daten.fully_pw = $("#gfFullyPw").value;
   }

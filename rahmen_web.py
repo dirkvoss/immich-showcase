@@ -50,6 +50,8 @@ def _einstellungen_anwenden():
 
 _einstellungen_anwenden()
 sys.path.insert(0, os.environ.get("RAHMEN_HELFER_DIR", "/opt/bilderrahmen"))
+import anzeige as ANZ
+import telefontermine as TT
 import rahmen_helfer as H  # noqa: E402
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response  # noqa: E402
@@ -612,7 +614,7 @@ def konfig(ziel: str = ""):
     return {"name": APP_NAME, "version": VERSION, "modus": MODUS, "auth": AUTH, "musik_upload": MUSIK_UPLOAD, "hochladen": bool(UPLOAD_KEY) or AUTH != "pin", "hochladen_mb": UPLOAD_MAX_MB, "konfiguriert": konfiguriert(), "tv_url": tv_url(), "beispiele": BEISPIELE, "beispiele_en": BEISPIELE_EN,
             "ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT and k not in RAHMEN_ZIELE},
             "rahmen": list(RAHMEN_ZIELE), "rahmen_namen": dict(RAHMEN_ZIELE), "rahmen_sek": gwert(z, "sek", std_sek()), "rahmen_fuellung": gwert(z, "fuellung", std_fuellung_rahmen()), "tv_fuellung": gwert(z, "fuellung", std_fuellung_tv()),
-            "rahmen_anzeige": gwert(z, "anzeige", std_anzeige()), "rahmen_nacht": rahmen_nacht(z), "rahmen_zusatz": zusatz_liste(), "koppeln": True,
+            "rahmen_anzeige": gwert(z, "anzeige", std_anzeige()), "rahmen_layout": layout_fuer(z), "rahmen_nacht": rahmen_nacht(z), "rahmen_zusatz": zusatz_liste(), "koppeln": True,
             "alle_ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT}}
 
 
@@ -1824,6 +1826,24 @@ def gwert(z, feld, standard=None):
     return standard if v in (None, "", []) else v
 
 
+def layout_global():
+    """Layout der Einblendungen, das fuer alle Rahmen gilt (Standard, alte Bildunterschrift-Haken, allgemeines Layout)."""
+    return ANZ.zusammen(ANZ.aus_anzeige(std_anzeige()), EINST.get("layout"))
+
+
+def layout_fuer(z=None):
+    """Layout der Einblendungen fuer einen Rahmen (eigene Anordnung des Geraets gewinnt feldweise)."""
+    e = GERAETE.get(z) or {} if z else {}
+    return ANZ.zusammen(ANZ.aus_anzeige(std_anzeige()), EINST.get("layout"), ANZ.aus_anzeige(e.get("anzeige")), e.get("layout"))
+
+
+def anzeige_version(z):
+    """Kurze Kennung der Anzeige-Einstellungen eines Rahmens (Anordnung, Quellen, Handy-Termine): der Rahmen laedt neu, sobald sie sich aendert."""
+    staende = sorted((k, v.get("aktualisiert") or "") for k, v in TELEFON.items())
+    roh = json.dumps([layout_fuer(z), zusatz_liste(), staende, bool(kalender_url())], sort_keys=True)
+    return hashlib.md5(roh.encode()).hexdigest()[:8]
+
+
 def rahmen_sek(z=None):
     return gwert(z or PLAYER, "sek", std_sek())
 
@@ -2372,8 +2392,15 @@ def kalender_url():
     return einst("kalender_url", KALENDER_URL)
 
 
+TERMINE_FILE = os.environ.get("RAHMEN_WEB_TERMINE_FILE", os.path.join(os.path.dirname(EINST_FILE), "rahmen_web_termine.json"))
+TELEFON = lies_json(TERMINE_FILE, {})                                  # Termine aus den Kalendern der Handys (siehe telefontermine.py)
+if not isinstance(TELEFON, dict):
+    TELEFON = {}
+TELEFON_LOCK = threading.Lock()
+
+
 def zusatz_liste():
-    return [k for k in _liste("RAHMEN_WEB_RAHMEN_ZUSATZ", "wetter,kalender") if (k == "wetter" and wetter_ort()) or (k == "kalender" and kalender_url())]
+    return [k for k in _liste("RAHMEN_WEB_RAHMEN_ZUSATZ", "wetter,kalender") if (k == "wetter" and wetter_ort()) or (k == "kalender" and (kalender_url() or TELEFON))]
 ZUSATZ_CACHE = {}
 
 
@@ -2483,7 +2510,19 @@ def ics_termine(text, heute, tage=2, maximum=4):
 
 
 def kalender_holen():
-    return ics_termine(http_text(kalender_url()), datetime.date.today())
+    """Termine von heute und morgen aus dem Kalender-Link (falls eingerichtet)."""
+    return ics_termine(http_text(kalender_url()), datetime.date.today(), maximum=40) if kalender_url() else []
+
+
+def kalender_roh():
+    """Alle Termine von heute und morgen: Kalender-Link und Handys zusammen (ein Fehler beim Link nimmt die Handy-Termine nicht mit)."""
+    liste = []
+    try:
+        liste += kalender_holen()
+    except Exception as e:  # noqa: BLE001
+        H.log.warning("Kalender-Link: %s", e)
+    liste += TT.ereignisse(TELEFON, datetime.date.today())
+    return liste
 
 
 @app.get("/api/rahmen/zusatz")
@@ -2496,10 +2535,50 @@ def rahmen_zusatz(_=Depends(geraet)):
         if w:
             out["wetter"] = w
     if "kalender" in zusatz:
-        t = zusatz_gecacht("kalender", 600, kalender_holen)
+        t = zusatz_gecacht("kalender", 600, kalender_roh)
         if t is not None:
-            out["termine"] = t
+            out["termine"] = TT.naechste(t, datetime.datetime.now(), personen=sum(1 for v in TELEFON.values() if v.get("kuerzel")) >= 2)   # Kuerzel nur, wenn mehrere Handys teilen
+            out["geburtstage"] = TT.geburtstage(t)
     return out
+
+
+# --------------------------------------------------------------------------- Termine aus den Kalendern der Handys (iPhone-App)
+def telefon_speichern():
+    try:
+        schreibe_json(TERMINE_FILE, TELEFON)
+    except OSError as e:
+        H.log.error("Handy-Termine nicht speicherbar: %s", e)
+        raise HTTPException(500, "Die Termine konnten nicht gespeichert werden.")
+    ZUSATZ_CACHE.pop("kalender", None)
+
+
+@app.put("/api/termine/telefon")
+def termine_telefon_setzen(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
+    """Ein Handy meldet die Termine seiner gewaehlten Kalender (ersetzt den bisherigen Stand dieses Handys)."""
+    global TELEFON
+    with TELEFON_LOCK:
+        try:
+            TELEFON = TT.quelle_setzen(TELEFON, daten.get("quelle"), daten.get("name"), daten.get("termine"), datetime.datetime.now(), daten.get("kuerzel"), daten.get("farbe"))
+        except ValueError as e:
+            raise HTTPException(400, str(e))
+        telefon_speichern()
+        return {"ok": True, "anzahl": len(TELEFON[daten["quelle"]]["termine"])}
+
+
+@app.get("/api/termine/telefon")
+def termine_telefon_liste(_=Depends(anmeldung)):
+    return {"quellen": [{"id": k, "name": v.get("name") or "Handy", "anzahl": len(v.get("termine", [])), "aktualisiert": v.get("aktualisiert"), "kuerzel": v.get("kuerzel") or "", "farbe": v.get("farbe") or ""} for k, v in sorted(TELEFON.items(), key=lambda x: x[1].get("name") or "")]}
+
+
+@app.delete("/api/termine/telefon/{quelle}")
+def termine_telefon_entfernen(quelle: str, _=Depends(anmeldung), __=Depends(csrf)):
+    global TELEFON
+    with TELEFON_LOCK:
+        if quelle not in TELEFON:
+            raise HTTPException(404, "Dieses Handy ist nicht (mehr) angemeldet.")
+        TELEFON = {k: v for k, v in TELEFON.items() if k != quelle}
+        telefon_speichern()
+    return {"ok": True}
 
 
 # --------------------------------------------------------------------------- Geraete: Uebersicht und Kopplung per Code
@@ -2624,7 +2703,7 @@ NACHT_RE = re.compile(r"(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})")
 
 def geraet_ansicht(z, e):
     t = TV.get(z) or {}
-    return {"selbst": meldet_selbst(z), "ip": t.get("ip") or "", "akku": (FULLY_STATE.get(z) or {}).get("akku"), "id": z, "art": e["art"], "name": e["name"], "sek": e.get("sek"), "fuellung": e.get("fuellung") or "", "anzeige": e.get("anzeige") or [],
+    return {"layout": layout_fuer(z), "layout_eigen": bool(e.get("layout")), "selbst": meldet_selbst(z), "ip": t.get("ip") or "", "akku": (FULLY_STATE.get(z) or {}).get("akku"), "id": z, "art": e["art"], "name": e["name"], "sek": e.get("sek"), "fuellung": e.get("fuellung") or "", "anzeige": e.get("anzeige") or [],
             "nacht": e.get("nacht") or "", "quellen": e.get("quellen") or "", "zeitplan": e.get("zeitplan") or "",
             "fully_host": e.get("fully_host") or "", "fully_pw_gesetzt": bool(e.get("fully_pw")), "adb_host": e.get("adb_host") or "", "alarm_min": e.get("alarm_min")}
 
@@ -2662,6 +2741,14 @@ def geraet_felder(daten, art):
             if any(x not in ("datum", "zeit", "ort") for x in a):
                 raise HTTPException(400, "Unbekannte Bildunterschrift")
             (setzen.__setitem__("anzeige", [x for x in ("datum", "zeit", "ort") if x in a]) if a else weg.append("anzeige"))
+        if "layout" in daten:
+            if daten["layout"] in (None, {}):
+                weg.append("layout")
+            else:
+                try:
+                    setzen["layout"] = ANZ.pruefen(daten["layout"])
+                except ValueError as ex:
+                    raise HTTPException(400, str(ex))
         if "nacht" in daten:
             v = str(daten["nacht"] or "").strip()
             m = NACHT_RE.fullmatch(v)
@@ -2728,7 +2815,7 @@ def geraet_aufraeumen(z):
 @app.get("/api/verwaltung")
 def verwaltung(_=Depends(anmeldung)):
     return {"geraete": [geraet_ansicht(z, e) for z, e in GERAETE.items()], "register_aktiv": REGISTER["aktiv"],
-            "standard": {"sek": std_sek(), "fuellung_rahmen": std_fuellung_rahmen(), "fuellung_tv": std_fuellung_tv(), "anzeige": std_anzeige(), "nacht": RAHMEN_NACHT}}
+            "standard": {"layout": layout_global(), "sek": std_sek(), "fuellung_rahmen": std_fuellung_rahmen(), "fuellung_tv": std_fuellung_tv(), "anzeige": std_anzeige(), "nacht": RAHMEN_NACHT}}
 
 
 @app.post("/api/verwaltung/geraete")
@@ -2914,13 +3001,13 @@ def einst_ansicht():
         namen = sorted({n for n, _i in H.lade_personen()[0]})
     except Exception:  # noqa: BLE001 - ohne Immich keine Personenliste
         pass
-    return {"sek": EINST.get("sek"), "fuellung_rahmen": EINST.get("fuellung_rahmen") or "", "fuellung_tv": EINST.get("fuellung_tv") or "",
+    return {"layout": layout_global(), "sek": EINST.get("sek"), "fuellung_rahmen": EINST.get("fuellung_rahmen") or "", "fuellung_tv": EINST.get("fuellung_tv") or "",
             "anzeige": EINST.get("anzeige") or [], "alarm_min": EINST.get("alarm_min"), "tv_url": EINST.get("tv_url") or "",
             "wetter": EINST.get("wetter") or None, "wetter_env": bool(WETTER_ORT) and not EINST.get("wetter"),
             "kalender_gesetzt": bool(EINST.get("kalender_url")), "kalender_env": bool(KALENDER_URL) and not EINST.get("kalender_url"),
             "pushover_gesetzt": bool(pe.get("user") and pe.get("token")), "pushover_geraet": pe.get("device") or "",
             "aliase": EINST.get("aliase") or [], "personen": namen,
-            "standard": {"sek": RAHMEN_SEK, "fuellung_rahmen": RAHMEN_FUELLUNG, "fuellung_tv": TV_FUELLUNG, "anzeige": RAHMEN_ANZEIGE, "alarm_min": RAHMEN_ALARM_MIN, "tv_url": TV_URL}}
+            "standard": {"layout": ANZ.zusammen(), "sek": RAHMEN_SEK, "fuellung_rahmen": RAHMEN_FUELLUNG, "fuellung_tv": TV_FUELLUNG, "anzeige": RAHMEN_ANZEIGE, "alarm_min": RAHMEN_ALARM_MIN, "tv_url": TV_URL}}
 
 
 @app.get("/api/einstellungen")
@@ -2953,6 +3040,14 @@ def einstellungen_aendern(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
         if any(x not in ("datum", "zeit", "ort") for x in a):
             raise HTTPException(400, "Unbekannte Bildunterschrift")
         setzen("anzeige", [x for x in ("datum", "zeit", "ort") if x in a])
+    if "layout" in daten:
+        if daten["layout"] in (None, {}):
+            neu.pop("layout", None)
+        else:
+            try:
+                neu["layout"] = ANZ.pruefen(daten["layout"])
+            except ValueError as ex:
+                raise HTTPException(400, str(ex))
     if "alarm_min" in daten:
         if daten["alarm_min"] in (None, ""):
             neu.pop("alarm_min", None)
@@ -3340,6 +3435,7 @@ def tv_abfrage(request: Request, response: Response, ziel: str, seq: int = -1, s
         akku_melden(ziel, ak, pl == 1)
     befehl = t.pop("befehl", None)               # einmalig: "neuladen" oder "neustart" (aus der App ausgeloest)
     extra = {"befehl": befehl} if befehl else {}
+    extra["lv"] = anzeige_version(ziel)          # aendert sich, wenn Anordnung/Termine neu geladen werden muessen (ohne Seite neu zu laden)
     if seq < 0:                                   # Seite neu geladen: laufende Show fortsetzen
         return {"seq": t["seq"], "events": [t["aktiv"]] if t["aktiv"] else [], **extra}
     if seq > t["seq"]:                            # Server wurde neu gestartet

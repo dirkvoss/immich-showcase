@@ -20,8 +20,9 @@ struct WurzelAnsicht: View {
         }
         .sheet(isPresented: $modell.einstellungenOffen) { EinstellungenAnsicht() }
         .onChange(of: phase) { _, neu in
-            if neu == .background { modell.appWurdeInaktiv() }
+            if neu == .background { modell.appWurdeInaktiv(); KalenderSync.gemeinsam.hintergrundPlanen() }
             if neu == .active && modell.gesperrt { modell.entsperren() }
+            if neu == .active && !modell.demoAktiv { Task { await KalenderSync.gemeinsam.senden() } }
         }
     }
 }

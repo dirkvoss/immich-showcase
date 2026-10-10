@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.dirk-voss.showcase.kalender</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -47,12 +51,18 @@
 		<string>_http._tcp</string>
 		<string>_showcase._tcp</string>
 	</array>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Die App liest deine Termine nur, wenn du in den App-Einstellungen „Meine Termine auf dem Rahmen zeigen“ einschaltest.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Die Kamera wird nur zum Scannen des QR-Codes deines Servers genutzt.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Face ID schützt die App, wenn du das in den App-Einstellungen eingeschaltet hast.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Die App verbindet sich mit deinem Immich-Showcase-Server im Heimnetz.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>

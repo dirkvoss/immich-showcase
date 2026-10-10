@@ -55,13 +55,18 @@
   window.RW_T = function (s) { var t = String(s); var r = uebersetze(t); return r; };
 
   var ATTR = ["placeholder", "title", "aria-label", "alt"];
+  function ausgenommen(n) {                                   // Texte der Nutzer (Termine, Show-Namen) tragen translate="no" und bleiben, wie sie sind
+    for (; n && n.nodeType === 1; n = n.parentNode) if (n.getAttribute("translate") === "no") return true;
+    return false;
+  }
   function knoten(n) {
     var j, a, v, c;
     if (n.nodeType === 3) {
       if (n.parentNode && /^(SCRIPT|STYLE)$/.test(n.parentNode.nodeName)) return;
+      if (ausgenommen(n.parentNode)) return;
       v = uebersetze(n.data); if (v !== n.data) n.data = v;
     } else if (n.nodeType === 1) {
-      if (/^(SCRIPT|STYLE)$/.test(n.nodeName)) return;
+      if (/^(SCRIPT|STYLE)$/.test(n.nodeName) || ausgenommen(n)) return;
       for (j = 0; j < ATTR.length; j++) {
         a = n.getAttribute(ATTR[j]);
         if (a) { v = uebersetze(a); if (v !== a) n.setAttribute(ATTR[j], v); }

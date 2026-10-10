@@ -17,8 +17,6 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000;
   -webkit-filter: blur(46px) brightness(.55); filter: blur(46px) brightness(.55); -webkit-transition: opacity 1.2s ease; transition: opacity 1.2s ease; }
 .bg.an { opacity: 1; }
 body.zuschnitt .bild { object-fit: cover; }
-#bildtext { position: absolute; right: 36px; bottom: 28px; max-width: 55%; text-align: right; font-size: 30px; color: #fff; text-shadow: 0 1px 10px rgba(0,0,0,.85); opacity: 0; -webkit-transition: opacity 1s; transition: opacity 1s; }
-#bildtext.an { opacity: .92; }
 #nacht { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 40; display: none; }
 #mitte { background: -webkit-radial-gradient(50% 38%, circle, #2b3a52 0%, #151b27 55%, #07090e 100%); background: radial-gradient(circle at 50% 38%, #2b3a52 0%, #151b27 55%, #07090e 100%); position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: -webkit-flex; display: flex;
   -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center;
@@ -26,9 +24,6 @@ body.zuschnitt .bild { object-fit: cover; }
 #mitteLogo { display: block; margin: 0 auto 26px; border-radius: 56px; -webkit-box-shadow: 0 0 90px rgba(214,174,85,.35); box-shadow: 0 0 90px rgba(214,174,85,.35); }
 #mitte h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: 132px; line-height: 1; margin: 0 0 22px; font-weight: 600; letter-spacing: 2px; color: #f3e3b3; }
 #mitte p { font-size: 32px; line-height: 1.4; margin: 0; color: #c9ced6; }
-#titel { position: absolute; left: 40px; bottom: 36px; font-size: 30px; padding: 10px 18px; border-radius: 10px;
-  background: rgba(0,0,0,.55); opacity: 0; -webkit-transition: opacity .8s; transition: opacity .8s; }
-#titel.an { opacity: 1; }
 #musiktitel { position: absolute; right: 40px; bottom: 36px; max-width: 60%; font-size: 24px; padding: 8px 16px; border-radius: 10px; background: rgba(0,0,0,.55); color: #e6e9ee;
   opacity: 0; -webkit-transition: opacity .8s; transition: opacity .8s; text-align: right; }
 #musiktitel.an { opacity: 1; }
@@ -39,13 +34,19 @@ body.zuschnitt .bild { object-fit: cover; }
 #uhr { font-family: "Cormorant Garamond", Georgia, serif; font-size: 84px; line-height: 1; margin-top: 54px; color: #f3e3b3; letter-spacing: 2px; }
 #datum { font-size: 28px; margin-top: 10px; color: #9aa4b2; }
 #status { font-size: 24px; margin-top: 30px; color: #e0834f; min-height: 30px; }
-#uhrKlein { position: absolute; left: 36px; bottom: 28px; font-family: "Cormorant Garamond", Georgia, serif; font-size: 44px; color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,.7); opacity: 0; -webkit-transition: opacity 1s; transition: opacity 1s; }
-#uhrKlein.an { opacity: .85; }
-#zusatz { position: absolute; right: 36px; top: 28px; text-align: right; color: #fff; text-shadow: 0 1px 10px rgba(0,0,0,.85); opacity: 0; -webkit-transition: opacity 1s; transition: opacity 1s; }
-#zusatz.an { opacity: .9; }
-#zusatz .wetter { font-size: 52px; }
-#zusatz .termin { font-size: 26px; margin-top: 6px; }
-#zusatz .termin b { font-weight: 600; opacity: .8; }
+/* Einblendungen: jedes Element liegt im Rand-Rahmen #ebene; left/top in Prozent, mit translate(-x%,-y%) bleibt es immer innerhalb (0 = links/oben buendig, 100 = rechts/unten buendig) */
+#ebene { position: absolute; left: 36px; right: 36px; top: 28px; bottom: 28px; z-index: 5; }
+.el { position: absolute; color: #fff; text-shadow: 0 1px 10px rgba(0,0,0,.85); opacity: 0; width: -webkit-max-content; width: max-content; max-width: 60%; -webkit-transition: opacity 1s; transition: opacity 1s; }
+.el.an { opacity: .9; }
+#el-uhr, #el-heute, #el-wetter, #el-geburtstag { white-space: nowrap; }
+#el-titel { left: 0; top: 100%; -webkit-transform: translate(0, -100%); transform: translate(0, -100%); padding: 10px 18px; border-radius: 10px; background: rgba(0,0,0,.55); -webkit-transition: opacity .8s; transition: opacity .8s; }
+#el-titel.an { opacity: 1; }
+.pbadge { display: inline-block; min-width: 1.3em; margin-right: .35em; padding: 0 .2em; border-radius: .25em; text-align: center; font-size: .72em; font-weight: 700; text-shadow: none; vertical-align: .08em; }
+#el-uhr { font-family: "Cormorant Garamond", Georgia, serif; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
+#el-uhr.an { opacity: .85; }
+#el-termine .termin { margin-top: .25em; }
+#el-termine .termin:first-child { margin-top: 0; }
+#el-termine .termin b { font-weight: 600; opacity: .8; }
 #kopplung { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0f1218; z-index: 50; text-align: center; display: none; }
 #kopplung .innen { position: absolute; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); width: 90%; }
 #kopplung h1 { font: 600 64px "Cormorant Garamond", Georgia, serif; margin: 0 0 10px; }
@@ -73,10 +74,7 @@ body.zuschnitt .bild { object-fit: cover; }
     <div id="pinpunkte" class="versteckt"></div>
   </div>
 </div>
-<div id="titel"></div>
-<div id="uhrKlein"></div>
-<div id="zusatz"></div>
-<div id="bildtext"></div>
+<div id="ebene"></div>
 <div id="nacht"></div>
 <div id="musiktitel"></div>
 <div id="punkt"></div>
@@ -132,37 +130,83 @@ body.zuschnitt .bild { object-fit: cover; }
   var NAMEN = { lg: "LG TV", shield: "Shield" };
   api("/api/config?ziel=" + encodeURIComponent(ziel || ""), function (st, d) {
     if (st === 200 && d && d.alle_ziele && ziel !== "test" && !d.alle_ziele[ziel]) { try { localStorage.removeItem("showcaseZiel"); } catch (e) {} location.replace("/tv/"); return; }
-    if (st === 200 && d && d.rahmen_zusatz && d.rahmen_zusatz.length && d.rahmen && d.rahmen.indexOf(ziel) >= 0) zusatzLaden();
+    if (st === 200 && d && d.rahmen && d.rahmen.indexOf(ziel) >= 0) zusatzLaden();
     if (st === 200 && d && d.ziele) { for (var k in d.ziele) NAMEN[k] = d.ziele[k]; }
-    if (st === 200 && d && d.rahmen) { for (var r = 0; r < d.rahmen.length; r++) if (d.rahmen[r] === ziel) { rahmenModus = true; rahmenSek = d.rahmen_sek || 8; anzeige = d.rahmen_anzeige || []; nacht = d.rahmen_nacht || ""; if (!laeuft && !pinModus) startAmbient(); } }
+    if (st === 200 && d && d.rahmen) { for (var r = 0; r < d.rahmen.length; r++) if (d.rahmen[r] === ziel) { rahmenModus = true; rahmenSek = d.rahmen_sek || 8; anzeige = d.rahmen_anzeige || []; layoutSetzen(d.rahmen_layout); nacht = d.rahmen_nacht || ""; if (!laeuft && !pinModus) startAmbient(); } }
     fuellung = (rahmenModus ? d.rahmen_fuellung : d.tv_fuellung) || "balken";
     document.body.className = fuellung === "zuschnitt" ? "zuschnitt" : "";
   });
   var seq = -1, liste = [], idx = 0, sek = 8, laeuft = false, pausiert = false, timer = 0, marke = 0, vorn = null, name = "", titelTimer = 0, pin = "";
   var bildA = document.getElementById("bildA"), bildB = document.getElementById("bildB");
   var mitte = document.getElementById("mitte"), mitteTitel = document.getElementById("mitteTitel"), mitteText = document.getElementById("mitteText");
-  var titel = document.getElementById("titel"), punkt = document.getElementById("punkt"), pinpunkte = document.getElementById("pinpunkte");
-  var fuellung = "balken", anzeige = [], nacht = "", bgA = document.getElementById("bgA"), bgB = document.getElementById("bgB"), bildtextEl = document.getElementById("bildtext"), nachtEl = document.getElementById("nacht"), letzterWechsel = new Date().getTime(), letzterErfolg = new Date().getTime(), verbinde = true, pinModus = false, rahmenModus = false, rahmenSek = 8, ambient = false;
+  var punkt = document.getElementById("punkt"), pinpunkte = document.getElementById("pinpunkte");
+  var fuellung = "balken", anzeige = [], nacht = "", bgA = document.getElementById("bgA"), bgB = document.getElementById("bgB"), nachtEl = document.getElementById("nacht"), letzterWechsel = new Date().getTime(), letzterErfolg = new Date().getTime(), verbinde = true, pinModus = false, rahmenModus = false, rahmenSek = 8, ambient = false;
   var vid = document.getElementById("vid"), videoSet = {}, maxv = 60, videoTimer = 0, musikPausiert = false, imVideo = false;
   var audio = null, musikKey = "", laut = 0.3, musikBlockiert = false, fade = 1.2;
 
-  var zusatz = document.getElementById("zusatz"), zusatzTimer = 0, zusatzGestartet = false;
-  function zusatzLaden() {                                       // Wetter und Termine (alle 10 Minuten), nur wenn der Server sie eingerichtet hat
-    if (zusatzGestartet && zusatzTimer) { return; }
-    zusatzGestartet = true;
-    api("/api/rahmen/zusatz", function (st, d) {
-      if (st === 200 && d) {
-        zusatz.innerHTML = "";
-        if (d.wetter) { var w = document.createElement("div"); w.className = "wetter"; w.textContent = d.wetter.symbol + " " + d.wetter.temp + "°"; zusatz.appendChild(w); }
-        var t = d.termine || [];
-        for (var i = 0; i < t.length; i++) {
-          var r = document.createElement("div"), b = document.createElement("b");
-          r.className = "termin"; b.textContent = (t[i].tag === "heute" ? "" : window.RW_T("morgen") + " ") + t[i].zeit;
-          r.appendChild(b); r.appendChild(document.createTextNode((t[i].zeit || t[i].tag !== "heute" ? " " : "") + t[i].titel)); zusatz.appendChild(r);
-        }
-      }
+  // ---- Einblendungen (Uhrzeit, Datum, Foto-Datum, Foto-Ort, Wetter, Termine): Lage, Groesse und Sichtbarkeit kommen vom Server (Layout)
+  var ebene = document.getElementById("ebene"), lay = null, EL = {}, zusatzDaten = null, zusatzTimer = 0, zusatzGestartet = false;
+  var NAMEN_EL = ["uhr", "heute", "fotodatum", "fotoort", "wetter", "termine", "geburtstag", "titel"];
+  var BASIS = { uhr: 44, heute: 28, wetter: 52, termine: 26, fotodatum: 30, fotoort: 30, geburtstag: 32, titel: 30 };            // Schriftgroesse in px bei 100 %
+  var NUR_RUHEBILD = { uhr: 1, heute: 1, wetter: 1, termine: 1, geburtstag: 1 };                                      // diese erscheinen im Dauerprogramm, nicht bei geschickten Shows
+  var SCHRIFTEN = { serif: '"Cormorant Garamond", Georgia, serif', sans: "Arial, Helvetica, sans-serif", mono: 'Menlo, Consolas, "Courier New", monospace' };
+  function titelAus() { if (EL.titel) EL.titel.className = "el titel"; }
+  function layoutSetzen(l) {
+    lay = l || null;
+    for (var i = 0; i < NAMEN_EL.length; i++) {
+      var n = NAMEN_EL[i], e = EL[n], w = lay && lay[n];
+      if (!e) { e = document.createElement("div"); e.id = "el-" + n; if (n === "termine" || n === "geburtstag" || n === "titel") e.setAttribute("translate", "no"); e.className = n === "titel" ? "el titel" : "el"; ebene.appendChild(e); EL[n] = e; }
+      if (!w) continue;
+      var t = "translate(-" + w.x + "%,-" + w.y + "%)";
+      e.style.left = w.x + "%"; e.style.top = w.y + "%"; e.style.webkitTransform = t; e.style.transform = t;
+      e.style.textAlign = w.x >= 66 ? "right" : (w.x <= 34 ? "left" : "center");
+      e.style.fontSize = Math.round(BASIS[n] * (w.gr || 100) / 100) + "px";
+      e.style.color = w.farbe || ""; e.style.fontFamily = SCHRIFTEN[w.schrift] || "";
+    }
+    uhrZeigen(); zusatzZeichnen(); ambientAnzeige(ambient);
+  }
+  function hatInhalt(n) {
+    if (n === "wetter") return !!(zusatzDaten && zusatzDaten.wetter);
+    if (n === "termine") return !!(zusatzDaten && zusatzDaten.termine && zusatzDaten.termine.length);
+    if (n === "geburtstag") return !!(zusatzDaten && zusatzDaten.geburtstage && zusatzDaten.geburtstage.length);
+    return true;
+  }
+  function ambientAnzeige(an) {                                  // Elemente des Ruhebilds ein-/ausblenden
+    for (var n in NUR_RUHEBILD) { var e = EL[n]; if (e) e.className = "el" + (an && lay && lay[n] && lay[n].an && hatInhalt(n) ? " an" : ""); }
+  }
+  function fotoTexteLeeren() { if (EL.fotodatum) EL.fotodatum.className = "el"; if (EL.fotoort) EL.fotoort.className = "el"; }
+  function zusatzZeichnen() {
+    if (!EL.wetter) return;
+    var d = zusatzDaten || {}, t = d.termine || [], box = EL.termine, i;
+    EL.wetter.textContent = d.wetter ? d.wetter.symbol + " " + d.wetter.temp + "\u00b0" : "";
+    EL.geburtstag.textContent = d.geburtstage && d.geburtstage.length ? "\uD83C\uDF82 " + d.geburtstage.join(" \u00b7 ") : "";
+    box.innerHTML = "";
+    for (i = 0; i < t.length; i++) {
+      var r = document.createElement("div"), b = document.createElement("b");
+      r.className = "termin";
+      if (t[i].p && lay && lay.termine && lay.termine.person) {                          // Kuerzel der Person (nur wenn mehrere Handys teilen)
+        var pb = document.createElement("span"), f = t[i].p.f || "#888888", hell = parseInt(f.substr(1, 2), 16) * 0.299 + parseInt(f.substr(3, 2), 16) * 0.587 + parseInt(f.substr(5, 2), 16) * 0.114;
+        pb.className = "pbadge"; pb.textContent = t[i].p.k; pb.style.background = f; pb.style.color = hell > 150 ? "#000" : "#fff"; r.appendChild(pb);
+      } b.textContent = (t[i].tag === "heute" ? "" : window.RW_T("morgen") + " ") + t[i].zeit;
+      r.appendChild(b); r.appendChild(document.createTextNode((t[i].zeit || t[i].tag !== "heute" ? " " : "") + t[i].titel)); box.appendChild(r);
+    }
+    ambientAnzeige(ambient);
+  }
+  var lv = "";
+  function konfigNeu() {                                         // Anordnung/Termine wurden am Server geaendert: ohne Neuladen uebernehmen
+    api("/api/config?ziel=" + encodeURIComponent(ziel || ""), function (st, c) {
+      if (st !== 200 || !c) return;
+      layoutSetzen(c.rahmen_layout); zusatzLaden(true);
+      if (laeuft && liste.length) bildUnterschrift(liste[idx]);
     });
-    zusatzTimer = setTimeout(function () { zusatzTimer = 0; zusatzLaden(); }, 600000);
+  }
+  function zusatzLaden(sofort) {                                 // Wetter und Termine (alle 5 Minuten); der Server liefert nur, was eingerichtet ist
+    if (zusatzGestartet && zusatzTimer && !sofort) { return; }
+    clearTimeout(zusatzTimer); zusatzGestartet = true;
+    api("/api/rahmen/zusatz", function (st, d) {
+      if (st === 200 && d) { zusatzDaten = d; zusatzZeichnen(); }
+    });
+    zusatzTimer = setTimeout(function () { zusatzTimer = 0; zusatzLaden(); }, 300000);
   }
 
   function api(pfad, cb, methode, daten) {
@@ -221,7 +265,7 @@ body.zuschnitt .bild { object-fit: cover; }
     bildA.className = "bild"; bildB.className = "bild"; vorn = null;
     mitteTitel.textContent = "Immich Showcase";
     mitteText.textContent = (NAMEN[ziel] || window.RW_T("Fernseher")) + " · bereit. Wähle am Handy Fotos und tippe auf „Auf TV“. (Für Musik einmal die OK-Taste drücken.)";
-    mitte.className = ""; titel.className = ""; ambient = false; uhrKlein.className = zusatz.className = ""; bildtextEl.className = ""; nachtEl.style.display = "none"; bgA.className = "bg"; bgB.className = "bg";
+    mitte.className = ""; titelAus(); ambient = false; ambientAnzeige(false); fotoTexteLeeren(); nachtEl.style.display = "none"; bgA.className = "bg"; bgB.className = "bg";
     if (rahmenModus && !pinModus) startAmbient();
   }
   function startAmbient() {                                      // Bilderrahmen im Leerlauf: Zufallsfotos als Dauerprogramm
@@ -233,21 +277,21 @@ body.zuschnitt .bild { object-fit: cover; }
       fade = Math.min(1.2, sek * 0.3);
       bildA.style.webkitTransition = bildA.style.transition = "opacity " + fade + "s ease";
       bildB.style.webkitTransition = bildB.style.transition = "opacity " + fade + "s ease";
-      ambient = true; laeuft = true; pausiert = false; uhrKlein.className = zusatz.className = "an"; nachtPruefen();
+      ambient = true; laeuft = true; pausiert = false; ambientAnzeige(true); nachtPruefen();
       zeige(0);
     });
   }
-  function bildUnterschrift(id) {                                         // Datum/Ort (Konfiguration RAHMEN_WEB_RAHMEN_ANZEIGE), nur am Rahmen
-    if (!rahmenModus || !anzeige.length) { bildtextEl.className = ""; return; }
+  function bildUnterschrift(id) {                                         // Foto-Datum und Foto-Ort (nur am Rahmen, je nach Layout)
+    if (!rahmenModus || !lay || !(lay.fotodatum.an || lay.fotoort.an)) { fotoTexteLeeren(); return; }
     api("/api/bildinfo/" + id + "?lang=" + (window.RW_LANG || "de"), function (st, d) {
-      if (st !== 200 || !d) { bildtextEl.className = ""; return; }
-      var teile = [], dt = d.datum ? new Date(d.datum + "T12:00:00") : null, i;
-      for (i = 0; i < anzeige.length; i++) {
-        if (anzeige[i] === "datum" && dt && !isNaN(dt.getTime())) { try { teile.push(dt.toLocaleDateString(window.RW_LOCALE || "de-DE", { day: "numeric", month: "long", year: "numeric" })); } catch (e) { teile.push(d.datum); } }
-        if (anzeige[i] === "zeit" && d.zeit) teile.push(d.zeit);
-        if (anzeige[i] === "ort" && d.ort) teile.push(d.ort);
+      if (st !== 200 || !d) { fotoTexteLeeren(); return; }
+      var dt = d.datum ? new Date(d.datum + "T12:00:00") : null, datum = "", ort = lay.fotoort.an ? (d.ort || "") : "";
+      if (lay.fotodatum.an) {
+        if (dt && !isNaN(dt.getTime())) { try { datum = dt.toLocaleDateString(window.RW_LOCALE || "de-DE", { day: "numeric", month: "long", year: "numeric" }); } catch (e) { datum = d.datum; } }
+        if (lay.fotodatum.zeit && d.zeit) datum = datum ? datum + " \u00b7 " + d.zeit : d.zeit;
       }
-      bildtextEl.textContent = teile.join(" · "); bildtextEl.className = teile.length ? "an" : "";
+      EL.fotodatum.textContent = datum; EL.fotodatum.className = "el" + (datum ? " an" : "");
+      EL.fotoort.textContent = ort; EL.fotoort.className = "el" + (ort ? " an" : "");
     });
   }
   function nachtPruefen() {                                                // Nachtruhe: im Dauerprogramm schwarzer Schirm
@@ -264,8 +308,9 @@ body.zuschnitt .bild { object-fit: cover; }
   }
   setInterval(nachtPruefen, 20000);
   function zeigeTitel(text) {
-    titel.textContent = text; titel.className = "an"; clearTimeout(titelTimer);
-    titelTimer = setTimeout(function () { titel.className = ""; }, 6000);
+    if (!EL.titel || (lay && lay.titel && !lay.titel.an)) return;
+    EL.titel.textContent = text; EL.titel.className = "el titel an"; clearTimeout(titelTimer);
+    titelTimer = setTimeout(titelAus, 6000);
   }
   function mischen(a) { var l = a.slice(), i, j, t; for (i = l.length - 1; i > 0; i--) { j = Math.floor(Math.random() * (i + 1)); t = l[i]; l[i] = l[j]; l[j] = t; } return l; }
   function quelle(i) { return "/api/vorschau/" + liste[i] + "?s=gross"; }
@@ -340,7 +385,7 @@ body.zuschnitt .bild { object-fit: cover; }
   function behandle(e) {
     if (!e) return;
     if (e.typ === "start") {
-      ambient = false; uhrKlein.className = zusatz.className = ""; nachtEl.style.display = "none";
+      ambient = false; ambientAnzeige(false); nachtEl.style.display = "none";
       liste = e.zufall ? mischen(e.ids) : e.ids.slice(); sek = e.sek || 8; name = e.name || ""; idx = 0; laeuft = true; pausiert = false; fehler = 0;
       videoSet = {}; var vi; for (vi = 0; e.videos && vi < e.videos.length; vi++) videoSet[e.videos[vi]] = true; maxv = e.maxv || 60;
       fade = Math.min(1.2, sek * 0.3);                                   // Ueberblendung: 30 % der Anzeigedauer, hoechstens 1,2 s
@@ -365,14 +410,16 @@ body.zuschnitt .bild { object-fit: cover; }
       }
     }
   }
-  var uhrKlein = document.getElementById("uhrKlein");
   var statusEl = document.getElementById("status"), uhrEl = document.getElementById("uhr"), datumEl = document.getElementById("datum");
   function uhrZeigen() {                                         // Ruhebild: Uhrzeit und Datum, damit der Fernseher nie "leer" wirkt
     var d = new Date(), h = d.getHours(), m = d.getMinutes();
-    uhrEl.textContent = uhrKlein.textContent = (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
+    uhrEl.textContent = (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
+    if (EL.uhr) EL.uhr.textContent = uhrEl.textContent;
+    if (EL.heute) { try { EL.heute.textContent = d.toLocaleDateString(window.RW_LOCALE || "de-DE", { weekday: "long", day: "numeric", month: "long" }); } catch (e0) { EL.heute.textContent = d.toLocaleDateString(); } }
     try { datumEl.textContent = d.toLocaleDateString(window.RW_LOCALE || "de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric" }); } catch (e) { datumEl.textContent = d.toLocaleDateString(); }
   }
   uhrZeigen(); setInterval(uhrZeigen, 10000);
+  if (!lay) layoutSetzen(null);
   function verbunden(ok) { punkt.className = ok ? "" : "warn"; }
   function fullyInfo() {                                                  // laeuft die Seite in Fully Kiosk mit JavaScript-Schnittstelle, meldet sie Akku und Ladezustand selbst
     var f = window.fully, r = "", b, p;
@@ -390,6 +437,7 @@ body.zuschnitt .bild { object-fit: cover; }
         verbunden(true); statusEl.textContent = ""; letzterErfolg = new Date().getTime();
         var i;
         if (d.befehl) { befehlAusfuehren(d.befehl); return; }
+        if (d.lv && rahmenModus) { if (lv && d.lv !== lv) konfigNeu(); lv = d.lv; }
         for (i = 0; i < d.events.length; i++) behandle(d.events[i]);
         seq = d.seq;
         if (!laeuft && verbinde) { verbinde = false; bereit(); }

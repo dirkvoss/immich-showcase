@@ -1486,6 +1486,182 @@
           }
         }
       }
+    },
+    "Der Zugriff auf den Kalender ist nicht erlaubt. Bitte erlaube ihn in den iOS-Einstellungen unter „Showcase Immich“ → „Kalender“.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Access to the calendar is not allowed. Please allow it in the iOS Settings under “Showcase Immich” → “Calendars”."
+          }
+        }
+      }
+    },
+    "Die Termine der nächsten Tage aus den gewählten Kalendern werden an deinen Showcase-Server geschickt; der Rahmen zeigt daraus die nächsten Termine des Tages. Gesendet wird nur, solange das hier eingeschaltet ist.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The appointments of the next few days from the chosen calendars are sent to your Showcase server; the frame shows the next appointments of the day. Data is only sent while this is switched on."
+          }
+        }
+      }
+    },
+    "Kalender auf dem Rahmen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calendar on the frame"
+          }
+        }
+      }
+    },
+    "Kalender auswählen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose calendars"
+          }
+        }
+      }
+    },
+    "Keine Kalender gefunden.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No calendars found."
+          }
+        }
+      }
+    },
+    "Meine Termine auf dem Rahmen zeigen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show my appointments on the frame"
+          }
+        }
+      }
+    },
+    "Name dieses Handys": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name of this phone"
+          }
+        }
+      }
+    },
+    "Nur Uhrzeiten senden (ohne Titel)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send times only (no titles)"
+          }
+        }
+      }
+    },
+    "Senden nicht möglich: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not send: %@"
+          }
+        }
+      }
+    },
+    "Termin": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appointment"
+          }
+        }
+      }
+    },
+    "Zuletzt gesendet: %lld Termine, %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last sent: %lld appointments, %@"
+          }
+        }
+      }
+    },
+    "iOS-Einstellungen öffnen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open iOS Settings"
+          }
+        }
+      }
+    },
+    "iPhone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone"
+          }
+        }
+      }
+    },
+    "Kürzel am Rahmen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Initials on the frame"
+          }
+        }
+      }
+    },
+    "Farbe am Rahmen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Color on the frame"
+          }
+        }
+      }
+    },
+    "D": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "D"
+          }
+        }
+      }
     }
   }
 }

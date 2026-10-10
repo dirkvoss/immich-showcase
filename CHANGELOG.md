@@ -1,6 +1,17 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.18.0]
+### Neu
+- **Einblendungen am Rahmen frei anordnen:** Uhrzeit, heutiges Datum, Datum und Ort des Fotos, Wetter, Termine, Geburtstage und der Show-Titel sind einzeln ein- und ausschaltbar, in Farbe und Schrift (Serif, Sans, Monospace) einstellbar, per Ziehen (oder Lage-Auswahl und Pfeiltasten) beliebig positionierbar und in der Größe (40–300 %) einstellbar. Eine Vorschau zeigt das Ergebnis. Eine allgemeine Anordnung (⚙ Einstellungen → „Anzeige auf dem Rahmen“) und je Rahmen eine eigene (⚙ am Gerät). Änderungen erscheinen am laufenden Rahmen sofort, ohne Neuladen. Die frühere Einstellung „Bildunterschrift: Datum/Uhrzeit/Ort“ gilt als Ausgangspunkt weiter.
+- **Termine aus den Kalendern der Handys (iPhone-App):** Unter App-Einstellungen → „Meine Termine auf dem Rahmen zeigen“ gibt jede Person ihre Kalender frei (alles, was im iPhone-Kalender steht: iCloud, Google, Exchange, CalDAV). Es werden keine Links oder Passwörter gebraucht; wahlweise nur Uhrzeiten ohne Titel. Die App sendet beim Öffnen, bei Kalender-Änderungen und nach Möglichkeit im Hintergrund. In den Server-Einstellungen („Kalender von Handys“) sieht man die Handys und kann sie entfernen. Neue Schnittstellen: `PUT/GET /api/termine/telefon`, `DELETE /api/termine/telefon/{kennung}`.
+- **Geburtstage:** Aus dem Geburtstags-Kalender des iPhones zeigt der Rahmen „🎂 Omas Geburtstag“ als eigene Zeile (eigenes Element), nicht in der Terminliste.
+- **Termine nach Person:** Teilen mehrere Handys ihre Termine, steht vor jedem Termin ein farbiges Kürzel der Person (in der App unter „Kürzel am Rahmen“ und „Farbe am Rahmen“ einstellbar; am Rahmen unter „Termine“ abschaltbar). Bei nur einem Handy erscheint kein Kürzel.
+- **Show-Titel** (der Name der Show, der beim Start kurz erscheint) ist jetzt ein verschiebbares, abschaltbares Element.
+### Geändert
+- Texte der Nutzer am Rahmen (Termine, Show-Namen) werden nicht mehr von der Oberflächen-Übersetzung verändert (`translate="no"`).
+- Die Terminanzeige zeigt die **nächsten Termine des heutigen Tages** (bereits beendete verschwinden); ist heute nichts mehr, die von morgen. Termine aus dem Kalender-Link und von den Handys werden zusammengeführt. Die Zusatzanzeige wird alle 5 Minuten aufgefrischt.
+
 ## [2.17.0]
 ### Neu – Einrichtung so einfach wie möglich
 - **Ein Befehl zum Installieren:** `curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/install.sh | bash` lädt alles selbst, erkennt ein auf demselben Rechner laufendes Immich (Docker-Netz, Machine-Learning-Dienst) und startet Immich Showcase. Am Ende steht ein fertiger Einrichtungs-Link mit QR-Code. Optionen: `--with-immich`, `--port`, `--bonjour`, `--no-open`, `--version`.
