@@ -71,21 +71,23 @@ Der letzte Bildschirm zeigt dir **deine PIN**, den **QR-Code für die iPhone-App
 
 Beim ersten Öffnen führt ein kurzer Rundgang durch die Oberfläche. Danach hilft die Karte **„Erste Schritte“** oben auf der Seite. Sie hakt ab, was schon erledigt ist (Immich verbinden, Handy verbinden, Rahmen koppeln, erste Show senden).
 
-![Oberfläche mit „Erste Schritte“](anleitung/06-erste-schritte.png)
+![Die Oberfläche](anleitung/06-erste-schritte.png)
 
 ## 4. Einen Bilderrahmen oder Fernseher koppeln
 
-1. Tippe oben auf **Geräte** → **＋ Gerät hinzufügen**, wähle die Art (Bilderrahmen oder Fernseher) und gib einen Namen ein, z. B. „Wohnzimmer“.
+1. Tippe oben auf **Geräte** → **＋ Gerät hinzufügen**. Die App zeigt dir die Adresse des Servers (z. B. `192.168.1.20:8090`).
 
     ![Geräte](anleitung/07-geraete.png)
 
-2. Öffne am Tablet oder Fernseher im Browser nur die **Adresse des Servers** (z. B. `192.168.1.20:8090`, wie im letzten Assistentenschritt angezeigt). Das Gerät zeigt einen **Code** und einen QR-Code.
+2. Öffne am Tablet oder Fernseher im Browser genau diese **Adresse**. Das Gerät zeigt kurz einen Code, den du **nicht eintippen musst**.
 
     ![Tablet zeigt den Kopplungs-Code](anleitung/09-tablet-code.png)
 
-3. Gib den Code in der App unter **Code vom Gerät** ein und tippe auf **Koppeln**. Alternativ scannst du den QR-Code (in der iPhone-App mit „QR-Code am Gerät scannen“).
+3. In der App erscheint das Gerät **von selbst**, zum Beispiel „LG-Fernseher gefunden“. Gib einen Namen ein (z. B. „Wohnzimmer“) und tippe auf **Verbinden**. Die Art (Fernseher oder Bilderrahmen) erkennt Frameside am Gerät. Du kannst sie ändern.
 
-    ![Code eingeben und koppeln](anleitung/08-tablet-koppeln.png)
+    ![Gerät gefunden und verbinden](anleitung/08-tablet-koppeln.png)
+
+Zeigt die App das Gerät nicht, gib den Code vom Bildschirm unter **Geräte → Gerät koppeln** ein oder scanne den QR-Code (in der iPhone-App mit „QR-Code am Gerät scannen“).
 
 Das Gerät merkt sich die Kopplung und startet danach von selbst mit der Diashow. Tipp: Auf dem Tablet „Zum Home-Bildschirm hinzufügen“ bzw. Vollbild nutzen.
 
