@@ -599,7 +599,40 @@
   "Uhrzeit der Aufnahme mitanzeigen": "Mostrar también la hora de la foto",
   "Datumsformat": "Formato de fecha",
   "Datum ausgeschrieben (4. Dezember 2025)": "Fecha completa (4 de diciembre de 2025)",
-  "Datum kurz (04.12.2025)": "Fecha corta (04/12/2025)"
+  "Datum kurz (04.12.2025)": "Fecha corta (04/12/2025)",
+  "Sanfter Zoom bei jedem Foto": "Zoom suave en cada foto",
+  "Zwei Hochkant-Fotos nebeneinander": "Dos fotos verticales una al lado de la otra",
+  "Notiz an diesen Rahmen": "Nota para este marco",
+  "Ein kurzer Text, der für eine Weile am Rahmen erscheint, zum Beispiel „Heute Abend Pizza“.": "Un texto breve que aparece un rato en el marco, por ejemplo «Esta noche pizza».",
+  "Text": "Texto",
+  "Anzeigen für": "Mostrar durante",
+  "1 Stunde": "1 hora",
+  "6 Stunden": "6 horas",
+  "1 Tag": "1 día",
+  "3 Tage": "3 días",
+  "1 Woche": "1 semana",
+  "Notiz senden": "Enviar nota",
+  "Notiz entfernen": "Quitar nota",
+  "Die Notiz ist am Rahmen.": "La nota está en el marco.",
+  "Die Notiz wurde entfernt.": "Se quitó la nota.",
+  "Notiz": "Nota",
+  "Heute Abend Pizza": "Esta noche pizza",
+  "Erinnerungen („An diesem Tag“) im Dauerprogramm": "Recuerdos («En este día») en el programa continuo",
+  "Selten": "Pocas veces",
+  "Öfter": "A menudo",
+  "Oft": "Muy a menudo",
+  "Am Geburtstag Fotos der Person zeigen": "Mostrar fotos de la persona en su cumpleaños",
+  "Erinnerung („Vor 5 Jahren“)": "Recuerdo («Hace 5 años»)",
+  "Vor 5 Jahren": "Hace 5 años",
+  "Vor 1 Jahr": "Hace 1 año",
+  "Nachtruhe nach Sonnenstand (Sonnenuntergang bis -aufgang, braucht den Wetter-Ort)": "Reposo nocturno según el sol (de la puesta a la salida del sol, necesita el lugar del tiempo)",
+  "Diese Meldungen sende ich dir:": "Te envío estos avisos:",
+  "(zusätzlich zu den Meldungen über nicht erreichbare Rahmen)": "(además de los avisos de marcos no accesibles)",
+  "Immich nicht erreichbar": "Immich no accesible",
+  "Speicherplatz knapp": "Poco espacio de almacenamiento",
+  "Handy-Kalender nicht aktualisiert": "Calendario del teléfono no actualizado",
+  "Monatsbrief": "Resumen mensual",
+  "Monatsbrief (Vormonat) jetzt senden": "Enviar ahora el resumen mensual (mes anterior)"
  },
  "muster": [
   [
@@ -924,6 +957,10 @@
   [
    "^● Läuft gerade auf (.*)$",
    "● Reproduciéndose en $1"
+  ],
+  [
+   "^Vor (\\d+) Jahren$",
+   "Hace $1 años"
   ]
  ],
  "beschreibung": [

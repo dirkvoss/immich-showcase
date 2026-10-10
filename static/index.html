@@ -266,7 +266,7 @@ main { padding: 12px 16px; max-width: 1100px; margin: 0 auto; }
 .led-zeile .led-schalter input { width: 20px; height: 20px; accent-color: var(--accent); }
 .led-zeile .led-schalter select { flex: 1; min-width: 0; font-weight: 400; }
 .led-zeile input[type=color] { width: 36px; height: 30px; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: transparent; }
-.led-chip.titel { background: rgba(0,0,0,.55); padding: .1em .45em; border-radius: 6px; }
+.led-chip.titel, .led-chip.notiz { background: rgba(0,0,0,.55); padding: .1em .45em; border-radius: 6px; }
 .led-aus .led-zeile select, .led-aus .led-zeile input[type=range] { opacity: .45; }
 .led-zurueck { margin-top: 8px; }
 .gfdetails { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--bg); }
@@ -668,6 +668,9 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
       <label class="tvfeld"><span>App-Token</span> <input id="ePoToken" type="password" autocomplete="off" aria-label="App-Token"></label>
       <label class="tvfeld"><span>Alarm, wenn ein Rahmen so viele Minuten offline ist (0 = aus)</span> <input id="eAlarm" type="number" min="0" max="1440" inputmode="numeric" aria-label="Minuten bis zum Alarm"></label>
       <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="ePoTest" type="button">Test-Nachricht senden</button><button class="btn klein gefahr versteckt" id="ePoWeg" type="button">Zugang entfernen</button></div>
+      <p class="tipp"><b>Diese Meldungen sende ich dir:</b> (zusätzlich zu den Meldungen über nicht erreichbare Rahmen)</p>
+      <div id="eMeldungen"></div>
+      <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="eMonatTest" type="button">Monatsbrief (Vormonat) jetzt senden</button></div>
       <h3>Spitznamen für Personen</h3>
       <p class="tipp">Damit die Suche „Oma“ versteht, obwohl die Person in Immich anders heißt.</p>
       <div id="eAliase"></div>
@@ -747,8 +750,20 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
       <div class="nur-gf-rahmen">
         <div class="gf">
           <label class="tvfeld"><span>Sekunden pro Foto</span> <input id="gfSek" type="number" min="3" max="120" inputmode="numeric" aria-label="Sekunden pro Foto"></label>
+          <div id="gfNotizBlock" class="versteckt">
+            <h3>Notiz an diesen Rahmen</h3>
+            <p class="tipp">Ein kurzer Text, der für eine Weile am Rahmen erscheint, zum Beispiel „Heute Abend Pizza“.</p>
+            <label class="tvfeld stapel"><span>Text</span> <input id="gfNotiz" type="text" maxlength="200" autocomplete="off" aria-label="Notiz" placeholder="Heute Abend Pizza 🍕"></label>
+            <label class="tvfeld"><span>Anzeigen für</span> <select id="gfNotizDauer" aria-label="Anzeigedauer"><option value="1">1 Stunde</option><option value="6" selected>6 Stunden</option><option value="24">1 Tag</option><option value="72">3 Tage</option><option value="168">1 Woche</option></select></label>
+            <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein primaer" id="gfNotizSenden" type="button">Notiz senden</button><button class="btn klein gefahr" id="gfNotizWeg" type="button">Notiz entfernen</button></div>
+            <p class="tipp versteckt" id="gfNotizErg" role="status"></p>
+          </div>
           <h3>Anzeige auf diesem Rahmen</h3>
           <p class="tipp">Was eingeblendet wird und wo. Jeder Rahmen hat seine eigene Anordnung.</p>
+          <label class="tvfeld"><span>Sanfter Zoom bei jedem Foto</span> <input type="checkbox" id="gfBewegung" style="flex:none"></label>
+          <label class="tvfeld"><span>Zwei Hochkant-Fotos nebeneinander</span> <input type="checkbox" id="gfPaare" style="flex:none"></label>
+          <label class="tvfeld"><span>Erinnerungen („An diesem Tag“) im Dauerprogramm</span> <select id="gfErinnerungen" aria-label="Erinnerungen"><option value="">Aus</option><option value="selten">Selten</option><option value="oft">Öfter</option><option value="sehr">Oft</option></select></label>
+          <label class="tvfeld"><span>Am Geburtstag Fotos der Person zeigen</span> <input type="checkbox" id="gfGeburtstagsfotos" style="flex:none"></label>
           <div id="gfLayout"></div>
           <label class="tvfeld versteckt" id="gfUebernehmenZeile"><span>Anordnung übernehmen von</span> <select id="gfUebernehmen" aria-label="Anordnung übernehmen von"><option value="">–</option></select></label>
           <h3>Wetter und Termine auf diesem Rahmen</h3>
@@ -760,7 +775,8 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
           <div id="gfHandys"></div>
           <label class="tvfeld stapel"><span>Kalender-Link (iCal) nur für diesen Rahmen</span> <input id="gfKal" type="text" autocomplete="off" aria-label="Kalender-Link" placeholder="https://…"></label>
           <div class="tvknoepfe versteckt" id="gfKalWegZeile" style="justify-content:flex-start;margin-top:0"><button class="btn klein gefahr" id="gfKalWeg" type="button">Kalender-Link dieses Rahmens entfernen</button></div>
-          <div class="tvfeld"><span>Nachtruhe (Bildschirm aus)</span><span class="reihe"><input id="gfNachtVon" type="time" aria-label="von"> – <input id="gfNachtBis" type="time" aria-label="bis"></span></div>
+          <label class="tvfeld"><span>Nachtruhe nach Sonnenstand (Sonnenuntergang bis -aufgang, braucht den Wetter-Ort)</span> <input type="checkbox" id="gfNachtSonne" style="flex:none"></label>
+          <div class="tvfeld" id="gfNachtZeiten"><span>Nachtruhe (Bildschirm aus)</span><span class="reihe"><input id="gfNachtVon" type="time" aria-label="von"> – <input id="gfNachtBis" type="time" aria-label="bis"></span></div>
           <h3>Dauerprogramm</h3>
           <p class="tipp">Was der Rahmen zeigt, wenn niemand etwas schickt. Ohne Eintrag gilt die allgemeine Einstellung der Installation.</p>
           <div id="gfQuellen"></div>
@@ -1944,7 +1960,7 @@ $("#gfIpNehmen").addEventListener("click", e => { $("#gfFullyHost").value = e.cu
 // ---------------------------------------------------------------- Layout-Editor (Einblendungen am Rahmen)
 const LED_ELEMENTE = [                                          // [Name, Beschriftung, Schriftgroesse in px bei 100 % (wie am Rahmen)]
   ["uhr", "Uhrzeit", 44], ["heute", "Heutiges Datum", 28], ["fotodatum", "Foto: Aufnahmedatum", 30], ["fotoort", "Foto: Ort", 30], ["wetter", "Wetter", 52], ["termine", "Termine", 26],
-  ["geburtstag", "Geburtstage", 32], ["titel", "Show-Titel", 30]];
+  ["geburtstag", "Geburtstage", 32], ["titel", "Show-Titel", 30], ["notiz", "Notiz", 40], ["erinnerung", "Erinnerung („Vor 5 Jahren“)", 30]];
 const LED_SCHRIFTEN = { serif: '"Cormorant Garamond", Georgia, serif', sans: "Arial, Helvetica, sans-serif", mono: 'Menlo, Consolas, "Courier New", monospace' };
 const LED_LAGEN = [["frei", "Frei (ziehen)"], ["0,0", "Oben links"], ["50,0", "Oben Mitte"], ["100,0", "Oben rechts"], ["0,50", "Mitte links"], ["50,50", "Mitte"],
   ["100,50", "Mitte rechts"], ["0,100", "Unten links"], ["50,100", "Unten Mitte"], ["100,100", "Unten rechts"]];
@@ -1960,6 +1976,8 @@ function ledBeispiel(n, w) {
     case "wetter": return "☀️ 14°";
     case "geburtstag": return "🎂 " + RW_T("Omas Geburtstag");
     case "titel": return RW_T("Sommerferien");
+    case "notiz": return RW_T("Heute Abend Pizza") + " 🍕";
+    case "erinnerung": return RW_T("Vor 5 Jahren");
     default: return "15:00 " + RW_T("Zahnarzt") + "\n18:30 " + RW_T("Training");
   }
 }
@@ -2070,6 +2088,16 @@ function ortSuche(feld, box, waehlen) {                         // Ortssuche (We
 function gfOrtZeigen() { $("#gfOrtName").textContent = gfWetter ? gfWetter.name || (gfWetter.lat + ", " + gfWetter.lon) : RW_T("Standard"); $("#gfOrtWeg").classList.toggle("versteckt", !gfWetter); }
 ortSuche($("#gfOrtSuche"), $("#gfOrtTreffer"), o => { gfWetter = o; gfOrtZeigen(); });
 $("#gfOrtWeg").addEventListener("click", () => { gfWetter = null; gfOrtZeigen(); });
+async function notizSenden(text) {
+  try {
+    const r = await api("notizen/" + encodeURIComponent(gfId), { method: "PUT", body: JSON.stringify({ text, stunden: +$("#gfNotizDauer").value }) });
+    $("#gfNotizErg").textContent = r.text ? RW_T("Die Notiz ist am Rahmen.") : RW_T("Die Notiz wurde entfernt."); $("#gfNotizErg").classList.remove("versteckt");
+    if (!r.text) $("#gfNotiz").value = "";
+  } catch (e) { fehler(e); }
+}
+$("#gfNotizSenden").addEventListener("click", () => { if ($("#gfNotiz").value.trim()) notizSenden($("#gfNotiz").value.trim()); });
+$("#gfNotizWeg").addEventListener("click", () => notizSenden(""));
+$("#gfNachtSonne").addEventListener("change", () => $("#gfNachtZeiten").classList.toggle("versteckt", $("#gfNachtSonne").checked));
 $("#gfKalWeg").addEventListener("click", () => { gfKalLoeschen = true; $("#gfKal").value = ""; $("#gfKal").placeholder = "https://…"; $("#gfKalWegZeile").classList.add("versteckt"); });
 $("#gfUebernehmen").addEventListener("change", () => {
   const q = gfAlle.find(x => x.id === $("#gfUebernehmen").value); if (!q) return;
@@ -2103,6 +2131,9 @@ async function geraetDialogOeffnen(id) {
   $("#gfName").value = g.name; $("#gfFuellung").value = g.fuellung || "";
   $("#gfAlarm").value = g.alarm_min == null ? "" : g.alarm_min; $("#gfWartung").classList.toggle("versteckt", !id || g.art !== "rahmen"); $("#gfWartungErg").classList.add("versteckt");
   $("#gfSek").value = g.sek || ""; gfLed = layoutEditor($("#gfLayout"), g.layout || std, std);
+  $("#gfBewegung").checked = !!g.bewegung; $("#gfPaare").checked = !!g.paare; $("#gfErinnerungen").value = g.erinnerungen || ""; $("#gfGeburtstagsfotos").checked = g.geburtstagsfotos !== false;
+  $("#gfNotizBlock").classList.toggle("versteckt", !id || g.art !== "rahmen"); $("#gfNotiz").value = ""; $("#gfNotizErg").classList.add("versteckt");
+  if (id && g.art === "rahmen") { try { const n = await api("notizen/" + encodeURIComponent(id)); $("#gfNotiz").value = n.text || ""; } catch (e) {} }
   gfWetter = g.wetter || null; gfOrtZeigen(); $("#gfOrtSuche").value = ""; $("#gfOrtTreffer").innerHTML = "";
   $("#gfKal").value = ""; gfKalLoeschen = false; $("#gfKal").placeholder = g.kalender_gesetzt ? RW_T("gesetzt – zum Ändern neuen Link einfügen") : "https://…"; $("#gfKalWegZeile").classList.toggle("versteckt", !g.kalender_gesetzt);
   const sel = $("#gfUebernehmen"); sel.innerHTML = ""; const o0 = document.createElement("option"); o0.value = ""; o0.textContent = "–"; sel.append(o0);
@@ -2113,8 +2144,9 @@ async function geraetDialogOeffnen(id) {
     const l = document.createElement("label"); l.className = "tvfeld"; const t = document.createElement("span"); t.textContent = h.name; const c = document.createElement("input"); c.type = "checkbox"; c.value = h.id; c.checked = (g.termin_quellen || []).includes(h.id); c.style.flex = "none"; l.append(t, c); hb.append(l);
   }
   if (!handys.length) { const p = document.createElement("p"); p.className = "tipp"; p.textContent = RW_T("Noch kein Handy hat seinen Kalender freigegeben."); hb.append(p); }
-  const [von, bis] = (g.nacht || "-").split("-"); $("#gfNachtVon").value = (von || "").padStart(5, "0"); $("#gfNachtBis").value = (bis || "").padStart(5, "0");
-  if (!g.nacht) { $("#gfNachtVon").value = ""; $("#gfNachtBis").value = ""; }
+  $("#gfNachtSonne").checked = g.nacht === "sonne"; $("#gfNachtZeiten").classList.toggle("versteckt", g.nacht === "sonne");
+  const [von, bis] = (g.nacht === "sonne" ? "-" : (g.nacht || "-")).split("-"); $("#gfNachtVon").value = (von || "").padStart(5, "0"); $("#gfNachtBis").value = (bis || "").padStart(5, "0");
+  if (!g.nacht || g.nacht === "sonne") { $("#gfNachtVon").value = ""; $("#gfNachtBis").value = ""; }
   $("#gfQuellen").innerHTML = ""; for (const q of quellenLesen(g.quellen)) $("#gfQuellen").append(quelleZeile(q));
   $("#gfPlan").innerHTML = ""; for (const f of planLesen(g.zeitplan)) $("#gfPlan").append(planKarte(f));
   $("#gfDirekt").classList.toggle("versteckt", !id); $("#gfAdb").value = g.adb_host || ""; $("#gfDirekt").open = !!g.adb_host; $("#gfOeffnenErg").classList.add("versteckt");
@@ -2145,6 +2177,11 @@ function einstFuellen(d) {
   $("#eKalWeg").classList.toggle("versteckt", !d.kalender_gesetzt);
   $("#ePoUser").value = ""; $("#ePoToken").value = ""; $("#ePoUser").placeholder = $("#ePoToken").placeholder = d.pushover_gesetzt ? RW_T("gesetzt – leer lassen zum Behalten") : "";
   $("#ePoWeg").classList.toggle("versteckt", !d.pushover_gesetzt);
+  const mb = $("#eMeldungen"); mb.innerHTML = "";
+  for (const [k, name] of Object.entries(d.meldungen_namen || {})) {
+    const l = document.createElement("label"); l.className = "tvfeld"; const t = document.createElement("span"); t.textContent = RW_T(name);
+    const c = document.createElement("input"); c.type = "checkbox"; c.dataset.art = k; c.checked = d.meldungen[k] !== false; c.style.flex = "none"; l.append(t, c); mb.append(l);
+  }
   $("#eAlarm").value = d.alarm_min != null ? d.alarm_min : ""; $("#eAlarm").placeholder = String(d.standard.alarm_min);
   $("#eTvUrl").value = d.tv_url || ""; $("#eTvUrl").placeholder = d.standard.tv_url || "tv.example.com";
   $("#eAliase").innerHTML = ""; for (const a of d.aliase) $("#eAliase").append(aliasZeile(a));
@@ -2164,7 +2201,7 @@ async function einstOeffnen() {
 }
 function einstSammeln() {
   const k = { sek: $("#eSek").value, fuellung_rahmen: $("#eFuellungR").value, fuellung_tv: $("#eFuellungT").value, tv_url: $("#eTvUrl").value.trim(), alarm_min: $("#eAlarm").value,
-    wetter: einstWetter,
+    meldungen: Object.fromEntries([...$$("#eMeldungen input")].map(c => [c.dataset.art, c.checked])), wetter: einstWetter,
     aliase: [...$$("#eAliase .qzeile")].map(z => { const i = z.querySelectorAll("input"); return { name: i[0].value.trim(), person: i[1].value.trim() }; }) };
   if ($("#eKal").value.trim()) k.kalender_url = $("#eKal").value.trim();
   if ($("#ePoUser").value.trim() || $("#ePoToken").value.trim()) k.pushover = { user: $("#ePoUser").value.trim(), token: $("#ePoToken").value.trim() };
@@ -2205,6 +2242,7 @@ async function einstTest(was) {
 $("#eWetterTest").addEventListener("click", () => einstTest("wetter"));
 $("#eKalTest").addEventListener("click", () => einstTest("kalender"));
 $("#ePoTest").addEventListener("click", () => einstTest("pushover"));
+$("#eMonatTest").addEventListener("click", () => einstTest("monatsbrief"));
 $("#eKalWeg").addEventListener("click", async () => { try { const r = await api("einstellungen", { method: "PUT", body: JSON.stringify({ kalender_url: null }) }); einstFuellen(r.einstellungen); } catch (e) { fehler(e); } });
 $("#ePoWeg").addEventListener("click", async () => { try { const r = await api("einstellungen", { method: "PUT", body: JSON.stringify({ pushover: null }) }); einstFuellen(r.einstellungen); } catch (e) { fehler(e); } });
 
@@ -2317,7 +2355,7 @@ $("#gfSpeichern").addEventListener("click", async () => {
   if (gfId) daten.adb_host = $("#gfAdb").value.trim();
   if (!gfId) daten.art = $("#gfArt").value;
   if (istRahmen) {
-    Object.assign(daten, { sek: $("#gfSek").value, layout: gfLed ? gfLed.lesen() : undefined, wetter: gfWetter, termin_quellen: [...$$("#gfHandys input:checked")].map(c => c.value), nacht: von && bis ? von + "-" + bis : "",
+    Object.assign(daten, { sek: $("#gfSek").value, layout: gfLed ? gfLed.lesen() : undefined, wetter: gfWetter, bewegung: $("#gfBewegung").checked, paare: $("#gfPaare").checked, erinnerungen: $("#gfErinnerungen").value, geburtstagsfotos: $("#gfGeburtstagsfotos").checked, termin_quellen: [...$$("#gfHandys input:checked")].map(c => c.value), nacht: $("#gfNachtSonne").checked ? "sonne" : (von && bis ? von + "-" + bis : ""),
       quellen: quellenSchreiben(), zeitplan: planSchreiben(), fully_host: $("#gfFullyHost").value.trim(), alarm_min: $("#gfAlarm").value });
     if ($("#gfFullyPw").value) daten.fully_pw = $("#gfFullyPw").value;
     if ($("#gfKal").value.trim()) daten.kalender_url = $("#gfKal").value.trim(); else if (gfKalLoeschen) daten.kalender_url = null;

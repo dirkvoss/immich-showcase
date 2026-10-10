@@ -1,6 +1,19 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.20.0]
+### Neu
+- **Sanfter Zoom** bei jedem Foto (Ken-Burns-Effekt), je Rahmen ein-/ausschaltbar.
+- **Zwei Hochkant-Fotos nebeneinander:** Statt schwarzer Ränder setzt der Rahmen zwei Hochkant-Fotos zu einem Bild zusammen (je Rahmen schaltbar).
+- **Notizen an den Rahmen:** Ein kurzer Text („Heute Abend Pizza 🍕“) erscheint für 1 Stunde bis 1 Woche am Rahmen; eigenes Layout-Element „Notiz“ (Lage, Größe, Farbe, Schrift). Eingabe unter Geräte → ⚙ → „Notiz an diesen Rahmen“. Schnittstelle: `PUT/GET /api/notizen/{rahmen}`.
+- **Erinnerungen („An diesem Tag“):** Je Rahmen einstellbar (aus, selten, öfter, oft) mischt der Rahmen Fotos von heute in früheren Jahren in das Dauerprogramm. Das neue Layout-Element „Erinnerung“ zeigt dazu „Vor 5 Jahren“ (nur bei Fotos von heute ±3 Tage).
+- **Geburtstags-Fotos:** Hat eine Person aus Immich heute Geburtstag (aus dem Geburtstags-Kalender eines freigegebenen Handys, z. B. „Omas Geburtstag“ → Person „Oma“, auch über Spitznamen), zeigt das Dauerprogramm mehr Fotos dieser Person. Je Rahmen abschaltbar.
+- **Nachtruhe nach Sonnenstand:** Statt fester Uhrzeiten von Sonnenuntergang bis Sonnenaufgang am Wetter-Ort (täglich neu berechnet).
+- **Mehr Meldungen (Pushover), je Art abschaltbar** (Einstellungen): Immich seit 10 Minuten nicht erreichbar (und wieder da), Speicherplatz unter 10 %, Handy-Kalender seit 3 Tagen nicht gesendet.
+- **Monatsbrief:** Am 1. jedes Monats ein kurzer Rückblick per Pushover (neue Fotos in Immich, Erreichbarkeit und Ausfälle je Rahmen); „jetzt senden“ zum Ausprobieren in den Einstellungen.
+### Geändert
+- **Die Nachtruhe gilt am Rahmen jetzt immer**, auch während einer Show (bisher nur im Dauerprogramm; ein Rahmen mit dauerhafter Show wurde nie dunkel).
+
 ## [2.19.3]
 ### Neu
 - **Datumsformat beim Foto-Aufnahmedatum:** Auswahl zwischen **ausgeschrieben** („4. Dezember 2025“) und **kurz** („04.12.2025“), je Rahmen im Editor („Datumsformat“ beim Element „Foto: Aufnahmedatum“). Standard bleibt ausgeschrieben.

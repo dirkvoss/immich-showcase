@@ -6,7 +6,7 @@ Die Werte setzen sich schichtweise zusammen: Standard <- alte Einstellung "anzei
 """
 import re
 
-ELEMENTE = ("uhr", "heute", "fotodatum", "fotoort", "wetter", "termine", "geburtstag", "titel")
+ELEMENTE = ("uhr", "heute", "fotodatum", "fotoort", "wetter", "termine", "geburtstag", "titel", "notiz", "erinnerung")
 STANDARD = {
     "uhr": {"an": True, "x": 0, "y": 100, "gr": 100, "farbe": "", "schrift": ""},
     "heute": {"an": False, "x": 0, "y": 90, "gr": 100, "farbe": "", "schrift": ""},
@@ -16,6 +16,8 @@ STANDARD = {
     "termine": {"an": True, "x": 100, "y": 14, "gr": 100, "farbe": "", "schrift": "", "person": True},
     "geburtstag": {"an": True, "x": 50, "y": 0, "gr": 100, "farbe": "", "schrift": ""},
     "titel": {"an": True, "x": 0, "y": 88, "gr": 100, "farbe": "", "schrift": ""},      # Name der Show, kurz beim Start einer Show
+    "notiz": {"an": True, "x": 50, "y": 94, "gr": 100, "farbe": "", "schrift": ""},     # kurze Nachricht an den Rahmen ("Heute Abend Pizza")
+    "erinnerung": {"an": True, "x": 0, "y": 0, "gr": 100, "farbe": "", "schrift": ""},  # "Vor 5 Jahren" bei Fotos von heute in frueheren Jahren
 }
 GR_MIN, GR_MAX = 40, 300
 SCHRIFTEN = ("", "serif", "sans", "mono")                 # "" = Standard des Elements

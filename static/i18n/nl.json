@@ -599,7 +599,40 @@
   "Uhrzeit der Aufnahme mitanzeigen": "Ook de tijd van de foto tonen",
   "Datumsformat": "Datumnotatie",
   "Datum ausgeschrieben (4. Dezember 2025)": "Datum voluit (4 december 2025)",
-  "Datum kurz (04.12.2025)": "Datum kort (04-12-2025)"
+  "Datum kurz (04.12.2025)": "Datum kort (04-12-2025)",
+  "Sanfter Zoom bei jedem Foto": "Zachte zoom bij elke foto",
+  "Zwei Hochkant-Fotos nebeneinander": "Twee staande foto's naast elkaar",
+  "Notiz an diesen Rahmen": "Notitie voor deze lijst",
+  "Ein kurzer Text, der für eine Weile am Rahmen erscheint, zum Beispiel „Heute Abend Pizza“.": "Een korte tekst die een tijdje op de lijst verschijnt, bijvoorbeeld “Vanavond pizza”.",
+  "Text": "Tekst",
+  "Anzeigen für": "Tonen gedurende",
+  "1 Stunde": "1 uur",
+  "6 Stunden": "6 uur",
+  "1 Tag": "1 dag",
+  "3 Tage": "3 dagen",
+  "1 Woche": "1 week",
+  "Notiz senden": "Notitie sturen",
+  "Notiz entfernen": "Notitie verwijderen",
+  "Die Notiz ist am Rahmen.": "De notitie staat op de lijst.",
+  "Die Notiz wurde entfernt.": "De notitie is verwijderd.",
+  "Notiz": "Notitie",
+  "Heute Abend Pizza": "Vanavond pizza",
+  "Erinnerungen („An diesem Tag“) im Dauerprogramm": "Herinneringen (“Op deze dag”) in het doorlopende programma",
+  "Selten": "Zelden",
+  "Öfter": "Vaker",
+  "Oft": "Heel vaak",
+  "Am Geburtstag Fotos der Person zeigen": "Foto's van de persoon tonen op zijn/haar verjaardag",
+  "Erinnerung („Vor 5 Jahren“)": "Herinnering (“5 jaar geleden”)",
+  "Vor 5 Jahren": "5 jaar geleden",
+  "Vor 1 Jahr": "1 jaar geleden",
+  "Nachtruhe nach Sonnenstand (Sonnenuntergang bis -aufgang, braucht den Wetter-Ort)": "Nachtrust naar zonstand (zonsondergang tot zonsopgang, heeft de weerlocatie nodig)",
+  "Diese Meldungen sende ich dir:": "Deze meldingen stuur ik je:",
+  "(zusätzlich zu den Meldungen über nicht erreichbare Rahmen)": "(naast de meldingen over onbereikbare lijsten)",
+  "Immich nicht erreichbar": "Immich onbereikbaar",
+  "Speicherplatz knapp": "Opslagruimte bijna vol",
+  "Handy-Kalender nicht aktualisiert": "Agenda van telefoon niet bijgewerkt",
+  "Monatsbrief": "Maandbrief",
+  "Monatsbrief (Vormonat) jetzt senden": "Maandbrief (vorige maand) nu sturen"
  },
  "muster": [
   [
@@ -924,6 +957,10 @@
   [
    "^● Läuft gerade auf (.*)$",
    "● Nu op $1"
+  ],
+  [
+   "^Vor (\\d+) Jahren$",
+   "$1 jaar geleden"
   ]
  ],
  "beschreibung": [

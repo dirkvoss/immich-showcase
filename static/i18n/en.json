@@ -599,7 +599,40 @@
   "Uhrzeit der Aufnahme mitanzeigen": "Also show the time of the photo",
   "Datumsformat": "Date format",
   "Datum ausgeschrieben (4. Dezember 2025)": "Date written out (4 December 2025)",
-  "Datum kurz (04.12.2025)": "Date short (04/12/2025)"
+  "Datum kurz (04.12.2025)": "Date short (04/12/2025)",
+  "Sanfter Zoom bei jedem Foto": "Gentle zoom on every photo",
+  "Zwei Hochkant-Fotos nebeneinander": "Two portrait photos side by side",
+  "Notiz an diesen Rahmen": "Note for this frame",
+  "Ein kurzer Text, der für eine Weile am Rahmen erscheint, zum Beispiel „Heute Abend Pizza“.": "A short text that appears on the frame for a while, for example “Pizza tonight”.",
+  "Text": "Text",
+  "Anzeigen für": "Show for",
+  "1 Stunde": "1 hour",
+  "6 Stunden": "6 hours",
+  "1 Tag": "1 day",
+  "3 Tage": "3 days",
+  "1 Woche": "1 week",
+  "Notiz senden": "Send note",
+  "Notiz entfernen": "Remove note",
+  "Die Notiz ist am Rahmen.": "The note is on the frame.",
+  "Die Notiz wurde entfernt.": "The note was removed.",
+  "Notiz": "Note",
+  "Heute Abend Pizza": "Pizza tonight",
+  "Erinnerungen („An diesem Tag“) im Dauerprogramm": "Memories (“On this day”) in the idle programme",
+  "Selten": "Rarely",
+  "Öfter": "Often",
+  "Oft": "Very often",
+  "Am Geburtstag Fotos der Person zeigen": "Show photos of the person on their birthday",
+  "Erinnerung („Vor 5 Jahren“)": "Memory (“5 years ago”)",
+  "Vor 5 Jahren": "5 years ago",
+  "Vor 1 Jahr": "1 year ago",
+  "Nachtruhe nach Sonnenstand (Sonnenuntergang bis -aufgang, braucht den Wetter-Ort)": "Night rest by sun position (sunset to sunrise, needs the weather location)",
+  "Diese Meldungen sende ich dir:": "I will send you these notifications:",
+  "(zusätzlich zu den Meldungen über nicht erreichbare Rahmen)": "(in addition to the messages about unreachable frames)",
+  "Immich nicht erreichbar": "Immich unreachable",
+  "Speicherplatz knapp": "Storage space low",
+  "Handy-Kalender nicht aktualisiert": "Phone calendar not updated",
+  "Monatsbrief": "Monthly letter",
+  "Monatsbrief (Vormonat) jetzt senden": "Send monthly letter (last month) now"
  },
  "muster": [
   [
@@ -924,6 +957,10 @@
   [
    "^● Läuft gerade auf (.*)$",
    "● Now playing on $1"
+  ],
+  [
+   "^Vor (\\d+) Jahren$",
+   "$1 years ago"
   ]
  ],
  "beschreibung": [

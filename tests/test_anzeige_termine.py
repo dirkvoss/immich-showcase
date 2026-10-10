@@ -335,3 +335,181 @@ def test_datumsformat_des_aufnahmedatums():
         raise AssertionError("nicht abgelehnt")
     except ValueError:
         pass
+
+
+def test_zoom_und_hochformat_paare_je_rahmen(app_laden):
+    w, client, _ = app_laden(**ZWEI)
+    app = client("192.168.1.50")
+    cfg = lambda z: app.get(f"/api/config?ziel={z}").json()
+    assert cfg("flur")["rahmen_bewegung"] is False and cfg("flur")["rahmen_paare"] is False               # Standard: aus
+    lv = app.get("/api/tv/abfrage?ziel=flur&seq=-1").json()["lv"]
+    r = app.put("/api/verwaltung/geraete/flur", json={"bewegung": True, "paare": True}, headers=H)
+    assert r.status_code == 200 and r.json()["geraet"]["bewegung"] and r.json()["geraet"]["paare"]
+    assert cfg("flur")["rahmen_bewegung"] and cfg("flur")["rahmen_paare"] and not cfg("serbien")["rahmen_bewegung"]
+    assert app.get("/api/tv/abfrage?ziel=flur&seq=-1").json()["lv"] != lv                                  # laufender Rahmen laedt neu
+    assert app.put("/api/verwaltung/geraete/flur", json={"paare": "ja"}, headers=H).status_code == 400
+    app.put("/api/verwaltung/geraete/flur", json={"bewegung": False}, headers=H)
+    assert not cfg("flur")["rahmen_bewegung"] and cfg("flur")["rahmen_paare"]
+
+
+def test_notiz_an_den_rahmen(app_laden):
+    w, client, _ = app_laden(**ZWEI)
+    app = client("192.168.1.50")
+    zusatz = lambda z: app.get(f"/api/rahmen/zusatz?ziel={z}").json()
+    assert "notiz" not in zusatz("flur")
+    lv = app.get("/api/tv/abfrage?ziel=flur&seq=-1").json()["lv"]
+    r = app.put("/api/notizen/flur", json={"text": "  Heute Abend   Pizza 🍕 ", "stunden": 3}, headers=H)
+    assert r.status_code == 200 and r.json()["text"] == "Heute Abend Pizza 🍕"
+    assert zusatz("flur")["notiz"] == "Heute Abend Pizza 🍕" and "notiz" not in zusatz("serbien")        # nur dieser Rahmen
+    assert app.get("/api/tv/abfrage?ziel=flur&seq=-1").json()["lv"] != lv                              # laufender Rahmen laedt neu
+    assert app.get("/api/notizen/flur").json()["text"] == "Heute Abend Pizza 🍕"
+    assert w.lies_json(w.NOTIZEN_FILE, {})["flur"]["text"] == "Heute Abend Pizza 🍕"
+    # abgelaufen
+    assert w.notiz_fuer("flur", datetime.datetime.now() + datetime.timedelta(hours=4)) == ""
+    assert w.notiz_fuer("flur", datetime.datetime.now() + datetime.timedelta(hours=2)) != ""
+    # entfernen, Grenzen, Schutz
+    assert app.put("/api/notizen/flur", json={"text": ""}, headers=H).json()["text"] == "" and "notiz" not in zusatz("flur")
+    assert app.put("/api/notizen/gibtsnicht", json={"text": "x"}, headers=H).status_code == 404
+    assert app.put("/api/notizen/flur", json={"text": "x", "stunden": "abc"}, headers=H).status_code == 400
+    assert len(app.put("/api/notizen/flur", json={"text": "a" * 500, "stunden": 1}, headers=H).json()["text"]) == w.NOTIZ_MAX
+    assert app.put("/api/notizen/flur", json={"text": "x"}).status_code == 403
+    assert client("203.0.113.9").put("/api/notizen/flur", json={"text": "x"}, headers=H).status_code == 401
+    assert ANZ.zusammen()["notiz"]["an"]
+
+
+def test_erinnerungen_und_geburtstagsfotos_im_dauerprogramm(app_laden, monkeypatch):
+    w, client, _ = app_laden(**ZWEI)
+    app = client("192.168.1.50")
+    typen = lambda: [q["typ"] for q in w.rahmen_quellen("flur")]
+    assert "heute" not in typen()                                                                           # Standard: aus
+    assert app.put("/api/verwaltung/geraete/flur", json={"erinnerungen": "komisch"}, headers=H).status_code == 400
+    r = app.put("/api/verwaltung/geraete/flur", json={"erinnerungen": "oft"}, headers=H)
+    assert r.json()["geraet"]["erinnerungen"] == "oft" and "heute" in typen()
+    assert [q["gewicht"] for q in w.rahmen_quellen("flur") if q["typ"] == "heute"] == [0.4] and "heute" not in [q["typ"] for q in w.rahmen_quellen("serbien")]
+    app.put("/api/verwaltung/geraete/flur", json={"erinnerungen": ""}, headers=H)
+    assert "heute" not in typen()
+    # Geburtstag: 'Omas Geburtstag' -> Person 'Oma' (Spitzname fuer 'Anna Muster'); ohne Freigabe des Handys nichts
+    monkeypatch.setitem(w.PERSONEN_CACHE, "t", w.time.time())
+    monkeypatch.setitem(w.PERSONEN_CACHE, "named", [("Anna Muster", "p1"), ("Ben", "p2"), ("Al", "p3")])
+    monkeypatch.setitem(w.PERSONEN_CACHE, "alias", {"oma": "Anna Muster"})
+    heute = datetime.date.today()
+    app.put("/api/termine/telefon", json={"quelle": QUELLE, "name": "x", "termine": [
+        {"titel": "Omas Geburtstag", "von": heute.isoformat(), "bis": (heute + datetime.timedelta(days=1)).isoformat(), "geburtstag": True},
+        {"titel": "Als Geburtstag", "von": heute.isoformat(), "bis": (heute + datetime.timedelta(days=1)).isoformat(), "geburtstag": True}]}, headers=H)
+    assert w.geburtstag_personen("flur") == []                                                              # Handy nicht freigegeben
+    app.put("/api/verwaltung/geraete/flur", json={"termin_quellen": [QUELLE]}, headers=H)
+    assert w.geburtstag_personen("flur") == ["Anna Muster"]                                                 # 'Al' ist zu kurz fuer einen Treffer
+    assert {"typ": "person", "namen": ["Anna Muster"], "gewicht": 0.6} in w.rahmen_quellen("flur")
+    app.put("/api/verwaltung/geraete/flur", json={"geburtstagsfotos": False}, headers=H)
+    assert not any(q["typ"] == "person" for q in w.rahmen_quellen("flur"))
+    assert app.put("/api/verwaltung/geraete/flur", json={"geburtstagsfotos": "ja"}, headers=H).status_code == 400
+    assert ANZ.zusammen()["erinnerung"]["an"]
+
+
+def test_sonnenzeiten_und_nachtruhe_nach_sonnenstand(app_laden, monkeypatch):
+    import os
+    import time
+    import sonne
+    monkeypatch.setenv("TZ", "Europe/Berlin")
+    time.tzset()
+    auf, unter = sonne.sonnenzeiten(51.3, 6.85, datetime.date(2026, 10, 10))                          # Ratingen: Sommerzeit, Aufgang ~07:35, Untergang ~18:50
+    assert datetime.time(7, 25) <= auf.time() <= datetime.time(7, 45) and datetime.time(18, 40) <= unter.time() <= datetime.time(19, 0)
+    auf_w, unter_w = sonne.sonnenzeiten(51.3, 6.85, datetime.date(2026, 12, 21))                     # Winter: kurze Tage
+    assert datetime.time(8, 15) <= auf_w.time() <= datetime.time(8, 35) and datetime.time(16, 15) <= unter_w.time() <= datetime.time(16, 35)
+    assert sonne.sonnenzeiten(80, 10, datetime.date(2026, 6, 21)) is None                              # Polartag
+    w, client, _ = app_laden(**ZWEI)
+    app = client("192.168.1.50")
+    assert app.put("/api/verwaltung/geraete/flur", json={"nacht": "sonne"}, headers=H).json()["geraet"]["nacht"] == "sonne"
+    assert w.rahmen_nacht("flur") == ""                                                                  # ohne Wetter-Ort keine Berechnung
+    app.put("/api/einstellungen", json={"wetter": {"lat": 51.3, "lon": 6.85, "name": "Ratingen"}}, headers=H)
+    von, bis = w.rahmen_nacht("flur", datetime.datetime(2026, 10, 10, 12, 0)).split("-")
+    assert von.startswith("18:") and bis.startswith("07:")
+    assert app.get("/api/config?ziel=flur").json()["rahmen_nacht"] == w.rahmen_nacht("flur")
+    assert app.put("/api/verwaltung/geraete/flur", json={"nacht": "22:00-06:30"}, headers=H).json()["geraet"]["nacht"] == "22:00-06:30"
+    assert app.put("/api/verwaltung/geraete/flur", json={"nacht": "sonnig"}, headers=H).status_code == 400
+    assert app.put("/api/verwaltung/geraete/flur", json={"nacht": ""}, headers=H).json()["geraet"]["nacht"] == ""
+
+
+# ---------------------------------------------------------------- weitere Meldungen und Monatsbrief
+def wache_vorbereiten(w, monkeypatch, immich_ok=True, frei=0.5):
+    gesendet = []
+    monkeypatch.setattr(w, "pushover", lambda titel, text, prio=0: gesendet.append((titel, text)))
+    def aufruf(*a, **k):
+        if not immich_ok:
+            raise OSError("keine Verbindung")
+        return {"major": 3, "minor": 3, "patch": 1}
+    monkeypatch.setattr(w, "immich_aufruf", aufruf)
+
+    class Platte:
+        total, free = 100 * 2**30, int(100 * 2**30 * frei)
+    monkeypatch.setattr(w.shutil, "disk_usage", lambda p: Platte)
+    monkeypatch.setattr(w, "einst_speichern", lambda: None)
+    return gesendet
+
+
+def test_immich_ausfall_wird_nach_zehn_minuten_gemeldet(app_laden, monkeypatch):
+    w, client, _ = app_laden(**ZWEI)
+    gesendet = wache_vorbereiten(w, monkeypatch, immich_ok=False)
+    t0 = datetime.datetime(2026, 10, 10, 12, 0)
+    w.weitere_wache_pruefen(t0)
+    w.weitere_wache_pruefen(t0 + datetime.timedelta(minutes=9))
+    assert gesendet == []
+    w.weitere_wache_pruefen(t0 + datetime.timedelta(minutes=10))
+    w.weitere_wache_pruefen(t0 + datetime.timedelta(minutes=30))
+    assert [g[0] for g in gesendet] == ["Immich nicht erreichbar"]                                      # nur einmal
+    wache_vorbereiten(w, monkeypatch, immich_ok=True)
+    gesendet2 = wache_vorbereiten(w, monkeypatch, immich_ok=True)
+    w.weitere_wache_pruefen(t0 + datetime.timedelta(minutes=31))
+    assert [g[0] for g in gesendet2] == ["Immich wieder erreichbar"]
+
+
+def test_speicher_und_kalender_meldungen_und_abschalten(app_laden, monkeypatch):
+    w, client, _ = app_laden(**ZWEI)
+    app = client("192.168.1.50")
+    gesendet = wache_vorbereiten(w, monkeypatch, frei=0.04)
+    jetzt = datetime.datetime(2026, 10, 10, 12, 0)
+    w.weitere_wache_pruefen(jetzt)
+    w.weitere_wache_pruefen(jetzt + datetime.timedelta(minutes=5))
+    assert [g[0] for g in gesendet] == ["Speicherplatz knapp"]                                          # einmal am Tag
+    w.weitere_wache_pruefen(jetzt + datetime.timedelta(days=1))
+    assert [g[0] for g in gesendet] == ["Speicherplatz knapp", "Speicherplatz knapp"]
+    # Handy-Kalender: nur wenn ein Rahmen das Handy zeigt und es seit Tagen nichts gesendet hat
+    gesendet.clear()
+    w.TELEFON[QUELLE] = {"name": "Dirks iPhone", "aktualisiert": "2026-10-05T08:00:00", "termine": []}
+    wache_vorbereiten(w, monkeypatch)
+    g2 = wache_vorbereiten(w, monkeypatch)
+    w.weitere_wache_pruefen(jetzt)
+    assert g2 == []                                                                                      # auf keinem Rahmen freigegeben
+    app.put("/api/verwaltung/geraete/flur", json={"termin_quellen": [QUELLE]}, headers=H)
+    w.weitere_wache_pruefen(jetzt)
+    assert [g[0] for g in g2] == ["Handy-Kalender nicht aktualisiert"] and "Dirks iPhone" in g2[0][1]
+    w.weitere_wache_pruefen(jetzt + datetime.timedelta(hours=1))
+    assert len(g2) == 1                                                                                  # nicht staendig wiederholen
+    # abschalten in den Einstellungen
+    assert app.put("/api/einstellungen", json={"meldungen": {"kalender": False, "speicher": False}}, headers=H).status_code == 200
+    ansicht = app.get("/api/einstellungen").json()
+    assert ansicht["meldungen"] == {"immich": True, "speicher": False, "kalender": False, "monat": True}
+    w.weitere_wache_pruefen(jetzt + datetime.timedelta(days=2))
+    assert len(g2) == 1
+    assert app.put("/api/einstellungen", json={"meldungen": {"unbekannt": False}}, headers=H).status_code == 400
+    assert app.put("/api/einstellungen", json={"meldungen": {"immich": "nein"}}, headers=H).status_code == 400
+
+
+def test_monatsbrief_am_ersten_einmal(app_laden, monkeypatch):
+    w, client, _ = app_laden(**ZWEI)
+    gesendet = wache_vorbereiten(w, monkeypatch)
+    monkeypatch.setattr(w.H, "api", lambda m, p, d=None: {"total": 1234} if p == "/search/statistics" else [])
+    w.STATISTIK["2026-09"] = {"min_online": {"flur": 900, "serbien": 300}, "min_offline": {"flur": 100, "serbien": 700}, "ausfaelle": {"serbien": 2}}
+    w.weitere_wache_pruefen(datetime.datetime(2026, 10, 1, 8, 0))                                        # zu frueh am Tag
+    assert gesendet == []
+    w.weitere_wache_pruefen(datetime.datetime(2026, 10, 1, 9, 30))
+    assert len(gesendet) == 1 and gesendet[0][0] == "Dein Rückblick auf den September"
+    text = gesendet[0][1]
+    assert "1.234" in text and "Flur: 90 % erreichbar, keine Ausfälle" in text and "Serbien: 30 % erreichbar, 2 Ausfälle" in text
+    w.weitere_wache_pruefen(datetime.datetime(2026, 10, 1, 18, 0))
+    w.weitere_wache_pruefen(datetime.datetime(2026, 10, 2, 9, 30))
+    assert len(gesendet) == 1                                                                            # einmal je Monat
+    assert w.EINST["monatsbrief"] == "2026-09"
+    # Januar: Vormonat ist Dezember des Vorjahres
+    w.weitere_wache_pruefen(datetime.datetime(2027, 1, 1, 10, 0))
+    assert gesendet[-1][0] == "Dein Rückblick auf den Dezember"

@@ -599,7 +599,40 @@
   "Uhrzeit der Aufnahme mitanzeigen": "Afficher aussi l'heure de la photo",
   "Datumsformat": "Format de la date",
   "Datum ausgeschrieben (4. Dezember 2025)": "Date en toutes lettres (4 décembre 2025)",
-  "Datum kurz (04.12.2025)": "Date courte (04/12/2025)"
+  "Datum kurz (04.12.2025)": "Date courte (04/12/2025)",
+  "Sanfter Zoom bei jedem Foto": "Zoom doux sur chaque photo",
+  "Zwei Hochkant-Fotos nebeneinander": "Deux photos portrait côte à côte",
+  "Notiz an diesen Rahmen": "Note pour ce cadre",
+  "Ein kurzer Text, der für eine Weile am Rahmen erscheint, zum Beispiel „Heute Abend Pizza“.": "Un court texte qui s'affiche un moment sur le cadre, par exemple « Pizza ce soir ».",
+  "Text": "Texte",
+  "Anzeigen für": "Afficher pendant",
+  "1 Stunde": "1 heure",
+  "6 Stunden": "6 heures",
+  "1 Tag": "1 jour",
+  "3 Tage": "3 jours",
+  "1 Woche": "1 semaine",
+  "Notiz senden": "Envoyer la note",
+  "Notiz entfernen": "Supprimer la note",
+  "Die Notiz ist am Rahmen.": "La note est sur le cadre.",
+  "Die Notiz wurde entfernt.": "La note a été supprimée.",
+  "Notiz": "Note",
+  "Heute Abend Pizza": "Pizza ce soir",
+  "Erinnerungen („An diesem Tag“) im Dauerprogramm": "Souvenirs (« Ce jour-là ») dans le programme continu",
+  "Selten": "Rarement",
+  "Öfter": "Souvent",
+  "Oft": "Très souvent",
+  "Am Geburtstag Fotos der Person zeigen": "Afficher des photos de la personne le jour de son anniversaire",
+  "Erinnerung („Vor 5 Jahren“)": "Souvenir (« Il y a 5 ans »)",
+  "Vor 5 Jahren": "Il y a 5 ans",
+  "Vor 1 Jahr": "Il y a 1 an",
+  "Nachtruhe nach Sonnenstand (Sonnenuntergang bis -aufgang, braucht den Wetter-Ort)": "Veille nocturne selon le soleil (du coucher au lever du soleil, nécessite le lieu de la météo)",
+  "Diese Meldungen sende ich dir:": "Je t'envoie ces notifications :",
+  "(zusätzlich zu den Meldungen über nicht erreichbare Rahmen)": "(en plus des messages sur les cadres inaccessibles)",
+  "Immich nicht erreichbar": "Immich inaccessible",
+  "Speicherplatz knapp": "Espace de stockage faible",
+  "Handy-Kalender nicht aktualisiert": "Calendrier du téléphone non mis à jour",
+  "Monatsbrief": "Lettre mensuelle",
+  "Monatsbrief (Vormonat) jetzt senden": "Envoyer maintenant la lettre mensuelle (mois dernier)"
  },
  "muster": [
   [
@@ -924,6 +957,10 @@
   [
    "^● Läuft gerade auf (.*)$",
    "● En cours sur $1"
+  ],
+  [
+   "^Vor (\\d+) Jahren$",
+   "Il y a $1 ans"
   ]
  ],
  "beschreibung": [

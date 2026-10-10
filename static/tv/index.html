@@ -17,6 +17,13 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000;
   -webkit-filter: blur(46px) brightness(.55); filter: blur(46px) brightness(.55); -webkit-transition: opacity 1.2s ease; transition: opacity 1.2s ease; }
 .bg.an { opacity: 1; }
 body.zuschnitt .bild { object-fit: cover; }
+/* sanfter Zoom (Ken-Burns) je Foto, wenn am Rahmen eingeschaltet */
+@-webkit-keyframes kb1 { from { -webkit-transform: scale(1); transform: scale(1); } to { -webkit-transform: scale(1.08); transform: scale(1.08); } }
+@keyframes kb1 { from { transform: scale(1); } to { transform: scale(1.08); } }
+@-webkit-keyframes kb2 { from { -webkit-transform: scale(1.08); transform: scale(1.08); } to { -webkit-transform: scale(1); transform: scale(1); } }
+@keyframes kb2 { from { transform: scale(1.08); } to { transform: scale(1); } }
+body.bewegung .bild.an.kb1 { -webkit-animation: kb1 14s ease-out forwards; animation: kb1 14s ease-out forwards; }
+body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; animation: kb2 14s ease-out forwards; }
 #nacht { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 40; display: none; }
 #mitte { background: -webkit-radial-gradient(50% 38%, circle, #2b3a52 0%, #151b27 55%, #07090e 100%); background: radial-gradient(circle at 50% 38%, #2b3a52 0%, #151b27 55%, #07090e 100%); position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: -webkit-flex; display: flex;
   -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center;
@@ -41,6 +48,8 @@ body.zuschnitt .bild { object-fit: cover; }
 #el-uhr, #el-heute, #el-wetter, #el-geburtstag { white-space: nowrap; }
 #el-titel { left: 0; top: 100%; -webkit-transform: translate(0, -100%); transform: translate(0, -100%); padding: 10px 18px; border-radius: 10px; background: rgba(0,0,0,.55); -webkit-transition: opacity .8s; transition: opacity .8s; }
 #el-titel.an { opacity: 1; }
+#el-notiz { max-width: 80%; padding: 10px 24px; border-radius: 16px; background: rgba(0,0,0,.55); line-height: 1.25; }
+#el-notiz.an { opacity: 1; }
 .pbadge { display: inline-block; min-width: 1.3em; margin-right: .35em; padding: 0 .2em; border-radius: .25em; text-align: center; font-size: .72em; font-weight: 700; text-shadow: none; vertical-align: .08em; }
 #el-uhr { font-family: "Cormorant Garamond", Georgia, serif; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
 #el-uhr.an { opacity: .85; }
@@ -134,7 +143,8 @@ body.zuschnitt .bild { object-fit: cover; }
     if (st === 200 && d && d.ziele) { for (var k in d.ziele) NAMEN[k] = d.ziele[k]; }
     if (st === 200 && d && d.rahmen) { for (var r = 0; r < d.rahmen.length; r++) if (d.rahmen[r] === ziel) { rahmenModus = true; rahmenSek = d.rahmen_sek || 8; anzeige = d.rahmen_anzeige || []; layoutSetzen(d.rahmen_layout); ambientAnzeige(); nacht = d.rahmen_nacht || ""; if (!laeuft && !pinModus) startAmbient(); } }
     fuellung = (rahmenModus ? d.rahmen_fuellung : d.tv_fuellung) || "balken";
-    document.body.className = fuellung === "zuschnitt" ? "zuschnitt" : "";
+    bewegung = rahmenModus && !!d.rahmen_bewegung; paare = rahmenModus && !!d.rahmen_paare;
+    document.body.className = (fuellung === "zuschnitt" ? "zuschnitt" : "") + (bewegung ? " bewegung" : "");
   });
   var seq = -1, liste = [], idx = 0, sek = 8, laeuft = false, pausiert = false, timer = 0, marke = 0, vorn = null, name = "", titelTimer = 0, pin = "";
   var bildA = document.getElementById("bildA"), bildB = document.getElementById("bildB");
@@ -146,16 +156,16 @@ body.zuschnitt .bild { object-fit: cover; }
 
   // ---- Einblendungen (Uhrzeit, Datum, Foto-Datum, Foto-Ort, Wetter, Termine): Lage, Groesse und Sichtbarkeit kommen vom Server (Layout)
   var ebene = document.getElementById("ebene"), lay = null, EL = {}, zusatzDaten = null, zusatzTimer = 0, zusatzGestartet = false;
-  var NAMEN_EL = ["uhr", "heute", "fotodatum", "fotoort", "wetter", "termine", "geburtstag", "titel"];
-  var BASIS = { uhr: 44, heute: 28, wetter: 52, termine: 26, fotodatum: 30, fotoort: 30, geburtstag: 32, titel: 30 };            // Schriftgroesse in px bei 100 %
-  var NUR_RUHEBILD = { uhr: 1, heute: 1, wetter: 1, termine: 1, geburtstag: 1 };                                      // laufende Einblendungen (Foto-Datum/-Ort und Show-Titel steuern die Fotos selbst)
+  var NAMEN_EL = ["uhr", "heute", "fotodatum", "fotoort", "wetter", "termine", "geburtstag", "titel", "notiz", "erinnerung"];
+  var BASIS = { uhr: 44, heute: 28, wetter: 52, termine: 26, fotodatum: 30, fotoort: 30, geburtstag: 32, titel: 30, notiz: 40, erinnerung: 30 };            // Schriftgroesse in px bei 100 %
+  var NUR_RUHEBILD = { uhr: 1, heute: 1, wetter: 1, termine: 1, geburtstag: 1, notiz: 1 };                                      // laufende Einblendungen (Foto-Datum/-Ort und Show-Titel steuern die Fotos selbst)
   var SCHRIFTEN = { serif: '"Cormorant Garamond", Georgia, serif', sans: "Arial, Helvetica, sans-serif", mono: 'Menlo, Consolas, "Courier New", monospace' };
   function titelAus() { if (EL.titel) EL.titel.className = "el titel"; }
   function layoutSetzen(l) {
     lay = l || null;
     for (var i = 0; i < NAMEN_EL.length; i++) {
       var n = NAMEN_EL[i], e = EL[n], w = lay && lay[n];
-      if (!e) { e = document.createElement("div"); e.id = "el-" + n; if (n === "termine" || n === "geburtstag" || n === "titel") e.setAttribute("translate", "no"); e.className = n === "titel" ? "el titel" : "el"; ebene.appendChild(e); EL[n] = e; }
+      if (!e) { e = document.createElement("div"); e.id = "el-" + n; if (n === "termine" || n === "geburtstag" || n === "titel" || n === "notiz") e.setAttribute("translate", "no"); e.className = n === "titel" ? "el titel" : "el"; ebene.appendChild(e); EL[n] = e; }
       if (!w) continue;
       var t = "translate(-" + w.x + "%,-" + w.y + "%)";
       e.style.left = w.x + "%"; e.style.top = w.y + "%"; e.style.webkitTransform = t; e.style.transform = t;
@@ -169,17 +179,19 @@ body.zuschnitt .bild { object-fit: cover; }
     if (n === "wetter") return !!(zusatzDaten && zusatzDaten.wetter);
     if (n === "termine") return !!(zusatzDaten && zusatzDaten.termine && zusatzDaten.termine.length);
     if (n === "geburtstag") return !!(zusatzDaten && zusatzDaten.geburtstage && zusatzDaten.geburtstage.length);
+    if (n === "notiz") return !!(zusatzDaten && zusatzDaten.notiz);
     return true;
   }
   function ambientAnzeige() {                                    // Einblendungen am Rahmen (Uhrzeit, Datum, Wetter, Termine, Geburtstage): immer, wenn eingeschaltet - auch waehrend einer Show
     var an = rahmenModus;
     for (var n in NUR_RUHEBILD) { var e = EL[n]; if (e) e.className = "el" + (an && lay && lay[n] && lay[n].an && hatInhalt(n) ? " an" : ""); }
   }
-  function fotoTexteLeeren() { if (EL.fotodatum) EL.fotodatum.className = "el"; if (EL.fotoort) EL.fotoort.className = "el"; }
+  function fotoTexteLeeren() { if (EL.fotodatum) EL.fotodatum.className = "el"; if (EL.fotoort) EL.fotoort.className = "el"; if (EL.erinnerung) EL.erinnerung.className = "el"; }
   function zusatzZeichnen() {
     if (!EL.wetter) return;
     var d = zusatzDaten || {}, t = d.termine || [], box = EL.termine, i;
     EL.wetter.textContent = d.wetter ? d.wetter.symbol + " " + d.wetter.temp + "\u00b0" : "";
+    EL.notiz.textContent = d.notiz || "";
     EL.geburtstag.textContent = d.geburtstage && d.geburtstage.length ? "\uD83C\uDF82 " + d.geburtstage.join(" \u00b7 ") : "";
     box.innerHTML = "";
     for (i = 0; i < t.length; i++) {
@@ -197,7 +209,9 @@ body.zuschnitt .bild { object-fit: cover; }
   function konfigNeu() {                                         // Anordnung/Termine wurden am Server geaendert: ohne Neuladen uebernehmen
     api("/api/config?ziel=" + encodeURIComponent(ziel || ""), function (st, c) {
       if (st !== 200 || !c) return;
-      layoutSetzen(c.rahmen_layout); zusatzLaden(true);
+      layoutSetzen(c.rahmen_layout); zusatzLaden(true); nacht = c.rahmen_nacht || ""; nachtPruefen();
+      bewegung = rahmenModus && !!c.rahmen_bewegung; paare = rahmenModus && !!c.rahmen_paare;
+      document.body.className = (fuellung === "zuschnitt" ? "zuschnitt" : "") + (bewegung ? " bewegung" : "");
       if (laeuft && liste.length) bildUnterschrift(liste[idx]);
     });
   }
@@ -283,7 +297,7 @@ body.zuschnitt .bild { object-fit: cover; }
     });
   }
   function bildUnterschrift(id) {                                         // Foto-Datum und Foto-Ort (nur am Rahmen, je nach Layout)
-    if (!rahmenModus || !lay || !(lay.fotodatum.an || lay.fotoort.an)) { fotoTexteLeeren(); return; }
+    if (!rahmenModus || !lay || !(lay.fotodatum.an || lay.fotoort.an || (lay.erinnerung && lay.erinnerung.an))) { fotoTexteLeeren(); return; }
     api("/api/bildinfo/" + id + "?lang=" + (window.RW_LANG || "de"), function (st, d) {
       if (st !== 200 || !d) { fotoTexteLeeren(); return; }
       var dt = d.datum ? new Date(d.datum + "T12:00:00") : null, datum = "", ort = lay.fotoort.an ? (d.ort || "") : "";
@@ -291,18 +305,27 @@ body.zuschnitt .bild { object-fit: cover; }
         if (dt && !isNaN(dt.getTime())) { try { datum = dt.toLocaleDateString(window.RW_LOCALE || "de-DE", lay.fotodatum.format === "kurz" ? { day: "2-digit", month: "2-digit", year: "numeric" } : { day: "numeric", month: "long", year: "numeric" }); } catch (e) { datum = d.datum; } }
         if (lay.fotodatum.zeit && d.zeit) datum = datum ? datum + " \u00b7 " + d.zeit : d.zeit;
       }
+      var er = "", jetzt = new Date();                                                  // "Vor 5 Jahren": das Foto wurde heute (+/- 3 Tage) in einem frueheren Jahr aufgenommen
+      if (lay.erinnerung && lay.erinnerung.an && d.datum) {
+        var tm = d.datum.split("-"), diff = jetzt.getFullYear() - (+tm[0]);
+        if (diff >= 1) {
+          var abst = Math.abs(new Date(jetzt.getFullYear(), +tm[1] - 1, +tm[2]).getTime() - new Date(jetzt.getFullYear(), jetzt.getMonth(), jetzt.getDate()).getTime()) / 86400000;
+          if (abst <= 3) er = diff === 1 ? "Vor 1 Jahr" : "Vor " + diff + " Jahren";
+        }
+      }
+      EL.erinnerung.textContent = er; EL.erinnerung.className = "el" + (er ? " an" : "");
       EL.fotodatum.textContent = datum; EL.fotodatum.className = "el" + (datum ? " an" : "");
       EL.fotoort.textContent = ort; EL.fotoort.className = "el" + (ort ? " an" : "");
     });
   }
   function nachtPruefen() {                                                // Nachtruhe: im Dauerprogramm schwarzer Schirm
     var an = false, m, h1, m1, h2, m2, jetzt, a, b;
-    if (nacht && ambient) {
+    if (nacht && rahmenModus) {                                              // gilt am Rahmen immer, auch waehrend einer Show
       m = nacht.match(/^(\d+):(\d+)-(\d+):(\d+)$/);
       if (m) { h1 = +m[1]; m1 = +m[2]; h2 = +m[3]; m2 = +m[4]; var d = new Date(); jetzt = d.getHours() * 60 + d.getMinutes(); a = h1 * 60 + m1; b = h2 * 60 + m2; an = a <= b ? (jetzt >= a && jetzt < b) : (jetzt >= a || jetzt < b); }
     }
     nachtEl.style.display = an ? "block" : "none";
-    if (window.fully && nacht && ambient && an !== nachtPruefen.aus) {          // in Fully: Bildschirm wirklich aus/an (nur beim Wechsel, damit Handeingriffe nicht ueberstimmt werden)
+    if (window.fully && nacht && rahmenModus && an !== nachtPruefen.aus) {          // in Fully: Bildschirm wirklich aus/an (nur beim Wechsel, damit Handeingriffe nicht ueberstimmt werden)
       nachtPruefen.aus = an;
       try { if (an) { if (window.fully.turnScreenOff) window.fully.turnScreenOff(true); } else if (window.fully.turnScreenOn) window.fully.turnScreenOn(); } catch (e) {}
     }
@@ -315,7 +338,7 @@ body.zuschnitt .bild { object-fit: cover; }
   }
   function mischen(a) { var l = a.slice(), i, j, t; for (i = l.length - 1; i > 0; i--) { j = Math.floor(Math.random() * (i + 1)); t = l[i]; l[i] = l[j]; l[j] = t; } return l; }
   function quelle(i) { return "/api/vorschau/" + liste[i] + "?s=gross"; }
-  function plane() { clearTimeout(timer); if (laeuft && !pausiert) timer = setTimeout(function () { zeige(idx + 1); }, sek * 1000); }
+  function plane() { clearTimeout(timer); if (laeuft && !pausiert) timer = setTimeout(function () { zeige(idx + weiter); }, sek * 1000); }
   var fehler = 0;
   function videoAus() {                                          // Video beenden/ausblenden und Musik wieder aufnehmen
     clearTimeout(videoTimer);
@@ -346,6 +369,37 @@ body.zuschnitt .bild { object-fit: cover; }
     };
     vid.load();
   }
+  // ---- Hochkant-Fotos paarweise nebeneinander (je Rahmen schaltbar): zwei Hochkant-Fotos werden zu einem Querformat-Bild zusammengesetzt
+  var bewegung = false, paare = false, weiter = 1, paarUrls = [];
+  function bildLaden(url, cb) { var im = new Image(); im.onload = function () { cb(im); }; im.onerror = function () { cb(null); }; im.src = url; }
+  function paarZusammen(a, b, j, cb) {
+    try {
+      var c = document.createElement("canvas"), x, w = 1920, h = 1080, luecke = 16;
+      var f = h / Math.max(a.naturalHeight, b.naturalHeight);                          // beide gleich hoch, dicht beieinander, als Gruppe zentriert
+      var wa = a.naturalWidth * (h / a.naturalHeight), wb = b.naturalWidth * (h / b.naturalHeight), k = Math.min(1, (w - luecke) / (wa + wb));
+      var ha = h * k, hb = h * k; wa *= k; wb *= k;
+      c.width = w; c.height = h; x = c.getContext("2d"); x.fillStyle = "#05070b"; x.fillRect(0, 0, w, h);
+      var links = (w - (wa + wb + luecke)) / 2;
+      x.drawImage(a, links, (h - ha) / 2, wa, ha);
+      x.drawImage(b, links + wa + luecke, (h - hb) / 2, wb, hb);
+      c.toBlob(function (bl) { cb(bl ? URL.createObjectURL(bl) : null, j); }, "image/jpeg", 0.9);
+    } catch (e) { cb(null, 0); }
+  }
+  function paarBauen(i, cb) {                                    // cb(url oder null, wie viele Fotos zusaetzlich verbraucht wurden)
+    if (!paare || !rahmenModus || !liste.length || videoSet[liste[i]]) { cb(null, 0); return; }
+    bildLaden(quelle(i), function (a) {
+      if (!a || a.naturalHeight <= a.naturalWidth) { cb(null, 0); return; }          // nur Hochkant-Fotos
+      var j = 1;
+      (function suche() {
+        if (j > 4) { cb(null, 0); return; }
+        var k = (((i + j) % liste.length) + liste.length) % liste.length;
+        if (k === i || videoSet[liste[k]]) { j++; suche(); return; }
+        bildLaden(quelle(k), function (b) {
+          if (b && b.naturalHeight > b.naturalWidth) paarZusammen(a, b, j, cb); else { j++; suche(); }
+        });
+      })();
+    });
+  }
   function zeige(i) {
     clearTimeout(timer);
     if (!liste.length) return;
@@ -364,7 +418,8 @@ body.zuschnitt .bild { object-fit: cover; }
     neu.onload = function () {
       if (m !== marke) return;
       fehler = 0; letzterWechsel = new Date().getTime();
-      neu.className = "bild an";
+      if (bewegung) { neu.style.webkitAnimationDuration = neu.style.animationDuration = (sek + fade + 1) + "s"; }
+      neu.className = "bild an" + (bewegung ? (idx % 2 ? " kb2" : " kb1") : "");
       if (alt) alt.className = "bild";
       if (fuellung === "unscharf") {                                       // unscharfe Fortsetzung des Fotos statt schwarzer Raender
         var bn = (neu === bildA) ? bgA : bgB, ba = (neu === bildA) ? bgB : bgA;
@@ -373,7 +428,7 @@ body.zuschnitt .bild { object-fit: cover; }
       bildUnterschrift(liste[idx]);
       if (musikPausiert) { musikPausiert = false; if (audio) { try { audio.play(); } catch (e3) {} } }
       vorn = neu; mitte.className = "versteckt";
-      var n = new Image(); n.src = quelle((idx + 1) % liste.length);          // naechstes vorladen
+      var n = new Image(); n.src = quelle((idx + weiter) % liste.length);          // naechstes vorladen
       plane();
     };
     neu.onerror = function () {
@@ -381,7 +436,12 @@ body.zuschnitt .bild { object-fit: cover; }
       if (++fehler > 6) { var rm = rahmenModus; rahmenModus = false; bereit(); rahmenModus = rm; mitteText.textContent = "Die Fotos lassen sich gerade nicht laden."; if (rm) setTimeout(function () { if (!laeuft) startAmbient(); }, 30000); return; }
       zeige(idx + 1);
     };
-    neu.src = quelle(idx);
+    weiter = 1;
+    paarBauen(idx, function (url, mehr) {
+      if (m !== marke) return;
+      if (url) { weiter = 1 + mehr; paarUrls.push(url); while (paarUrls.length > 3) URL.revokeObjectURL(paarUrls.shift()); }
+      neu.src = url || quelle(idx);
+    });
   }
   function behandle(e) {
     if (!e) return;

@@ -51,6 +51,7 @@ def _einstellungen_anwenden():
 _einstellungen_anwenden()
 sys.path.insert(0, os.environ.get("RAHMEN_HELFER_DIR", "/opt/bilderrahmen"))
 import anzeige as ANZ
+import sonne as SONNE
 import telefontermine as TT
 import rahmen_helfer as H  # noqa: E402
 
@@ -614,7 +615,7 @@ def konfig(ziel: str = ""):
     return {"name": APP_NAME, "version": VERSION, "modus": MODUS, "auth": AUTH, "musik_upload": MUSIK_UPLOAD, "hochladen": bool(UPLOAD_KEY) or AUTH != "pin", "hochladen_mb": UPLOAD_MAX_MB, "konfiguriert": konfiguriert(), "tv_url": tv_url(), "beispiele": BEISPIELE, "beispiele_en": BEISPIELE_EN,
             "ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT and k not in RAHMEN_ZIELE},
             "rahmen": list(RAHMEN_ZIELE), "rahmen_namen": dict(RAHMEN_ZIELE), "rahmen_sek": gwert(z, "sek", std_sek()), "rahmen_fuellung": gwert(z, "fuellung", std_fuellung_rahmen()), "tv_fuellung": gwert(z, "fuellung", std_fuellung_tv()),
-            "rahmen_anzeige": gwert(z, "anzeige", std_anzeige()), "rahmen_layout": layout_fuer(z), "rahmen_nacht": rahmen_nacht(z), "rahmen_zusatz": zusatz_liste(z), "koppeln": True,
+            "rahmen_anzeige": gwert(z, "anzeige", std_anzeige()), "rahmen_layout": layout_fuer(z), "rahmen_bewegung": bool((GERAETE.get(z) or {}).get("bewegung")), "rahmen_paare": bool((GERAETE.get(z) or {}).get("paare")), "rahmen_nacht": rahmen_nacht(z), "rahmen_zusatz": zusatz_liste(z), "koppeln": True,
             "alle_ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT}}
 
 
@@ -1836,7 +1837,8 @@ def layout_fuer(z=None):
 def anzeige_version(z):
     """Kurze Kennung der Anzeige-Einstellungen eines Rahmens (Anordnung, Quellen, Handy-Termine): der Rahmen laedt neu, sobald sie sich aendert."""
     staende = sorted((k, hashlib.md5(json.dumps(v.get("termine"), sort_keys=True).encode()).hexdigest()[:8], v.get("kuerzel") or "", v.get("farbe") or "") for k, v in telefone_fuer(z).items())
-    roh = json.dumps([layout_fuer(z), zusatz_liste(z), staende, kalender_url(z), wetter_ort(z)], sort_keys=True)
+    e = GERAETE.get(z) or {}
+    roh = json.dumps([layout_fuer(z), zusatz_liste(z), staende, kalender_url(z), wetter_ort(z), bool(e.get("bewegung")), bool(e.get("paare")), notiz_fuer(z), rahmen_nacht(z)], sort_keys=True)
     return hashlib.md5(roh.encode()).hexdigest()[:8]
 
 
@@ -1844,8 +1846,21 @@ def rahmen_sek(z=None):
     return gwert(z or PLAYER, "sek", std_sek())
 
 
-def rahmen_nacht(z=None):
-    return gwert(z, "nacht", RAHMEN_NACHT) or ""
+def rahmen_nacht(z=None, jetzt=None):
+    """Nachtruhe 'von-bis'. Der Wert 'sonne' bedeutet: von Sonnenuntergang bis zum naechsten Sonnenaufgang am Wetter-Ort (taeglich neu berechnet)."""
+    v = gwert(z, "nacht", RAHMEN_NACHT) or ""
+    if v != "sonne":
+        return v
+    ort = wetter_ort(z)
+    if not ort:
+        return ""
+    heute = (jetzt or datetime.datetime.now()).date()
+    try:
+        untergang = SONNE.sonnenzeiten(ort[0], ort[1], heute)[1]
+        aufgang = SONNE.sonnenzeiten(ort[0], ort[1], heute + datetime.timedelta(days=1))[0]
+    except TypeError:                                                         # Polartag/Polarnacht: keine Nachtruhe nach Sonnenstand
+        return ""
+    return f"{untergang:%H:%M}-{aufgang:%H:%M}"
 
 
 AKTIV_FILE = os.environ.get("RAHMEN_WEB_AKTIV_FILE", os.path.join(os.path.dirname(SHOWS_FILE), "rahmen_web_aktiv.json"))
@@ -2118,10 +2133,41 @@ def rahmen_quellen(ziel=None, jetzt=None):
     quellen = [q for q in quellen if q["gewicht"] > 0]
     if not quellen:
         quellen = [{"typ": "alben", "gewicht": 1.0}] if (RAHMEN_ALBEN or RAHMEN_MARKER) else [{"typ": "alle", "gewicht": 1.0}]
+    e = (GERAETE.get(ziel) or {}) if ziel else {}
+    stufe = ERINNERUNG_STUFEN.get(e.get("erinnerungen"))                      # "An diesem Tag": Fotos von heute in frueheren Jahren einmischen
+    if stufe and not any(q["typ"] == "heute" for q in quellen):
+        quellen.append({"typ": "heute", "tage": 2, "gewicht": stufe})
+    if ziel and e.get("geburtstagsfotos", True):                               # am Geburtstag einer bekannten Person: ihre Fotos mehr zeigen
+        for name in geburtstag_personen(ziel):
+            quellen.append({"typ": "person", "namen": [name], "gewicht": 0.6})
     return quellen
 
 
 PERSONEN_CACHE = {"t": 0.0, "named": [], "alias": {}}
+ERINNERUNG_STUFEN = {"selten": 0.15, "oft": 0.4, "sehr": 1.0}
+
+
+def geburtstag_personen(z):
+    """Namen der Immich-Personen, die heute Geburtstag haben (aus dem Geburtstags-Kalender der freigegebenen Handys, z. B. 'Omas Geburtstag' -> Person 'Oma')."""
+    titel = TT.geburtstage(TT.ereignisse(telefone_fuer(z), datetime.date.today()))
+    if not titel:
+        return []
+    person_ids([])                                                             # Personenliste bei Bedarf auffrischen
+    namen = {}
+    for n, _i in PERSONEN_CACHE["named"]:
+        voll = H.norm(n)
+        namen[voll] = n
+        if voll.split(" ")[0] != voll:
+            namen[voll.split(" ")[0]] = n                                      # Vorname genuegt
+    for alias, person in PERSONEN_CACHE["alias"].items():
+        namen[alias] = person
+    gefunden = []
+    for t in titel:
+        tn = H.norm(t)
+        for kandidat, person in namen.items():
+            if len(kandidat) >= 3 and re.search(r"(?<![a-z0-9])" + re.escape(kandidat), tn) and person not in gefunden:
+                gefunden.append(person)
+    return gefunden
 
 
 def person_ids(namen):
@@ -2404,6 +2450,22 @@ TELEFON = lies_json(TERMINE_FILE, {})                                  # Termine
 if not isinstance(TELEFON, dict):
     TELEFON = {}
 TELEFON_LOCK = threading.Lock()
+NOTIZEN_FILE = os.environ.get("RAHMEN_WEB_NOTIZEN_FILE", os.path.join(os.path.dirname(EINST_FILE), "rahmen_web_notizen.json"))
+NOTIZEN = lies_json(NOTIZEN_FILE, {})                                    # Rahmen -> {"text": ..., "bis": ISO-Zeit}: kurze Nachricht an einen Rahmen
+if not isinstance(NOTIZEN, dict):
+    NOTIZEN = {}
+NOTIZ_MAX = 200
+
+
+def notiz_fuer(z, jetzt=None):
+    """Der aktuelle Notiztext eines Rahmens oder ''. Abgelaufene Notizen zaehlen nicht."""
+    n = NOTIZEN.get(z) if z else None
+    try:
+        if n and datetime.datetime.fromisoformat(n["bis"]) > (jetzt or datetime.datetime.now()):
+            return str(n["text"])
+    except (KeyError, TypeError, ValueError):
+        pass
+    return ""
 
 
 def zusatz_liste(z=None):
@@ -2538,6 +2600,8 @@ def rahmen_zusatz(ziel: str = "", g=Depends(geraet)):
     z = g.get("geraet") if g.get("typ") == "geraet" else ziel          # ein Geraete-Zugang gilt nur fuer sein eigenes Geraet
     z = z if z in GERAETE else None
     out = {}
+    if notiz_fuer(z):
+        out["notiz"] = notiz_fuer(z)
     zusatz = zusatz_liste(z)
     if "wetter" in zusatz:
         w = zusatz_gecacht("wetter:%s,%s" % wetter_ort(z), 900, lambda: wetter_holen(z))
@@ -2550,6 +2614,36 @@ def rahmen_zusatz(ziel: str = "", g=Depends(geraet)):
             out["termine"] = TT.naechste(t, datetime.datetime.now(), personen=mit_kuerzel >= 2)           # Kuerzel nur, wenn mehrere Handys auf diesem Rahmen teilen
             out["geburtstage"] = TT.geburtstage(t)
     return out
+
+
+# --------------------------------------------------------------------------- Notizen an einen Rahmen
+@app.put("/api/notizen/{z}")
+def notiz_setzen(z: str, daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
+    """Kurze Nachricht an einen Rahmen ({"text": "...", "stunden": 1..168}); leerer Text entfernt sie."""
+    global NOTIZEN
+    if z not in RAHMEN_ZIELE:
+        raise HTTPException(404, "Rahmen nicht gefunden")
+    text = " ".join(str(daten.get("text") or "").split())[:NOTIZ_MAX]
+    neu = {k: v for k, v in NOTIZEN.items() if k != z}
+    if text:
+        try:
+            stunden = max(1, min(int(daten.get("stunden", 6)), 168))
+        except (TypeError, ValueError):
+            raise HTTPException(400, "Dauer bitte in Stunden angeben (1 bis 168)")
+        neu[z] = {"text": text, "bis": (datetime.datetime.now() + datetime.timedelta(hours=stunden)).isoformat(timespec="seconds")}
+    try:
+        schreibe_json(NOTIZEN_FILE, neu)
+    except OSError as e:
+        H.log.error("Notizen nicht speicherbar: %s", e)
+        raise HTTPException(500, "Die Notiz konnte nicht gespeichert werden.")
+    NOTIZEN = neu
+    return {"ok": True, "text": text, "bis": (neu.get(z) or {}).get("bis")}
+
+
+@app.get("/api/notizen/{z}")
+def notiz_lesen(z: str, _=Depends(anmeldung)):
+    n = NOTIZEN.get(z) or {}
+    return {"text": notiz_fuer(z), "bis": n.get("bis") if notiz_fuer(z) else None}
 
 
 # --------------------------------------------------------------------------- Termine aus den Kalendern der Handys (iPhone-App)
@@ -2714,7 +2808,7 @@ NACHT_RE = re.compile(r"(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})")
 
 def geraet_ansicht(z, e):
     t = TV.get(z) or {}
-    return {"layout": layout_fuer(z), "layout_eigen": bool(e.get("layout")), "wetter": e.get("wetter") or None, "termin_quellen": e.get("termin_quellen") or [],
+    return {"layout": layout_fuer(z), "layout_eigen": bool(e.get("layout")), "bewegung": bool(e.get("bewegung")), "paare": bool(e.get("paare")), "erinnerungen": e.get("erinnerungen") or "", "geburtstagsfotos": e.get("geburtstagsfotos", True), "wetter": e.get("wetter") or None, "termin_quellen": e.get("termin_quellen") or [],
             "kalender_gesetzt": bool(e.get("kalender_url")), "selbst": meldet_selbst(z), "ip": t.get("ip") or "", "akku": (FULLY_STATE.get(z) or {}).get("akku"), "id": z, "art": e["art"], "name": e["name"], "sek": e.get("sek"), "fuellung": e.get("fuellung") or "", "anzeige": e.get("anzeige") or [],
             "nacht": e.get("nacht") or "", "quellen": e.get("quellen") or "", "zeitplan": e.get("zeitplan") or "",
             "fully_host": e.get("fully_host") or "", "fully_pw_gesetzt": bool(e.get("fully_pw")), "adb_host": e.get("adb_host") or "", "alarm_min": e.get("alarm_min")}
@@ -2753,6 +2847,20 @@ def geraet_felder(daten, art):
             if any(x not in ("datum", "zeit", "ort") for x in a):
                 raise HTTPException(400, "Unbekannte Bildunterschrift")
             (setzen.__setitem__("anzeige", [x for x in ("datum", "zeit", "ort") if x in a]) if a else weg.append("anzeige"))
+        if "erinnerungen" in daten:
+            v = str(daten["erinnerungen"] or "")
+            if v and v not in ERINNERUNG_STUFEN:
+                raise HTTPException(400, "Unbekannte Stufe für die Erinnerungen")
+            (setzen.__setitem__("erinnerungen", v) if v else weg.append("erinnerungen"))
+        if "geburtstagsfotos" in daten:
+            if not isinstance(daten["geburtstagsfotos"], bool):
+                raise HTTPException(400, "Bitte ein oder aus")
+            (weg.append("geburtstagsfotos") if daten["geburtstagsfotos"] else setzen.__setitem__("geburtstagsfotos", False))      # Standard: an
+        for feld in ("bewegung", "paare"):                       # sanfter Zoom, zwei Hochkant-Fotos nebeneinander
+            if feld in daten:
+                if not isinstance(daten[feld], bool):
+                    raise HTTPException(400, "Bitte ein oder aus")
+                (setzen.__setitem__(feld, True) if daten[feld] else weg.append(feld))
         if "wetter" in daten:
             w = daten["wetter"]
             if w in (None, {}):
@@ -2788,9 +2896,15 @@ def geraet_felder(daten, art):
         if "nacht" in daten:
             v = str(daten["nacht"] or "").strip()
             m = NACHT_RE.fullmatch(v)
-            if v and not (m and int(m[1]) < 24 and int(m[3]) < 24 and int(m[2]) < 60 and int(m[4]) < 60):
+            if v == "sonne":
+                setzen["nacht"] = v
+                v = ""
+            elif v and not (m and int(m[1]) < 24 and int(m[3]) < 24 and int(m[2]) < 60 and int(m[4]) < 60):
                 raise HTTPException(400, "Nachtruhe bitte als von-bis, z. B. 22:00-06:30")
-            (setzen.__setitem__("nacht", v) if v else weg.append("nacht"))
+            if v:
+                setzen["nacht"] = v
+            elif "nacht" not in setzen:
+                weg.append("nacht")
         if "quellen" in daten:
             v = str(daten["quellen"] or "").strip()
             for tok in [x.strip() for x in v.split(",") if x.strip()]:
@@ -3062,7 +3176,7 @@ def einst_ansicht():
             "wetter": EINST.get("wetter") or None, "wetter_env": bool(WETTER_ORT) and not EINST.get("wetter"),
             "kalender_gesetzt": bool(EINST.get("kalender_url")), "kalender_env": bool(KALENDER_URL) and not EINST.get("kalender_url"),
             "pushover_gesetzt": bool(pe.get("user") and pe.get("token")), "pushover_geraet": pe.get("device") or "",
-            "aliase": EINST.get("aliase") or [], "personen": namen,
+            "aliase": EINST.get("aliase") or [], "personen": namen, "meldungen": {k: meldung_an(k) for k in MELDUNGEN_ARTEN}, "meldungen_namen": MELDUNGEN_ARTEN,
             "standard": {"sek": RAHMEN_SEK, "fuellung_rahmen": RAHMEN_FUELLUNG, "fuellung_tv": TV_FUELLUNG, "anzeige": RAHMEN_ANZEIGE, "alarm_min": RAHMEN_ALARM_MIN, "tv_url": TV_URL}}
 
 
@@ -3148,6 +3262,11 @@ def einstellungen_aendern(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
                 raise HTTPException(400, "Pushover: User-Key und App-Token bitte vollständig eintragen (je 30 Zeichen)")
             if user and token:
                 neu["pushover"] = {"user": user, "token": token, "device": str(pz.get("device") or "").strip()[:25]}
+    if "meldungen" in daten:
+        m = daten["meldungen"]
+        if not isinstance(m, dict) or any(k not in MELDUNGEN_ARTEN or not isinstance(v, bool) for k, v in m.items()):
+            raise HTTPException(400, "Meldungen: unbekannte Art oder ungültiger Wert")
+        setzen("meldungen", {k: v for k, v in m.items() if v is False})            # gespeichert wird nur, was abgeschaltet ist (Standard: alles an)
     if "aliase" in daten:
         liste = daten["aliase"] if isinstance(daten["aliase"], list) else []
         sauber = []
@@ -3190,6 +3309,11 @@ def einstellungen_testen(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
             if not kalender_url():
                 raise ValueError("Kein Kalender-Link eingestellt")
             return {"ok": True, "nachricht": f"Kalender gelesen: {len(kalender_holen())} Termin(e) in den nächsten Tagen"}
+        if was == "monatsbrief":
+            vor = datetime.date.today().replace(day=1) - datetime.timedelta(days=1)
+            titel, text = monatsbrief_text(vor.year, vor.month)
+            pushover_senden(titel, text, 0)
+            return {"ok": True, "nachricht": "Monatsbrief (Vormonat) gesendet"}
         if was == "pushover":
             pushover_senden("Immich Showcase", "Test: Benachrichtigungen funktionieren.", 0)
             return {"ok": True, "nachricht": "Test-Nachricht gesendet"}
@@ -3317,6 +3441,8 @@ def rahmen_wache_pruefen(jetzt=None):
         alarm = gwert(z, "alarm_min", std_alarm_min())
         if alarm and offline_min >= alarm and gemeldet != "offline":
             WACHE["gemeldet"][z] = "offline"
+            ausf = STATISTIK.setdefault(f"{datetime.date.today():%Y-%m}", {"min_online": {}, "min_offline": {}, "ausfaelle": {}})["ausfaelle"]
+            ausf[z] = ausf.get(z, 0) + 1
             meldungen.append((f"{name} nicht erreichbar", f"Der Rahmen meldet sich seit {int(offline_min)} Minuten nicht mehr (Tablet aus, WLAN oder Browser beendet?)."))
         elif haengt and gemeldet != "haengt":
             WACHE["gemeldet"][z] = "haengt"
@@ -3330,13 +3456,135 @@ def rahmen_wache_pruefen(jetzt=None):
     return meldungen
 
 
+# Weitere Meldungen (je Art in den Einstellungen abschaltbar): Immich nicht erreichbar, Speicherplatz knapp, Handy-Kalender veraltet, Monatsbrief
+MELDUNGEN_ARTEN = {"immich": "Immich nicht erreichbar", "speicher": "Speicherplatz knapp", "kalender": "Handy-Kalender nicht aktualisiert", "monat": "Monatsbrief"}
+STATISTIK_FILE = os.environ.get("RAHMEN_WEB_STATISTIK_FILE", os.path.join(os.path.dirname(EINST_FILE), "rahmen_web_statistik.json"))
+STATISTIK = lies_json(STATISTIK_FILE, {})                                  # "2026-10" -> {"min_online": {Rahmen: n}, "min_offline": {...}, "ausfaelle": {...}}
+if not isinstance(STATISTIK, dict):
+    STATISTIK = {}
+MONATE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
+IMMICH_AUS_MIN = 10
+SPEICHER_WARN = 0.10
+KALENDER_ALT_TAGE = 3
+
+
+def meldung_an(art):
+    m = EINST.get("meldungen")
+    return bool(m.get(art, True)) if isinstance(m, dict) else True
+
+
+def statistik_zaehlen(jetzt):
+    """Eine Minute Verfuegbarkeit je Rahmen festhalten (fuer den Monatsbrief)."""
+    monat = STATISTIK.setdefault(f"{jetzt.year}-{jetzt.month:02d}", {"min_online": {}, "min_offline": {}, "ausfaelle": {}})
+    for z in RAHMEN_ZIELE:
+        if time.time() - WACHE["start"] < 180:                                   # kurz nach dem Start sind die Rahmen noch nicht wieder da
+            continue
+        art = "min_online" if time.time() - TV[z]["hb"] < 120 else "min_offline"
+        monat[art][z] = monat[art].get(z, 0) + 1
+
+
+def statistik_speichern():
+    for k in sorted(STATISTIK)[:-14]:                                           # nur die letzten 14 Monate behalten
+        STATISTIK.pop(k, None)
+    try:
+        schreibe_json(STATISTIK_FILE, STATISTIK)
+    except OSError as e:
+        H.log.warning("Statistik nicht speicherbar: %s", e)
+
+
+def monatsbrief_text(jahr, monat):
+    """Kurzer Rueckblick auf einen Monat: neue Fotos in Immich und die Verfuegbarkeit der Rahmen."""
+    von = datetime.datetime(jahr, monat, 1)
+    bis = datetime.datetime(jahr + (monat == 12), monat % 12 + 1, 1)
+    teile = []
+    try:
+        n = H.api("POST", "/search/statistics", {"createdAfter": von.strftime("%Y-%m-%dT%H:%M:%S.000Z"), "createdBefore": bis.strftime("%Y-%m-%dT%H:%M:%S.000Z")})["total"]
+        teile.append(f"Neue Fotos in Immich: {int(n):,}".replace(",", "."))
+    except Exception as e:  # noqa: BLE001 - ohne Immich gibt es eben keine Zahl
+        H.log.warning("Monatsbrief: Fotozahl nicht lesbar: %s", e)
+    st = STATISTIK.get(f"{jahr}-{monat:02d}") or {}
+    for z, name in RAHMEN_ZIELE.items():
+        on, off = (st.get("min_online") or {}).get(z, 0), (st.get("min_offline") or {}).get(z, 0)
+        if on + off:
+            ausf = (st.get("ausfaelle") or {}).get(z, 0)
+            teile.append(f"{name}: {round(100 * on / (on + off))} % erreichbar" + (f", {ausf} Ausfall" if ausf == 1 else f", {ausf} Ausfälle" if ausf else ", keine Ausfälle"))
+    return (f"Dein Rückblick auf den {MONATE[monat - 1]}", "\n".join(teile) or "Keine Daten für diesen Monat.")
+
+
+def weitere_wache_pruefen(jetzt=None):
+    """Alle 60 Sekunden: meldet (Pushover), wenn Immich laenger weg ist, der Speicher knapp wird oder ein Handy-Kalender veraltet; Monatsbrief am 1. des Monats."""
+    jetzt = jetzt or datetime.datetime.now()
+    meldungen = []
+    # Immich
+    try:
+        immich_aufruf("GET", "/server/version")
+        ok = True
+    except Exception:  # noqa: BLE001
+        ok = False
+    if ok:
+        WACHE.pop("immich_seit", None)
+        if WACHE.pop("immich_gemeldet", False) and meldung_an("immich"):
+            meldungen.append(("Immich wieder erreichbar", "Immich antwortet wieder."))
+    else:
+        seit = WACHE.setdefault("immich_seit", jetzt)
+        if (jetzt - seit).total_seconds() >= IMMICH_AUS_MIN * 60 and not WACHE.get("immich_gemeldet"):
+            WACHE["immich_gemeldet"] = True
+            if meldung_an("immich"):
+                meldungen.append(("Immich nicht erreichbar", f"Immich antwortet seit {IMMICH_AUS_MIN} Minuten nicht. Die Rahmen zeigen nur noch bereits geladene Fotos."))
+    # Speicherplatz
+    try:
+        d = shutil.disk_usage(os.path.dirname(EINST_FILE) or "/")
+        frei = d.free / d.total
+        if frei < SPEICHER_WARN and WACHE.get("speicher_tag") != jetzt.date() and meldung_an("speicher"):
+            WACHE["speicher_tag"] = jetzt.date()
+            meldungen.append(("Speicherplatz knapp", f"Auf dem Server sind nur noch {round(frei * 100)} % frei ({round(d.free / 2**30)} GB)."))
+        elif frei >= SPEICHER_WARN + 0.05:
+            WACHE.pop("speicher_tag", None)
+    except OSError:
+        pass
+    # Handy-Kalender (nur Handys, die an einem Rahmen gezeigt werden)
+    genutzt = {q for e in GERAETE.values() for q in (e.get("termin_quellen") or [])}
+    for k, v in TELEFON.items():
+        try:
+            alter = jetzt - datetime.datetime.fromisoformat(v.get("aktualisiert"))
+        except (TypeError, ValueError):
+            continue
+        if alter.days >= KALENDER_ALT_TAGE and k in genutzt and WACHE.setdefault("kalender_tag", {}).get(k) != jetzt.date() and meldung_an("kalender"):
+            WACHE["kalender_tag"][k] = jetzt.date()
+            meldungen.append(("Handy-Kalender nicht aktualisiert", f"Der Kalender von „{v.get('name') or 'Handy'}“ wurde seit {alter.days} Tagen nicht gesendet. Tipp: die App einmal öffnen."))
+        elif alter.days < 1:
+            (WACHE.get("kalender_tag") or {}).pop(k, None)
+    # Monatsbrief am 1. des Monats ab 9 Uhr (einmal je Monat)
+    vor = (jetzt.replace(day=1) - datetime.timedelta(days=1))
+    schluessel = f"{vor.year}-{vor.month:02d}"
+    if jetzt.day == 1 and jetzt.hour >= 9 and EINST.get("monatsbrief") != schluessel:
+        if meldung_an("monat"):
+            meldungen.append(monatsbrief_text(vor.year, vor.month))
+        with GERAETE_LOCK:
+            EINST["monatsbrief"] = schluessel
+            einst_speichern()
+    for titel, text in meldungen:
+        H.log.warning("Meldung: %s - %s", titel, text)
+        pushover(titel, text)
+    return meldungen
+
+
 def rahmen_wache_schleife():
+    takt = 0
     while True:
         time.sleep(60)
+        takt += 1
         try:
             rahmen_wache_pruefen()
         except Exception as e:  # noqa: BLE001
             H.log.warning("Rahmen-Ueberwachung: %s", e)
+        try:
+            statistik_zaehlen(datetime.datetime.now())
+            weitere_wache_pruefen()
+            if takt % 10 == 0:
+                statistik_speichern()
+        except Exception as e:  # noqa: BLE001
+            H.log.warning("Weitere Ueberwachung: %s", e)
 
 
 @app.on_event("startup")
