@@ -1,6 +1,10 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.19.2]
+### Geändert
+- Beim Element „Foto: Aufnahmedatum“ steht der Schalter **„Uhrzeit der Aufnahme mitanzeigen“** jetzt als eigene, gut sichtbare Zeile direkt unter dem Titel (vorher klein und grau darunter). Die Vorschau zeigt sofort „… · 14:30“.
+
 ## [2.19.1]
 ### Geändert
 - **Dialoge haben eine feste Knopfleiste:** „Speichern“, „Schließen“, „Abbrechen“ usw. bleiben am unteren Rand des Dialogs sichtbar, auch wenn der Inhalt lang ist (am Handy musste man bisher bis ganz nach unten scrollen). Die Höhe berücksichtigt die Adressleiste von Safari.
