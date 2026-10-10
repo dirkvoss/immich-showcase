@@ -5,6 +5,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach
 ### Geändert
 - Texte nach dem neuen Ablauf: Einrichtungsassistent, Installationsskript und „Alles in Ordnung?“ erklären jetzt, dass Fernseher und Tablets von selbst in der App erscheinen (kein Code mehr nötig). Die Zeile zur Version heißt in „Alles in Ordnung?“ jetzt „Frameside“.
 - Anleitungen mit neuen Bildern (Name Frameside, neuer Kopplungs-Ablauf).
+- Freiwillige Spenden über Ko-fi: Link im README und GitHub-Sponsor-Knopf (`.github/FUNDING.yml`). Frameside bleibt kostenlos.
 
 ## [2.23.0]
 ### Neu
