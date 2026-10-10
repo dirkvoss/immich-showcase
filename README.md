@@ -5,7 +5,7 @@
 **Show your [Immich](https://immich.app) photos on the TV and on a picture frame – and let the whole family do it from their phone.**
 Search in plain sentences ("Grandma and Anna, Christmas 2019, on the beach"), tap the photos you like, give the show a name and send it to the living-room TV or the picture frame in the hallway. Optional background music, videos, and a continuous slideshow when nobody has asked for anything.
 
-🇩🇪 [Deutsche Anleitung](README.de.md)
+🇩🇪 [Deutsche Anleitung](README.de.md) · ☕ [Say thanks on Ko-fi](https://ko-fi.com/frameside) (Frameside is free; donations are voluntary)
 
 > Frameside is an independent community project. It is not affiliated with, endorsed by, or part of the Immich project. "Immich" is the name of the software it works with.
 

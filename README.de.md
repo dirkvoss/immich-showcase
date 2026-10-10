@@ -5,7 +5,7 @@
 **Zeige deine [Immich](https://immich.app)-Fotos auf dem Fernseher und im Bilderrahmen – und lass die ganze Familie das vom Handy aus tun.**
 Suche in ganzen Sätzen („Oma und Anna Weihnachten 2019 am Strand“), tippe die Fotos an, gib der Show einen Namen und schick sie an den Fernseher im Wohnzimmer oder den Bilderrahmen im Flur. Mit Hintergrundmusik, Videos und einem Dauerprogramm, wenn gerade niemand etwas ausgewählt hat.
 
-🇬🇧 [English instructions](README.md)
+🇬🇧 [English instructions](README.md) · ☕ [Danke sagen auf Ko-fi](https://ko-fi.com/frameside) (Frameside ist kostenlos, Spenden sind freiwillig)
 
 > Frameside ist ein unabhängiges Community-Projekt und steht in keiner Verbindung zum Immich-Projekt oder dessen Betreibern. „Immich“ ist der Name der Software, mit der es zusammenarbeitet.
 
