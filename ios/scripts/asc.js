@@ -2,6 +2,7 @@
 // Kleiner Zugang zu App Store Connect ohne Fremdpakete (nur Node).  Zugangsdaten: scripts/release.env (KEY_ID, ISSUER_ID, TEAM_ID).
 //   node scripts/asc.js profil     legt das App-Store-Verteilungsprofil an und installiert es lokal
 //   node scripts/asc.js app        zeigt den App-Eintrag (Name, Bundle-ID, Builds)
+//   node scripts/asc.js store      traegt die Store-Texte aus store/store.json in die Version 1.0 (Entwurf) ein; reicht nichts ein
 'use strict';
 const fs = require('fs'), path = require('path'), crypto = require('crypto'), https = require('https'), os = require('os');
 const BUNDLE_ID = 'com.dirk-voss.showcase', PROFIL_NAME = 'Showcase Immich App Store';
@@ -66,4 +67,41 @@ async function app() {
   console.log('Builds:', b.map(x => `${x.attributes.version} (${x.attributes.processingState})`).join(', ') || 'noch keine');
 }
 
-({ profil, app }[process.argv[2]] || (() => { console.log('Befehle: profil | app'); return Promise.resolve(); }))().catch(e => { console.error('FEHLER:', e.message); process.exit(1); });
+async function store() {
+  const a = (await ruf('GET', `/v1/apps?filter[bundleId]=${BUNDLE_ID}`)).data[0];
+  if (!a) throw new Error('Kein App-Eintrag');
+  const texte = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'store', 'store.json'), 'utf8'));
+  const versionen = (await ruf('GET', `/v1/apps/${a.id}/appStoreVersions?filter[appStoreState]=PREPARE_FOR_SUBMISSION,DEVELOPER_REJECTED,REJECTED&limit=5`)).data;
+  if (!versionen.length) throw new Error('Keine bearbeitbare Version (Vorbereitung) gefunden');
+  const v = versionen[0];
+  console.log(`Version ${v.attributes.versionString} (${v.attributes.appStoreState})`);
+  const loks = (await ruf('GET', `/v1/appStoreVersions/${v.id}/appStoreVersionLocalizations?limit=50`)).data;
+  for (const [sprache, felder] of Object.entries(texte)) {
+    const vorhanden = loks.find(l => l.attributes.locale === sprache);
+    if (vorhanden) {
+      await ruf('PATCH', `/v1/appStoreVersionLocalizations/${vorhanden.id}`, { data: { type: 'appStoreVersionLocalizations', id: vorhanden.id, attributes: felder } });
+      console.log(`${sprache}: aktualisiert`);
+    } else {
+      await ruf('POST', '/v1/appStoreVersionLocalizations', { data: { type: 'appStoreVersionLocalizations', attributes: { locale: sprache, ...felder },
+        relationships: { appStoreVersion: { data: { type: 'appStoreVersions', id: v.id } } } } });
+      console.log(`${sprache}: angelegt`);
+    }
+  }
+}
+
+async function infos() {
+  const a = (await ruf('GET', `/v1/apps?filter[bundleId]=${BUNDLE_ID}`)).data[0];
+  const ai = (await ruf('GET', `/v1/apps/${a.id}/appInfos`)).data[0];
+  const loks = (await ruf('GET', `/v1/appInfos/${ai.id}/appInfoLocalizations?limit=20`)).data;
+  for (const l of loks) console.log(l.attributes.locale, '|', l.attributes.name, '|', l.attributes.subtitle, '|', l.attributes.privacyPolicyUrl || '-');
+  return { a, ai, loks };
+}
+
+async function untertitel() {
+  const { loks } = await infos();
+  const en = loks.find(l => l.attributes.locale === 'en-US');
+  await ruf('PATCH', `/v1/appInfoLocalizations/${en.id}`, { data: { type: 'appInfoLocalizations', id: en.id, attributes: { subtitle: 'Photo frame for Immich' } } });
+  console.log('en-US Untertitel gesetzt');
+}
+
+({ profil, app, store, infos, untertitel }[process.argv[2]] || (() => { console.log('Befehle: profil | app | store | infos | untertitel'); return Promise.resolve(); }))().catch(e => { console.error('FEHLER:', e.message); process.exit(1); });
