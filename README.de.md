@@ -65,14 +65,14 @@ Der **Einrichtungsassistent** hat drei kurze Schritte:
 2. **Anmelden** mit deinem Immich-Konto (E-Mail + Passwort). Frameside legt einen eigenen API-Schlüssel an, **ohne Löschrechte**; dein Passwort wird nicht gespeichert.
 3. **Wer darf zugreifen?** **Gemeinsame PIN** (empfohlen; im Heimnetz auf Wunsch ohne Eingabe) oder **Immich-Konten** (jede Person sieht nur ihre eigenen Fotos).
 
-Am Ende zeigt die Seite einen **QR-Code für die iPhone-App** und die Adresse für Fernseher und Tablets. Danach in der App unter „Geräte“ den Code eingeben, der am Fernseher oder Tablet erscheint. Eine „Erste Schritte“-Liste in der Oberfläche begleitet dich, bis alles läuft.
+Am Ende zeigt die Seite einen **QR-Code für die iPhone-App** und die Adresse für Fernseher und Tablets. Danach am Fernseher oder Tablet im Browser diese Adresse öffnen: Das Gerät erscheint in der App unter „Geräte → ＋ Gerät hinzufügen“ von selbst, du gibst nur einen Namen ein (der Code bleibt als Ausweg). Eine „Erste Schritte“-Liste in der Oberfläche begleitet dich, bis alles läuft.
 
 Weitere Wege:
 - **Noch kein Immich?** `./install.sh --with-immich` startet Immich **und** Frameside zusammen.
 - **Anderer Port:** `./install.sh --port 80` (dann genügt am Fernseher die reine IP-Adresse).
 - **Per Hand** (ohne Skript): `cp .env.example .env`, `docker compose up -d`, `docker compose logs showcase` zeigt den Einrichtungs-Code, dann `http://<server>:8090/setup/` öffnen. Lieber ohne Assistent? `RAHMEN_IMMICH_URL` und `RAHMEN_IMMICH_KEY` in die `.env` eintragen; Werte aus der `.env` haben immer Vorrang.
 - **NAS und Heimserver mit Oberfläche:** Fertige Anleitungen für **Synology** (Container Manager), **Unraid** (Vorlage), **TrueNAS** und **Portainer** liegen in `examples/`.
-- Auf dem iPhone ohne App: Teilen → „Zum Home-Bildschirm“. Mit App: „Frameside“ im App Store bzw. über TestFlight; sie **findet den Server im WLAN selbst**.
+- Auf dem iPhone ohne App: Teilen → „Zum Home-Bildschirm“. Mit App (die iPhone-App kommt bald in den App Store, bis dahin über TestFlight): sie **findet den Server im WLAN selbst**.
 
 ## Was kann als Bilderrahmen dienen?
 Jedes Gerät mit einem **Webbrowser**, das eine Adresse öffnen kann. **Ein Kiosk-Modus oder Zusatz-Apps wie Fully Kiosk sind nicht nötig** – der Browser genügt. Die Seite bittet den Browser, den Bildschirm wach zu halten; wo das nicht klappt, stellst du die Auto-Sperre des Geräts auf „Nie“. Ein Kiosk-Modus (Vollbild, nichts anderes erreichbar) ist nur ein Komfort, den du bei Bedarf dazunehmen kannst.
@@ -127,7 +127,7 @@ Der Weg über die `.env`:
 
 ## Geräte per Code koppeln (keine Adressen tippen)
 1. Am Fernseher oder Tablet **`http://<server>:8090/tv/`** öffnen (ohne `?ziel=`). Es erscheint ein 6-stelliger **Code** und ein **QR-Code**.
-2. In der App **📡 Geräte** antippen, den Code eingeben (oder den QR-Code mit der Handykamera scannen – dann ist er schon eingetragen), wählen, welcher Fernseher/Rahmen es ist, **Koppeln** tippen.
+2. In der App **📡 Geräte → ＋ Gerät hinzufügen** antippen. Das Gerät erscheint dort von selbst („LG-Fernseher gefunden“): Namen eingeben, **Verbinden** tippen. Klappt das nicht, den Code vom Bildschirm unter *Gerät koppeln* eingeben (oder den QR-Code mit der Handykamera scannen).
 3. Das Gerät merkt sich seine Rolle. Danach genügt `/tv/` allein. (Welche Fernseher und Rahmen es gibt, steht weiterhin in der `.env`, siehe unten.)
 
 ## Die Geräte-Ansicht

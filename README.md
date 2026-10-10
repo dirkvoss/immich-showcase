@@ -65,14 +65,14 @@ The **setup wizard** has three short steps:
 2. **Sign in** with your Immich account (email + password). Frameside creates its own API key **without delete rights**; your password is not stored.
 3. **Who may use it?** **Shared PIN** (recommended; at home optionally without typing it) or **Immich accounts** (everyone only sees their own photos).
 
-At the end the page shows a **QR code for the iPhone app** and the address for TVs and tablets. Then enter the code shown on the TV or tablet in the app under "Devices". A "First steps" list in the interface guides you until everything works.
+At the end the page shows a **QR code for the iPhone app** and the address for TVs and tablets. Then open that address in the browser of the TV or tablet: the device shows up in the app by itself under "Devices → ＋ Add device" – you only give it a name (typing the code is the fallback). A "First steps" list in the interface guides you until everything works.
 
 More ways:
 - **No Immich yet?** `./install.sh --with-immich` starts Immich **and** Frameside together.
 - **Different port:** `./install.sh --port 80` (then the TV only needs the plain IP address).
 - **By hand** (no script): `cp .env.example .env`, `docker compose up -d`, `docker compose logs showcase` shows the setup code, then open `http://<server>:8090/setup/`. Prefer no wizard? Put `RAHMEN_IMMICH_URL` and `RAHMEN_IMMICH_KEY` into `.env`; values from `.env` always win.
 - **NAS and home servers with a UI:** ready-made guides for **Synology** (Container Manager), **Unraid** (template), **TrueNAS** and **Portainer** are in `examples/`.
-- On the iPhone without the app: Share → "Add to Home Screen". With the app: "Frameside" from the App Store or TestFlight; it **finds the server on your Wi-Fi by itself**.
+- On the iPhone without the app: Share → "Add to Home Screen". With the app (iPhone app coming to the App Store soon, available via TestFlight until then): it **finds the server on your Wi-Fi by itself**.
 
 ## What can be used as a picture frame?
 Any device with a **web browser** that can open an address. **A kiosk mode or add-on apps such as Fully Kiosk are not required** – the browser is enough. The page asks the browser to keep the screen awake; where that does not work, set the device's auto-lock to "Never". A kiosk mode (full screen, nothing else reachable) is only a convenience you can add if you like.
