@@ -1,6 +1,12 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.21.0]
+### Neu
+- **Gäste-Upload per QR-Code („Fest“):** Unter Geräte → ⚙ → „Fest: Fotos von Gästen“ startest du für 4 Stunden bis 3 Tage einen Gäste-Upload. Am Rahmen erscheint ein QR-Code (neues Layout-Element „Gäste-QR-Code“), Gäste scannen ihn und laden auf einer einfachen Seite (ohne Anmeldung, deutsch/englisch) Fotos hoch; sie kommen gleich als Nächstes auf den Rahmen. Die Fotos liegen in Immich im Upload-Album (Namen mit „Gast-“). Schutz: zufällige Kennung, Zeitfenster, höchstens 300 Fotos je Fest, 40 Fotos je 10 Minuten und IP, nur Fotos (keine Videos). Schnittstellen: `POST/GET/DELETE /api/gaeste/{rahmen}`, öffentlich `GET /gast/{kennung}` und `PUT /api/gast/{kennung}/hochladen`.
+- **Grüße mit Foto:** Unter Geräte → ⚙ → „Gruß mit Foto an diesen Rahmen“ schickst du ein Foto mit einem Satz („💌 Anna: Hallo Oma!“). Das Foto kommt als Nächstes und danach alle paar Fotos wieder, solange der Gruß gilt (2 Stunden). **Ein Tipp auf den Rahmen sendet ein ❤️** an dich (Pushover). Neues Layout-Element „Gruß mit Foto“.
+- **Favoriten öfter zeigen** (aus, selten, öfter, oft): Fotos mit Stern in Immich werden im Dauerprogramm bevorzugt.
+
 ## [2.20.0]
 ### Neu
 - **Sanfter Zoom** bei jedem Foto (Ken-Burns-Effekt), je Rahmen ein-/ausschaltbar.

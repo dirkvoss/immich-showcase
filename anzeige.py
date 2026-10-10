@@ -6,7 +6,7 @@ Die Werte setzen sich schichtweise zusammen: Standard <- alte Einstellung "anzei
 """
 import re
 
-ELEMENTE = ("uhr", "heute", "fotodatum", "fotoort", "wetter", "termine", "geburtstag", "titel", "notiz", "erinnerung")
+ELEMENTE = ("uhr", "heute", "fotodatum", "fotoort", "wetter", "termine", "geburtstag", "titel", "notiz", "erinnerung", "gruss", "gaeste")
 STANDARD = {
     "uhr": {"an": True, "x": 0, "y": 100, "gr": 100, "farbe": "", "schrift": ""},
     "heute": {"an": False, "x": 0, "y": 90, "gr": 100, "farbe": "", "schrift": ""},
@@ -18,6 +18,8 @@ STANDARD = {
     "titel": {"an": True, "x": 0, "y": 88, "gr": 100, "farbe": "", "schrift": ""},      # Name der Show, kurz beim Start einer Show
     "notiz": {"an": True, "x": 50, "y": 94, "gr": 100, "farbe": "", "schrift": ""},     # kurze Nachricht an den Rahmen ("Heute Abend Pizza")
     "erinnerung": {"an": True, "x": 0, "y": 0, "gr": 100, "farbe": "", "schrift": ""},  # "Vor 5 Jahren" bei Fotos von heute in frueheren Jahren
+    "gruss": {"an": True, "x": 50, "y": 100, "gr": 100, "farbe": "", "schrift": ""},    # Gruss mit Foto: "Von Anna: Hallo Oma!"
+    "gaeste": {"an": True, "x": 100, "y": 50, "gr": 100, "farbe": "", "schrift": ""},   # QR-Code "Fotos zum Rahmen schicken" waehrend eines Festes
 }
 GR_MIN, GR_MAX = 40, 300
 SCHRIFTEN = ("", "serif", "sans", "mono")                 # "" = Standard des Elements

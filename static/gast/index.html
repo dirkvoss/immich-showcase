@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Fotos für den Rahmen</title>
+<style>
+:root { color-scheme: light dark; --bg: #f6f1e9; --card: #fff; --text: #1d2430; --muted: #6b7380; --accent: #c98a2e; --ok: #2f7d4f; --err: #b3452d; }
+@media (prefers-color-scheme: dark) { :root { --bg: #11151c; --card: #1b212b; --text: #eef1f5; --muted: #9aa4b2; --accent: #e0b35a; } }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); font: 17px/1.5 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; display: flex; align-items: center; justify-content: center; padding: 20px; }
+main { width: 100%; max-width: 440px; background: var(--card); border-radius: 22px; padding: 28px 22px 24px; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,.14); }
+h1 { margin: 0 0 6px; font-size: 26px; line-height: 1.2; }
+p { margin: 8px 0; color: var(--muted); }
+.knopf { display: block; width: 100%; margin-top: 20px; padding: 16px; border: 0; border-radius: 16px; background: var(--accent); color: #1d1405; font-family: inherit; font-weight: 700; font-size: 19px; line-height: 1.2; cursor: pointer; }
+.knopf:disabled { opacity: .55; }
+#liste { margin-top: 16px; text-align: left; font-size: 15px; color: var(--muted); max-height: 40vh; overflow: auto; }
+#liste div { padding: 4px 0; }
+.ok { color: var(--ok); } .fehl { color: var(--err); }
+#zaehler { margin-top: 14px; font-weight: 600; color: var(--text); }
+.klein { font-size: 13px; margin-top: 18px; }
+</style>
+</head>
+<body>
+<main>
+  <div style="font-size:46px" aria-hidden="true">📸</div>
+  <h1 id="titel">Fotos für den Rahmen</h1>
+  <p id="text">Wähle Fotos aus – sie erscheinen gleich auf dem Bilderrahmen.</p>
+  <button class="knopf" id="wahl" type="button" disabled>Fotos auswählen</button>
+  <input type="file" id="datei" accept="image/jpeg,image/png,image/webp,image/heic" multiple hidden>
+  <div id="zaehler"></div>
+  <div id="liste" aria-live="polite"></div>
+  <p class="klein" id="hinweis">Die Fotos werden im Fotoarchiv der Gastgeber gespeichert.</p>
+</main>
+<script>
+(function () {
+  var T = { de: { titel: "Fotos für den Rahmen", rahmen: "Fotos für „%s“", text: "Wähle Fotos aus – sie erscheinen gleich auf dem Bilderrahmen.", wahl: "Fotos auswählen", mehr: "Weitere Fotos senden", ende: "Dieses Fest ist beendet. Danke für deine Fotos!", fehler: "Das hat nicht geklappt", gross: "ist zu groß (höchstens %s MB)", zaehler: "%s von %s gesendet", fertig: "Danke! %s Foto(s) sind unterwegs zum Rahmen. 🎉", hinweis: "Die Fotos werden im Fotoarchiv der Gastgeber gespeichert.", kein: "Kein Netz? Bitte später noch einmal versuchen." },
+            en: { titel: "Photos for the frame", rahmen: "Photos for “%s”", text: "Pick photos – they will appear on the picture frame in a moment.", wahl: "Choose photos", mehr: "Send more photos", ende: "This party is over. Thanks for your photos!", fehler: "That did not work", gross: "is too large (max. %s MB)", zaehler: "%s of %s sent", fertig: "Thank you! %s photo(s) are on their way to the frame. 🎉", hinweis: "The photos are saved in the hosts' photo library.", kein: "No connection? Please try again later." } };
+  var L = T[(navigator.language || "de").slice(0, 2)] || T.de;
+  function f(s) { var a = arguments, i = 1; return s.replace(/%s/g, function () { return a[i++]; }); }
+  var kennung = location.pathname.replace(/^\/gast\//, "").replace(/\/.*/, ""), maxMb = 40;
+  var el = function (id) { return document.getElementById(id); };
+  el("titel").textContent = L.titel; el("text").textContent = L.text; el("wahl").textContent = L.wahl; el("hinweis").textContent = L.hinweis;
+  function http(methode, pfad, daten, kopf, cb) {
+    var x = new XMLHttpRequest(); x.open(methode, pfad, true); x.setRequestHeader("X-Rahmen", "1");
+    for (var k in (kopf || {})) x.setRequestHeader(k, kopf[k]);
+    x.onload = function () { var d = null; try { d = JSON.parse(x.responseText); } catch (e) {} cb(x.status, d); };
+    x.onerror = function () { cb(0, null); };
+    x.send(daten || null);
+  }
+  http("GET", "/api/gast/" + encodeURIComponent(kennung), null, null, function (st, d) {
+    if (st === 200 && d && d.aktiv) { maxMb = d.max_mb || 40; el("titel").textContent = f(L.rahmen, d.rahmen); el("wahl").disabled = false; }
+    else { el("text").textContent = L.ende; el("wahl").style.display = "none"; }
+  });
+  el("wahl").addEventListener("click", function () { el("datei").click(); });
+  el("datei").addEventListener("change", function () {
+    var dateien = Array.prototype.slice.call(el("datei").files), i = 0, ok = 0;
+    el("datei").value = ""; if (!dateien.length) return;
+    el("wahl").disabled = true; el("liste").innerHTML = "";
+    function zeile(text, klasse) { var d = document.createElement("div"); d.textContent = text; if (klasse) d.className = klasse; el("liste").appendChild(d); }
+    (function weiter() {
+      el("zaehler").textContent = f(L.zaehler, ok, dateien.length);
+      if (i >= dateien.length) {
+        el("wahl").disabled = false; el("wahl").textContent = L.mehr;
+        if (ok) { el("zaehler").textContent = f(L.fertig, ok); }
+        return;
+      }
+      var datei = dateien[i++];
+      if (datei.size > maxMb * 1024 * 1024) { zeile(datei.name + " " + f(L.gross, maxMb), "fehl"); weiter(); return; }
+      http("PUT", "/api/gast/" + encodeURIComponent(kennung) + "/hochladen", datei, { "Content-Type": "application/octet-stream", "X-Dateiname": encodeURIComponent(datei.name || "Foto"), "X-Datum": String(datei.lastModified || 0) }, function (st, d) {
+        if (st === 200) { ok++; zeile("✓ " + datei.name, "ok"); }
+        else { zeile((d && d.nachricht) || (st === 0 ? L.kein : L.fehler + " (" + st + ")"), "fehl"); if (st === 410 || st === 429) { i = dateien.length; } }
+        weiter();
+      });
+    })();
+  });
+})();
+</script>
+</body>
+</html>

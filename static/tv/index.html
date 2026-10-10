@@ -50,6 +50,11 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
 #el-titel.an { opacity: 1; }
 #el-notiz { max-width: 80%; padding: 10px 24px; border-radius: 16px; background: rgba(0,0,0,.55); line-height: 1.25; }
 #el-notiz.an { opacity: 1; }
+#el-gruss { max-width: 80%; padding: 12px 28px; border-radius: 18px; background: rgba(0,0,0,.62); line-height: 1.25; text-align: center; }
+#el-gruss.an { opacity: 1; }
+#el-gaeste { width: 8em; max-width: none; padding: .5em; border-radius: .6em; background: rgba(255,255,255,.96); color: #111; text-shadow: none; text-align: center !important; font-size: 24px; line-height: 1.2; }
+#el-gaeste.an { opacity: 1; }
+#el-gaeste svg { display: block; width: 7em; height: 7em; margin: 0 auto .3em; }
 .pbadge { display: inline-block; min-width: 1.3em; margin-right: .35em; padding: 0 .2em; border-radius: .25em; text-align: center; font-size: .72em; font-weight: 700; text-shadow: none; vertical-align: .08em; }
 #el-uhr { font-family: "Cormorant Garamond", Georgia, serif; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
 #el-uhr.an { opacity: .85; }
@@ -156,16 +161,16 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
 
   // ---- Einblendungen (Uhrzeit, Datum, Foto-Datum, Foto-Ort, Wetter, Termine): Lage, Groesse und Sichtbarkeit kommen vom Server (Layout)
   var ebene = document.getElementById("ebene"), lay = null, EL = {}, zusatzDaten = null, zusatzTimer = 0, zusatzGestartet = false;
-  var NAMEN_EL = ["uhr", "heute", "fotodatum", "fotoort", "wetter", "termine", "geburtstag", "titel", "notiz", "erinnerung"];
-  var BASIS = { uhr: 44, heute: 28, wetter: 52, termine: 26, fotodatum: 30, fotoort: 30, geburtstag: 32, titel: 30, notiz: 40, erinnerung: 30 };            // Schriftgroesse in px bei 100 %
-  var NUR_RUHEBILD = { uhr: 1, heute: 1, wetter: 1, termine: 1, geburtstag: 1, notiz: 1 };                                      // laufende Einblendungen (Foto-Datum/-Ort und Show-Titel steuern die Fotos selbst)
+  var NAMEN_EL = ["uhr", "heute", "fotodatum", "fotoort", "wetter", "termine", "geburtstag", "titel", "notiz", "erinnerung", "gruss", "gaeste"];
+  var BASIS = { uhr: 44, heute: 28, wetter: 52, termine: 26, fotodatum: 30, fotoort: 30, geburtstag: 32, titel: 30, notiz: 40, erinnerung: 30, gruss: 36, gaeste: 24 };            // Schriftgroesse in px bei 100 %
+  var NUR_RUHEBILD = { uhr: 1, heute: 1, wetter: 1, termine: 1, geburtstag: 1, notiz: 1, gaeste: 1 };                                      // laufende Einblendungen (Foto-Datum/-Ort und Show-Titel steuern die Fotos selbst)
   var SCHRIFTEN = { serif: '"Cormorant Garamond", Georgia, serif', sans: "Arial, Helvetica, sans-serif", mono: 'Menlo, Consolas, "Courier New", monospace' };
   function titelAus() { if (EL.titel) EL.titel.className = "el titel"; }
   function layoutSetzen(l) {
     lay = l || null;
     for (var i = 0; i < NAMEN_EL.length; i++) {
       var n = NAMEN_EL[i], e = EL[n], w = lay && lay[n];
-      if (!e) { e = document.createElement("div"); e.id = "el-" + n; if (n === "termine" || n === "geburtstag" || n === "titel" || n === "notiz") e.setAttribute("translate", "no"); e.className = n === "titel" ? "el titel" : "el"; ebene.appendChild(e); EL[n] = e; }
+      if (!e) { e = document.createElement("div"); e.id = "el-" + n; if (n === "termine" || n === "geburtstag" || n === "titel" || n === "notiz" || n === "gruss" || n === "gaeste") e.setAttribute("translate", "no"); e.className = n === "titel" ? "el titel" : "el"; ebene.appendChild(e); EL[n] = e; }
       if (!w) continue;
       var t = "translate(-" + w.x + "%,-" + w.y + "%)";
       e.style.left = w.x + "%"; e.style.top = w.y + "%"; e.style.webkitTransform = t; e.style.transform = t;
@@ -180,13 +185,58 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
     if (n === "termine") return !!(zusatzDaten && zusatzDaten.termine && zusatzDaten.termine.length);
     if (n === "geburtstag") return !!(zusatzDaten && zusatzDaten.geburtstage && zusatzDaten.geburtstage.length);
     if (n === "notiz") return !!(zusatzDaten && zusatzDaten.notiz);
+    if (n === "gaeste") return !!(zusatzDaten && zusatzDaten.gaeste);
     return true;
   }
   function ambientAnzeige() {                                    // Einblendungen am Rahmen (Uhrzeit, Datum, Wetter, Termine, Geburtstage): immer, wenn eingeschaltet - auch waehrend einer Show
     var an = rahmenModus;
     for (var n in NUR_RUHEBILD) { var e = EL[n]; if (e) e.className = "el" + (an && lay && lay[n] && lay[n].an && hatInhalt(n) ? " an" : ""); }
   }
-  function fotoTexteLeeren() { if (EL.fotodatum) EL.fotodatum.className = "el"; if (EL.fotoort) EL.fotoort.className = "el"; if (EL.erinnerung) EL.erinnerung.className = "el"; }
+  function fotoTexteLeeren() { if (EL.fotodatum) EL.fotodatum.className = "el"; if (EL.fotoort) EL.fotoort.className = "el"; if (EL.erinnerung) EL.erinnerung.className = "el"; if (EL.gruss) EL.gruss.className = "el"; }
+  // ---- Gruss mit Foto: das Foto kommt als naechstes (und spaeter noch ein paar Mal), dazu der Text; ein Tipp auf den Rahmen sendet ein Herz zurueck
+  var grussKey = "", grussZaehler = 0;
+  function grussPruefen() {
+    var g = zusatzDaten && zusatzDaten.gruss, key = g ? g.id + "|" + g.text : "";
+    if (key !== grussKey) {
+      grussKey = key; grussZaehler = 0;
+      if (g && g.id && liste.length && rahmenModus) liste.splice(idx + 1, 0, g.id);
+    }
+  }
+  function grussNachziehen() {                                    // nach einigen Fotos erneut zeigen, solange der Gruss gilt
+    var g = zusatzDaten && zusatzDaten.gruss;
+    if (!g || !g.id || !liste.length || !rahmenModus) return;
+    if (++grussZaehler % 8 === 0 && liste[(idx + 1) % liste.length] !== g.id) liste.splice(idx + 1, 0, g.id);
+  }
+  function grussAnzeigen(id) {
+    var g = zusatzDaten && zusatzDaten.gruss, e = EL.gruss;
+    if (!e) return;
+    if (!rahmenModus || !g || (g.id && g.id !== id) || !(g.text || g.absender)) { e.className = "el"; return; }
+    e.textContent = "\uD83D\uDC8C " + (g.absender ? g.absender + (g.text ? ": " : "") : "") + g.text + (g.herz ? " \u2764\uFE0F" : "");
+    e.className = "el an";
+  }
+  document.addEventListener("click", function () {                // Tipp auf den Gruss = Herz
+    var g = zusatzDaten && zusatzDaten.gruss;
+    if (!g || g.herz || !EL.gruss || EL.gruss.className.indexOf("an") < 0) return;
+    g.herz = true; EL.gruss.textContent += " \u2764\uFE0F";
+    api("/api/gruss/" + encodeURIComponent(ziel) + "/herz", function () {}, "POST", {});
+  });
+  // ---- Fest: QR-Code "Fotos zum Rahmen schicken"; neue Gaeste-Fotos kommen als Naechstes auf den Rahmen
+  var gaesteUrl = "", gaesteBekannt = {}, gaesteErst = true;
+  function gaesteZeichnen() {
+    var g = zusatzDaten && zusatzDaten.gaeste, e = EL.gaeste, i;
+    if (!e) return;
+    if (!g) { gaesteUrl = ""; e.innerHTML = ""; gaesteErst = true; return; }
+    var url = (g.basis || location.origin) + g.pfad;
+    if (url !== gaesteUrl) {
+      gaesteUrl = url;
+      try { var qr = qrcode(0, "M"); qr.addData(url); qr.make(); e.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true }) + "<div></div>"; e.lastChild.textContent = window.RW_T("Fotos zum Rahmen schicken"); }
+      catch (x) { e.textContent = url; }
+    }
+    for (i = 0; i < (g.ids || []).length; i++) {                  // neue Fotos der Gaeste als naechstes zeigen (beim Laden der Seite nur merken)
+      if (!gaesteBekannt[g.ids[i]]) { gaesteBekannt[g.ids[i]] = 1; if (!gaesteErst && liste.length && rahmenModus) liste.splice(idx + 1, 0, g.ids[i]); }
+    }
+    gaesteErst = false;
+  }
   function zusatzZeichnen() {
     if (!EL.wetter) return;
     var d = zusatzDaten || {}, t = d.termine || [], box = EL.termine, i;
@@ -203,7 +253,7 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
       } b.textContent = (t[i].tag === "heute" ? "" : window.RW_T("morgen") + " ") + t[i].zeit;
       r.appendChild(b); r.appendChild(document.createTextNode((t[i].zeit || t[i].tag !== "heute" ? " " : "") + t[i].titel)); box.appendChild(r);
     }
-    ambientAnzeige(ambient);
+    grussPruefen(); gaesteZeichnen(); ambientAnzeige(ambient);
   }
   var lv = "";
   function konfigNeu() {                                         // Anordnung/Termine wurden am Server geaendert: ohne Neuladen uebernehmen
@@ -425,7 +475,7 @@ body.bewegung .bild.an.kb2 { -webkit-animation: kb2 14s ease-out forwards; anima
         var bn = (neu === bildA) ? bgA : bgB, ba = (neu === bildA) ? bgB : bgA;
         bn.style.backgroundImage = "url(" + neu.src + ")"; bn.className = "bg an"; ba.className = "bg";
       }
-      bildUnterschrift(liste[idx]);
+      bildUnterschrift(liste[idx]); grussAnzeigen(liste[idx]); grussNachziehen();
       if (musikPausiert) { musikPausiert = false; if (audio) { try { audio.play(); } catch (e3) {} } }
       vorn = neu; mitte.className = "versteckt";
       var n = new Image(); n.src = quelle((idx + weiter) % liste.length);          // naechstes vorladen

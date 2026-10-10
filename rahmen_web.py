@@ -1838,7 +1838,7 @@ def anzeige_version(z):
     """Kurze Kennung der Anzeige-Einstellungen eines Rahmens (Anordnung, Quellen, Handy-Termine): der Rahmen laedt neu, sobald sie sich aendert."""
     staende = sorted((k, hashlib.md5(json.dumps(v.get("termine"), sort_keys=True).encode()).hexdigest()[:8], v.get("kuerzel") or "", v.get("farbe") or "") for k, v in telefone_fuer(z).items())
     e = GERAETE.get(z) or {}
-    roh = json.dumps([layout_fuer(z), zusatz_liste(z), staende, kalender_url(z), wetter_ort(z), bool(e.get("bewegung")), bool(e.get("paare")), notiz_fuer(z), rahmen_nacht(z)], sort_keys=True)
+    roh = json.dumps([layout_fuer(z), zusatz_liste(z), staende, kalender_url(z), wetter_ort(z), bool(e.get("bewegung")), bool(e.get("paare")), notiz_fuer(z), rahmen_nacht(z), gruss_fuer(z), gaeste_zusatz(z)], sort_keys=True)
     return hashlib.md5(roh.encode()).hexdigest()[:8]
 
 
@@ -2137,6 +2137,9 @@ def rahmen_quellen(ziel=None, jetzt=None):
     stufe = ERINNERUNG_STUFEN.get(e.get("erinnerungen"))                      # "An diesem Tag": Fotos von heute in frueheren Jahren einmischen
     if stufe and not any(q["typ"] == "heute" for q in quellen):
         quellen.append({"typ": "heute", "tage": 2, "gewicht": stufe})
+    fav = ERINNERUNG_STUFEN.get(e.get("favoriten"))                           # Favoriten (Stern in Immich) oefter zeigen
+    if fav:
+        quellen.append({"typ": "favoriten", "gewicht": fav})
     if ziel and e.get("geburtstagsfotos", True):                               # am Geburtstag einer bekannten Person: ihre Fotos mehr zeigen
         for name in geburtstag_personen(ziel):
             quellen.append({"typ": "person", "namen": [name], "gewicht": 0.6})
@@ -2341,6 +2344,8 @@ def rahmen_auswahl(n, ziel=None):
             if not pids:
                 continue
             body["personIds"] = pids
+        elif q["typ"] == "favoriten":
+            body["isFavorite"] = True
         elif q["typ"] == "neu":
             body["createdAfter"] = (datetime.datetime.utcnow() - datetime.timedelta(days=q["tage"])).strftime("%Y-%m-%dT%H:%M:%S.000Z")
         try:
@@ -2455,6 +2460,21 @@ NOTIZEN = lies_json(NOTIZEN_FILE, {})                                    # Rahme
 if not isinstance(NOTIZEN, dict):
     NOTIZEN = {}
 NOTIZ_MAX = 200
+GRUESSE_FILE = os.environ.get("RAHMEN_WEB_GRUESSE_FILE", os.path.join(os.path.dirname(EINST_FILE), "rahmen_web_gruesse.json"))
+GRUESSE = lies_json(GRUESSE_FILE, {})                                   # Rahmen -> {"text", "absender", "id" (Foto), "bis", "herz"}: Gruss mit Foto an einen Rahmen
+if not isinstance(GRUESSE, dict):
+    GRUESSE = {}
+
+
+def gruss_fuer(z, jetzt=None):
+    """Der aktuelle Gruss eines Rahmens ({text, absender, id, herz}) oder None."""
+    g = GRUESSE.get(z) if z else None
+    try:
+        if g and datetime.datetime.fromisoformat(g["bis"]) > (jetzt or datetime.datetime.now()):
+            return {"text": g.get("text") or "", "absender": g.get("absender") or "", "id": g.get("id") or "", "herz": bool(g.get("herz"))}
+    except (KeyError, TypeError, ValueError):
+        pass
+    return None
 
 
 def notiz_fuer(z, jetzt=None):
@@ -2602,6 +2622,10 @@ def rahmen_zusatz(ziel: str = "", g=Depends(geraet)):
     out = {}
     if notiz_fuer(z):
         out["notiz"] = notiz_fuer(z)
+    if gruss_fuer(z):
+        out["gruss"] = gruss_fuer(z)
+    if gaeste_zusatz(z):
+        out["gaeste"] = gaeste_zusatz(z)
     zusatz = zusatz_liste(z)
     if "wetter" in zusatz:
         w = zusatz_gecacht("wetter:%s,%s" % wetter_ort(z), 900, lambda: wetter_holen(z))
@@ -2644,6 +2668,175 @@ def notiz_setzen(z: str, daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
 def notiz_lesen(z: str, _=Depends(anmeldung)):
     n = NOTIZEN.get(z) or {}
     return {"text": notiz_fuer(z), "bis": n.get("bis") if notiz_fuer(z) else None}
+
+
+# --------------------------------------------------------------------------- Gaeste-Upload per QR-Code (Fest): Gaeste schicken Fotos, der Rahmen zeigt sie gleich
+GAESTE_FILE = os.environ.get("RAHMEN_WEB_GAESTE_FILE", os.path.join(os.path.dirname(EINST_FILE), "rahmen_web_gaeste.json"))
+GAESTE = lies_json(GAESTE_FILE, {})                                     # Kennung -> {"ziel", "bis", "anzahl", "ids": [letzte Foto-IDs]}
+if not isinstance(GAESTE, dict):
+    GAESTE = {}
+GAESTE_LOCK = threading.Lock()
+GAST_MAX_FOTOS = 300                                                    # je Fest
+GAST_PRO_IP = 40                                                        # je IP und 10 Minuten
+GAST_ZEITEN = {}
+
+
+def gaeste_speichern(neu):
+    global GAESTE
+    try:
+        schreibe_json(GAESTE_FILE, neu)
+    except OSError as e:
+        H.log.error("Gaeste-Fest nicht speicherbar: %s", e)
+        raise HTTPException(500, "Das Fest konnte nicht gespeichert werden.")
+    GAESTE = neu
+
+
+def gast_fest(kennung, jetzt=None):
+    """Das laufende Fest zu einer Kennung oder None (unbekannt/abgelaufen)."""
+    f = GAESTE.get(kennung)
+    try:
+        if f and datetime.datetime.fromisoformat(f["bis"]) > (jetzt or datetime.datetime.now()):
+            return f
+    except (KeyError, TypeError, ValueError):
+        pass
+    return None
+
+
+def gaeste_fuer(z, jetzt=None):
+    """(Kennung, Fest) des laufenden Gaeste-Uploads eines Rahmens oder (None, None)."""
+    for k, f in GAESTE.items():
+        if f.get("ziel") == z and gast_fest(k, jetzt):
+            return k, f
+    return None, None
+
+
+def gaeste_zusatz(z):
+    k, f = gaeste_fuer(z)
+    if not k:
+        return None
+    return {"pfad": "/gast/" + k, "basis": tv_url() or "", "anzahl": f.get("anzahl", 0), "ids": list(f.get("ids", []))[-30:], "bis": f["bis"]}
+
+
+@app.post("/api/gaeste/{z}")
+def gaeste_starten(z: str, daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
+    """Startet den Gaeste-Upload fuer einen Rahmen ('stunden' 1-72, Standard 8): ein QR-Code am Rahmen fuehrt zu einer Seite, auf der Gaeste Fotos hochladen."""
+    if z not in RAHMEN_ZIELE:
+        raise HTTPException(404, "Rahmen nicht gefunden")
+    if not upload_schluessel():
+        raise HTTPException(403, "Hochladen ist nicht eingerichtet")
+    try:
+        stunden = max(1, min(int(daten.get("stunden", 8)), 72))
+    except (TypeError, ValueError):
+        raise HTTPException(400, "Dauer bitte in Stunden angeben (1 bis 72)")
+    jetzt = datetime.datetime.now()
+    with GAESTE_LOCK:
+        neu = {k: f for k, f in GAESTE.items() if f.get("ziel") != z and gast_fest(k, jetzt)}            # je Rahmen ein Fest; Abgelaufenes aufraeumen
+        kennung = secrets.token_urlsafe(12)
+        neu[kennung] = {"ziel": z, "bis": (jetzt + datetime.timedelta(hours=stunden)).isoformat(timespec="seconds"), "anzahl": 0, "ids": []}
+        gaeste_speichern(neu)
+    return {"ok": True, "pfad": "/gast/" + kennung, "bis": neu[kennung]["bis"], "basis": tv_url() or ""}
+
+
+@app.get("/api/gaeste/{z}")
+def gaeste_lesen(z: str, _=Depends(anmeldung)):
+    z_ = gaeste_zusatz(z)
+    return {"aktiv": bool(z_), **({"pfad": z_["pfad"], "bis": z_["bis"], "anzahl": z_["anzahl"], "basis": z_["basis"]} if z_ else {})}
+
+
+@app.delete("/api/gaeste/{z}")
+def gaeste_beenden(z: str, _=Depends(anmeldung), __=Depends(csrf)):
+    with GAESTE_LOCK:
+        gaeste_speichern({k: f for k, f in GAESTE.items() if f.get("ziel") != z})
+    return {"ok": True}
+
+
+@app.get("/api/gast/{kennung}")
+def gast_info(kennung: str):
+    """Fuer die Gaeste-Seite (ohne Anmeldung): laeuft das Fest noch, wie heisst der Rahmen."""
+    f = gast_fest(kennung)
+    if not f:
+        return {"aktiv": False}
+    return {"aktiv": True, "rahmen": RAHMEN_ZIELE.get(f["ziel"], "Rahmen"), "bis": f["bis"], "max_mb": UPLOAD_MAX_MB, "anzahl": f.get("anzahl", 0)}
+
+
+@app.put("/api/gast/{kennung}/hochladen")
+async def gast_hochladen(kennung: str, request: Request, __=Depends(csrf)):
+    """Ein Foto von einem Gast (nur mit gueltiger Kennung des laufenden Festes). Landet im Upload-Album und kommt gleich auf den Rahmen."""
+    f = gast_fest(kennung)
+    if not f:
+        raise HTTPException(410, "Dieses Fest ist beendet.")
+    schluessel = upload_schluessel()
+    if not schluessel:
+        raise HTTPException(403, "Hochladen ist nicht eingerichtet")
+    if f.get("anzahl", 0) >= GAST_MAX_FOTOS:
+        raise HTTPException(429, "Für dieses Fest sind keine weiteren Fotos möglich.")
+    ip, jetzt_ = client_ip(request), time.time()
+    with UPLOAD_LOCK:
+        zeiten = [t for t in GAST_ZEITEN.get(ip, []) if t > jetzt_ - 600]
+        if len(zeiten) >= GAST_PRO_IP:
+            raise HTTPException(429, "Zu viele Fotos in kurzer Zeit. Bitte kurz warten.")
+        GAST_ZEITEN[ip] = zeiten + [jetzt_]
+        for k in [k for k, v in GAST_ZEITEN.items() if not v or v[-1] < jetzt_ - 600]:
+            GAST_ZEITEN.pop(k, None)
+    daten, typ, name, datum, groesse = await foto_aus_request(request)
+    ergebnis = await run_in_threadpool(upload_zu_immich, daten, typ, "Gast-" + name, datum, schluessel)
+    with GAESTE_LOCK:
+        if kennung in GAESTE:
+            fest = dict(GAESTE[kennung])
+            fest["anzahl"] = fest.get("anzahl", 0) + 1
+            if ergebnis["id"] not in fest.get("ids", []):
+                fest["ids"] = (fest.get("ids", []) + [ergebnis["id"]])[-60:]
+            gaeste_speichern({**GAESTE, kennung: fest})
+    H.log.info("Gaeste-Upload: %s (%d KB) -> %s", name, groesse // 1024, ergebnis["id"])
+    return {"ok": True}
+
+
+# --------------------------------------------------------------------------- Gruesse mit Foto an einen Rahmen
+def gruesse_speichern(neu):
+    global GRUESSE
+    try:
+        schreibe_json(GRUESSE_FILE, neu)
+    except OSError as e:
+        H.log.error("Gruesse nicht speicherbar: %s", e)
+        raise HTTPException(500, "Der Gruß konnte nicht gespeichert werden.")
+    GRUESSE = neu
+
+
+@app.put("/api/gruss/{z}")
+def gruss_setzen(z: str, daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
+    """Gruss an einen Rahmen: Foto ('id' eines hochgeladenen Fotos, optional) und Text, fuer 'minuten' (Standard 120). Ohne Foto und Text wird er entfernt."""
+    if z not in RAHMEN_ZIELE:
+        raise HTTPException(404, "Rahmen nicht gefunden")
+    text = " ".join(str(daten.get("text") or "").split())[:NOTIZ_MAX]
+    absender = " ".join(str(daten.get("absender") or "").split())[:40]
+    foto = str(daten.get("id") or "")
+    if foto and not ID_RE.match(foto):
+        raise HTTPException(400, "Ungueltige Foto-ID")
+    neu = {k: v for k, v in GRUESSE.items() if k != z}
+    if text or foto:
+        try:
+            minuten = max(5, min(int(daten.get("minuten", 120)), 1440))
+        except (TypeError, ValueError):
+            raise HTTPException(400, "Dauer bitte in Minuten angeben (5 bis 1440)")
+        neu[z] = {"text": text, "absender": absender, "id": foto, "herz": False,
+                  "bis": (datetime.datetime.now() + datetime.timedelta(minutes=minuten)).isoformat(timespec="seconds")}
+    gruesse_speichern(neu)
+    return {"ok": True, "gruss": gruss_fuer(z)}
+
+
+@app.post("/api/gruss/{z}/herz")
+def gruss_herz(z: str, g=Depends(geraet), __=Depends(csrf)):
+    """Der Rahmen meldet ein Herz (jemand hat den Gruss angetippt): Pushover an den Absender-Account, einmal je Gruss."""
+    if g.get("typ") == "geraet" and g.get("geraet") != z:
+        raise HTTPException(403, "Dieser Zugang gilt nur fuer ein anderes Geraet")
+    aktuell = gruss_fuer(z)
+    if not aktuell:
+        raise HTTPException(404, "Kein aktueller Gruß")
+    if not aktuell["herz"]:
+        gruesse_speichern({**GRUESSE, z: {**GRUESSE[z], "herz": True}})
+        wer = f" von {aktuell['absender']}" if aktuell["absender"] else ""
+        threading.Thread(target=pushover, args=(f"❤️ {RAHMEN_ZIELE.get(z, 'Rahmen')}", f"Dein Gruß{wer} ist angekommen: jemand hat ihn am Rahmen mit einem Herz bedacht.", 0), daemon=True).start()
+    return {"ok": True}
 
 
 # --------------------------------------------------------------------------- Termine aus den Kalendern der Handys (iPhone-App)
@@ -2808,7 +3001,7 @@ NACHT_RE = re.compile(r"(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})")
 
 def geraet_ansicht(z, e):
     t = TV.get(z) or {}
-    return {"layout": layout_fuer(z), "layout_eigen": bool(e.get("layout")), "bewegung": bool(e.get("bewegung")), "paare": bool(e.get("paare")), "erinnerungen": e.get("erinnerungen") or "", "geburtstagsfotos": e.get("geburtstagsfotos", True), "wetter": e.get("wetter") or None, "termin_quellen": e.get("termin_quellen") or [],
+    return {"layout": layout_fuer(z), "layout_eigen": bool(e.get("layout")), "bewegung": bool(e.get("bewegung")), "paare": bool(e.get("paare")), "erinnerungen": e.get("erinnerungen") or "", "favoriten": e.get("favoriten") or "", "geburtstagsfotos": e.get("geburtstagsfotos", True), "wetter": e.get("wetter") or None, "termin_quellen": e.get("termin_quellen") or [],
             "kalender_gesetzt": bool(e.get("kalender_url")), "selbst": meldet_selbst(z), "ip": t.get("ip") or "", "akku": (FULLY_STATE.get(z) or {}).get("akku"), "id": z, "art": e["art"], "name": e["name"], "sek": e.get("sek"), "fuellung": e.get("fuellung") or "", "anzeige": e.get("anzeige") or [],
             "nacht": e.get("nacht") or "", "quellen": e.get("quellen") or "", "zeitplan": e.get("zeitplan") or "",
             "fully_host": e.get("fully_host") or "", "fully_pw_gesetzt": bool(e.get("fully_pw")), "adb_host": e.get("adb_host") or "", "alarm_min": e.get("alarm_min")}
@@ -2852,6 +3045,11 @@ def geraet_felder(daten, art):
             if v and v not in ERINNERUNG_STUFEN:
                 raise HTTPException(400, "Unbekannte Stufe für die Erinnerungen")
             (setzen.__setitem__("erinnerungen", v) if v else weg.append("erinnerungen"))
+        if "favoriten" in daten:
+            v = str(daten["favoriten"] or "")
+            if v and v not in ERINNERUNG_STUFEN:
+                raise HTTPException(400, "Unbekannte Stufe für die Favoriten")
+            (setzen.__setitem__("favoriten", v) if v else weg.append("favoriten"))
         if "geburtstagsfotos" in daten:
             if not isinstance(daten["geburtstagsfotos"], bool):
                 raise HTTPException(400, "Bitte ein oder aus")
@@ -4107,19 +4305,8 @@ def upload_zu_immich(daten, typ, name, datum_ms, key=None):
     return {"ok": True, "id": asset, "neu": antwort.get("status") == "created"}
 
 
-@app.put("/api/hochladen")
-async def hochladen(request: Request, _=Depends(anmeldung), __=Depends(csrf)):
-    """Ein Foto vom Handy: roher Inhalt im Body, Name in 'X-Dateiname' (URL-kodiert), Aufnahmezeit in 'X-Datum' (ms). Landet in Immich im Upload-Album."""
-    schluessel = upload_schluessel()
-    if not schluessel:
-        raise HTTPException(403, "Hochladen ist nicht eingerichtet")
-    jetzt_ = time.time()
-    with UPLOAD_LOCK:
-        while UPLOAD_ZEITEN and UPLOAD_ZEITEN[0] < jetzt_ - 3600:
-            UPLOAD_ZEITEN.popleft()
-        if len(UPLOAD_ZEITEN) >= UPLOAD_PRO_STUNDE:
-            raise HTTPException(429, "Zu viele Uploads in der letzten Stunde")
-        UPLOAD_ZEITEN.append(jetzt_)
+async def foto_aus_request(request: Request):
+    """Liest ein Foto aus dem Body (mit Groessenlimit), erkennt den Typ, bereinigt den Namen. Rueckgabe: (daten, typ, name, datum_ms, groesse)."""
     limit = UPLOAD_MAX_MB * 1024 * 1024
     try:
         if int(request.headers.get("content-length") or 0) > limit:
@@ -4145,12 +4332,33 @@ async def hochladen(request: Request, _=Depends(anmeldung), __=Depends(csrf)):
         datum = 0
     if not 0 < datum < (time.time() + 86400) * 1000:
         datum = 0
+    return daten, typ, name, datum, groesse
+
+
+@app.put("/api/hochladen")
+async def hochladen(request: Request, _=Depends(anmeldung), __=Depends(csrf)):
+    """Ein Foto vom Handy: roher Inhalt im Body, Name in 'X-Dateiname' (URL-kodiert), Aufnahmezeit in 'X-Datum' (ms). Landet in Immich im Upload-Album."""
+    schluessel = upload_schluessel()
+    if not schluessel:
+        raise HTTPException(403, "Hochladen ist nicht eingerichtet")
+    jetzt_ = time.time()
+    with UPLOAD_LOCK:
+        while UPLOAD_ZEITEN and UPLOAD_ZEITEN[0] < jetzt_ - 3600:
+            UPLOAD_ZEITEN.popleft()
+        if len(UPLOAD_ZEITEN) >= UPLOAD_PRO_STUNDE:
+            raise HTTPException(429, "Zu viele Uploads in der letzten Stunde")
+        UPLOAD_ZEITEN.append(jetzt_)
+    daten, typ, name, datum, groesse = await foto_aus_request(request)
     ergebnis = await run_in_threadpool(upload_zu_immich, daten, typ, name, datum, schluessel)
     H.log.info("Upload: %s (%d KB) -> %s%s", name, groesse // 1024, ergebnis["id"], "" if ergebnis["neu"] else " (schon vorhanden)")
     return ergebnis
 
 
 if os.path.isdir(STATIC_DIR):
+    @app.get("/gast/{kennung}", include_in_schema=False)
+    def gaeste_seite(kennung: str):
+        return FileResponse(os.path.join(STATIC_DIR, "gast", "index.html"))
+
     TV_BROWSER_RE = re.compile(r"NetCast|Web0S|webOS|SMART-TV|SmartTV|Tizen|CrKey|BRAVIA|HbbTV|VIDAA|Android TV|\bAFT[A-Z0-9]{1,4}\b|Roku", re.I)
 
     @app.get("/", include_in_schema=False)

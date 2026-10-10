@@ -513,3 +513,108 @@ def test_monatsbrief_am_ersten_einmal(app_laden, monkeypatch):
     # Januar: Vormonat ist Dezember des Vorjahres
     w.weitere_wache_pruefen(datetime.datetime(2027, 1, 1, 10, 0))
     assert gesendet[-1][0] == "Dein Rückblick auf den Dezember"
+
+
+def test_favoriten_oefter_zeigen(app_laden):
+    w, client, _ = app_laden(**ZWEI)
+    app = client("192.168.1.50")
+    assert not any(q["typ"] == "favoriten" for q in w.rahmen_quellen("flur"))
+    assert app.put("/api/verwaltung/geraete/flur", json={"favoriten": "komisch"}, headers=H).status_code == 400
+    r = app.put("/api/verwaltung/geraete/flur", json={"favoriten": "oft"}, headers=H)
+    assert r.json()["geraet"]["favoriten"] == "oft" and {"typ": "favoriten", "gewicht": 0.4} in w.rahmen_quellen("flur")
+    assert not any(q["typ"] == "favoriten" for q in w.rahmen_quellen("serbien"))
+    app.put("/api/verwaltung/geraete/flur", json={"favoriten": ""}, headers=H)
+    assert not any(q["typ"] == "favoriten" for q in w.rahmen_quellen("flur"))
+
+
+def test_gruss_mit_foto_und_herz(app_laden, monkeypatch):
+    w, client, _ = app_laden(**ZWEI)
+    app = client("192.168.1.50")
+    push = []
+    monkeypatch.setattr(w, "pushover", lambda titel, text, prio=0: push.append((titel, text)))
+    zusatz = lambda z: app.get(f"/api/rahmen/zusatz?ziel={z}").json()
+    FOTO = "0123abcd-4567-89ab-cdef-0123456789ab"
+    lv = app.get("/api/tv/abfrage?ziel=flur&seq=-1").json()["lv"]
+    r = app.put("/api/gruss/flur", json={"text": "Hallo Oma!", "absender": "Anna", "id": FOTO, "minuten": 60}, headers=H)
+    assert r.status_code == 200 and r.json()["gruss"] == {"text": "Hallo Oma!", "absender": "Anna", "id": FOTO, "herz": False}
+    assert zusatz("flur")["gruss"]["text"] == "Hallo Oma!" and "gruss" not in zusatz("serbien")
+    assert app.get("/api/tv/abfrage?ziel=flur&seq=-1").json()["lv"] != lv
+    # Herz: einmal je Gruss, Pushover
+    assert app.post("/api/gruss/flur/herz", headers=H).status_code == 200
+    assert app.post("/api/gruss/flur/herz", headers=H).status_code == 200
+    assert len(push) == 1 and "Anna" in push[0][1] and zusatz("flur")["gruss"]["herz"] is True
+    assert app.post("/api/gruss/serbien/herz", headers=H).status_code == 404                              # dort ist kein Gruss
+    # abgelaufen / entfernt / Pruefungen
+    assert w.gruss_fuer("flur", datetime.datetime.now() + datetime.timedelta(minutes=61)) is None
+    assert app.put("/api/gruss/flur", json={"text": ""}, headers=H).json()["gruss"] is None
+    assert app.put("/api/gruss/flur", json={"text": "x", "id": "../../etc"}, headers=H).status_code == 400
+    assert app.put("/api/gruss/flur", json={"text": "x", "minuten": "viel"}, headers=H).status_code == 400
+    assert app.put("/api/gruss/gibtsnicht", json={"text": "x"}, headers=H).status_code == 404
+    assert app.put("/api/gruss/flur", json={"text": "x"}).status_code == 403
+    assert client("203.0.113.9").put("/api/gruss/flur", json={"text": "x"}, headers=H).status_code == 401
+    assert ANZ.zusammen()["gruss"]["an"]
+
+
+# ---------------------------------------------------------------- Gaeste-Upload per QR-Code
+JPEG = b"\xff\xd8\xff\xe0" + b"\x00" * 64
+
+
+def gaeste_app(app_laden, **env):
+    w, client, _ = app_laden(**ZWEI, RAHMEN_IMMICH_UPLOAD_KEY="upload-key", **env)
+    return w, client, client("192.168.1.50")
+
+
+def test_gaeste_fest_ablauf(app_laden, monkeypatch):
+    w, client, app = gaeste_app(app_laden)
+    hochgeladen = []
+    monkeypatch.setattr(w, "upload_zu_immich", lambda d, typ, name, ms, key=None: hochgeladen.append(name) or {"ok": True, "id": f"foto-{len(hochgeladen):04d}-aaaa-bbbb-cccc-dddddddddddd", "neu": True})
+    assert not app.get("/api/gaeste/flur").json()["aktiv"] and "gaeste" not in app.get("/api/rahmen/zusatz?ziel=flur").json()
+    lv = app.get("/api/tv/abfrage?ziel=flur&seq=-1").json()["lv"]
+    r = app.post("/api/gaeste/flur", json={"stunden": 4}, headers=H).json()
+    assert r["ok"] and r["pfad"].startswith("/gast/") and len(r["pfad"]) > 12
+    kennung = r["pfad"][6:]
+    assert app.get("/api/tv/abfrage?ziel=flur&seq=-1").json()["lv"] != lv                                # Rahmen zeigt den QR-Code
+    z = app.get("/api/rahmen/zusatz?ziel=flur").json()["gaeste"]
+    assert z["pfad"] == r["pfad"] and z["anzahl"] == 0 and "gaeste" not in app.get("/api/rahmen/zusatz?ziel=serbien").json()
+    # Gast (ohne Anmeldung, von aussen) sieht die Seite, die Info und kann hochladen
+    gast = client("203.0.113.77")
+    assert gast.get(r["pfad"]).status_code == 200 and "Fotos" in gast.get(r["pfad"]).text
+    info = gast.get(f"/api/gast/{kennung}").json()
+    assert info["aktiv"] and info["rahmen"] == "Flur" and info["max_mb"] == 40
+    for n in range(3):
+        assert gast.put(f"/api/gast/{kennung}/hochladen", content=JPEG, headers={**H, "X-Dateiname": f"Fest%20{n}.jpg"}).status_code == 200
+    assert hochgeladen == ["Gast-Fest 0.jpg", "Gast-Fest 1.jpg", "Gast-Fest 2.jpg"]
+    z = app.get("/api/rahmen/zusatz?ziel=flur").json()["gaeste"]
+    assert z["anzahl"] == 3 and len(z["ids"]) == 3 and z["ids"][0].startswith("foto-0001")               # der Rahmen bekommt die neuen Foto-IDs
+    # Schutz: ohne Header, falsche Kennung, kein Foto
+    assert gast.put(f"/api/gast/{kennung}/hochladen", content=JPEG).status_code == 403
+    assert gast.put("/api/gast/falsch/hochladen", content=JPEG, headers=H).status_code == 410
+    assert gast.put(f"/api/gast/{kennung}/hochladen", content=b"<html>", headers=H).status_code == 415
+    assert not gast.get("/api/gast/falsch").json()["aktiv"]
+    # Gaeste duerfen nichts anderes
+    assert gast.post("/api/gaeste/flur", json={}, headers=H).status_code == 401 and gast.get("/api/verwaltung").status_code == 401
+    # Ende
+    assert app.delete("/api/gaeste/flur", headers=H).json()["ok"]
+    assert gast.put(f"/api/gast/{kennung}/hochladen", content=JPEG, headers=H).status_code == 410
+    assert "gaeste" not in app.get("/api/rahmen/zusatz?ziel=flur").json()
+
+
+def test_gaeste_grenzen(app_laden, monkeypatch):
+    w, client, app = gaeste_app(app_laden)
+    monkeypatch.setattr(w, "upload_zu_immich", lambda d, typ, name, ms, key=None: {"ok": True, "id": "x" * 36, "neu": True})
+    assert app.post("/api/gaeste/gibtsnicht", json={}, headers=H).status_code == 404
+    assert app.post("/api/gaeste/flur", json={"stunden": "viel"}, headers=H).status_code == 400
+    kennung = app.post("/api/gaeste/flur", json={}, headers=H).json()["pfad"][6:]
+    neu = app.post("/api/gaeste/flur", json={}, headers=H).json()["pfad"][6:]                          # ein neues Fest ersetzt das alte desselben Rahmens
+    assert neu != kennung and client("203.0.113.77").put(f"/api/gast/{kennung}/hochladen", content=JPEG, headers=H).status_code == 410
+    monkeypatch.setattr(w, "GAST_PRO_IP", 2)
+    g = client("203.0.113.78")
+    assert [g.put(f"/api/gast/{neu}/hochladen", content=JPEG, headers=H).status_code for _ in range(3)] == [200, 200, 429]
+    # Abgelaufen
+    w.GAESTE[neu]["bis"] = (datetime.datetime.now() - datetime.timedelta(minutes=1)).isoformat()
+    assert not client("203.0.113.79").get(f"/api/gast/{neu}").json()["aktiv"]
+    assert w.gaeste_fuer("flur") == (None, None)
+    # ohne Upload-Schluessel kein Fest
+    w2, client2, _ = app_laden(**ZWEI)
+    assert client2("192.168.1.50").post("/api/gaeste/flur", json={}, headers=H).status_code == 403
+    assert ANZ.zusammen()["gaeste"]["an"]
