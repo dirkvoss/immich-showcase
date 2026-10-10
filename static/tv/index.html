@@ -132,7 +132,7 @@ body.zuschnitt .bild { object-fit: cover; }
     if (st === 200 && d && d.alle_ziele && ziel !== "test" && !d.alle_ziele[ziel]) { try { localStorage.removeItem("showcaseZiel"); } catch (e) {} location.replace("/tv/"); return; }
     if (st === 200 && d && d.rahmen && d.rahmen.indexOf(ziel) >= 0) zusatzLaden();
     if (st === 200 && d && d.ziele) { for (var k in d.ziele) NAMEN[k] = d.ziele[k]; }
-    if (st === 200 && d && d.rahmen) { for (var r = 0; r < d.rahmen.length; r++) if (d.rahmen[r] === ziel) { rahmenModus = true; rahmenSek = d.rahmen_sek || 8; anzeige = d.rahmen_anzeige || []; layoutSetzen(d.rahmen_layout); nacht = d.rahmen_nacht || ""; if (!laeuft && !pinModus) startAmbient(); } }
+    if (st === 200 && d && d.rahmen) { for (var r = 0; r < d.rahmen.length; r++) if (d.rahmen[r] === ziel) { rahmenModus = true; rahmenSek = d.rahmen_sek || 8; anzeige = d.rahmen_anzeige || []; layoutSetzen(d.rahmen_layout); ambientAnzeige(); nacht = d.rahmen_nacht || ""; if (!laeuft && !pinModus) startAmbient(); } }
     fuellung = (rahmenModus ? d.rahmen_fuellung : d.tv_fuellung) || "balken";
     document.body.className = fuellung === "zuschnitt" ? "zuschnitt" : "";
   });
@@ -148,7 +148,7 @@ body.zuschnitt .bild { object-fit: cover; }
   var ebene = document.getElementById("ebene"), lay = null, EL = {}, zusatzDaten = null, zusatzTimer = 0, zusatzGestartet = false;
   var NAMEN_EL = ["uhr", "heute", "fotodatum", "fotoort", "wetter", "termine", "geburtstag", "titel"];
   var BASIS = { uhr: 44, heute: 28, wetter: 52, termine: 26, fotodatum: 30, fotoort: 30, geburtstag: 32, titel: 30 };            // Schriftgroesse in px bei 100 %
-  var NUR_RUHEBILD = { uhr: 1, heute: 1, wetter: 1, termine: 1, geburtstag: 1 };                                      // diese erscheinen im Dauerprogramm, nicht bei geschickten Shows
+  var NUR_RUHEBILD = { uhr: 1, heute: 1, wetter: 1, termine: 1, geburtstag: 1 };                                      // laufende Einblendungen (Foto-Datum/-Ort und Show-Titel steuern die Fotos selbst)
   var SCHRIFTEN = { serif: '"Cormorant Garamond", Georgia, serif', sans: "Arial, Helvetica, sans-serif", mono: 'Menlo, Consolas, "Courier New", monospace' };
   function titelAus() { if (EL.titel) EL.titel.className = "el titel"; }
   function layoutSetzen(l) {
@@ -171,7 +171,8 @@ body.zuschnitt .bild { object-fit: cover; }
     if (n === "geburtstag") return !!(zusatzDaten && zusatzDaten.geburtstage && zusatzDaten.geburtstage.length);
     return true;
   }
-  function ambientAnzeige(an) {                                  // Elemente des Ruhebilds ein-/ausblenden
+  function ambientAnzeige() {                                    // Einblendungen am Rahmen (Uhrzeit, Datum, Wetter, Termine, Geburtstage): immer, wenn eingeschaltet - auch waehrend einer Show
+    var an = rahmenModus;
     for (var n in NUR_RUHEBILD) { var e = EL[n]; if (e) e.className = "el" + (an && lay && lay[n] && lay[n].an && hatInhalt(n) ? " an" : ""); }
   }
   function fotoTexteLeeren() { if (EL.fotodatum) EL.fotodatum.className = "el"; if (EL.fotoort) EL.fotoort.className = "el"; }
@@ -515,7 +516,7 @@ body.zuschnitt .bild { object-fit: cover; }
   });
   var stand = null;
   function standPruefen() {                                    // neue Version auf dem Server? Dann (im Ruhebild) neu laden
-    api("/api/version", function (st, d) { if (st === 200 && d) { if (stand === null) stand = d.v; else if (d.v !== stand && (!laeuft || ambient)) location.reload(); } });
+    api("/api/version", function (st, d) { if (st === 200 && d) { if (stand === null) stand = d.v; else if (d.v !== stand) location.reload(); } });
   }
   standPruefen(); setInterval(standPruefen, 60000);
   // Selbstheilung: haengt das Dauerprogramm (kein Bildwechsel) oder bricht die Verbindung lange ab, Seite neu laden

@@ -2,8 +2,7 @@
 
 Ein Element hat: an (sichtbar), farbe (#rrggbb, leer = Standard), schrift (serif/sans/mono, leer = Standard), x/y (0-100, Prozent der Flaeche; 0/0 = oben links, 100/100 = unten rechts, das Element liegt dabei immer
 innerhalb des Bildschirms), gr (Groesse in Prozent) bei "fotodatum" zeit (Aufnahmezeit zusaetzlich zeigen) und bei "termine" person (Kuerzel der Person davor).
-Die Werte setzen sich schichtweise zusammen: Standard <- alte Einstellung "anzeige" (allgemein) <- allgemeines Layout <- alte "anzeige"
-des Geraets <- Layout des Geraets.
+Die Werte setzen sich schichtweise zusammen: Standard <- alte Einstellung "anzeige" (allgemein, dann am Geraet) <- allgemeines Layout <- Layout des Geraets.
 """
 import re
 
@@ -16,7 +15,7 @@ STANDARD = {
     "wetter": {"an": True, "x": 100, "y": 0, "gr": 100, "farbe": "", "schrift": ""},
     "termine": {"an": True, "x": 100, "y": 14, "gr": 100, "farbe": "", "schrift": "", "person": True},
     "geburtstag": {"an": True, "x": 50, "y": 0, "gr": 100, "farbe": "", "schrift": ""},
-    "titel": {"an": True, "x": 0, "y": 100, "gr": 100, "farbe": "", "schrift": ""},      # Name der Show, kurz beim Start einer Show
+    "titel": {"an": True, "x": 0, "y": 88, "gr": 100, "farbe": "", "schrift": ""},      # Name der Show, kurz beim Start einer Show
 }
 GR_MIN, GR_MAX = 40, 300
 SCHRIFTEN = ("", "serif", "sans", "mono")                 # "" = Standard des Elements

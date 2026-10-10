@@ -240,3 +240,14 @@ def test_geburtstage_und_personen_am_rahmen(app_laden):
     assert all(t.get("p", {}).get("k") in ("D", "S") for t in termine)                       # zwei Handys: Kuerzel dabei
     app.delete("/api/termine/telefon/bbbbbbbb-0002", headers=H)
     assert all("p" not in t for t in app.get("/api/rahmen/zusatz?ziel=flur").json()["termine"])   # nur noch ein Handy: kein Kuerzel
+
+
+def test_gespeichertes_layout_schlaegt_alte_bildunterschrift_am_geraet(app_laden):
+    """Ein Geraet mit der alten Einstellung 'Bildunterschrift' darf das im Editor gespeicherte Layout nicht uebersteuern."""
+    w, client, _ = app_laden(**LAN)
+    app = client("192.168.1.50")
+    app.put("/api/verwaltung/geraete/flur", json={"anzeige": ["datum", "ort"]}, headers=H)
+    cfg = lambda: app.get("/api/config?ziel=flur").json()["rahmen_layout"]
+    assert cfg()["fotoort"]["an"] and cfg()["fotodatum"]["an"]                                      # Ausgangspunkt: die alte Einstellung
+    app.put("/api/einstellungen", json={"layout": {"fotoort": {"an": False}}}, headers=H)            # im Editor ausgeschaltet
+    assert not cfg()["fotoort"]["an"] and cfg()["fotodatum"]["an"]

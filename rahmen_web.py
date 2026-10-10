@@ -1832,9 +1832,10 @@ def layout_global():
 
 
 def layout_fuer(z=None):
-    """Layout der Einblendungen fuer einen Rahmen (eigene Anordnung des Geraets gewinnt feldweise)."""
+    """Layout der Einblendungen fuer einen Rahmen. Die alten Haken 'Bildunterschrift' (allgemein, am Geraet) sind nur der Ausgangspunkt;
+    ein gespeichertes Layout (allgemein, dann am Geraet) gewinnt feldweise."""
     e = GERAETE.get(z) or {} if z else {}
-    return ANZ.zusammen(ANZ.aus_anzeige(std_anzeige()), EINST.get("layout"), ANZ.aus_anzeige(e.get("anzeige")), e.get("layout"))
+    return ANZ.zusammen(ANZ.aus_anzeige(std_anzeige()), ANZ.aus_anzeige(e.get("anzeige")), EINST.get("layout"), e.get("layout"))
 
 
 def anzeige_version(z):

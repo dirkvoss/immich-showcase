@@ -1,6 +1,13 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.18.1]
+### Behoben
+- **Uhrzeit, Datum, Wetter, Termine und Geburtstage erscheinen jetzt auch während einer Show** (bisher nur im Dauerprogramm; ein Rahmen, der dauerhaft eine Show spielt, zeigte sie nie). Was in „Anzeige auf dem Rahmen“ eingeschaltet ist, wird gezeigt.
+- Ein laufender Rahmen **lädt sich bei einer neuen Version immer neu** (bisher nur außerhalb von Shows, sodass er die neue Seite nie bekam). Eine laufende Show wird danach fortgesetzt.
+- Ein im Editor gespeichertes Layout gilt jetzt vor der alten Geräte-Einstellung „Bildunterschrift“ (Foto-Ort und Foto-Datum ließen sich an einem solchen Rahmen nicht ausschalten).
+- Der Show-Titel liegt standardmäßig etwas über der Uhr, damit beide sich nicht überdecken.
+
 ## [2.18.0]
 ### Neu
 - **Einblendungen am Rahmen frei anordnen:** Uhrzeit, heutiges Datum, Datum und Ort des Fotos, Wetter, Termine, Geburtstage und der Show-Titel sind einzeln ein- und ausschaltbar, in Farbe und Schrift (Serif, Sans, Monospace) einstellbar, per Ziehen (oder Lage-Auswahl und Pfeiltasten) beliebig positionierbar und in der Größe (40–300 %) einstellbar. Eine Vorschau zeigt das Ergebnis. Eine allgemeine Anordnung (⚙ Einstellungen → „Anzeige auf dem Rahmen“) und je Rahmen eine eigene (⚙ am Gerät). Änderungen erscheinen am laufenden Rahmen sofort, ohne Neuladen. Die frühere Einstellung „Bildunterschrift: Datum/Uhrzeit/Ort“ gilt als Ausgangspunkt weiter.
