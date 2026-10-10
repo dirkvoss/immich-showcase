@@ -583,7 +583,19 @@
   "Show-Titel": "Título del pase",
   "Omas Geburtstag": "Cumpleaños de la abuela",
   "Sommerferien": "Vacaciones de verano",
-  "Farbe zurücksetzen": "Restablecer color"
+  "Farbe zurücksetzen": "Restablecer color",
+  "Anzeige auf diesem Rahmen": "Pantalla en este marco",
+  "Was eingeblendet wird und wo. Jeder Rahmen hat seine eigene Anordnung.": "Qué se muestra y dónde. Cada marco tiene su propia disposición.",
+  "Anordnung übernehmen von": "Copiar disposición de",
+  "Wetter und Termine auf diesem Rahmen": "Tiempo y citas en este marco",
+  "Wetter-Ort": "Lugar del tiempo",
+  "Ohne eigenen Ort gilt der Standard aus den Einstellungen.": "Sin lugar propio se usa el predeterminado de los ajustes.",
+  "Termine von diesen Handys zeigt der Rahmen:": "El marco muestra las citas de estos teléfonos:",
+  "Kalender-Link (iCal) nur für diesen Rahmen": "Enlace de calendario (iCal) solo para este marco",
+  "Kalender-Link dieses Rahmens entfernen": "Quitar el enlace de calendario de este marco",
+  "Wetter und Termine (Standard)": "Tiempo y citas (predeterminado)",
+  "Gelten für Rahmen, die unter ⚙ keinen eigenen Ort bzw. Kalender-Link haben. Die Anordnung, den Wetter-Ort, den Kalender-Link und die Handys stellst du für jeden Rahmen einzeln unter ⚙ ein. Für das Wetter wird nur der Ortsname an open-meteo.com geschickt.": "Valen para los marcos que no tienen lugar o enlace de calendario propio en ⚙. La disposición, el lugar del tiempo, el enlace y los teléfonos se ajustan para cada marco en ⚙. Para el tiempo solo se envía el nombre del lugar a open-meteo.com.",
+  "In der iPhone-App unter „App-Einstellungen“ → „Meine Termine auf dem Rahmen zeigen“ gibt jede Person ihre Termine frei. Hier siehst du, wer das tut, und kannst ein Handy entfernen. Auf welchem Rahmen die Termine eines Handys erscheinen, legst du beim Rahmen unter ⚙ fest (neue Handys erscheinen zunächst auf keinem).": "En la app de iPhone, en «Ajustes de la app» → «Mostrar mis citas en el marco», cada persona comparte sus citas. Aquí ves quién lo hace y puedes quitar un teléfono. En qué marco aparecen las citas de un teléfono se define en el marco, en ⚙ (los teléfonos nuevos no aparecen al principio en ningún marco)."
  },
  "muster": [
   [

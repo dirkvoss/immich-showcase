@@ -204,7 +204,7 @@ body.zuschnitt .bild { object-fit: cover; }
   function zusatzLaden(sofort) {                                 // Wetter und Termine (alle 5 Minuten); der Server liefert nur, was eingerichtet ist
     if (zusatzGestartet && zusatzTimer && !sofort) { return; }
     clearTimeout(zusatzTimer); zusatzGestartet = true;
-    api("/api/rahmen/zusatz", function (st, d) {
+    api("/api/rahmen/zusatz?ziel=" + encodeURIComponent(ziel || ""), function (st, d) {
       if (st === 200 && d) { zusatzDaten = d; zusatzZeichnen(); }
     });
     zusatzTimer = setTimeout(function () { zusatzTimer = 0; zusatzLaden(); }, 300000);

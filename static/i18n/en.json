@@ -583,7 +583,19 @@
   "Show-Titel": "Show title",
   "Omas Geburtstag": "Grandma's birthday",
   "Sommerferien": "Summer holidays",
-  "Farbe zurücksetzen": "Reset color"
+  "Farbe zurücksetzen": "Reset color",
+  "Anzeige auf diesem Rahmen": "Display on this frame",
+  "Was eingeblendet wird und wo. Jeder Rahmen hat seine eigene Anordnung.": "What is shown and where. Every frame has its own arrangement.",
+  "Anordnung übernehmen von": "Copy arrangement from",
+  "Wetter und Termine auf diesem Rahmen": "Weather and appointments on this frame",
+  "Wetter-Ort": "Weather location",
+  "Ohne eigenen Ort gilt der Standard aus den Einstellungen.": "Without its own location the default from the settings applies.",
+  "Termine von diesen Handys zeigt der Rahmen:": "The frame shows appointments from these phones:",
+  "Kalender-Link (iCal) nur für diesen Rahmen": "Calendar link (iCal) for this frame only",
+  "Kalender-Link dieses Rahmens entfernen": "Remove this frame's calendar link",
+  "Wetter und Termine (Standard)": "Weather and appointments (default)",
+  "Gelten für Rahmen, die unter ⚙ keinen eigenen Ort bzw. Kalender-Link haben. Die Anordnung, den Wetter-Ort, den Kalender-Link und die Handys stellst du für jeden Rahmen einzeln unter ⚙ ein. Für das Wetter wird nur der Ortsname an open-meteo.com geschickt.": "Apply to frames that have no location or calendar link of their own under ⚙. The arrangement, weather location, calendar link and phones are set for each frame separately under ⚙. For the weather only the place name is sent to open-meteo.com.",
+  "In der iPhone-App unter „App-Einstellungen“ → „Meine Termine auf dem Rahmen zeigen“ gibt jede Person ihre Termine frei. Hier siehst du, wer das tut, und kannst ein Handy entfernen. Auf welchem Rahmen die Termine eines Handys erscheinen, legst du beim Rahmen unter ⚙ fest (neue Handys erscheinen zunächst auf keinem).": "In the iPhone app under “App settings” → “Show my appointments on the frame” each person shares their appointments. Here you can see who does and remove a phone. On which frame a phone's appointments appear is set at the frame under ⚙ (new phones appear on no frame at first)."
  },
  "muster": [
   [

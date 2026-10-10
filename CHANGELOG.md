@@ -1,6 +1,14 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.19.0]
+### Geändert
+- **Die Anzeige gilt jetzt pro Rahmen statt für alle:** Anordnung der Einblendungen (Uhrzeit, Datum, Foto-Datum und -Ort, Wetter, Termine, Geburtstage, Show-Titel), **Wetter-Ort**, **Kalender-Link** und die Auswahl der **Handys** stellst du für jeden Rahmen einzeln unter Geräte → ⚙ ein (Abschnitte „Anzeige auf diesem Rahmen“ und „Wetter und Termine auf diesem Rahmen“). Aus den allgemeinen Einstellungen ist die Anordnung entfernt; dort bleiben Wetter-Ort und Kalender-Link als Standard für Rahmen ohne eigene Angabe.
+- Ein **neuer Rahmen startet mit den Standardwerten** (keine Vorlage). „Anordnung übernehmen von …“ kopiert die eines anderen Rahmens.
+- **Neue Handys erscheinen zunächst auf keinem Rahmen.** Welche Handy-Termine ein Rahmen zeigt, wird am Rahmen angehakt. Beim Update bekommen bestehende Rahmen einmalig alle bis dahin bekannten Handys, damit sich nichts ändert; wer das nicht möchte (z. B. bei einem Rahmen an einem anderen Ort), nimmt den Haken unter ⚙ weg. Die Kürzel der Personen erscheinen, wenn auf diesem Rahmen mehrere Handys teilen.
+- Wetter und Termine werden je Rahmen abgefragt und getrennt zwischengespeichert (`GET /api/rahmen/zusatz?ziel=`). Neue Felder am Gerät: `wetter`, `termin_quellen`, `kalender_url`.
+- Die Kennung für „Anordnung/Termine neu laden“ am laufenden Rahmen berücksichtigt den Inhalt der Handy-Termine (auch zwei Änderungen in derselben Sekunde).
+
 ## [2.18.1]
 ### Behoben
 - **Uhrzeit, Datum, Wetter, Termine und Geburtstage erscheinen jetzt auch während einer Show** (bisher nur im Dauerprogramm; ein Rahmen, der dauerhaft eine Show spielt, zeigte sie nie). Was in „Anzeige auf dem Rahmen“ eingeschaltet ist, wird gezeigt.

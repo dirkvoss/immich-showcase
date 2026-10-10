@@ -646,18 +646,15 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
       <label class="tvfeld"><span>Sekunden pro Foto</span> <input id="eSek" type="number" min="3" max="120" inputmode="numeric" aria-label="Sekunden pro Foto"></label>
       <label class="tvfeld"><span>Hintergrund (Rahmen)</span> <select id="eFuellungR" aria-label="Hintergrund (Rahmen)"><option value="">Standard</option><option value="unscharf">Unscharf</option><option value="zuschnitt">Zuschnitt</option><option value="balken">Schwarze Balken</option></select></label>
       <label class="tvfeld"><span>Hintergrund (Fernseher)</span> <select id="eFuellungT" aria-label="Hintergrund (Fernseher)"><option value="">Standard</option><option value="unscharf">Unscharf</option><option value="zuschnitt">Zuschnitt</option><option value="balken">Schwarze Balken</option></select></label>
-      <h3>Anzeige auf dem Rahmen</h3>
-      <p class="tipp">Was am Rahmen eingeblendet wird und wo: Uhrzeit, heutiges Datum, Datum und Ort des Fotos, Wetter und Termine. Jedes Element lässt sich ein- und ausschalten, verschieben und in der Größe ändern. Für einzelne Rahmen gibt es unter ⚙ eine eigene Anordnung.</p>
-      <div id="eLayout"></div>
-      <h3>Wetter und Termine</h3>
-      <p class="tipp">Erscheinen am Rahmen, wenn sie oben bei „Anzeige auf dem Rahmen“ eingeschaltet sind. Für das Wetter wird nur der Ortsname an open-meteo.com geschickt.</p>
+      <h3>Wetter und Termine (Standard)</h3>
+      <p class="tipp">Gelten für Rahmen, die unter ⚙ keinen eigenen Ort bzw. Kalender-Link haben. Die Anordnung, den Wetter-Ort, den Kalender-Link und die Handys stellst du für jeden Rahmen einzeln unter ⚙ ein. Für das Wetter wird nur der Ortsname an open-meteo.com geschickt.</p>
       <div class="tvfeld"><span>Ort</span> <span id="eOrtName" style="flex:1;text-align:right"></span> <button class="btn klein versteckt" id="eOrtWeg" type="button">Entfernen</button></div>
       <label class="tvfeld"><span>Ort suchen</span> <input id="eOrtSuche" type="text" autocomplete="off" aria-label="Ort suchen" placeholder="Berlin"></label>
       <div id="eOrtTreffer"></div>
       <label class="tvfeld stapel"><span>Kalender-Link (iCal)</span> <input id="eKal" type="text" autocomplete="off" aria-label="Kalender-Link" placeholder="https://…"></label>
       <div class="tvknoepfe" style="justify-content:flex-start;margin-top:0"><button class="btn klein" id="eWetterTest" type="button">Wetter testen</button><button class="btn klein" id="eKalTest" type="button">Kalender testen</button><button class="btn klein gefahr versteckt" id="eKalWeg" type="button">Kalender-Link entfernen</button></div>
       <h3>Kalender von Handys</h3>
-      <p class="tipp">In der iPhone-App unter „App-Einstellungen“ → „Kalender auf dem Rahmen zeigen“ gibt jede Person ihre Termine frei. Hier siehst du, wer das tut, und kannst ein Handy wieder entfernen.</p>
+      <p class="tipp">In der iPhone-App unter „App-Einstellungen“ → „Meine Termine auf dem Rahmen zeigen“ gibt jede Person ihre Termine frei. Hier siehst du, wer das tut, und kannst ein Handy entfernen. Auf welchem Rahmen die Termine eines Handys erscheinen, legst du beim Rahmen unter ⚙ fest (neue Handys erscheinen zunächst auf keinem).</p>
       <div id="eTelefone"></div>
       <h3>Benachrichtigungen aufs Handy (Pushover)</h3>
       <p class="tipp">Warnt zum Beispiel, wenn ein Rahmen offline ist oder der Akku fast leer ist. Den Zugang gibt es unter pushover.net.</p>
@@ -744,8 +741,19 @@ body.mit-leiste { padding-bottom: calc(env(safe-area-inset-bottom) + 190px); }
       <div class="nur-gf-rahmen">
         <div class="gf">
           <label class="tvfeld"><span>Sekunden pro Foto</span> <input id="gfSek" type="number" min="3" max="120" inputmode="numeric" aria-label="Sekunden pro Foto"></label>
-          <div class="tvfeld"><span>Einblendungen (Uhrzeit, Datum, Ort, Wetter, Termine)</span><span class="reihe"><label><input type="checkbox" id="gfLayoutEigen"> eigene Anordnung</label></span></div>
-          <div id="gfLayout" class="versteckt"></div>
+          <h3>Anzeige auf diesem Rahmen</h3>
+          <p class="tipp">Was eingeblendet wird und wo. Jeder Rahmen hat seine eigene Anordnung.</p>
+          <div id="gfLayout"></div>
+          <label class="tvfeld versteckt" id="gfUebernehmenZeile"><span>Anordnung übernehmen von</span> <select id="gfUebernehmen" aria-label="Anordnung übernehmen von"><option value="">–</option></select></label>
+          <h3>Wetter und Termine auf diesem Rahmen</h3>
+          <div class="tvfeld"><span>Wetter-Ort</span> <span id="gfOrtName" style="flex:1;text-align:right"></span> <button class="btn klein versteckt" id="gfOrtWeg" type="button">Entfernen</button></div>
+          <label class="tvfeld"><span>Ort suchen</span> <input id="gfOrtSuche" type="text" autocomplete="off" aria-label="Ort suchen" placeholder="Belgrad"></label>
+          <div id="gfOrtTreffer"></div>
+          <p class="tipp">Ohne eigenen Ort gilt der Standard aus den Einstellungen.</p>
+          <p class="tipp"><b>Termine von diesen Handys zeigt der Rahmen:</b></p>
+          <div id="gfHandys"></div>
+          <label class="tvfeld stapel"><span>Kalender-Link (iCal) nur für diesen Rahmen</span> <input id="gfKal" type="text" autocomplete="off" aria-label="Kalender-Link" placeholder="https://…"></label>
+          <div class="tvknoepfe versteckt" id="gfKalWegZeile" style="justify-content:flex-start;margin-top:0"><button class="btn klein gefahr" id="gfKalWeg" type="button">Kalender-Link dieses Rahmens entfernen</button></div>
           <div class="tvfeld"><span>Nachtruhe (Bildschirm aus)</span><span class="reihe"><input id="gfNachtVon" type="time" aria-label="von"> – <input id="gfNachtBis" type="time" aria-label="bis"></span></div>
           <h3>Dauerprogramm</h3>
           <p class="tipp">Was der Rahmen zeigt, wenn niemand etwas schickt. Ohne Eintrag gilt die allgemeine Einstellung der Installation.</p>
@@ -2029,8 +2037,34 @@ function layoutEditor(mount, start, standard) {
   zurueck.addEventListener("click", () => { const s = standard || {}; for (const e of LED_ELEMENTE) Object.assign(w[e[0]], JSON.parse(JSON.stringify(s[e[0]] || w[e[0]]))); alle(); });
   return { lesen: () => JSON.parse(JSON.stringify(w)) };
 }
-let gfLed = null, eLed = null;
-$("#gfLayoutEigen").addEventListener("change", () => $("#gfLayout").classList.toggle("versteckt", !$("#gfLayoutEigen").checked));
+let gfLed = null, gfWetter = null, gfKalLoeschen = false, gfAlle = [];
+function ortSuche(feld, box, waehlen) {                         // Ortssuche (Wetter): Treffer als Knoepfe unter dem Feld; waehlen({lat, lon, name})
+  let timer = 0;
+  feld.addEventListener("input", () => {
+    clearTimeout(timer); const q = feld.value.trim(); box.innerHTML = ""; if (q.length < 2) return;
+    timer = setTimeout(async () => {
+      try {
+        const d = await api("einstellungen/ort-suche?q=" + encodeURIComponent(q));
+        for (const o of d.orte) {
+          const b = document.createElement("button"); b.type = "button"; b.className = "btn klein"; b.style.margin = "2px 6px 2px 0";
+          b.textContent = [o.name, o.region, o.land].filter((x, i, a) => x && a.indexOf(x) === i).join(", ");
+          b.addEventListener("click", () => { waehlen({ lat: o.lat, lon: o.lon, name: o.name + (o.land ? ", " + o.land : "") }); box.innerHTML = ""; feld.value = ""; });
+          box.append(b);
+        }
+        if (!d.orte.length) box.textContent = RW_T("Nichts gefunden.");
+      } catch (e) {}
+    }, 350);
+  });
+}
+function gfOrtZeigen() { $("#gfOrtName").textContent = gfWetter ? gfWetter.name || (gfWetter.lat + ", " + gfWetter.lon) : RW_T("Standard"); $("#gfOrtWeg").classList.toggle("versteckt", !gfWetter); }
+ortSuche($("#gfOrtSuche"), $("#gfOrtTreffer"), o => { gfWetter = o; gfOrtZeigen(); });
+$("#gfOrtWeg").addEventListener("click", () => { gfWetter = null; gfOrtZeigen(); });
+$("#gfKalWeg").addEventListener("click", () => { gfKalLoeschen = true; $("#gfKal").value = ""; $("#gfKal").placeholder = "https://…"; $("#gfKalWegZeile").classList.add("versteckt"); });
+$("#gfUebernehmen").addEventListener("change", () => {
+  const q = gfAlle.find(x => x.id === $("#gfUebernehmen").value); if (!q) return;
+  gfLed = layoutEditor($("#gfLayout"), q.layout, gfStandard); $("#gfUebernehmen").value = "";
+});
+let gfStandard = null;
 async function telefoneLaden() {                                // Kalender von Handys (iPhone-App) in den Einstellungen
   const box = $("#eTelefone"); box.innerHTML = "";
   let q = []; try { q = (await api("termine/telefon")).quellen; } catch (e) { return; }
@@ -2046,18 +2080,28 @@ async function telefoneLaden() {                                // Kalender von 
   }
 }
 async function geraetDialogOeffnen(id) {
-  gfId = id || null; gfArt = "rahmen"; let std = null;
+  gfId = id || null; gfArt = "rahmen"; let std = null, handys = [];
   let g = { art: "rahmen", name: "", sek: "", fuellung: "", anzeige: [], nacht: "", quellen: "", zeitplan: "", fully_host: "", fully_pw_gesetzt: false };
   try {
     const v = await api("verwaltung");
     if (id) g = v.geraete.find(x => x.id === id) || g;
-    $("#gfSek").placeholder = String(v.standard.sek); std = v.standard.layout;
+    $("#gfSek").placeholder = String(v.standard.sek); std = v.standard.layout; gfStandard = std; handys = v.telefone || []; gfAlle = v.geraete.filter(x => x.art === "rahmen" && x.id !== id);
   } catch (e) { fehler(e); return; }
   gfArt = g.art; $("#geraetTitel").textContent = RW_T(id ? "Gerät einstellen" : "Gerät hinzufügen");
   $("#gfArtZeile").classList.toggle("versteckt", !!id); $("#gfArt").value = g.art; gfArtAnpassen();
   $("#gfName").value = g.name; $("#gfFuellung").value = g.fuellung || "";
   $("#gfAlarm").value = g.alarm_min == null ? "" : g.alarm_min; $("#gfWartung").classList.toggle("versteckt", !id || g.art !== "rahmen"); $("#gfWartungErg").classList.add("versteckt");
-  $("#gfSek").value = g.sek || ""; gfLed = layoutEditor($("#gfLayout"), g.layout || std, std); $("#gfLayoutEigen").checked = !!g.layout_eigen; $("#gfLayout").classList.toggle("versteckt", !g.layout_eigen);
+  $("#gfSek").value = g.sek || ""; gfLed = layoutEditor($("#gfLayout"), g.layout || std, std);
+  gfWetter = g.wetter || null; gfOrtZeigen(); $("#gfOrtSuche").value = ""; $("#gfOrtTreffer").innerHTML = "";
+  $("#gfKal").value = ""; gfKalLoeschen = false; $("#gfKal").placeholder = g.kalender_gesetzt ? RW_T("gesetzt – zum Ändern neuen Link einfügen") : "https://…"; $("#gfKalWegZeile").classList.toggle("versteckt", !g.kalender_gesetzt);
+  const sel = $("#gfUebernehmen"); sel.innerHTML = ""; const o0 = document.createElement("option"); o0.value = ""; o0.textContent = "–"; sel.append(o0);
+  for (const x of gfAlle) { const o = document.createElement("option"); o.value = x.id; o.textContent = x.name; sel.append(o); }
+  $("#gfUebernehmenZeile").classList.toggle("versteckt", !gfAlle.length);
+  const hb = $("#gfHandys"); hb.innerHTML = "";
+  for (const h of handys) {
+    const l = document.createElement("label"); l.className = "tvfeld"; const t = document.createElement("span"); t.textContent = h.name; const c = document.createElement("input"); c.type = "checkbox"; c.value = h.id; c.checked = (g.termin_quellen || []).includes(h.id); c.style.flex = "none"; l.append(t, c); hb.append(l);
+  }
+  if (!handys.length) { const p = document.createElement("p"); p.className = "tipp"; p.textContent = RW_T("Noch kein Handy hat seinen Kalender freigegeben."); hb.append(p); }
   const [von, bis] = (g.nacht || "-").split("-"); $("#gfNachtVon").value = (von || "").padStart(5, "0"); $("#gfNachtBis").value = (bis || "").padStart(5, "0");
   if (!g.nacht) { $("#gfNachtVon").value = ""; $("#gfNachtBis").value = ""; }
   $("#gfQuellen").innerHTML = ""; for (const q of quellenLesen(g.quellen)) $("#gfQuellen").append(quelleZeile(q));
@@ -2084,7 +2128,6 @@ function einstFuellen(d) {
   einstDaten = d; einstWetter = d.wetter;
   $("#eSek").value = d.sek || ""; $("#eSek").placeholder = String(d.standard.sek);
   $("#eFuellungR").value = d.fuellung_rahmen || ""; $("#eFuellungT").value = d.fuellung_tv || "";
-  eLed = layoutEditor($("#eLayout"), d.layout, d.standard.layout);
   $("#eOrtName").textContent = d.wetter ? d.wetter.name || (d.wetter.lat + ", " + d.wetter.lon) : (d.wetter_env ? RW_T("über die Installation eingestellt") : RW_T("nicht eingestellt"));
   $("#eOrtWeg").classList.toggle("versteckt", !d.wetter); $("#eOrtSuche").value = ""; $("#eOrtTreffer").innerHTML = "";
   $("#eKal").value = ""; $("#eKal").placeholder = d.kalender_gesetzt ? RW_T("gesetzt – zum Ändern neuen Link einfügen") : d.kalender_env ? RW_T("über die Installation eingestellt") : "https://…";
@@ -2110,7 +2153,7 @@ async function einstOeffnen() {
 }
 function einstSammeln() {
   const k = { sek: $("#eSek").value, fuellung_rahmen: $("#eFuellungR").value, fuellung_tv: $("#eFuellungT").value, tv_url: $("#eTvUrl").value.trim(), alarm_min: $("#eAlarm").value,
-    layout: eLed ? eLed.lesen() : undefined, wetter: einstWetter,
+    wetter: einstWetter,
     aliase: [...$$("#eAliase .qzeile")].map(z => { const i = z.querySelectorAll("input"); return { name: i[0].value.trim(), person: i[1].value.trim() }; }) };
   if ($("#eKal").value.trim()) k.kalender_url = $("#eKal").value.trim();
   if ($("#ePoUser").value.trim() || $("#ePoToken").value.trim()) k.pushover = { user: $("#ePoUser").value.trim(), token: $("#ePoToken").value.trim() };
@@ -2263,9 +2306,10 @@ $("#gfSpeichern").addEventListener("click", async () => {
   if (gfId) daten.adb_host = $("#gfAdb").value.trim();
   if (!gfId) daten.art = $("#gfArt").value;
   if (istRahmen) {
-    Object.assign(daten, { sek: $("#gfSek").value, layout: $("#gfLayoutEigen").checked && gfLed ? gfLed.lesen() : null, nacht: von && bis ? von + "-" + bis : "",
+    Object.assign(daten, { sek: $("#gfSek").value, layout: gfLed ? gfLed.lesen() : undefined, wetter: gfWetter, termin_quellen: [...$$("#gfHandys input:checked")].map(c => c.value), nacht: von && bis ? von + "-" + bis : "",
       quellen: quellenSchreiben(), zeitplan: planSchreiben(), fully_host: $("#gfFullyHost").value.trim(), alarm_min: $("#gfAlarm").value });
     if ($("#gfFullyPw").value) daten.fully_pw = $("#gfFullyPw").value;
+    if ($("#gfKal").value.trim()) daten.kalender_url = $("#gfKal").value.trim(); else if (gfKalLoeschen) daten.kalender_url = null;
   }
   const b = $("#gfSpeichern"); b.disabled = true;
   try {

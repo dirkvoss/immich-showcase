@@ -583,7 +583,19 @@
   "Show-Titel": "Titre du diaporama",
   "Omas Geburtstag": "Anniversaire de mamie",
   "Sommerferien": "Vacances d'été",
-  "Farbe zurücksetzen": "Réinitialiser la couleur"
+  "Farbe zurücksetzen": "Réinitialiser la couleur",
+  "Anzeige auf diesem Rahmen": "Affichage sur ce cadre",
+  "Was eingeblendet wird und wo. Jeder Rahmen hat seine eigene Anordnung.": "Ce qui s'affiche et où. Chaque cadre a sa propre disposition.",
+  "Anordnung übernehmen von": "Reprendre la disposition de",
+  "Wetter und Termine auf diesem Rahmen": "Météo et rendez-vous sur ce cadre",
+  "Wetter-Ort": "Lieu de la météo",
+  "Ohne eigenen Ort gilt der Standard aus den Einstellungen.": "Sans lieu propre, c'est la valeur par défaut des réglages qui s'applique.",
+  "Termine von diesen Handys zeigt der Rahmen:": "Le cadre affiche les rendez-vous de ces téléphones :",
+  "Kalender-Link (iCal) nur für diesen Rahmen": "Lien de calendrier (iCal) pour ce cadre uniquement",
+  "Kalender-Link dieses Rahmens entfernen": "Supprimer le lien de calendrier de ce cadre",
+  "Wetter und Termine (Standard)": "Météo et rendez-vous (par défaut)",
+  "Gelten für Rahmen, die unter ⚙ keinen eigenen Ort bzw. Kalender-Link haben. Die Anordnung, den Wetter-Ort, den Kalender-Link und die Handys stellst du für jeden Rahmen einzeln unter ⚙ ein. Für das Wetter wird nur der Ortsname an open-meteo.com geschickt.": "S'appliquent aux cadres sans lieu ni lien de calendrier propre sous ⚙. La disposition, le lieu de la météo, le lien et les téléphones se règlent pour chaque cadre sous ⚙. Pour la météo, seul le nom du lieu est envoyé à open-meteo.com.",
+  "In der iPhone-App unter „App-Einstellungen“ → „Meine Termine auf dem Rahmen zeigen“ gibt jede Person ihre Termine frei. Hier siehst du, wer das tut, und kannst ein Handy entfernen. Auf welchem Rahmen die Termine eines Handys erscheinen, legst du beim Rahmen unter ⚙ fest (neue Handys erscheinen zunächst auf keinem).": "Dans l'app iPhone, sous « Réglages de l'app » → « Afficher mes rendez-vous sur le cadre », chaque personne partage ses rendez-vous. Ici tu vois qui le fait et peux retirer un téléphone. Sur quel cadre apparaissent les rendez-vous d'un téléphone se règle au cadre sous ⚙ (les nouveaux téléphones n'apparaissent d'abord sur aucun cadre)."
  },
  "muster": [
   [

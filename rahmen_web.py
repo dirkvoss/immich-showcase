@@ -614,7 +614,7 @@ def konfig(ziel: str = ""):
     return {"name": APP_NAME, "version": VERSION, "modus": MODUS, "auth": AUTH, "musik_upload": MUSIK_UPLOAD, "hochladen": bool(UPLOAD_KEY) or AUTH != "pin", "hochladen_mb": UPLOAD_MAX_MB, "konfiguriert": konfiguriert(), "tv_url": tv_url(), "beispiele": BEISPIELE, "beispiele_en": BEISPIELE_EN,
             "ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT and k not in RAHMEN_ZIELE},
             "rahmen": list(RAHMEN_ZIELE), "rahmen_namen": dict(RAHMEN_ZIELE), "rahmen_sek": gwert(z, "sek", std_sek()), "rahmen_fuellung": gwert(z, "fuellung", std_fuellung_rahmen()), "tv_fuellung": gwert(z, "fuellung", std_fuellung_tv()),
-            "rahmen_anzeige": gwert(z, "anzeige", std_anzeige()), "rahmen_layout": layout_fuer(z), "rahmen_nacht": rahmen_nacht(z), "rahmen_zusatz": zusatz_liste(), "koppeln": True,
+            "rahmen_anzeige": gwert(z, "anzeige", std_anzeige()), "rahmen_layout": layout_fuer(z), "rahmen_nacht": rahmen_nacht(z), "rahmen_zusatz": zusatz_liste(z), "koppeln": True,
             "alle_ziele": {k: v for k, v in TV_ZIELE.items() if k not in TV_VERSTECKT}}
 
 
@@ -1826,11 +1826,6 @@ def gwert(z, feld, standard=None):
     return standard if v in (None, "", []) else v
 
 
-def layout_global():
-    """Layout der Einblendungen, das fuer alle Rahmen gilt (Standard, alte Bildunterschrift-Haken, allgemeines Layout)."""
-    return ANZ.zusammen(ANZ.aus_anzeige(std_anzeige()), EINST.get("layout"))
-
-
 def layout_fuer(z=None):
     """Layout der Einblendungen fuer einen Rahmen. Die alten Haken 'Bildunterschrift' (allgemein, am Geraet) sind nur der Ausgangspunkt;
     ein gespeichertes Layout (allgemein, dann am Geraet) gewinnt feldweise."""
@@ -1840,8 +1835,8 @@ def layout_fuer(z=None):
 
 def anzeige_version(z):
     """Kurze Kennung der Anzeige-Einstellungen eines Rahmens (Anordnung, Quellen, Handy-Termine): der Rahmen laedt neu, sobald sie sich aendert."""
-    staende = sorted((k, v.get("aktualisiert") or "") for k, v in TELEFON.items())
-    roh = json.dumps([layout_fuer(z), zusatz_liste(), staende, bool(kalender_url())], sort_keys=True)
+    staende = sorted((k, hashlib.md5(json.dumps(v.get("termine"), sort_keys=True).encode()).hexdigest()[:8], v.get("kuerzel") or "", v.get("farbe") or "") for k, v in telefone_fuer(z).items())
+    roh = json.dumps([layout_fuer(z), zusatz_liste(z), staende, kalender_url(z), wetter_ort(z)], sort_keys=True)
     return hashlib.md5(roh.encode()).hexdigest()[:8]
 
 
@@ -2384,13 +2379,24 @@ if _m:
 KALENDER_URL = os.environ.get("RAHMEN_WEB_KALENDER_URL", "").strip()
 if not re.match(r"^https?://", KALENDER_URL):
     KALENDER_URL = ""
-def wetter_ort():
-    w = EINST.get("wetter")
-    return (float(w["lat"]), float(w["lon"])) if isinstance(w, dict) and "lat" in w and "lon" in w else WETTER_ORT
+def wetter_ort(z=None):
+    """Wetter-Ort (lat, lon): der des Rahmens, sonst der allgemeine."""
+    for w in ((GERAETE.get(z) or {}).get("wetter") if z else None, EINST.get("wetter")):
+        if isinstance(w, dict) and "lat" in w and "lon" in w:
+            return (float(w["lat"]), float(w["lon"]))
+    return WETTER_ORT
 
 
-def kalender_url():
-    return einst("kalender_url", KALENDER_URL)
+def kalender_url(z=None):
+    """Kalender-Link: der des Rahmens, sonst der allgemeine."""
+    u = (GERAETE.get(z) or {}).get("kalender_url") if z else None
+    return u if isinstance(u, str) and re.match(r"^https?://", u) else einst("kalender_url", KALENDER_URL)
+
+
+def telefone_fuer(z):
+    """Die Handys, deren Termine dieser Rahmen zeigen darf (Freigabe am Rahmen; neue Handys sind zunaechst auf keinem Rahmen)."""
+    erlaubt = (GERAETE.get(z) or {}).get("termin_quellen") if z else None
+    return {k: v for k, v in TELEFON.items() if k in (erlaubt or [])}
 
 
 TERMINE_FILE = os.environ.get("RAHMEN_WEB_TERMINE_FILE", os.path.join(os.path.dirname(EINST_FILE), "rahmen_web_termine.json"))
@@ -2400,8 +2406,8 @@ if not isinstance(TELEFON, dict):
 TELEFON_LOCK = threading.Lock()
 
 
-def zusatz_liste():
-    return [k for k in _liste("RAHMEN_WEB_RAHMEN_ZUSATZ", "wetter,kalender") if (k == "wetter" and wetter_ort()) or (k == "kalender" and (kalender_url() or TELEFON))]
+def zusatz_liste(z=None):
+    return [k for k in _liste("RAHMEN_WEB_RAHMEN_ZUSATZ", "wetter,kalender") if (k == "wetter" and wetter_ort(z)) or (k == "kalender" and (kalender_url(z) or telefone_fuer(z)))]
 ZUSATZ_CACHE = {}
 
 
@@ -2432,8 +2438,8 @@ def zusatz_gecacht(name, sekunden, holen):
     return wert
 
 
-def wetter_holen():
-    lat, lon = wetter_ort()
+def wetter_holen(z=None):
+    lat, lon = wetter_ort(z)
     d = json.loads(http_text(f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,weather_code&timezone=auto"))
     cur = d["current"]
     return {"temp": round(float(cur["temperature_2m"])), "symbol": wetter_symbol(int(cur["weather_code"]))}
@@ -2510,35 +2516,38 @@ def ics_termine(text, heute, tage=2, maximum=4):
     return [{k: v for k, v in e.items() if k != "_k"} for e in ergebnis if e["titel"]][:maximum]
 
 
-def kalender_holen():
+def kalender_holen(z=None):
     """Termine von heute und morgen aus dem Kalender-Link (falls eingerichtet)."""
-    return ics_termine(http_text(kalender_url()), datetime.date.today(), maximum=40) if kalender_url() else []
+    return ics_termine(http_text(kalender_url(z)), datetime.date.today(), maximum=40) if kalender_url(z) else []
 
 
-def kalender_roh():
-    """Alle Termine von heute und morgen: Kalender-Link und Handys zusammen (ein Fehler beim Link nimmt die Handy-Termine nicht mit)."""
+def kalender_roh(z=None):
+    """Alle Termine von heute und morgen fuer einen Rahmen: Kalender-Link und freigegebene Handys zusammen (ein Fehler beim Link nimmt die Handy-Termine nicht mit)."""
     liste = []
     try:
-        liste += kalender_holen()
+        liste += kalender_holen(z)
     except Exception as e:  # noqa: BLE001
         H.log.warning("Kalender-Link: %s", e)
-    liste += TT.ereignisse(TELEFON, datetime.date.today())
+    liste += TT.ereignisse(telefone_fuer(z), datetime.date.today())
     return liste
 
 
 @app.get("/api/rahmen/zusatz")
-def rahmen_zusatz(_=Depends(geraet)):
-    """Wetter und Termine fuer die Zusatzanzeige am Rahmen (nur was eingerichtet ist)."""
+def rahmen_zusatz(ziel: str = "", g=Depends(geraet)):
+    """Wetter und Termine fuer die Zusatzanzeige eines Rahmens (nur was fuer diesen Rahmen eingerichtet ist)."""
+    z = g.get("geraet") if g.get("typ") == "geraet" else ziel          # ein Geraete-Zugang gilt nur fuer sein eigenes Geraet
+    z = z if z in GERAETE else None
     out = {}
-    zusatz = zusatz_liste()
+    zusatz = zusatz_liste(z)
     if "wetter" in zusatz:
-        w = zusatz_gecacht("wetter", 900, wetter_holen)
+        w = zusatz_gecacht("wetter:%s,%s" % wetter_ort(z), 900, lambda: wetter_holen(z))
         if w:
             out["wetter"] = w
     if "kalender" in zusatz:
-        t = zusatz_gecacht("kalender", 600, kalender_roh)
+        t = zusatz_gecacht(f"kalender:{z}", 600, lambda: kalender_roh(z))
         if t is not None:
-            out["termine"] = TT.naechste(t, datetime.datetime.now(), personen=sum(1 for v in TELEFON.values() if v.get("kuerzel")) >= 2)   # Kuerzel nur, wenn mehrere Handys teilen
+            mit_kuerzel = sum(1 for v in telefone_fuer(z).values() if v.get("kuerzel"))
+            out["termine"] = TT.naechste(t, datetime.datetime.now(), personen=mit_kuerzel >= 2)           # Kuerzel nur, wenn mehrere Handys auf diesem Rahmen teilen
             out["geburtstage"] = TT.geburtstage(t)
     return out
 
@@ -2550,7 +2559,8 @@ def telefon_speichern():
     except OSError as e:
         H.log.error("Handy-Termine nicht speicherbar: %s", e)
         raise HTTPException(500, "Die Termine konnten nicht gespeichert werden.")
-    ZUSATZ_CACHE.pop("kalender", None)
+    for k in [k for k in ZUSATZ_CACHE if k.startswith("kalender")]:
+        ZUSATZ_CACHE.pop(k, None)
 
 
 @app.put("/api/termine/telefon")
@@ -2704,7 +2714,8 @@ NACHT_RE = re.compile(r"(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})")
 
 def geraet_ansicht(z, e):
     t = TV.get(z) or {}
-    return {"layout": layout_fuer(z), "layout_eigen": bool(e.get("layout")), "selbst": meldet_selbst(z), "ip": t.get("ip") or "", "akku": (FULLY_STATE.get(z) or {}).get("akku"), "id": z, "art": e["art"], "name": e["name"], "sek": e.get("sek"), "fuellung": e.get("fuellung") or "", "anzeige": e.get("anzeige") or [],
+    return {"layout": layout_fuer(z), "layout_eigen": bool(e.get("layout")), "wetter": e.get("wetter") or None, "termin_quellen": e.get("termin_quellen") or [],
+            "kalender_gesetzt": bool(e.get("kalender_url")), "selbst": meldet_selbst(z), "ip": t.get("ip") or "", "akku": (FULLY_STATE.get(z) or {}).get("akku"), "id": z, "art": e["art"], "name": e["name"], "sek": e.get("sek"), "fuellung": e.get("fuellung") or "", "anzeige": e.get("anzeige") or [],
             "nacht": e.get("nacht") or "", "quellen": e.get("quellen") or "", "zeitplan": e.get("zeitplan") or "",
             "fully_host": e.get("fully_host") or "", "fully_pw_gesetzt": bool(e.get("fully_pw")), "adb_host": e.get("adb_host") or "", "alarm_min": e.get("alarm_min")}
 
@@ -2742,6 +2753,30 @@ def geraet_felder(daten, art):
             if any(x not in ("datum", "zeit", "ort") for x in a):
                 raise HTTPException(400, "Unbekannte Bildunterschrift")
             (setzen.__setitem__("anzeige", [x for x in ("datum", "zeit", "ort") if x in a]) if a else weg.append("anzeige"))
+        if "wetter" in daten:
+            w = daten["wetter"]
+            if w in (None, {}):
+                weg.append("wetter")
+            else:
+                try:
+                    lat, lon = float(w["lat"]), float(w["lon"])
+                    assert -90 <= lat <= 90 and -180 <= lon <= 180
+                except (KeyError, TypeError, ValueError, AssertionError):
+                    raise HTTPException(400, "Wetter-Ort ungültig")
+                setzen["wetter"] = {"lat": lat, "lon": lon, "name": str(w.get("name") or "")[:80]}
+        if "termin_quellen" in daten:
+            q = daten["termin_quellen"]
+            if not isinstance(q, list) or len(q) > TT.MAX_QUELLEN or not all(isinstance(x, str) and TT.QUELLE_RE.fullmatch(x) for x in q):
+                raise HTTPException(400, "Die Auswahl der Handys ist ungültig")
+            setzen["termin_quellen"] = list(dict.fromkeys(q))
+        if "kalender_url" in daten:
+            u = str(daten["kalender_url"] or "").strip()
+            if not u:
+                weg.append("kalender_url")
+            elif not re.match(r"^https?://\S{4,1000}$", u):
+                raise HTTPException(400, "Kalender-Link bitte als https://… eintragen")
+            else:
+                setzen["kalender_url"] = u
         if "layout" in daten:
             if daten["layout"] in (None, {}):
                 weg.append("layout")
@@ -2802,6 +2837,23 @@ def geraete_aendern(g):
         raise HTTPException(500, "Die Geräteliste konnte nicht gespeichert werden.")
     REGISTER["aktiv"] = True
     geraete_anwenden(g)
+    for k in [k for k in ZUSATZ_CACHE if k.startswith("kalender")]:         # Freigaben/Links koennen sich geaendert haben
+        ZUSATZ_CACHE.pop(k, None)
+
+
+def handys_freigaben_migrieren():
+    """Einmalig beim Start: Rahmen ohne Handy-Freigabe bekommen die bis dahin bekannten Handys (so aendert sich beim Update nichts);
+    Handys, die spaeter dazukommen, erscheinen erst, wenn man sie am Rahmen freigibt."""
+    if not REGISTER["aktiv"]:
+        return
+    with GERAETE_LOCK:
+        g = {k: dict(v) for k, v in GERAETE.items()}
+        neu = [z for z, e in g.items() if e.get("art") == "rahmen" and "termin_quellen" not in e]
+        for z in neu:
+            g[z]["termin_quellen"] = sorted(TELEFON)
+        if neu:
+            geraete_aendern(g)
+            H.log.info("Handy-Freigaben fuer %d Rahmen uebernommen", len(neu))
 
 
 def geraet_aufraeumen(z):
@@ -2816,7 +2868,8 @@ def geraet_aufraeumen(z):
 @app.get("/api/verwaltung")
 def verwaltung(_=Depends(anmeldung)):
     return {"geraete": [geraet_ansicht(z, e) for z, e in GERAETE.items()], "register_aktiv": REGISTER["aktiv"],
-            "standard": {"layout": layout_global(), "sek": std_sek(), "fuellung_rahmen": std_fuellung_rahmen(), "fuellung_tv": std_fuellung_tv(), "anzeige": std_anzeige(), "nacht": RAHMEN_NACHT}}
+            "telefone": [{"id": k, "name": v.get("name") or "Handy", "kuerzel": v.get("kuerzel") or ""} for k, v in sorted(TELEFON.items(), key=lambda x: x[1].get("name") or "")],
+            "standard": {"layout": ANZ.zusammen(), "sek": std_sek(), "fuellung_rahmen": std_fuellung_rahmen(), "fuellung_tv": std_fuellung_tv(), "anzeige": std_anzeige(), "nacht": RAHMEN_NACHT}}
 
 
 @app.post("/api/verwaltung/geraete")
@@ -2826,6 +2879,8 @@ def geraet_anlegen(daten: dict, _=Depends(anmeldung), __=Depends(csrf)):
         raise HTTPException(400, "Bitte Rahmen oder Fernseher wählen")
     name = name_pruefen(daten.get("name"))
     setzen, _weg = geraet_felder({**daten, "name": name}, art)
+    if art == "rahmen" and "layout" not in setzen:
+        setzen["layout"] = ANZ.zusammen()                                  # ein neuer Rahmen startet mit den Standardwerten (keine Vorlage)
     with GERAETE_LOCK:
         z = geraet_kennung(name)
         g = {k: dict(v) for k, v in GERAETE.items()}
@@ -3002,13 +3057,13 @@ def einst_ansicht():
         namen = sorted({n for n, _i in H.lade_personen()[0]})
     except Exception:  # noqa: BLE001 - ohne Immich keine Personenliste
         pass
-    return {"layout": layout_global(), "sek": EINST.get("sek"), "fuellung_rahmen": EINST.get("fuellung_rahmen") or "", "fuellung_tv": EINST.get("fuellung_tv") or "",
+    return {"sek": EINST.get("sek"), "fuellung_rahmen": EINST.get("fuellung_rahmen") or "", "fuellung_tv": EINST.get("fuellung_tv") or "",
             "anzeige": EINST.get("anzeige") or [], "alarm_min": EINST.get("alarm_min"), "tv_url": EINST.get("tv_url") or "",
             "wetter": EINST.get("wetter") or None, "wetter_env": bool(WETTER_ORT) and not EINST.get("wetter"),
             "kalender_gesetzt": bool(EINST.get("kalender_url")), "kalender_env": bool(KALENDER_URL) and not EINST.get("kalender_url"),
             "pushover_gesetzt": bool(pe.get("user") and pe.get("token")), "pushover_geraet": pe.get("device") or "",
             "aliase": EINST.get("aliase") or [], "personen": namen,
-            "standard": {"layout": ANZ.zusammen(), "sek": RAHMEN_SEK, "fuellung_rahmen": RAHMEN_FUELLUNG, "fuellung_tv": TV_FUELLUNG, "anzeige": RAHMEN_ANZEIGE, "alarm_min": RAHMEN_ALARM_MIN, "tv_url": TV_URL}}
+            "standard": {"sek": RAHMEN_SEK, "fuellung_rahmen": RAHMEN_FUELLUNG, "fuellung_tv": TV_FUELLUNG, "anzeige": RAHMEN_ANZEIGE, "alarm_min": RAHMEN_ALARM_MIN, "tv_url": TV_URL}}
 
 
 @app.get("/api/einstellungen")
@@ -3858,6 +3913,9 @@ if os.path.isdir(STATIC_DIR):
         return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
     app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
+
+
+handys_freigaben_migrieren()
 
 
 if __name__ == "__main__":

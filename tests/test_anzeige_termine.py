@@ -46,7 +46,7 @@ def test_layout_in_den_einstellungen_und_am_geraet(app_laden):
     app = client("192.168.1.50")
     assert app.get("/api/config?ziel=flur").json()["rahmen_layout"]["uhr"]["x"] == 0
     r = app.put("/api/einstellungen", json={"layout": {"uhr": {"x": 100, "y": 100}, "heute": {"an": True}}}, headers=H)
-    assert r.status_code == 200 and r.json()["einstellungen"]["layout"]["uhr"]["x"] == 100
+    assert r.status_code == 200
     cfg = app.get("/api/config?ziel=flur").json()["rahmen_layout"]
     assert cfg["uhr"]["x"] == 100 and cfg["heute"]["an"]
     # eigene Anordnung am Geraet gewinnt, der Rest bleibt allgemein
@@ -141,6 +141,8 @@ def test_handy_termine_erscheinen_am_rahmen(app_laden):
     r = app.put("/api/termine/telefon", json={"quelle": QUELLE, "name": "Dirks iPhone", "termine": [
         {"titel": "Abendessen", "von": iso(heute), "bis": iso(heute + datetime.timedelta(minutes=30))}]}, headers=H)
     assert r.status_code == 200 and r.json()["anzahl"] == 1
+    assert "kalender" not in app.get("/api/config?ziel=flur").json()["rahmen_zusatz"]                # neues Handy: auf keinem Rahmen, bis es freigegeben ist
+    app.put("/api/verwaltung/geraete/flur", json={"termin_quellen": [QUELLE]}, headers=H)
     assert "kalender" in app.get("/api/config?ziel=flur").json()["rahmen_zusatz"]
     z = app.get("/api/rahmen/zusatz?ziel=flur").json()
     assert z["termine"] == [{"tag": "heute", "zeit": "23:00", "titel": "Abendessen"}] or jetzt.hour == 23     # (kurz vor Mitternacht kann der Termin schon vorbei sein)
@@ -176,8 +178,12 @@ def test_rahmen_erfaehrt_aenderungen_ohne_neuladen(app_laden):
     c = lv()
     assert c != b
     app.put("/api/termine/telefon", json={"quelle": QUELLE, "name": "x", "termine": []}, headers=H)
-    assert lv() != c
-
+    assert lv() == c                                                                                     # Handy noch nicht fuer diesen Rahmen freigegeben
+    app.put("/api/verwaltung/geraete/flur", json={"termin_quellen": [QUELLE]}, headers=H)
+    d = lv()
+    assert d != c
+    app.put("/api/termine/telefon", json={"quelle": QUELLE, "name": "x", "termine": [{"titel": "t", "von": "2026-10-10"}]}, headers=H)
+    assert lv() != d
 
 # ---------------------------------------------------------------- Farbe, Schrift, Show-Titel, Geburtstage, Personen
 def test_standard_hat_alle_elemente_mit_farbe_und_schrift():
@@ -229,6 +235,7 @@ def test_geburtstage_und_personen_am_rahmen(app_laden):
     app = client("192.168.1.50")
     heute = datetime.date.today()
     spaet = datetime.datetime.combine(heute, datetime.time(23, 50))
+    app.put("/api/verwaltung/geraete/flur", json={"termin_quellen": ["aaaaaaaa-0001", "bbbbbbbb-0002"]}, headers=H)
     for quelle, kuerzel in (("aaaaaaaa-0001", "D"), ("bbbbbbbb-0002", "S")):
         app.put("/api/termine/telefon", json={"quelle": quelle, "name": kuerzel, "kuerzel": kuerzel, "farbe": "#336699", "termine": [
             {"titel": "Omas Geburtstag", "von": heute.isoformat(), "bis": (heute + datetime.timedelta(days=1)).isoformat(), "geburtstag": True},
@@ -251,3 +258,69 @@ def test_gespeichertes_layout_schlaegt_alte_bildunterschrift_am_geraet(app_laden
     assert cfg()["fotoort"]["an"] and cfg()["fotodatum"]["an"]                                      # Ausgangspunkt: die alte Einstellung
     app.put("/api/einstellungen", json={"layout": {"fotoort": {"an": False}}}, headers=H)            # im Editor ausgeschaltet
     assert not cfg()["fotoort"]["an"] and cfg()["fotodatum"]["an"]
+
+
+# ---------------------------------------------------------------- Anzeige pro Rahmen
+ZWEI = {"RAHMEN_WEB_LAN": "192.168.1.0/24", "RAHMEN_WEB_RAHMEN_ZIELE": "flur=Flur,serbien=Serbien"}
+
+
+def test_handys_je_rahmen_freigeben(app_laden):
+    w, client, _ = app_laden(**ZWEI)
+    app = client("192.168.1.50")
+    spaet = datetime.datetime.combine(datetime.date.today(), datetime.time(23, 50))
+    app.put("/api/termine/telefon", json={"quelle": QUELLE, "name": "Dirk", "termine": [{"titel": "Privat", "von": iso(spaet)}]}, headers=H)
+    zusatz = lambda z: app.get(f"/api/rahmen/zusatz?ziel={z}").json()
+    assert zusatz("flur").get("termine", []) == [] and zusatz("serbien").get("termine", []) == []        # neues Handy: nirgends
+    app.put("/api/verwaltung/geraete/flur", json={"termin_quellen": [QUELLE]}, headers=H)
+    assert [t["titel"] for t in zusatz("flur")["termine"]] == ["Privat"]
+    assert zusatz("serbien").get("termine", []) == []                                                     # auf dem anderen Rahmen bleibt es unsichtbar
+    assert app.put("/api/verwaltung/geraete/flur", json={"termin_quellen": ["ungueltig!"]}, headers=H).status_code == 400
+    assert app.put("/api/verwaltung/geraete/flur", json={"termin_quellen": "x"}, headers=H).status_code == 400
+    assert [h["id"] for h in app.get("/api/verwaltung").json()["telefone"]] == [QUELLE]
+
+
+def test_wetter_ort_und_kalender_link_je_rahmen(app_laden, monkeypatch):
+    w, client, _ = app_laden(**ZWEI)
+    app = client("192.168.1.50")
+    app.put("/api/einstellungen", json={"wetter": {"lat": 51.3, "lon": 6.8, "name": "Ratingen"}}, headers=H)
+    assert w.wetter_ort("flur") == (51.3, 6.8) and w.wetter_ort("serbien") == (51.3, 6.8)                # ohne eigenen Ort gilt der allgemeine
+    r = app.put("/api/verwaltung/geraete/serbien", json={"wetter": {"lat": 44.8, "lon": 20.46, "name": "Belgrad"}}, headers=H)
+    assert r.status_code == 200 and r.json()["geraet"]["wetter"]["name"] == "Belgrad"
+    assert w.wetter_ort("serbien") == (44.8, 20.46) and w.wetter_ort("flur") == (51.3, 6.8)
+    gefragt = []
+    monkeypatch.setattr(w, "http_text", lambda url, timeout=10: gefragt.append(url) or '{"current": {"temperature_2m": 9.4, "weather_code": 0}}')
+    assert app.get("/api/rahmen/zusatz?ziel=serbien").json()["wetter"]["temp"] == 9 and "latitude=44.8" in gefragt[-1]
+    assert app.get("/api/rahmen/zusatz?ziel=flur").json()["wetter"]["temp"] == 9 and "latitude=51.3" in gefragt[-1]
+    assert app.put("/api/verwaltung/geraete/serbien", json={"wetter": {"lat": 999, "lon": 0}}, headers=H).status_code == 400
+    assert app.put("/api/verwaltung/geraete/serbien", json={"wetter": None}, headers=H).json()["geraet"]["wetter"] is None
+    assert w.wetter_ort("serbien") == (51.3, 6.8)
+    # Kalender-Link je Rahmen
+    assert app.put("/api/verwaltung/geraete/serbien", json={"kalender_url": "kein-link"}, headers=H).status_code == 400
+    r = app.put("/api/verwaltung/geraete/serbien", json={"kalender_url": "https://example.org/serbien.ics"}, headers=H)
+    assert r.json()["geraet"]["kalender_gesetzt"] and w.kalender_url("serbien") == "https://example.org/serbien.ics" and not w.kalender_url("flur")
+
+
+def test_neuer_rahmen_startet_mit_standardwerten(app_laden):
+    w, client, _ = app_laden(**ZWEI)
+    app = client("192.168.1.50")
+    app.put("/api/einstellungen", json={"layout": {"uhr": {"x": 77}}}, headers=H)                        # alte allgemeine Anordnung (aus 2.18.x)
+    assert app.get("/api/config?ziel=flur").json()["rahmen_layout"]["uhr"]["x"] == 77                    # bestehende Rahmen erben sie weiter
+    r = app.post("/api/verwaltung/geraete", json={"art": "rahmen", "name": "Kueche"}, headers=H).json()
+    neu = r["id"]
+    assert r["geraet"]["layout"] == ANZ.zusammen() and r["geraet"]["termin_quellen"] == []               # ein neuer Rahmen: Standard, keine Handys
+    assert app.get(f"/api/config?ziel={neu}").json()["rahmen_layout"]["uhr"]["x"] == 0
+
+
+def test_update_uebernimmt_bekannte_handys_fuer_bestehende_rahmen(app_laden):
+    """Rahmen aus einer Version ohne Freigaben zeigen weiter die bis dahin bekannten Handys; spaetere Handys muessen freigegeben werden."""
+    w, client, _ = app_laden(**ZWEI)
+    app = client("192.168.1.50")
+    app.put("/api/verwaltung/geraete/flur", json={"name": "Flur"}, headers=H)                            # legt die Geraetedatei an
+    w.TELEFON.update({QUELLE: {"name": "Dirk", "aktualisiert": "2026-10-10T08:00:00", "termine": []}})
+    for e in w.GERAETE.values():
+        e.pop("termin_quellen", None)                                                                     # Stand vor dem Update
+    w.handys_freigaben_migrieren()
+    assert w.GERAETE["flur"]["termin_quellen"] == [QUELLE] and w.GERAETE["serbien"]["termin_quellen"] == [QUELLE]
+    w.TELEFON["cccccccc-0003"] = {"name": "Neu", "aktualisiert": "2026-10-10T09:00:00", "termine": []}
+    w.handys_freigaben_migrieren()                                                                        # zweiter Lauf aendert nichts
+    assert w.GERAETE["flur"]["termin_quellen"] == [QUELLE]
