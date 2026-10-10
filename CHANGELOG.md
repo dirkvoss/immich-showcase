@@ -1,6 +1,12 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.22.0]
+### Neu
+- **Raspberry Pi als Server in einem Befehl:** `examples/raspberry-pi/install-pi.sh` installiert auf einem frisch aufgespielten Raspberry Pi OS (Lite, 64-Bit) bzw. jedem Debian-Rechner Docker und Immich Showcase, meldet den Server im Netz an (Bonjour: die iPhone-App findet ihn selbst; mit `--hostname showcase` auch unter `showcase.local`) und zeigt den Einrichtungs-Link. Optionen: `--hostname`, `--port`, `--ohne-bonjour`, `--version`. Auf einem Debian-12-System getestet; auf echter Raspberry-Pi-Hardware (arm64) noch nicht.
+### Geändert
+- Der Update-Hinweis in „Alles in Ordnung?“ nennt jetzt den genauen Befehl für die Standard-Installation (`cd ~/immich-showcase && docker compose pull && docker compose up -d`) und weist auf Watchtower für automatische Updates hin.
+
 ## [2.21.0]
 ### Neu
 - **Gäste-Upload per QR-Code („Fest“):** Unter Geräte → ⚙ → „Fest: Fotos von Gästen“ startest du für 4 Stunden bis 3 Tage einen Gäste-Upload. Am Rahmen erscheint ein QR-Code (neues Layout-Element „Gäste-QR-Code“), Gäste scannen ihn und laden auf einer einfachen Seite (ohne Anmeldung, deutsch/englisch) Fotos hoch; sie kommen gleich als Nächstes auf den Rahmen. Die Fotos liegen in Immich im Upload-Album (Namen mit „Gast-“). Schutz: zufällige Kennung, Zeitfenster, höchstens 300 Fotos je Fest, 40 Fotos je 10 Minuten und IP, nur Fotos (keine Videos). Schnittstellen: `POST/GET/DELETE /api/gaeste/{rahmen}`, öffentlich `GET /gast/{kennung}` und `PUT /api/gast/{kennung}/hochladen`.

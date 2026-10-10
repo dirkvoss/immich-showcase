@@ -34,6 +34,9 @@ sudo usermod -aG docker $USER
 
 3. Prüfe, ob der Pi **Immich erreicht**. Im Browser eines Rechners im selben Netz öffnest du Immich so, wie du es immer tust, z. B. `http://192.168.1.20:2283`. Genau diese Adresse brauchst du gleich im Assistenten. Tipp: Gib dem Immich-Rechner eine feste IP-Adresse, damit sich die Adresse nicht ändert.
 
+> **Abkürzung für den Raspberry Pi:** Statt der Schritte 1 und 2 genügt auf einem frisch aufgespielten Pi (Raspberry Pi OS Lite, 64-Bit) ein einziger Befehl, der Docker und Immich Showcase installiert und den Server im Netz anmeldet:
+> `curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/examples/raspberry-pi/install-pi.sh | bash -s -- --hostname showcase`
+
 ## 2. Installieren (1 Befehl)
 
 Auf dem Pi:

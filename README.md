@@ -89,7 +89,12 @@ Use `http://<server>:8090/tv/` **without** `?ziel=…` to pair the device by cod
 
 **Not supported:** ready-made frames with closed software (for example Aura, Skylight, Nixplay, Pix-Star, Frameo). They accept photos only through their own app or e-mail and do not let you open an address.
 
-### Raspberry Pi in 5 minutes
+### Raspberry Pi as a server in one command
+On the Pi (Raspberry Pi OS **Lite, 64-bit**, set name, Wi-Fi and SSH in the Raspberry Pi Imager) via SSH:
+`curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/examples/raspberry-pi/install-pi.sh | bash -s -- --hostname showcase`
+The script installs Docker and Immich Showcase, announces the server on the network (the iPhone app finds it by itself, on the home network also `http://showcase.local:8090`) and shows the setup link. If Immich runs on another machine, enter its address in the wizard (see the German guide for a separate machine).
+
+### Raspberry Pi as a picture-frame display in 5 minutes
 1. Flash **Raspberry Pi OS with desktop** (Raspberry Pi Imager), enable Wi-Fi/SSH there, boot, let it log in to the desktop automatically.
 2. On the Pi, in a terminal: `curl -O https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/examples/raspberry-pi/setup-kiosk.sh && chmod +x setup-kiosk.sh && ./setup-kiosk.sh http://<server>:8090/tv/`
 3. `sudo reboot`. The Pi starts full screen and shows the pairing code. Remove again with `./setup-kiosk.sh --entfernen`.

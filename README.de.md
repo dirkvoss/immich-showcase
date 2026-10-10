@@ -89,7 +89,12 @@ Die Adresse `http://<server>:8090/tv/` **ohne** `?ziel=…` öffnen, um das Ger�
 
 **Nicht möglich:** fertige Rahmen mit geschlossener Software (z. B. Aura, Skylight, Nixplay, Pix-Star, Frameo). Sie nehmen Fotos nur über ihre eigene App oder per E-Mail an und lassen keine freie Adresse zu.
 
-### Raspberry Pi in 5 Minuten
+### Raspberry Pi als Server in einem Befehl
+Auf dem Pi (Raspberry Pi OS **Lite, 64-Bit**, im Raspberry Pi Imager Name, WLAN und SSH einstellen) per SSH:
+`curl -fsSL https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/examples/raspberry-pi/install-pi.sh | bash -s -- --hostname showcase`
+Das Skript installiert Docker und Immich Showcase, meldet den Server im Netz an (die iPhone-App findet ihn selbst, im Heimnetz auch `http://showcase.local:8090`) und zeigt den Einrichtungs-Link. Läuft Immich auf einem anderen Rechner, trägst du dessen Adresse im Assistenten ein, siehe [die Anleitung dazu](docs/anleitung-externer-rechner.md).
+
+### Raspberry Pi als Bilderrahmen-Anzeige in 5 Minuten
 1. **Raspberry Pi OS mit Desktop** aufspielen (Raspberry Pi Imager), dort WLAN/SSH einrichten, starten und automatisch am Desktop anmelden lassen.
 2. Auf dem Pi im Terminal: `curl -O https://raw.githubusercontent.com/dirkvoss/immich-showcase/main/examples/raspberry-pi/setup-kiosk.sh && chmod +x setup-kiosk.sh && ./setup-kiosk.sh http://<server>:8090/tv/`
 3. `sudo reboot`. Der Pi startet im Vollbild und zeigt den Kopplungs-Code. Entfernen: `./setup-kiosk.sh --entfernen`.

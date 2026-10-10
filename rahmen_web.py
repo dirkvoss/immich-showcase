@@ -956,7 +956,7 @@ def gesundheit_pruefungen():
     aktuell, neu = versionsnummer(VERSION), neueste_version()
     if aktuell and neu and neu > aktuell:
         add("version", "Showcase", "warnung", f"Version {VERSION}, läuft seit {laufzeit}. Es gibt eine neuere Version: {'.'.join(map(str, neu))}.",
-            "Aktualisieren: im Ordner mit der docker-compose.yml „docker compose pull“ und „docker compose up -d“ (Daten und Einstellungen bleiben erhalten). Wer Watchtower benutzt, bekommt das Update von selbst.")
+            "Aktualisieren auf dem Server (bei Installation mit install.sh): cd ~/immich-showcase && docker compose pull && docker compose up -d — sonst im Ordner mit der docker-compose.yml „docker compose pull“ und „docker compose up -d“. Daten und Einstellungen bleiben erhalten. Wer Watchtower benutzt, bekommt das Update von selbst.")
     else:
         add("version", "Showcase", "info", f"Version {VERSION}, läuft seit {laufzeit}." + (" Das ist die neueste Version." if aktuell and neu and neu == aktuell else ""))
     return liste
