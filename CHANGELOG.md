@@ -1,6 +1,11 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.23.1]
+### Geändert
+- Texte nach dem neuen Ablauf: Einrichtungsassistent, Installationsskript und „Alles in Ordnung?“ erklären jetzt, dass Fernseher und Tablets von selbst in der App erscheinen (kein Code mehr nötig). Die Zeile zur Version heißt in „Alles in Ordnung?“ jetzt „Frameside“.
+- Anleitungen mit neuen Bildern (Name Frameside, neuer Kopplungs-Ablauf).
+
 ## [2.23.0]
 ### Neu
 - **Neuer Name: Frameside** (vorher „Immich Showcase“). Der Name „Immich“ gehört dem Immich-Projekt und soll nicht im Namen einer eigenständigen App stehen. Frameside ist ein eigenständiges Programm **für Immich**. Die technischen Namen bleiben unverändert, damit nichts bricht: GitHub-Repository `dirkvoss/immich-showcase`, Docker-Image `ghcr.io/dirkvoss/immich-showcase`, Umgebungsvariablen `RAHMEN_WEB_*`, Bonjour-Diensttyp `_showcase._tcp`, Album „Showcase-Uploads“. Neue Installationen zeigen den neuen Namen in der Oberfläche, im Fernseher-Titel, im Einrichtungsassistenten, in den Docs und in der iPhone-App. Wer in seiner `.env` `RAHMEN_WEB_NAME` gesetzt hat, behält seinen eigenen Namen.

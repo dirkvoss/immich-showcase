@@ -142,7 +142,7 @@ if command -v qrencode >/dev/null 2>&1; then echo "  (oder den QR-Code mit dem H
 if [[ $MIT_IMMICH == 1 ]]; then echo "  Zuerst Immich einrichten:  http://$IP:2283   (erstes Konto = Administrator). Adresse von Immich im Assistenten: http://immich-server:2283"; fi
 if [[ -z "$CODE" ]]; then echo "  Einrichtungs-Code:  docker compose logs showcase"; fi
 echo "  Der Link ist nur zur Einrichtung gedacht; danach ist er ohne Wirkung."
-echo "  Fernseher/Tablet: dort im Browser nur  $IP$PORTTEIL  eingeben und mit dem angezeigten Code koppeln (App -> Geraete)."
+echo "  Fernseher/Tablet: dort im Browser nur  $IP$PORTTEIL  eingeben. Es erscheint dann in der App unter Geraete -> Geraet hinzufuegen von selbst."
 if [[ $OEFFNEN == 1 ]]; then                                                      # Browser oeffnen, wenn es einen Bildschirm gibt
   if command -v open >/dev/null 2>&1; then open "$LINK" >/dev/null 2>&1 || true
   elif command -v xdg-open >/dev/null 2>&1 && [[ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]]; then xdg-open "$LINK" >/dev/null 2>&1 || true; fi

@@ -928,7 +928,7 @@ def gesundheit_pruefungen():
         zuletzt = jetzt - t["hb"] if t["hb"] else None
         alarm = gwert(z, "alarm_min", std_alarm_min())
         if zuletzt is None:
-            add("g-" + z, titel, "info", "Hat sich noch nie gemeldet.", f"Am Gerät die Seite /tv/ öffnen und mit dem Code koppeln (App → Geräte).")
+            add("g-" + z, titel, "info", "Hat sich noch nie gemeldet.", "Am Gerät die Adresse des Servers im Browser öffnen. In der App unter Geräte → Gerät hinzufügen erscheint es von selbst.")
         elif zuletzt < 15:
             akku = (FULLY_STATE.get(z) or {}).get("akku")
             laedt = (FULLY_STATE.get(z) or {}).get("laedt")
@@ -955,10 +955,10 @@ def gesundheit_pruefungen():
     laufzeit = f"{sek // 86400} Tagen" if sek >= 172800 else f"{sek // 3600} Stunden" if sek >= 7200 else f"{max(sek // 60, 1)} Minuten"
     aktuell, neu = versionsnummer(VERSION), neueste_version()
     if aktuell and neu and neu > aktuell:
-        add("version", "Showcase", "warnung", f"Version {VERSION}, läuft seit {laufzeit}. Es gibt eine neuere Version: {'.'.join(map(str, neu))}.",
+        add("version", "Frameside", "warnung", f"Version {VERSION}, läuft seit {laufzeit}. Es gibt eine neuere Version: {'.'.join(map(str, neu))}.",
             "Aktualisieren auf dem Server (bei Installation mit install.sh): cd ~/immich-showcase && docker compose pull && docker compose up -d — sonst im Ordner mit der docker-compose.yml „docker compose pull“ und „docker compose up -d“. Daten und Einstellungen bleiben erhalten. Wer Watchtower benutzt, bekommt das Update von selbst.")
     else:
-        add("version", "Showcase", "info", f"Version {VERSION}, läuft seit {laufzeit}." + (" Das ist die neueste Version." if aktuell and neu and neu == aktuell else ""))
+        add("version", "Frameside", "info", f"Version {VERSION}, läuft seit {laufzeit}." + (" Das ist die neueste Version." if aktuell and neu and neu == aktuell else ""))
     return liste
 
 
