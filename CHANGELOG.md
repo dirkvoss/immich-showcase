@@ -1,6 +1,11 @@
 # Änderungsprotokoll
 Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [SemVer](https://semver.org/lang/de/).
 
+## [2.19.1]
+### Geändert
+- **Dialoge haben eine feste Knopfleiste:** „Speichern“, „Schließen“, „Abbrechen“ usw. bleiben am unteren Rand des Dialogs sichtbar, auch wenn der Inhalt lang ist (am Handy musste man bisher bis ganz nach unten scrollen). Die Höhe berücksichtigt die Adressleiste von Safari.
+- Auf der Vorschau der Anordnung lässt sich am Handy normal scrollen; nur die einzelnen Elemente lassen sich ziehen.
+
 ## [2.19.0]
 ### Geändert
 - **Die Anzeige gilt jetzt pro Rahmen statt für alle:** Anordnung der Einblendungen (Uhrzeit, Datum, Foto-Datum und -Ort, Wetter, Termine, Geburtstage, Show-Titel), **Wetter-Ort**, **Kalender-Link** und die Auswahl der **Handys** stellst du für jeden Rahmen einzeln unter Geräte → ⚙ ein (Abschnitte „Anzeige auf diesem Rahmen“ und „Wetter und Termine auf diesem Rahmen“). Aus den allgemeinen Einstellungen ist die Anordnung entfernt; dort bleiben Wetter-Ort und Kalender-Link als Standard für Rahmen ohne eigene Angabe.
